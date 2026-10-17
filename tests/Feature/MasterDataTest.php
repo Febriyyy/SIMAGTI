@@ -6,7 +6,7 @@ use App\Models\Company;
 use App\Models\Internship;
 use App\Models\StudyProgram;
 use App\Models\User;
-use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class MasterDataTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(DatabaseSeeder::class);
+        $this->seed(TestingSeeder::class);
     }
 
     private function user(string $email): User

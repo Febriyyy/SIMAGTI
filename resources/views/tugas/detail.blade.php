@@ -35,6 +35,21 @@
             <section class="card">
                 <div class="card-head">
                     <div>
+                        <h2 class="card-title">Materi dari mentor</h2>
+                        <p class="card-sub">Slide, panduan, atau gambar contoh untuk task ini.</p>
+                    </div>
+                    @if ($task->attachments->isNotEmpty())
+                        <x-chip tone="purple">{{ $task->attachments->count() }} berkas</x-chip>
+                    @endif
+                </div>
+                <div class="card-body">
+                    @include('tugas._attachments', ['canManage' => $isMentor && ! $locked])
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <div>
                         <h2 class="card-title">Bukti pengerjaan</h2>
                         <p class="card-sub">Link GitHub, Google Drive, atau dokumen lain.</p>
                     </div>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Actions\Applications\ReviewKaprodiApproval;
 use App\Http\Requests\Applications\ReviewKaprodiRequest;
 use App\Models\Internship;
-use App\Models\InternshipApproval;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -16,14 +15,7 @@ class KaprodiApprovalController extends Controller
     public function index(): View
     {
         $waiting = Internship::with(['student', 'company', 'division', 'approvals.reviewer', 'invitations'])
-            ->where('track', 'mandiri')
-            ->where('status', 'diajukan')
-            ->whereHas('approvals', fn ($q) => $q
-                ->where('step', InternshipApproval::STEP_BIRO)
-                ->where('status', 'approved'))
-            ->whereHas('approvals', fn ($q) => $q
-                ->where('step', InternshipApproval::STEP_KAPRODI)
-                ->where('status', 'pending'))
+            ->awaitingKaprodi()
             ->oldest()
             ->get();
 

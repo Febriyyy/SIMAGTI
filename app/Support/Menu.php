@@ -24,6 +24,11 @@ class Menu
             'mentor' => [
                 $dashboard,
                 ['label' => 'Task Mingguan', 'route' => 'mentor.tugas', 'icon' => 'tasks', 'active' => ['mentor.tugas*', 'tugas.show']],
+                ['label' => 'Penilaian Akhir', 'route' => 'mentor.penilaian', 'icon' => 'award', 'active' => 'mentor.penilaian*'],
+            ],
+            'ketua_divisi' => [
+                $dashboard,
+                ['label' => 'Validasi Penilaian', 'route' => 'divisi.validasi', 'icon' => 'award', 'active' => 'divisi.validasi*'],
             ],
             'biro' => [
                 $dashboard,

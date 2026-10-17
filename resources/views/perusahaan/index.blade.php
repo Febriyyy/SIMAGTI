@@ -13,7 +13,7 @@
         @endif
     </div>
 
-    <form method="GET" action="{{ route('perusahaan.index') }}" class="inline-form" style="margin-bottom: 16px">
+    <form method="GET" action="{{ route('perusahaan.index') }}" class="inline-form">
         <input type="search" name="q" class="input" value="{{ $search }}" placeholder="Cari nama perusahaan" aria-label="Cari nama perusahaan">
         <button type="submit" class="btn">Cari</button>
     </form>
@@ -32,25 +32,29 @@
                             <th>Perusahaan</th>
                             <th>Bidang</th>
                             <th>Status</th>
-                            <th>Mahasiswa aktif</th>
-                            <th>Total KP</th>
-                            @if ($canManage)<th></th>@endif
+                            <th>Magang aktif</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($companies as $company)
                             <tr>
                                 <td>
-                                    <div class="cell-title">{{ $company->name }}</div>
+                                    <div class="cell-title truncate" title="{{ $company->name }}">{{ $company->name }}</div>
                                     <div class="cell-sub">{{ $company->city ?? '–' }}</div>
                                 </td>
-                                <td>{{ $company->industry ?? '–' }}</td>
+                                <td><span class="truncate truncate-sm" title="{{ $company->industry }}">{{ $company->industry ?? '–' }}</span></td>
                                 <td><x-chip :tone="$company->statusTone()">{{ $company->statusLabel() }}</x-chip></td>
-                                <td>{{ $company->active_internships_count }}</td>
-                                <td>{{ $company->internships_count }}</td>
-                                @if ($canManage)
-                                    <td class="col-action"><a href="{{ route('perusahaan.edit', $company) }}" class="btn btn-sm">Ubah</a></td>
-                                @endif
+                                <td>
+                                    <span class="cell-title">{{ $company->active_internships_count }}</span>
+                                    <span class="muted">dari {{ $company->internships_count }} total</span>
+                                </td>
+                                <td class="col-action">
+                                    <a href="{{ route('perusahaan.show', $company) }}" class="btn btn-sm">Statistik</a>
+                                    @if ($canManage)
+                                        <a href="{{ route('perusahaan.edit', $company) }}" class="btn btn-sm">Ubah</a>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

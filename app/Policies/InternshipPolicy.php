@@ -40,6 +40,48 @@ class InternshipPolicy
         return Response::allow();
     }
 
+    /**
+     * Mentor mengisi penilaian akhir untuk bimbingannya.
+     * Boleh saat KP berjalan maupun sudah selesai, selama penilaian belum dikirim ke ketua divisi.
+     * (Kunci KP selesai berlaku untuk task dan meeting; penilaian punya kunci sendiri: status tervalidasi.)
+     */
+    public function assess(User $user, Internship $internship): Response
+    {
+        if (! $internship->isMentoredBy($user)) {
+            return Response::deny('Mahasiswa ini bukan bimbingan Anda.');
+        }
+
+        if (! in_array($internship->status, ['berjalan', 'selesai'], true)) {
+            return Response::deny('Penilaian hanya untuk KP yang sedang berjalan atau sudah selesai.');
+        }
+
+        $status = $internship->assessment?->status;
+
+        if ($status === 'validated') {
+            return Response::deny('Penilaian sudah divalidasi dan terkunci.');
+        }
+
+        if ($status === 'submitted') {
+            return Response::deny('Penilaian sedang menunggu validasi ketua divisi.');
+        }
+
+        return Response::allow();
+    }
+
+    /** Ketua divisi memvalidasi atau mengembalikan penilaian, hanya untuk penempatan di bawahnya dan yang sudah dikirim mentor. */
+    public function validateAssessment(User $user, Internship $internship): Response
+    {
+        if (! $internship->isSupervisedBy($user)) {
+            return Response::deny('Penempatan ini bukan di bawah divisi Anda.');
+        }
+
+        if ($internship->assessment?->status !== 'submitted') {
+            return Response::deny('Tidak ada penilaian yang menunggu validasi.');
+        }
+
+        return Response::allow();
+    }
+
     /** Mahasiswa boleh mengajukan KP mandiri hanya jika belum punya penempatan aktif. */
     public function submitIndependent(User $user): Response
     {

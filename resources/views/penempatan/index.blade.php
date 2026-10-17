@@ -13,7 +13,7 @@
         @endif
     </div>
 
-    <form method="GET" action="{{ route('penempatan.index') }}" class="inline-form" style="margin-bottom: 16px">
+    <form method="GET" action="{{ route('penempatan.index') }}" class="inline-form">
         <label for="status" class="label" style="margin: 0">Status</label>
         <select id="status" name="status" class="select select-sm">
             <option value="">Semua</option>
@@ -37,8 +37,7 @@
                         <tr>
                             <th>Mahasiswa</th>
                             <th>Perusahaan</th>
-                            <th>Mentor</th>
-                            <th>Dosen pembimbing</th>
+                            <th>Dospem</th>
                             <th>Jalur</th>
                             <th>Task selesai</th>
                             <th>Status</th>
@@ -48,10 +47,12 @@
                         @foreach ($internships as $internship)
                             <tr>
                                 <td><x-person :user="$internship->student" /></td>
-                                <td>{{ $internship->company->name }}</td>
-                                <td>{{ $internship->mentor?->name ?? '–' }}</td>
-                                <td>{{ $internship->lecturer?->name ?? '–' }}</td>
-                                <td>{{ $internship->track === 'mandiri' ? 'Mandiri' : 'Lowongan kampus' }}</td>
+                                <td>
+                                    <div class="cell-title truncate" title="{{ $internship->company->name }}">{{ $internship->company->name }}</div>
+                                    <div class="cell-sub truncate" title="Mentor: {{ $internship->mentor?->name ?? 'belum ada' }}">Mentor: {{ $internship->mentor?->name ?? 'belum ada' }}</div>
+                                </td>
+                                <td><span title="{{ $internship->lecturer?->name }}">{{ $internship->lecturer?->shortName() ?? '–' }}</span></td>
+                                <td>{{ $internship->track === 'mandiri' ? 'Mandiri' : 'Kampus' }}</td>
                                 <td><x-progress :value="$internship->percent()" /></td>
                                 <td><x-chip :tone="$internship->statusTone()">{{ $internship->statusLabel() }}</x-chip></td>
                             </tr>

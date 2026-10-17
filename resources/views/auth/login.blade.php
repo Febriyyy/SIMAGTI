@@ -6,15 +6,23 @@
     <title>Masuk · {{ config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/kp.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
+    <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
 </head>
 <body class="auth-body">
 <div class="auth-wrap">
+    <div class="auth-split">
+    <div class="auth-panel">
+        <svg class="hero-art" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
+        <svg class="hero-art hero-art-2" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
+        <div class="hero-eyebrow">Sistem Monitoring Kerja Praktik</div>
+        <p class="auth-panel-title">Task mingguan, penilaian, dan progres KP dalam satu tempat.</p>
+        <p class="auth-panel-sub">Untuk mahasiswa, mentor, ketua divisi, dosen pembimbing, kaprodi, dan biro kerjasama.</p>
+    </div>
     <div class="auth-card">
         <div class="brand">
-            <span class="brand-mark">KP</span>
-            <span class="brand-name">KP Monitor</span>
+            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="brand-logo" width="168" height="51">
         </div>
 
         <h1 class="auth-title">Masuk</h1>
@@ -48,20 +56,8 @@
             <button type="submit" class="btn btn-primary btn-block">Masuk</button>
         </form>
     </div>
+    </div>
 
-    @if (app()->environment('local'))
-        <div class="demo">
-            <strong>Akun contoh</strong> (kata sandi: <code>password</code>)
-            <table>
-                <tr><td>Mahasiswa</td><td>mahasiswa@kp.test</td></tr>
-                <tr><td>Mentor</td><td>mentor@kp.test</td></tr>
-                <tr><td>Ketua Divisi</td><td>divisi@kp.test</td></tr>
-                <tr><td>Dosen Pembimbing</td><td>dospem@kp.test</td></tr>
-                <tr><td>Kaprodi</td><td>kaprodi@kp.test</td></tr>
-                <tr><td>Biro Kerjasama</td><td>biro@kp.test</td></tr>
-            </table>
-        </div>
-    @endif
 </div>
 </body>
 </html>

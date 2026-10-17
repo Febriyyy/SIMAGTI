@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Tasks;
 
 use App\Models\Internship;
+use App\Models\TaskAttachment;
 use App\Models\WeeklyTask;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
@@ -31,6 +32,17 @@ class StoreTaskRequest extends FormRequest
             'day' => ['required', Rule::in(array_keys(WeeklyTask::DAYS))],
             'title' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:1000'],
-        ];
+        ] + TaskAttachment::rules();
+    }
+
+    public function messages(): array
+    {
+        return TaskAttachment::messages();
+    }
+
+    /** @return list<\Illuminate\Http\UploadedFile> */
+    public function attachments(): array
+    {
+        return array_values($this->file('lampiran', []));
     }
 }

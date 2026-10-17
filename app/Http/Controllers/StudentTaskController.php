@@ -26,7 +26,7 @@ class StudentTaskController extends Controller
         $week = $internship->clampWeek($request->integer('minggu') ?: null);
 
         $tasks = $internship->tasks()
-            ->withCount(['evidences', 'comments'])
+            ->withCount(['evidences', 'comments', 'attachments'])
             ->where('week_number', $week)
             ->get()
             ->sortBy(fn (WeeklyTask $task) => $task->dayOrder())

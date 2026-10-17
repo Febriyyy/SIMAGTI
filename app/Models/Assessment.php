@@ -114,13 +114,37 @@ class Assessment extends Model
         ]);
     }
 
+    /** Rubrik yang dipakai: rubrik penilaian yang sudah ada, atau rubrik aktif untuk penilaian baru. */
+    public static function rubricFor(Internship $internship): ?AssessmentRubric
+    {
+        $rubric = $internship->assessment?->rubric ?? AssessmentRubric::active();
+
+        return $rubric?->load(['aspects' => fn ($q) => $q->orderBy('sort_order')]);
+    }
+
+    /** Draft yang pernah dikirim lalu dikembalikan ketua divisi (ada catatan). */
+    public function wasReturned(): bool
+    {
+        return $this->status === 'draft' && filled($this->supervisor_note);
+    }
+
+    /** Huruf mutu: yang terkunci jika sudah divalidasi, atau perkiraan dari skala yang berlaku. */
+    public function letter(): ?string
+    {
+        if ($this->letter_grade) {
+            return $this->letter_grade;
+        }
+
+        return $this->final_score !== null ? Grading::letterFor((float) $this->final_score) : null;
+    }
+
     public function statusLabel(): string
     {
-        return self::STATUSES[$this->status][0] ?? $this->status;
+        return $this->wasReturned() ? 'Dikembalikan' : (self::STATUSES[$this->status][0] ?? $this->status);
     }
 
     public function statusTone(): string
     {
-        return self::STATUSES[$this->status][1] ?? 'gray';
+        return $this->wasReturned() ? 'red' : (self::STATUSES[$this->status][1] ?? 'gray');
     }
 }

@@ -32,6 +32,22 @@ Kaprodi memutuskan    → ReviewKaprodiApproval    (hanya setelah biro setuju; s
 Mentor/ketua divisi   → AcceptInvitation         (link sekali pakai, berlaku 14 hari, membuat akun dan memasang ke penempatan)
 ```
 
+## Alur penilaian akhir
+
+```
+Mentor mengisi rubrik   → SaveAssessment    (draft boleh sebagian; nilai akhir = jumlah nilai x bobot)
+Mentor mengirim         → SaveAssessment    (semua aspek wajib terisi; status "menunggu validasi", mentor tidak bisa mengubah)
+Ketua divisi memutuskan → ReviewAssessment  (validasi: nilai + huruf mutu + versi skala dikunci permanen
+                                             | kembalikan: wajib catatan, kembali ke draft, mentor memperbaiki)
+Mahasiswa               → dashboard menampilkan nilai hanya setelah tervalidasi
+```
+
+Baris penilaian dikunci (`lockForUpdate`) saat diputuskan, jadi dua klik bersamaan tidak memproses dua kali.
+
+## Dashboard pemantauan
+
+Dashboard ketua divisi, dosen pembimbing, dan kaprodi dibangun oleh satu Action `BuildMonitoringDashboard` yang memakai `Internship::visibleTo`, sehingga tiap peran hanya menghitung mahasiswa yang memang boleh dilihatnya. Statistik perusahaan (`BuildCompanyStats`) dipakai bersama oleh halaman web dan API.
+
 ## Pertanyaan yang mungkin ditanyakan
 
 **Bagaimana mencegah mahasiswa punya dua penempatan aktif?**
@@ -45,6 +61,12 @@ Penempatan dikunci (`locked_at`), task tidak bisa diubah, penilaian yang divalid
 
 **Kalau skala nilai kampus berubah, apakah nilai lama ikut berubah?**
 Tidak. Skala berversi dan setiap huruf mutu disimpan bersama versinya.
+
+**Bagaimana kalau mentor salah memberi nilai?**
+Selama belum divalidasi, ketua divisi bisa mengembalikannya dengan catatan, lalu mentor memperbaiki. Setelah divalidasi, nilai terkunci di level model, jadi tidak ada jalan pintas untuk mengubahnya.
+
+**Dari mana angka "perlu perhatian"?**
+Dihitung dari data nyata: tanggal bukti terakhir, persentase task selesai, dan sisa hari KP dibanding status penilaian. Batasnya ditulis sebagai konstanta di satu tempat.
 
 **Bagaimana keaslian sertifikat diperiksa?**
 Setiap sertifikat punya nomor unik dan token acak. Endpoint publik `/api/v1/certificates/{token}` menjawab valid atau tidak tanpa membuka NIM.

@@ -3,12 +3,17 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="page-head">
-        <div>
-            <h1 class="page-title">{{ \App\Support\Greeting::now() }}, {{ $user->firstName() }}</h1>
-            <p class="page-sub">Ringkasan kerja praktik kamu.</p>
-        </div>
-    </div>
+    @if ($internship)
+        <x-hero eyebrow="Mahasiswa · {{ $internship->company->name }}"
+                :title="\App\Support\Greeting::now().', '.$user->firstName()"
+                :sub="'Minggu ke-'.$internship->currentWeek().' dari '.$internship->totalWeeks().'. Kerjakan task minggu ini dan lampirkan buktinya.'"
+                action="Lihat task minggu ini" :href="route('tugas.index')" />
+    @else
+        <x-hero eyebrow="Mahasiswa"
+                :title="\App\Support\Greeting::now().', '.$user->firstName()"
+                sub="Kamu belum punya penempatan KP. Ajukan KP mandiri jika sudah menemukan tempat."
+                action="Ajukan KP mandiri" :href="route('pengajuan.index')" />
+    @endif
 
     @if (! $internship)
         <div class="card">
@@ -19,10 +24,17 @@
             </div>
         </div>
     @else
-        <div class="pills">
-            <span class="pill"><x-icon name="calendar" :size="16" /> Minggu ke-<strong>{{ $internship->currentWeek() }}</strong> dari {{ $internship->totalWeeks() }}</span>
-            <span class="pill"><x-icon name="clock" :size="16" /> Sisa <strong>{{ $internship->daysLeft() }} hari</strong></span>
-            <span class="pill"><x-icon name="tasks" :size="16" /> Task selesai <strong>{{ $internship->completed_tasks_count }}</strong> dari {{ $internship->tasks_count }}</span>
+        @php($a = $internship->assessment)
+        <div class="stat-grid">
+            <x-stat label="Minggu berjalan" :value="$internship->currentWeek()" :unit="'dari '.$internship->totalWeeks()" icon="calendar"
+                    :hint="$internship->start_date->locale('id')->translatedFormat('j M').' – '.$internship->end_date->locale('id')->translatedFormat('j M Y')" />
+            <x-stat label="Sisa waktu" :value="$internship->daysLeft()" unit="hari" icon="clock"
+                    :tone="$internship->daysLeft() <= 14 && $internship->status === 'berjalan' ? 'amber' : 'blue'" hint="Sampai KP selesai" />
+            <x-stat label="Task selesai" :value="$internship->completed_tasks_count" :unit="'dari '.$internship->tasks_count" icon="tasks"
+                    :percent="$internship->percent()" />
+            <x-stat label="Nilai akhir" :value="$a?->isValidated() ? $a->letter_grade : null" :unit="$a?->isValidated() ? \App\Support\Num::short($a->final_score) : null"
+                    icon="award" :tone="$a?->isValidated() ? 'green' : 'gray'" empty="Belum dinilai"
+                    :hint="$a?->isValidated() ? 'Sudah divalidasi' : 'Muncul setelah divalidasi'" />
         </div>
 
         <div class="layout">

@@ -27,10 +27,28 @@ class StoredFile extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
+    public function extension(): string
+    {
+        return strtolower(pathinfo($this->original_name, PATHINFO_EXTENSION));
+    }
+
+    public function isImage(): bool
+    {
+        return str_starts_with((string) $this->mime_type, 'image/');
+    }
+
+    /** PDF dan gambar boleh dibuka langsung di browser; PowerPoint diunduh. */
+    public function opensInline(): bool
+    {
+        return $this->isImage() || $this->mime_type === 'application/pdf';
+    }
+
     public function sizeLabel(): string
     {
         $kb = $this->size / 1024;
 
-        return $kb >= 1024 ? number_format($kb / 1024, 1).' MB' : number_format($kb, 0).' KB';
+        return $kb >= 1024
+            ? number_format($kb / 1024, 1, ',', '.').' MB'
+            : max(1, (int) round($kb)).' KB';
     }
 }

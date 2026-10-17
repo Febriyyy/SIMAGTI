@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Internship;
 use App\Models\Invitation;
 use App\Models\User;
-use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,7 +17,7 @@ class ApplicationFlowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(DatabaseSeeder::class);
+        $this->seed(TestingSeeder::class);
     }
 
     private function user(string $email): User

@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
 use App\Support\Grading;
-use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\TestingSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LogicException;
@@ -28,7 +28,7 @@ class SchemaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(DatabaseSeeder::class);
+        $this->seed(TestingSeeder::class);
     }
 
     private function user(string $email): User

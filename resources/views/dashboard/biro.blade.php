@@ -3,85 +3,67 @@
 @section('title', 'Dashboard Biro Kerjasama')
 
 @section('content')
-    <div class="page-head">
-        <div>
-            <h1 class="page-title">{{ \App\Support\Greeting::now() }}, {{ $user->firstName() }}</h1>
-            <p class="page-sub">Perusahaan mitra dan mahasiswa yang sedang magang.</p>
-        </div>
+    <x-hero eyebrow="Biro Kerjasama"
+            :title="\App\Support\Greeting::now().', '.$user->firstName()"
+            :sub="$stats['waiting'] > 0
+                ? $stats['waiting'].' perusahaan dari jalur KP mandiri menunggu verifikasi Anda.'
+                : 'Tidak ada perusahaan yang menunggu verifikasi. Pantau mitra dan statistiknya di bawah.'"
+            action="Buka verifikasi" :href="route('biro.verifikasi')" />
+
+    <div class="stat-grid">
+        <x-stat label="Perusahaan mitra" :value="$stats['partners']" unit="perusahaan" icon="building" hint="Termasuk KP mandiri" />
+        <x-stat label="Perlu verifikasi" :value="$stats['waiting']" unit="perusahaan" icon="clock"
+                :tone="$stats['waiting'] > 0 ? 'amber' : 'gray'" :href="route('biro.verifikasi')" hint="Dari jalur KP mandiri" />
+        <x-stat label="Magang aktif" :value="$stats['students']" unit="mahasiswa" icon="users" hint="Di semua perusahaan" />
     </div>
 
-    <div class="pills">
-        <span class="pill"><x-icon name="building" :size="16" /> Perusahaan mitra <strong>{{ $stats['partners'] }}</strong></span>
-        <span class="pill"><x-icon name="clock" :size="16" /> Menunggu verifikasi <strong>{{ $stats['waiting'] }}</strong></span>
-        <span class="pill"><x-icon name="users" :size="16" /> Mahasiswa magang aktif <strong>{{ $stats['students'] }}</strong></span>
-    </div>
-
-    <div class="layout">
-        <div class="col">
-            <section class="card">
-                <div class="card-head">
-                    <h2 class="card-title">Perusahaan</h2>
-                </div>
-
-                @if ($companies->isEmpty())
-                    <div class="empty">
-                        <strong>Belum ada perusahaan</strong>
-                        Perusahaan akan muncul setelah ditambahkan.
-                    </div>
-                @else
-                    <div class="table-wrap">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Perusahaan</th>
-                                    <th>Bidang</th>
-                                    <th>Status</th>
-                                    <th>Mahasiswa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($companies as $company)
-                                    <tr>
-                                        <td>
-                                            <div class="cell-title">{{ $company->name }}</div>
-                                            @if ($company->address)
-                                                <div class="cell-sub">{{ $company->address }}</div>
-                                            @endif
-                                        </td>
-                                        <td>{{ $company->industry ?? '–' }}</td>
-                                        <td><x-chip :tone="$company->statusTone()">{{ $company->statusLabel() }}</x-chip></td>
-                                        <td>{{ $company->internships_count }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
+    <section class="card">
+        <div class="card-head">
+            <div>
+                <h2 class="card-title">Perusahaan</h2>
+                <p class="card-sub">Urut dari yang paling banyak mahasiswa magang</p>
+            </div>
+            <a href="{{ route('perusahaan.index') }}" class="btn btn-sm">Kelola perusahaan</a>
         </div>
 
-        <div class="col">
-            <section class="card">
-                <div class="card-head">
-                    <div>
-                        <h2 class="card-title">Menunggu verifikasi</h2>
-                        <p class="card-sub">Perusahaan dari jalur KP mandiri</p>
-                    </div>
-                    <a href="{{ route('biro.verifikasi') }}" class="btn btn-sm">Buka</a>
-                </div>
-                @if ($waiting->isEmpty())
-                    <p class="meeting-empty">Tidak ada yang menunggu.</p>
-                @else
-                    <ul class="item-list">
-                        @foreach ($waiting as $company)
-                            <li>
-                                <div class="cell-title">{{ $company->name }}</div>
-                                <div class="cell-sub">{{ $company->industry ?? '–' }}</div>
-                            </li>
+        @if ($companies->isEmpty())
+            <div class="empty">
+                <strong>Belum ada perusahaan</strong>
+                Perusahaan akan muncul setelah ditambahkan.
+            </div>
+        @else
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Perusahaan</th>
+                            <th>Bidang</th>
+                            <th>Magang aktif</th>
+                            <th>Nilai rata-rata</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($companies as $company)
+                            <tr>
+                                <td>
+                                    <div class="cell-title truncate" title="{{ $company->name }}">{{ $company->name }}</div>
+                                    <div class="cell-sub">{{ $company->city ?? 'Kota belum diisi' }}</div>
+                                </td>
+                                <td><span class="truncate truncate-sm" title="{{ $company->industry }}">{{ $company->industry ?? '–' }}</span></td>
+                                <td class="nowrap">
+                                    <span class="cell-title">{{ $company->active_internships_count }}</span>
+                                    <span class="muted">dari {{ $company->internships_count }} total</span>
+                                </td>
+                                <td>{{ \App\Support\Num::short($company->average_score) }}</td>
+                                <td><x-chip :tone="$company->statusTone()">{{ $company->statusLabel() }}</x-chip></td>
+                                <td class="col-action"><a href="{{ route('perusahaan.show', $company) }}" class="btn btn-sm">Statistik</a></td>
+                            </tr>
                         @endforeach
-                    </ul>
-                @endif
-            </section>
-        </div>
-    </div>
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
 @endsection

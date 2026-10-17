@@ -61,29 +61,40 @@ Setelah Anda meminta fondasi yang jelas dan tidak ambigu:
 - **API v1 baca-saja** dengan token Sanctum, plus verifikasi sertifikat publik.
 - Tes baru untuk semua di atas.
 
+### Tahap 5: penilaian akhir dan dashboard data nyata (v5, 17 Oktober 2026)
+Untuk presentasi progres ke dosen pada 19 Oktober:
+
+- **Penilaian akhir**: mentor mengisi rubrik (draft atau kirim), ketua divisi memvalidasi atau mengembalikan dengan catatan, lalu nilai dan huruf mutu terkunci bersama versi skalanya. Mahasiswa melihat nilainya di dashboard setelah divalidasi.
+- **Dashboard dospem, kaprodi, dan ketua divisi**: memakai data nyata, yaitu bukti terakhir, daftar perlu perhatian beserta alasannya, status penilaian, dan sebaran huruf mutu. Kaprodi juga mendapat ringkasan per perusahaan dan antrean persetujuan, sedangkan ketua divisi mendapat antrean validasi.
+- **Statistik per perusahaan** (permintaan dosen): durasi rata-rata, sebaran skill dalam persen, dan performa (rata-rata nilai, sebaran huruf, rata-rata per aspek). Tersedia di web (`/perusahaan/{id}`) dan di API.
+- Perbaikan kecil: sapaan tidak lagi memakai gelar ("Selamat pagi, Hendra", bukan "Dr."), zona waktu aplikasi diganti ke Asia/Jakarta, dan tanggal bukti di data demo disesuaikan dengan minggu tugasnya.
+
+### Tahap 6: tampilan SIMAGTI, lampiran task, data realistis (17 Oktober 2026)
+- Tampilan baru untuk semua halaman (gaya campuran acuan Mondays dan Coursue), warna dan logo SIMAGTI, tabel yang tidak bertumpuk di layar 1280px ke atas.
+- **Lampiran task**: mentor melampirkan PDF, PowerPoint, atau gambar (maks. 5 berkas, 10 MB per berkas) saat membuat task atau dari halaman detail. Berkas disimpan privat dan hanya bisa diunduh mahasiswa pemilik task dan mentornya.
+- **Data realistis (fiktif)** menggantikan akun contoh: 28 akun bernama lengkap, 6 perusahaan, 14 mahasiswa dengan kondisi beragam. Kotak akun contoh di halaman login dihapus; daftar akun ada di `docs/AKUN.md`. Data lama (`*@kp.test`) dipakai khusus untuk tes otomatis.
+
 ## 5. Status jujur
 
 | Bagian | Status |
 |---|---|
 | Database, model, seeder, tes v3 | Terbukti jalan di komputer Anda |
-| Refactor Form Request / Policy / Action | Kode selesai, lolos pemeriksaan sintaks, **belum dijalankan** |
-| KP mandiri, data master, API v1 | Kode dan tes selesai, **belum dijalankan** |
+| v4: refactor, KP mandiri, data master, API v1 | Terbukti jalan: 86 tes lolos (17 Okt) |
+| v5: penilaian akhir, dashboard data nyata, statistik perusahaan | Lolos tes dan dicoba di browser (SQLite) |
+| v6: tampilan SIMAGTI, lampiran task, data realistis | 118 tes lolos dan alur dicoba di browser (SQLite). Belum dicoba di MySQL Laragon |
 
-Lingkungan tempat saya bekerja tidak bisa mengunduh paket Laravel (Packagist diblokir), jadi saya hanya bisa memeriksa sintaks dan konsistensi rute, kelas, dan view. Bukti sebenarnya adalah `php artisan test` di komputer Anda. Kemungkinan ada beberapa tes yang gagal pada putaran pertama; kirim hasilnya dan saya perbaiki.
-
-Jumlah tes sekarang: 85 (KpFlow 16, Schema 18, ApplicationFlow 18, MasterData 16, Api 16, Example 1).
+Jumlah tes sekarang: 118 (KpFlow 16, Schema 18, ApplicationFlow 18, MasterData 16, Api 16, AssessmentFlow 13, DashboardData 8, TaskAttachment 9, DataSeeder 2, Example 1).
 
 ## 6. Belum dikerjakan
 
-- Penilaian akhir mentor dan validasi ketua divisi (UI)
 - Input nilai sidang, halaman skala nilai kaprodi
 - UI konversi jadi karyawan
 - Sertifikat PDF + QR
 - Dokumen dan template, surat pengantar
 - Lowongan magang, skill, template task (UI)
-- Dashboard analitik dan ekspor Excel/PDF
+- Ekspor Excel/PDF
 - Email notifikasi
-- Dashboard dospem, kaprodi, biro dengan data nyata
+- Halaman rubrik (kaprodi mengubah aspek dan bobot)
 
 Urutan yang dikorbankan jika waktu mepet: lowongan, template laporan dan surat, ekspor laporan, status konversi lanjutan.
 
@@ -96,4 +107,4 @@ Urutan yang dikorbankan jika waktu mepet: lowongan, template laporan dan surat, 
 
 ## 8. Akun demo
 
-Semua kata sandi `password`: kaprodi@kp.test, dospem@kp.test, biro@kp.test, mentor@kp.test, mentor2@kp.test, divisi@kp.test, divisi2@kp.test, mahasiswa@kp.test (Rina), dimas@kp.test, fajar@kp.test, salsa@kp.test (KP selesai), nadia@kp.test (KP mandiri menunggu).
+Lihat `docs/AKUN.md`. Kata sandi semua akun: `Simagti2026`. (Akun `*@kp.test` hanya ada di database tes otomatis.)

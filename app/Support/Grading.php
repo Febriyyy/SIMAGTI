@@ -45,6 +45,36 @@ class Grading
         return $version;
     }
 
+    /** Huruf-huruf pada skala yang berlaku, dari tertinggi ke terendah. */
+    public static function letters(?int $version = null): array
+    {
+        $letters = GradeScale::where('version', $version ?? self::currentVersion())
+            ->orderByDesc('min_score')
+            ->pluck('grade')
+            ->all();
+
+        return $letters !== [] ? $letters : array_keys(self::DEFAULT_SCALE);
+    }
+
+    /**
+     * Jumlah per huruf mutu, urut dari tertinggi. Huruf yang tidak ada di skala berlaku tetap dihitung di akhir.
+     *
+     * @param  iterable<string|null>  $grades
+     * @return array<string, int>
+     */
+    public static function distribution(iterable $grades): array
+    {
+        $counts = array_fill_keys(self::letters(), 0);
+
+        foreach ($grades as $grade) {
+            if ($grade !== null && $grade !== '') {
+                $counts[$grade] = ($counts[$grade] ?? 0) + 1;
+            }
+        }
+
+        return $counts;
+    }
+
     public static function letterFor(float $score, ?int $version = null): string
     {
         $version ??= self::currentVersion();

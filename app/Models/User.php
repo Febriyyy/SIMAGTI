@@ -60,9 +60,27 @@ class User extends Authenticatable
         return self::ROLE_LABELS[$this->role] ?? ucfirst((string) $this->role);
     }
 
+    /** Nama tanpa gelar (Dr., Ir., S.Kom., M.T., ...) untuk tabel yang sempit. Nama lengkap tetap dipakai di tempat lain. */
+    public function shortName(): string
+    {
+        $name = trim(explode(',', $this->name)[0]);
+        $words = array_filter(preg_split('/\s+/', $name), fn ($w) => ! str_ends_with($w, '.'));
+
+        return $words ? implode(' ', $words) : $this->name;
+    }
+
+    /** Nama depan tanpa gelar di depan (Dr., Ir., Prof.) untuk sapaan. */
     public function firstName(): string
     {
-        return explode(' ', trim($this->name))[0];
+        $words = preg_split('/\s+/', trim($this->name));
+
+        foreach ($words as $word) {
+            if (! str_ends_with($word, '.')) {
+                return rtrim($word, ',');
+            }
+        }
+
+        return $words[0];
     }
 
     // ---------- Relasi ----------

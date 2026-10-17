@@ -30,19 +30,22 @@
                     <tbody>
                         @foreach ($logs as $log)
                             <tr>
-                                <td class="muted" style="white-space: nowrap">{{ $log->created_at->locale('id')->translatedFormat('j M Y, H:i') }}</td>
+                                <td class="muted">{{ $log->created_at->locale('id')->translatedFormat('j M Y, H:i') }}</td>
                                 <td>
                                     @if ($log->user)
                                         <div class="person">
-                                            <span class="person-name">{{ $log->user->name }}</span>
-                                            <span class="person-sub">{{ $log->user->roleLabel() }}</span>
+                                            <x-avatar :user="$log->user" small />
+                                            <div class="person-text">
+                                                <span class="person-name">{{ $log->user->name }}</span>
+                                                <span class="person-sub">{{ $log->user->roleLabel() }}</span>
+                                            </div>
                                         </div>
                                     @else
                                         <span class="muted">–</span>
                                     @endif
                                 </td>
                                 <td><x-chip>{{ $log->action }}</x-chip></td>
-                                <td>{{ $log->description }}</td>
+                                <td class="cell-wrap">{{ $log->description }}</td>
                             </tr>
                         @endforeach
                     </tbody>

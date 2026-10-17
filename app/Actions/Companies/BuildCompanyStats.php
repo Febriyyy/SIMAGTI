@@ -3,11 +3,12 @@
 namespace App\Actions\Companies;
 
 use App\Models\Company;
+use App\Support\Grading;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Ringkasan satu perusahaan: jumlah mahasiswa berjalan/selesai, progres, durasi,
- * dan sebaran skill mahasiswa yang sedang magang (dalam persen).
+ * performa (nilai akhir tervalidasi), dan sebaran skill mahasiswa yang sedang magang (dalam persen).
  * Dipakai bersama oleh API dan dashboard web.
  */
 class BuildCompanyStats
@@ -16,13 +17,14 @@ class BuildCompanyStats
     public function handle(Company $company): array
     {
         $internships = $company->internships()
-            ->with('student:id,name,nim')
+            ->with(['student:id,name,nim', 'assessment.scores.aspect'])
             ->withProgress()
             ->whereIn('status', ['berjalan', 'selesai'])
             ->get();
 
         $ongoing = $internships->where('status', 'berjalan')->values();
         $finished = $internships->where('status', 'selesai')->values();
+        $validated = $internships->map->assessment->filter(fn ($a) => $a?->isValidated())->values();
 
         return [
             'company' => ['id' => $company->id, 'name' => $company->name],
@@ -31,6 +33,9 @@ class BuildCompanyStats
             'average_progress_percent' => $ongoing->isEmpty()
                 ? 0
                 : (int) round($ongoing->avg(fn ($i) => $i->percent())),
+            'average_duration_months' => $internships->isEmpty()
+                ? 0
+                : round($internships->avg(fn ($i) => $i->durationMonths()), 1),
             'students' => $internships->map(fn ($i) => [
                 'internship_id' => $i->id,
                 'name' => $i->student->name,
@@ -39,8 +44,35 @@ class BuildCompanyStats
                 'progress_percent' => $i->percent(),
                 'duration_months' => $i->durationMonths(),
                 'days_left' => $i->status === 'berjalan' ? $i->daysLeft() : 0,
+                // Nilai hanya dibuka jika sudah divalidasi ketua divisi.
+                'final_score' => $i->assessment?->isValidated() ? (float) $i->assessment->final_score : null,
+                'letter_grade' => $i->assessment?->isValidated() ? $i->assessment->letter_grade : null,
             ])->values()->all(),
+            'performance' => $this->performance($validated),
             'skills' => $this->skillDistribution($ongoing->pluck('student_id')->all()),
+        ];
+    }
+
+    /**
+     * Performa dari penilaian akhir yang sudah divalidasi: rata-rata nilai, sebaran huruf mutu, rata-rata per aspek.
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Assessment>  $validated
+     * @return array<string, mixed>
+     */
+    private function performance($validated): array
+    {
+        $aspects = $validated
+            ->flatMap(fn ($a) => $a->scores)
+            ->groupBy(fn ($score) => $score->aspect->name)
+            ->map(fn ($scores, $name) => ['name' => $name, 'average' => round((float) $scores->avg('score'), 2)])
+            ->values()
+            ->all();
+
+        return [
+            'assessed_count' => $validated->count(),
+            'average_final_score' => $validated->isEmpty() ? null : round((float) $validated->avg('final_score'), 2),
+            'grades' => Grading::distribution($validated->pluck('letter_grade')),
+            'aspects' => $aspects,
         ];
     }
 

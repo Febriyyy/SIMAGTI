@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
@@ -68,6 +69,12 @@ class Company extends Model
     public function internships(): HasMany
     {
         return $this->hasMany(Internship::class);
+    }
+
+    /** Penilaian akhir semua mahasiswa yang pernah magang di perusahaan ini. */
+    public function assessments(): HasManyThrough
+    {
+        return $this->hasManyThrough(Assessment::class, Internship::class);
     }
 
     public function statusLabel(): string

@@ -74,6 +74,12 @@ class WeeklyTask extends Model
         return $this->hasMany(TaskComment::class);
     }
 
+    /** Materi dari mentor untuk task ini. */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(TaskAttachment::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

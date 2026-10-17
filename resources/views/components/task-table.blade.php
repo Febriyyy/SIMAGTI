@@ -13,10 +13,14 @@
             @foreach ($tasks as $task)
                 <tr>
                     <td class="col-day">{{ $task->dayShort() }}</td>
-                    <td>
-                        <span class="cell-title cell-clip" style="display: inline-block; vertical-align: middle">{{ $task->title }}</span>
-                        @if (($task->evidences_count ?? 0) > 0 || ($task->comments_count ?? 0) > 0)
+                    <td class="col-grow">
+                        <div class="clip-row">
+                        <span class="cell-title cell-clip" title="{{ $task->title }}">{{ $task->title }}</span>
+                        @if (($task->evidences_count ?? 0) > 0 || ($task->comments_count ?? 0) > 0 || ($task->attachments_count ?? 0) > 0)
                             <span class="marks">
+                                @if (($task->attachments_count ?? 0) > 0)
+                                    <span title="Ada materi dari mentor"><x-icon name="paperclip" :size="15" /><span class="sr-only">Ada materi dari mentor</span></span>
+                                @endif
                                 @if (($task->evidences_count ?? 0) > 0)
                                     <span title="Bukti sudah dikirim"><x-icon name="link" :size="15" /><span class="sr-only">Bukti sudah dikirim</span></span>
                                 @endif
@@ -25,6 +29,7 @@
                                 @endif
                             </span>
                         @endif
+                        </div>
                     </td>
                     <td><x-chip :tone="$task->statusTone()">{{ $task->statusLabel() }}</x-chip></td>
                     <td class="col-action">

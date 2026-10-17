@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <form method="GET" action="{{ route('mahasiswa.index') }}" class="inline-form" style="margin-bottom: 16px">
+    <form method="GET" action="{{ route('mahasiswa.index') }}" class="inline-form">
         <input type="search" name="q" class="input" value="{{ $search }}" placeholder="Cari nama atau NIM" aria-label="Cari nama atau NIM">
         <button type="submit" class="btn">Cari</button>
     </form>

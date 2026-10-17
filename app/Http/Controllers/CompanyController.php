@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Companies\BuildCompanyStats;
 use App\Actions\Companies\SaveCompany;
 use App\Http\Requests\Companies\SaveCompanyRequest;
 use App\Models\Company;
@@ -30,6 +31,16 @@ class CompanyController extends Controller
         $canManage = $request->user()->can('manage', Company::class);
 
         return view('perusahaan.index', compact('companies', 'search', 'canManage'));
+    }
+
+    /** Statistik satu perusahaan: durasi, sebaran skill, dan performa mahasiswa. */
+    public function show(Company $company, BuildCompanyStats $build): View
+    {
+        Gate::authorize('viewStats', $company);
+
+        $stats = $build->handle($company);
+
+        return view('perusahaan.show', compact('company', 'stats'));
     }
 
     public function create(): View

@@ -12,7 +12,7 @@ class TaskDetailController extends Controller
     /** Detail satu task: dilihat mahasiswa pemiliknya atau mentornya (aturan di WeeklyTaskPolicy). */
     public function show(Request $request, WeeklyTask $task): View
     {
-        $task->load('internship.student', 'internship.company', 'internship.mentor', 'evidences.submitter', 'comments.author');
+        $task->load('internship.student', 'internship.company', 'internship.mentor', 'evidences.submitter', 'comments.author', 'attachments.file');
 
         Gate::authorize('view', $task);
 

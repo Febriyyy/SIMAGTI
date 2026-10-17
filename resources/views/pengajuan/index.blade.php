@@ -40,7 +40,7 @@
                                         <span class="muted">–</span>
                                     @endif
                                 </td>
-                                <td>{{ $approval?->note ?? '–' }}</td>
+                                <td class="cell-wrap">{{ $approval?->note ?? '–' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

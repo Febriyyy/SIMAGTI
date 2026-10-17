@@ -54,10 +54,10 @@
             @endif
         </section>
 
-        <details class="card" @if ($errors->hasAny(['day', 'title', 'description', 'minggu'])) open @endif>
+        <details class="card" @if ($errors->hasAny(['day', 'title', 'description', 'minggu', 'lampiran', 'lampiran.*'])) open @endif>
             <summary>Tambah task</summary>
             <div class="card-body">
-                <form method="POST" action="{{ route('mentor.tugas.store') }}" class="form-grid">
+                <form method="POST" action="{{ route('mentor.tugas.store') }}" class="form-grid" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="magang" value="{{ $selected->id }}">
                     <input type="hidden" name="minggu" value="{{ $week }}">
@@ -79,6 +79,10 @@
                     <div class="span-all">
                         <label for="description" class="label">Deskripsi (opsional)</label>
                         <textarea id="description" name="description" class="textarea" maxlength="1000">{{ old('description') }}</textarea>
+                    </div>
+
+                    <div class="span-all">
+                        @include('tugas._upload')
                     </div>
 
                     <div class="span-all">

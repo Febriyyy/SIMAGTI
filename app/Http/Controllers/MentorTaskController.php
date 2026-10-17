@@ -35,7 +35,7 @@ class MentorTaskController extends Controller
         $week = $selected->clampWeek($request->integer('minggu') ?: null);
 
         $tasks = $selected->tasks()
-            ->withCount(['evidences', 'comments'])
+            ->withCount(['evidences', 'comments', 'attachments'])
             ->where('week_number', $week)
             ->get()
             ->sortBy(fn (WeeklyTask $task) => $task->dayOrder())
@@ -48,7 +48,7 @@ class MentorTaskController extends Controller
     {
         $data = $request->validated();
 
-        $createTask->handle($request->user(), $request->internship(), $data);
+        $createTask->handle($request->user(), $request->internship(), $data, $request->attachments());
 
         return redirect()
             ->route('mentor.tugas', ['magang' => $request->internship()->id, 'minggu' => $data['minggu']])

@@ -6,16 +6,16 @@
     <title>@yield('title', 'Dashboard') · {{ config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/kp.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
+    <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
 </head>
 <body>
 @php($user = auth()->user())
 <div class="shell">
     <aside class="sidebar">
         <a href="{{ route('dashboard') }}" class="brand">
-            <span class="brand-mark">KP</span>
-            <span class="brand-name">KP Monitor</span>
+            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="brand-logo" width="168" height="51">
         </a>
 
         <span class="nav-label">Menu</span>
@@ -33,7 +33,7 @@
             <span class="nav-label">Akun</span>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="nav-item">
+                <button type="submit" class="nav-item is-danger">
                     <x-icon name="logout" />
                     <span>Keluar</span>
                 </button>
@@ -43,7 +43,7 @@
 
     <main class="main">
         <header class="topbar">
-            <span class="topbar-date">{{ now()->locale('id')->translatedFormat('l, j F Y') }}</span>
+            <span class="topbar-date"><x-icon name="calendar" :size="16" /> {{ now()->locale('id')->translatedFormat('l, j F Y') }}</span>
             <div class="profile">
                 <div class="profile-text">
                     <span class="profile-name">{{ $user->name }}</span>

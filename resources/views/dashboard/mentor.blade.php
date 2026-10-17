@@ -3,20 +3,21 @@
 @section('title', 'Dashboard Mentor')
 
 @section('content')
-    <div class="page-head">
-        <div>
-            <h1 class="page-title">{{ \App\Support\Greeting::now() }}, {{ $user->firstName() }}</h1>
-            <p class="page-sub">Pantau mahasiswa bimbingan Anda.</p>
-        </div>
-        <a href="{{ route('mentor.tugas') }}" class="btn btn-primary">
-            <x-icon name="plus" :size="16" /> Kelola task
-        </a>
-    </div>
+    <x-hero eyebrow="Mentor"
+            :title="\App\Support\Greeting::now().', '.$user->firstName()"
+            :sub="$stats['review'] > 0
+                ? 'Ada '.$stats['review'].' bukti task dari mahasiswa yang menunggu tinjauan Anda.'
+                : 'Semua bukti task sudah Anda tinjau. Atur task dan meeting minggu ini.'"
+            action="Kelola task" :href="route('mentor.tugas')" />
 
-    <div class="pills">
-        <span class="pill"><x-icon name="users" :size="16" /> Mahasiswa bimbingan <strong>{{ $stats['students'] }}</strong></span>
-        <span class="pill"><x-icon name="chat" :size="16" /> Perlu ditinjau <strong>{{ $stats['review'] }}</strong></span>
-        <span class="pill"><x-icon name="tasks" :size="16" /> Task selesai <strong>{{ $stats['done'] }}</strong></span>
+    <div class="stat-grid">
+        <x-stat label="Mahasiswa bimbingan" :value="$stats['students']" unit="orang" icon="users" hint="Yang sedang magang" />
+        <x-stat label="Perlu ditinjau" :value="$stats['review']" unit="bukti" icon="chat"
+                :tone="$stats['review'] > 0 ? 'amber' : 'green'"
+                :hint="$stats['review'] > 0 ? 'Belum diberi komentar' : 'Semua sudah ditinjau'" />
+        <x-stat label="Task selesai" :value="$stats['done']" unit="task" icon="tasks" hint="Semua bimbingan" />
+        <x-stat label="Belum dinilai" :value="$stats['to_assess']" unit="mahasiswa" icon="award"
+                :tone="$stats['to_assess'] > 0 ? 'blue' : 'green'" :href="route('mentor.penilaian')" hint="Belum dikirim ke ketua divisi" />
     </div>
 
     <div class="layout">
@@ -37,7 +38,7 @@
                             <thead>
                                 <tr>
                                     <th>Mahasiswa</th>
-                                    <th>Perusahaan</th>
+                                    <th>Minggu</th>
                                     <th>Progres task</th>
                                     <th></th>
                                 </tr>
@@ -46,7 +47,10 @@
                                 @foreach ($internships as $internship)
                                     <tr>
                                         <td><x-person :user="$internship->student" /></td>
-                                        <td>{{ $internship->company->name }}</td>
+                                        <td>
+                                            <span class="cell-title">Ke-{{ $internship->currentWeek() }}</span>
+                                            <span class="muted">dari {{ $internship->totalWeeks() }}</span>
+                                        </td>
                                         <td><x-progress :value="$internship->percent()" /></td>
                                         <td class="col-action">
                                             <a href="{{ route('mentor.tugas', ['magang' => $internship->id]) }}" class="btn btn-sm">Kelola</a>

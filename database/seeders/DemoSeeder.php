@@ -163,7 +163,7 @@ class DemoSeeder extends Seeder
 
         // Penempatan magang
         $today = Carbon::today();
-        $place = function (User $student, Company $company, CompanyDivision $division, User $mentor, User $divisi, int $startMonthsAgo, int $durationMonths, string $finalStatus, array $tasks) use ($dospem, $period): Internship {
+        $place = function (User $student, Company $company, CompanyDivision $division, User $mentor, User $divisi, int $startMonthsAgo, int $durationMonths, string $finalStatus, array $tasks, int $idleDays = 0) use ($dospem, $period): Internship {
             $start = Carbon::today()->subMonthsNoOverflow($startMonthsAgo);
             $end = $start->copy()->addMonthsNoOverflow($durationMonths);
 
@@ -183,7 +183,7 @@ class DemoSeeder extends Seeder
             $internship->assignStaff($mentor, InternshipStaff::ROLE_MENTOR);
             $internship->assignStaff($divisi, InternshipStaff::ROLE_SUPERVISOR);
 
-            $this->seedTasks($internship, $mentor, $tasks, $finalStatus === 'selesai');
+            $this->seedTasks($internship, $mentor, $tasks, $finalStatus === 'selesai', $idleDays);
 
             if ($finalStatus === 'selesai') {
                 $internship->update(['status' => 'selesai']);
@@ -194,7 +194,7 @@ class DemoSeeder extends Seeder
 
         $magangRina = $place($rina, $nusantara, $divNusantara, $mentorA, $divisiA, 3, 5, 'berjalan', self::TASKS_SOFTWARE);
         $magangFajar = $place($fajar, $nusantara, $divNusantara, $mentorA, $divisiA, 4, 5, 'berjalan', self::TASKS_SOFTWARE);
-        $magangDimas = $place($dimas, $dataPrima, $divData, $mentorB, $divisiB, 2, 4, 'berjalan', self::TASKS_DATA);
+        $magangDimas = $place($dimas, $dataPrima, $divData, $mentorB, $divisiB, 2, 4, 'berjalan', self::TASKS_DATA, idleDays: 10);
         $magangSalsa = $place($salsa, $dataPrima, $divData, $mentorB, $divisiB, 6, 5, 'selesai', self::TASKS_DATA);
 
         // KP mandiri yang masih menunggu verifikasi biro dan persetujuan kaprodi
@@ -229,6 +229,11 @@ class DemoSeeder extends Seeder
 
         // Penilaian akhir, nilai sidang, sertifikat, dan konversi untuk KP yang sudah selesai
         $this->seedFinished($magangSalsa, $mentorB, $divisiB, $kaprodi);
+
+        // Penilaian akhir yang sedang berjalan, untuk demo:
+        // Fajar sudah dikirim mentor dan menunggu validasi ketua divisi; Dimas masih draft; Rina belum dinilai.
+        $this->seedAssessment($magangFajar, $mentorA, ['Disiplin' => 84, 'Komunikasi' => 78, 'Kemampuan teknis' => 86, 'Kerja tim' => 80], submit: true);
+        $this->seedAssessment($magangDimas, $mentorB, ['Disiplin' => 88, 'Komunikasi' => 82], submit: false);
 
         // Template task milik mentor
         $template = TaskTemplate::create([
@@ -319,7 +324,7 @@ class DemoSeeder extends Seeder
     }
 
     /** Isi task untuk 4 minggu terakhir (atau sampai minggu berjalan), lengkap dengan bukti dan komentar. */
-    private function seedTasks(Internship $internship, User $mentor, array $set, bool $finished): void
+    private function seedTasks(Internship $internship, User $mentor, array $set, bool $finished, int $idleDays = 0): void
     {
         $current = $internship->currentWeek();
         $days = array_keys(WeeklyTask::DAYS);
@@ -344,23 +349,53 @@ class DemoSeeder extends Seeder
                     'created_by' => $mentor->id,
                 ]);
 
+                // Tanggal bukti mengikuti hari task-nya (tidak melewati hari ini), dikurangi $idleDays untuk contoh mahasiswa pasif.
+                $when = $internship->start_date->copy()->addDays(($week - 1) * 7 + $i)->setTime(16, 0);
+                $when = ($when->greaterThan(now()) ? now()->subHour() : $when)->subDays($idleDays);
+
                 if ($done) {
-                    TaskEvidence::create([
+                    $evidence = TaskEvidence::create([
                         'weekly_task_id' => $task->id,
                         'submitted_by' => $internship->student_id,
                         'type' => 'link',
                         'url' => 'https://github.com/contoh/proyek/pull/'.($week * 10 + $i),
                     ]);
+                    $evidence->forceFill(['created_at' => $when, 'updated_at' => $when])->save();
                 }
 
                 if ($done && ($past || $i === 0)) {
-                    TaskComment::create([
+                    $comment = TaskComment::create([
                         'weekly_task_id' => $task->id,
                         'user_id' => $mentor->id,
                         'body' => self::COMMENTS[($week + $i) % count(self::COMMENTS)],
                     ]);
+                    $comment->forceFill(['created_at' => $when->copy()->addHours(2), 'updated_at' => $when->copy()->addHours(2)])->save();
                 }
             }
+        }
+    }
+
+    /** @param  array<string, int>  $scores  nama aspek => nilai (aspek yang tidak disebut dibiarkan kosong) */
+    private function seedAssessment(Internship $internship, User $mentor, array $scores, bool $submit): void
+    {
+        $rubric = AssessmentRubric::active();
+
+        $assessment = Assessment::create([
+            'internship_id' => $internship->id,
+            'rubric_id' => $rubric->id,
+            'assessor_id' => $mentor->id,
+        ]);
+
+        foreach ($rubric->aspects as $aspect) {
+            if (isset($scores[$aspect->name])) {
+                $assessment->scores()->create(['rubric_aspect_id' => $aspect->id, 'score' => $scores[$aspect->name]]);
+            }
+        }
+
+        $assessment->update(['final_score' => $assessment->computeFinalScore()]);
+
+        if ($submit) {
+            $assessment->submit();
         }
     }
 

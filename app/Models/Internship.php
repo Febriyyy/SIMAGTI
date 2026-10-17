@@ -242,6 +242,19 @@ class Internship extends Model
         };
     }
 
+    /** KP mandiri yang sudah diverifikasi biro dan menunggu persetujuan akhir kaprodi. */
+    public function scopeAwaitingKaprodi(Builder $query): Builder
+    {
+        return $query->where('track', 'mandiri')
+            ->where('status', 'diajukan')
+            ->whereHas('approvals', fn ($q) => $q
+                ->where('step', InternshipApproval::STEP_BIRO)
+                ->where('status', 'approved'))
+            ->whereHas('approvals', fn ($q) => $q
+                ->where('step', InternshipApproval::STEP_KAPRODI)
+                ->where('status', 'pending'));
+    }
+
     /** Tambahkan tasks_count dan completed_tasks_count. */
     public function scopeWithProgress(Builder $query): Builder
     {
