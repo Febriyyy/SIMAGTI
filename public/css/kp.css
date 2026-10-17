@@ -126,8 +126,15 @@ a:hover { text-decoration: underline; }
 .nav-item .icon { color: var(--muted-2); transition: color 150ms; }
 .nav-item:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
 .nav-item:hover .icon { color: var(--text); }
-.nav-item.is-active { background: var(--primary-soft); color: var(--primary-dark); font-weight: 700; }
+.nav-item { position: relative; }
+/* Menu aktif: garis hijau di tepi kiri sidebar, teks tebal, ikon hijau (acuan Donezo) */
+.nav-item.is-active { background: transparent; color: var(--text); font-weight: 700; }
+.nav-item.is-active::before {
+    content: ''; position: absolute; left: -18px; top: 6px; bottom: 6px; width: 4px;
+    border-radius: 0 4px 4px 0; background: var(--primary);
+}
 .nav-item.is-active .icon { color: var(--primary); }
+.nav-item.is-active:hover { background: var(--surface-2); }
 .nav-item.is-danger { color: var(--red); }
 .nav-item.is-danger .icon { color: var(--red); }
 .nav-item.is-danger:hover { background: var(--red-soft); }
@@ -245,44 +252,68 @@ details.card .card-body { padding-top: 20px; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: start; }
 
 /* ---------- Kartu angka (komponen x-stat) ----------
-   Susunan tetap untuk semua kartu: kepala (ikon + label), angka, satu baris keterangan.
-   Tinggi semua kartu dalam satu baris otomatis sama. */
+   Acuan gaya "Donezo": judul + tombol panah melingkar, angka besar, satu baris keterangan, tanpa ikon.
+   Kartu pertama di setiap baris = kartu sorotan berlatar hijau tua. Tinggi kartu dalam satu baris selalu sama. */
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
 .stat {
     --tone: var(--primary); --tone-soft: var(--primary-soft);
-    display: flex; flex-direction: column; gap: 12px; min-width: 0;
-    padding: 18px 20px; color: var(--text);
+    display: flex; flex-direction: column; gap: 14px; min-width: 0;
+    padding: 20px 22px 18px; color: var(--text);
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); box-shadow: var(--shadow);
+    border-radius: 22px; box-shadow: var(--shadow);
 }
 .stat-amber { --tone: var(--amber); --tone-soft: var(--amber-soft); }
 .stat-green { --tone: var(--green); --tone-soft: var(--green-soft); }
 .stat-gray { --tone: var(--gray); --tone-soft: var(--gray-soft); }
 .stat-blue { --tone: var(--primary); --tone-soft: var(--primary-soft); }
 
-.stat-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
-/* Ikon polos, kecil, sebaris dengan label: tanpa kotak berwarna di belakangnya. */
-.stat-icon { display: inline-flex; flex: none; color: var(--muted-2); }
-.stat-amber .stat-icon { color: var(--amber); }
-.stat-green .stat-icon { color: var(--green); }
-.stat-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 13px; font-weight: 500; }
-.stat-go { display: inline-flex; flex: none; color: var(--muted-2); transition: color 150ms, transform 150ms; }
+.stat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 32px; min-width: 0; }
+.stat-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.stat-go {
+    display: grid; place-items: center; flex: none; width: 32px; height: 32px;
+    border: 1.5px solid var(--text); border-radius: 50%; color: var(--text);
+    transition: background-color 150ms, color 150ms, border-color 150ms;
+}
 
-.stat-value { font-size: 26px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
-.stat-value small { margin-left: 6px; color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: 0; }
-.stat-value.is-empty { font-size: 17px; line-height: 26px; color: var(--muted); font-weight: 700; letter-spacing: -0.01em; }
+.stat-value { font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+.stat-value small { margin-left: 8px; color: var(--muted); font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.stat-value.is-empty { font-size: 20px; line-height: 40px; color: var(--muted); font-weight: 600; letter-spacing: -0.01em; }
 .stat-amber .stat-value { color: var(--amber); }
 
-.stat-foot { display: flex; align-items: center; gap: 10px; min-height: 18px; margin-top: auto; }
-.stat-hint { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12px; }
+.stat-foot { display: flex; align-items: center; gap: 8px; min-height: 20px; margin-top: auto; }
+.stat-hint { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12.5px; }
+.stat-amber .stat-hint, .stat-green .stat-hint { color: var(--tone); font-weight: 500; }
+.stat-badge {
+    flex: none; padding: 1px 7px; border: 1px solid currentColor; border-radius: 6px;
+    color: var(--tone); font-size: 11px; font-weight: 700; line-height: 16px;
+}
 .stat-bar { flex: 1; height: 6px; border-radius: 999px; background: var(--gray-soft); overflow: hidden; }
 .stat-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--tone); }
 .stat-bar + .stat-hint { flex: none; font-weight: 600; color: var(--gray); }
 
 .stat-link { transition: border-color 150ms, box-shadow 150ms; }
-.stat-link:hover { border-color: var(--tone); text-decoration: none; box-shadow: var(--shadow-hover); }
-.stat-link:hover .stat-go { color: var(--tone); transform: translateX(2px); }
+.stat-link:hover { text-decoration: none; box-shadow: var(--shadow-hover); }
+.stat-link:hover .stat-go { background: var(--text); color: #fff; }
+
+/* Kartu sorotan: kartu pertama di setiap baris */
+.stat-grid > .stat:first-child {
+    border-color: transparent; color: #fff;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(2, 168, 111, 0.45) 0, rgba(2, 168, 111, 0) 55%),
+        linear-gradient(150deg, #035a4f 0%, #03423e 100%);
+    box-shadow: 0 10px 24px rgba(3, 66, 62, 0.22);
+}
+.stat-grid > .stat:first-child .stat-label,
+.stat-grid > .stat:first-child .stat-value { color: #fff; }
+.stat-grid > .stat:first-child .stat-value small,
+.stat-grid > .stat:first-child .stat-value.is-empty { color: rgba(255, 255, 255, 0.72); }
+.stat-grid > .stat:first-child .stat-hint { color: #9fe8c8; font-weight: 500; }
+.stat-grid > .stat:first-child .stat-badge { color: #9fe8c8; }
+.stat-grid > .stat:first-child .stat-go { border-color: transparent; background: #fff; color: var(--brand-ink); }
+.stat-grid > .stat:first-child .stat-bar { background: rgba(255, 255, 255, 0.18); }
+.stat-grid > .stat:first-child .stat-bar > span { background: #9fe8c8; }
+.stat-grid > .stat:first-child .stat-bar + .stat-hint { color: #fff; }
 
 /* ---------- Tabel ---------- */
 
@@ -354,18 +385,18 @@ details.card .card-body { padding-top: 20px; }
 
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 40px; padding: 9px 18px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+    min-height: 40px; padding: 9px 20px; border: 1px solid var(--line-strong); border-radius: 999px;
     background: var(--surface); color: var(--text);
     font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
     transition: background-color 150ms, border-color 150ms, color 150ms;
 }
-.btn:hover { background: var(--surface-2); border-color: var(--muted-2); text-decoration: none; }
+.btn:hover { background: var(--surface-2); border-color: var(--text); text-decoration: none; }
 .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-shadow); }
 .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
 .btn-dark { background: var(--text); border-color: var(--text); color: #fff; border-radius: 999px; padding: 8px 8px 8px 20px; }
 .btn-dark:hover { background: #000; border-color: #000; }
 .btn-dark .btn-dark-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: var(--text); }
-.btn-sm { min-height: 32px; padding: 5px 12px; font-size: 13px; border-radius: 10px; }
+.btn-sm { min-height: 32px; padding: 5px 14px; font-size: 13px; border-radius: 999px; }
 .btn-block { width: 100%; }
 .btn.is-disabled { opacity: 0.45; pointer-events: none; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -621,6 +652,8 @@ details.card .card-body { padding-top: 20px; }
     .nav-label { display: none; }
     .nav { flex-direction: row; order: 3; flex: 0 0 100%; overflow-x: auto; }
     .nav-item { width: auto; white-space: nowrap; padding: 8px 12px; }
+    .nav-item.is-active { background: var(--primary-soft); }
+    .nav-item.is-active::before { display: none; }
     .sidebar-foot { margin: 0 0 0 auto; }
 
     .topbar { padding: 16px 16px 0; }
@@ -654,10 +687,12 @@ details.card .card-body { padding-top: 20px; }
     .file { flex-wrap: wrap; }
 
     .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat { padding: 14px; gap: 10px; }
-    .stat-go { display: none; }
-    .stat-label { white-space: normal; }
-    .stat-value { font-size: 22px; }
+    .stat { padding: 16px; gap: 10px; border-radius: 18px; }
+    .stat-head { align-items: flex-start; }
+    .stat-label { font-size: 13.5px; white-space: normal; }
+    .stat-go { width: 28px; height: 28px; }
+    .stat-value { font-size: 30px; }
+    .stat-value small { display: block; margin: 4px 0 0; font-size: 12px; }
     .stat-hint { white-space: normal; }
 }
 
