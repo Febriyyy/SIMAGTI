@@ -25,3 +25,11 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.claude/
+.agent/
+.agents/
+.gemini/
