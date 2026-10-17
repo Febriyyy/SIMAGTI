@@ -14,9 +14,8 @@
 <div class="auth-wrap">
     <div class="auth-split">
     <div class="auth-panel">
-        <svg class="hero-art" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
-        <svg class="hero-art hero-art-2" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
-        <div class="hero-eyebrow">Sistem Monitoring Kerja Praktik</div>
+        <img class="hero-mark" src="{{ asset('images/logo-simagti-mark.svg') }}" alt="" aria-hidden="true">
+            <div class="hero-eyebrow">Sistem Monitoring Kerja Praktik</div>
         <p class="auth-panel-title">Task mingguan, penilaian, dan progres KP dalam satu tempat.</p>
         <p class="auth-panel-sub">Untuk mahasiswa, mentor, ketua divisi, dosen pembimbing, kaprodi, dan biro kerjasama.</p>
     </div>

@@ -14,6 +14,7 @@ Dokumen ini menjelaskan bahasa dan teknologi yang dipakai di tiap bagian proyek,
 | JavaScript | Hampir tidak ada (hanya `select()` pada link salin) | Sederhana, minim bug |
 | API | JSON, REST, Laravel Sanctum (token Bearer) | Standar, mudah dijelaskan |
 | Font | Plus Jakarta Sans (Google Fonts) | Terbaca, tidak kaku |
+| Ikon | Heroicons outline (paket `blade-ui-kit/blade-heroicons`) | Set ikon dari pembuat Tailwind CSS; satu gaya garis yang konsisten |
 | Dokumentasi | Markdown, Mermaid untuk ERD | Bisa dibuka di VS Code |
 
 ## 2. Arsitektur backend
@@ -101,6 +102,7 @@ Blade merender HTML di server, CSS ditulis manual di satu berkas.
 - **Tanpa animasi** selain transisi warna 150 ms.
 - **Responsif**: di layar kecil sidebar menjadi bilah atas, kartu angka dua kolom, tabel bisa digulir.
 - **Logo**: `public/images/logo-simagti.svg` (logo lengkap, latar transparan, dipakai di sidebar, login, dan halaman aktivasi) dan `logo-simagti-mark.svg` (simbol saja, untuk ikon tab browser). Keduanya dibuat dari berkas logo asli tanpa mengubah bentuk dan warnanya, hanya latar putih dibuang dan ruang kosong dipotong.
+- **Ikon**: komponen `x-icon` memetakan nama ikon aplikasi (misalnya `tasks`) ke Heroicons (`clipboard-document-check`). Jika paket belum terpasang atau nama ikon tidak ditemukan, komponen memakai ikon cadangan sehingga halaman tetap tampil.
 - **Komponen Blade**: `hero` (banner sapaan di semua dashboard, tombolnya menuju halaman yang paling perlu dibuka peran itu), `stat` (kartu angka, satu-satunya gaya ringkasan angka), `person` (avatar + nama + NIM), `avatar` (inisial berwarna tetap per orang), `chip`, `progress`, `icon`, `task-table`.
 - **Grafik tanpa JavaScript**: batang mendatar (`hbars`) untuk sebaran skill dan performa per aspek, kolom (`grade-bars`) untuk sebaran huruf mutu. Semuanya HTML + CSS biasa.
 - **Menu per peran** dibuat di `Menu.php` dan hanya menampilkan halaman yang sudah ada.
@@ -162,6 +164,7 @@ PHPUnit dengan SQLite in-memory, data demo diisi ulang tiap tes. Tes dikelompokk
 ```powershell
 cd D:\phkm\kp-monitor
 php artisan install:api          # sekali saja: memasang Sanctum dan tabel token
+composer require blade-ui-kit/blade-heroicons   # sekali saja: paket ikon
 php artisan migrate:fresh --seed
 php artisan test
 composer run dev

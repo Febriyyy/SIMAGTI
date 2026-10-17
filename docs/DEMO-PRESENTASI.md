@@ -6,6 +6,7 @@ Waktu sekitar 10 menit. Kata sandi semua akun: `Simagti2026` (daftar lengkap di 
 
 ```powershell
 cd D:\phkm\kp-monitor
+composer require blade-ui-kit/blade-heroicons   # sekali saja: paket ikon
 php artisan migrate:fresh --seed
 php artisan test        # harus 118 lolos
 composer run dev

@@ -199,8 +199,11 @@ a:hover { text-decoration: underline; }
 .hero-title { margin-top: 8px; font-size: 30px; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
 .hero-sub { margin-top: 8px; font-size: 14px; opacity: 0.88; }
 .hero-action { position: relative; z-index: 1; flex: none; }
-.hero-art { position: absolute; right: 22%; top: 50%; transform: translateY(-50%); width: 140px; height: 140px; color: rgba(255, 255, 255, 0.22); pointer-events: none; }
-.hero-art-2 { right: 6%; top: 18%; width: 54px; height: 54px; transform: none; color: rgba(255, 255, 255, 0.3); }
+.hero-mark {
+    /* Siluet logo SIMAGTI sebagai hiasan, putih transparan di atas gradasi */
+    position: absolute; right: -36px; bottom: -64px; width: 260px; height: 260px;
+    filter: brightness(0) invert(1); opacity: 0.09; pointer-events: none; user-select: none;
+}
 
 /* ---------- Kartu ---------- */
 
@@ -583,8 +586,7 @@ details.card .card-body { padding-top: 20px; }
 }
 .auth-panel-title { position: relative; font-size: 28px; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
 .auth-panel-sub { position: relative; opacity: 0.88; }
-.auth-panel .hero-art { right: auto; left: 44px; top: 56px; transform: none; width: 120px; height: 120px; }
-.auth-panel .hero-art-2 { left: auto; right: 48px; top: 120px; width: 48px; height: 48px; }
+.auth-panel .hero-mark { right: -80px; top: 30px; bottom: auto; width: 360px; height: 360px; opacity: 0.06; }
 .auth-card {
     width: 100%; max-width: 420px; padding: 36px;
     background: var(--surface); border: 1px solid var(--line);
@@ -637,8 +639,7 @@ details.card .card-body { padding-top: 20px; }
 
     .hero { flex-direction: column; align-items: flex-start; padding: 24px; }
     .hero-title { font-size: 24px; }
-    .hero-art { right: -20px; width: 110px; height: 110px; }
-    .hero-art-2 { display: none; }
+    .hero-mark { width: 180px; height: 180px; right: -40px; bottom: -50px; }
 
     .auth-split { grid-template-columns: 1fr; }
     .auth-panel { display: none; }

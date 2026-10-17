@@ -5,8 +5,7 @@
 --}}
 @props(['eyebrow' => null, 'title', 'sub' => null, 'action' => null, 'href' => null])
 <section class="hero">
-    <svg class="hero-art" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
-    <svg class="hero-art hero-art-2" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
+    <img class="hero-mark" src="{{ asset('images/logo-simagti-mark.svg') }}" alt="" aria-hidden="true">
     <div class="hero-text">
         @if ($eyebrow)<div class="hero-eyebrow">{{ $eyebrow }}</div>@endif
         <h1 class="hero-title">{{ $title }}</h1>
