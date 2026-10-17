@@ -14,10 +14,10 @@
 @php($tag = $href ? 'a' : 'div')
 <{{ $tag }} @if ($href) href="{{ $href }}" @endif {{ $attributes->class(['stat', 'stat-'.$tone, 'stat-link' => $href]) }}>
     <div class="stat-head">
-        <span class="stat-icon"><x-icon :name="$icon" :size="18" /></span>
+        <span class="stat-icon"><x-icon :name="$icon" :size="16" /></span>
         <span class="stat-label">{{ $label }}</span>
         @if ($href)
-            <span class="stat-go" aria-hidden="true"><x-icon name="arrow" :size="14" /></span>
+            <span class="stat-go" aria-hidden="true"><x-icon name="arrow" :size="16" /></span>
         @endif
     </div>
     @if ($value === null || $value === '')

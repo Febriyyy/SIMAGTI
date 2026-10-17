@@ -261,17 +261,13 @@ details.card .card-body { padding-top: 20px; }
 .stat-gray { --tone: var(--gray); --tone-soft: var(--gray-soft); }
 .stat-blue { --tone: var(--primary); --tone-soft: var(--primary-soft); }
 
-.stat-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.stat-icon {
-    display: grid; place-items: center; flex: none; width: 36px; height: 36px;
-    border-radius: 11px; background: var(--tone-soft); color: var(--tone);
-}
-.stat-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gray); font-size: 13px; font-weight: 600; }
-.stat-go {
-    display: grid; place-items: center; flex: none; width: 26px; height: 26px;
-    border-radius: 50%; background: var(--surface-2); color: var(--muted);
-    transition: background-color 150ms, color 150ms;
-}
+.stat-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+/* Ikon polos, kecil, sebaris dengan label: tanpa kotak berwarna di belakangnya. */
+.stat-icon { display: inline-flex; flex: none; color: var(--muted-2); }
+.stat-amber .stat-icon { color: var(--amber); }
+.stat-green .stat-icon { color: var(--green); }
+.stat-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 13px; font-weight: 500; }
+.stat-go { display: inline-flex; flex: none; color: var(--muted-2); transition: color 150ms, transform 150ms; }
 
 .stat-value { font-size: 26px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
 .stat-value small { margin-left: 6px; color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: 0; }
@@ -286,7 +282,7 @@ details.card .card-body { padding-top: 20px; }
 
 .stat-link { transition: border-color 150ms, box-shadow 150ms; }
 .stat-link:hover { border-color: var(--tone); text-decoration: none; box-shadow: var(--shadow-hover); }
-.stat-link:hover .stat-go { background: var(--tone); color: #fff; }
+.stat-link:hover .stat-go { color: var(--tone); transform: translateX(2px); }
 
 /* ---------- Tabel ---------- */
 
@@ -659,9 +655,7 @@ details.card .card-body { padding-top: 20px; }
 
     .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     .stat { padding: 14px; gap: 10px; }
-    .stat-icon { width: 30px; height: 30px; border-radius: 9px; }
     .stat-go { display: none; }
-    .stat-head { flex-direction: column; align-items: flex-start; gap: 8px; }
     .stat-label { white-space: normal; }
     .stat-value { font-size: 22px; }
     .stat-hint { white-space: normal; }
