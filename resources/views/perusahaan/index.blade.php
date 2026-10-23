@@ -9,7 +9,7 @@
             <p class="page-sub">Perusahaan mitra dan tempat KP yang diajukan mahasiswa.</p>
         </div>
         @if ($canManage)
-            <a href="{{ route('perusahaan.create') }}" class="btn btn-primary"><x-icon name="plus" :size="16" /> Tambah perusahaan</a>
+            <a href="{{ route('perusahaan.create') }}" class="btn btn-primary"><x-ikon name="plus" :size="16" /> Tambah perusahaan</a>
         @endif
     </div>
 

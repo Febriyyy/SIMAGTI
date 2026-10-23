@@ -27,7 +27,7 @@ class CertificateVerificationController extends Controller
             'number' => $certificate->number,
             'issued_at' => $certificate->issued_at?->toDateString(),
             'student_name' => $internship->student->name,
-            'company_name' => $internship->company->name,
+            'company_name' => $internship->placeName(),
             'start_date' => $internship->start_date->toDateString(),
             'end_date' => $internship->end_date->toDateString(),
             'revoked_reason' => $certificate->status === 'dicabut' ? $certificate->revoked_reason : null,

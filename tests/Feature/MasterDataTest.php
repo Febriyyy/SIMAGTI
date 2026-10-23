@@ -49,8 +49,8 @@ class MasterDataTest extends TestCase
         return array_merge([
             'student_id' => $student->id,
             'company_id' => $this->nusantara()->id,
-            'mentor_id' => $this->user('mentor@kp.test')->id,
-            'supervisor_id' => $this->user('divisi@kp.test')->id,
+            'supervisor_id' => $this->user('supervisor@kp.test')->id,
+            'program_type' => 'industri',
             'lecturer_id' => $this->user('dospem@kp.test')->id,
             'start_date' => now()->addDays(7)->toDateString(),
             'end_date' => now()->addMonths(4)->toDateString(),
@@ -63,7 +63,8 @@ class MasterDataTest extends TestCase
     {
         $this->actingAs($this->user('biro@kp.test'))->get('/perusahaan')->assertOk()->assertSee('PT Nusantara Digital');
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/perusahaan')->assertOk();
-        $this->actingAs($this->user('mentor@kp.test'))->get('/perusahaan')->assertForbidden();
+        $this->actingAs($this->user('supervisor@kp.test'))->get('/perusahaan')->assertForbidden();
+        $this->actingAs($this->user('tu@kp.test'))->get('/perusahaan')->assertForbidden();
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/perusahaan')->assertForbidden();
     }
 
@@ -146,7 +147,7 @@ class MasterDataTest extends TestCase
         $base = ['name' => 'X', 'study_program_id' => $program->id, 'password' => 'sandi-awal-1'];
 
         $this->actingAs($kaprodi)
-            ->post('/mahasiswa', $base + ['email' => 'baru@kampus.test', 'nim' => '2210511012'])
+            ->post('/mahasiswa', $base + ['email' => 'baru@kampus.test', 'nim' => '2310511012'])
             ->assertSessionHasErrors('nim');
 
         $this->actingAs($kaprodi)
@@ -175,8 +176,8 @@ class MasterDataTest extends TestCase
         $this->assertSame('lowongan', $internship->track);
         $this->assertSame('berjalan', $internship->status);
         $this->assertSame($this->user('dospem@kp.test')->id, $internship->lecturer_id);
-        $this->assertTrue($internship->isMentoredBy($this->user('mentor@kp.test')));
-        $this->assertTrue($internship->isSupervisedBy($this->user('divisi@kp.test')));
+        $this->assertSame(['magang', 'industri'], [$internship->program, $internship->program_type]);
+        $this->assertTrue($internship->isSupervisedBy($this->user('supervisor@kp.test')));
         $this->assertDatabaseHas('internship_status_histories', ['internship_id' => $internship->id, 'to_status' => 'berjalan']);
     }
 
@@ -189,25 +190,25 @@ class MasterDataTest extends TestCase
             ->assertSessionHasErrors('student_id');
     }
 
-    public function test_mentor_harus_staf_dari_perusahaan_yang_dipilih(): void
+    public function test_company_supervisor_harus_staf_dari_perusahaan_yang_dipilih(): void
     {
         $student = $this->freeStudent();
 
-        // mentor2 bekerja di PT Data Prima, bukan PT Nusantara Digital
+        // supervisor2 bekerja di PT Data Prima, bukan PT Nusantara Digital
         $this->actingAs($this->user('kaprodi@kp.test'))
-            ->post('/penempatan', $this->placementPayload($student, ['mentor_id' => $this->user('mentor2@kp.test')->id]))
-            ->assertSessionHasErrors('mentor_id');
+            ->post('/penempatan', $this->placementPayload($student, ['supervisor_id' => $this->user('supervisor2@kp.test')->id]))
+            ->assertSessionHasErrors('supervisor_id');
 
         $this->assertDatabaseMissing('internships', ['student_id' => $student->id]);
     }
 
-    public function test_pengguna_dengan_peran_salah_ditolak_sebagai_mentor_atau_dosen(): void
+    public function test_pengguna_dengan_peran_salah_ditolak_sebagai_supervisor_atau_dosen(): void
     {
         $student = $this->freeStudent();
 
         $this->actingAs($this->user('kaprodi@kp.test'))
-            ->post('/penempatan', $this->placementPayload($student, ['lecturer_id' => $this->user('mentor@kp.test')->id]))
-            ->assertSessionHasErrors('lecturer_id');
+            ->post('/penempatan', $this->placementPayload($student, ['lecturer_id' => $this->user('supervisor@kp.test')->id, 'supervisor_id' => $this->user('dospem@kp.test')->id]))
+            ->assertSessionHasErrors(['lecturer_id', 'supervisor_id']);
     }
 
     public function test_tanggal_selesai_penempatan_harus_setelah_tanggal_mulai(): void

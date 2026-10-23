@@ -4,14 +4,15 @@
 
 @section('content')
     @php
-        [$heroAction, $heroHref] = match ($user->role) {
-            'kaprodi' => ['Persetujuan KP', route('kaprodi.persetujuan')],
-            'ketua_divisi' => ['Buka validasi', route('divisi.validasi')],
-            default => $attention->isNotEmpty() ? ['Lihat yang perlu perhatian', '#perlu-perhatian'] : [null, null],
+        [$heroAction, $heroHref] = match (true) {
+            $user->hasRole('kaprodi') => ['Persetujuan KP', route('kaprodi.persetujuan')],
+            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => ['Buka validasi', route('validasi.index')],
+            $attention->isNotEmpty() => ['Lihat yang perlu perhatian', '#perlu-perhatian'],
+            default => ['Pantau kegiatan', route('pantau.index')],
         };
         $heroSub = match (true) {
-            $user->hasRole('ketua_divisi') && $waitingValidation->isNotEmpty() => $waitingValidation->count().' penilaian akhir menunggu validasi Anda.',
-            $user->hasRole('kaprodi') && $waitingApproval > 0 => $waitingApproval.' KP mandiri menunggu persetujuan Anda.',
+            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => $subtitle.' '.$waitingValidation->count().' penilaian akhir menunggu validasi Anda.',
+            $user->hasRole('kaprodi') && $waitingApproval > 0 => $waitingApproval.' pengajuan KP menunggu persetujuan Anda.',
             $attention->isNotEmpty() => $subtitle.' '.$attention->count().' mahasiswa perlu perhatian.',
             default => $subtitle.' Semua mahasiswa aktif dalam kondisi baik.',
         };
@@ -22,7 +23,7 @@
     @php($rules = \App\Actions\Dashboard\BuildMonitoringDashboard::class)
     <div class="stat-grid">
         <x-stat label="Magang aktif" :value="$stats['active']" unit="mahasiswa" icon="users"
-                :hint="'di '.$stats['companies'].' perusahaan'" />
+                :hint="'di '.$stats['companies'].' perusahaan'" :href="route('pantau.index')" />
 
         <x-stat label="Task selesai" :value="$stats['average'].'%'" icon="tasks" :percent="$stats['average']" />
 
@@ -57,8 +58,8 @@
                         <table class="table table-compact">
                             <thead>
                                 <tr>
-                                    <th>Mahasiswa</th>
-                                    <th>Perusahaan</th>
+                                    <th style="width: 28%">Mahasiswa</th>
+                                    <th style="width: 26%">Tempat</th>
                                     <th>Progres task</th>
                                     <th>Nilai akhir</th>
                                     <th>Status KP</th>
@@ -68,10 +69,10 @@
                                 @foreach ($internships as $internship)
                                     @php($a = $internship->assessment)
                                     <tr>
-                                        <td><x-person :user="$internship->student" /></td>
-                                        <td>
-                                            <span class="truncate" title="{{ $internship->company->name }}">{{ $internship->company->name }}</span>
-                                            <div class="cell-sub truncate" title="Mentor: {{ $internship->mentor?->name ?? 'belum ada' }}">{{ $internship->mentor?->name ?? 'Mentor belum ada' }}</div>
+                                        <td class="col-fluid"><a href="{{ route('pantau.show', $internship) }}" class="row-link"><x-person :user="$internship->student" /></a></td>
+                                        <td class="col-fluid">
+                                            <span class="truncate" title="{{ $internship->placeName() }}">{{ $internship->placeName() }}</span>
+                                            <div class="cell-sub truncate" title="{{ $internship->placeDetail() }}">{{ $internship->placeDetail() ?? $internship->programTypeLabel() }}</div>
                                         </td>
                                         <td>
                                             @if ($internship->status === 'diajukan')
@@ -79,7 +80,7 @@
                                             @else
                                                 <x-progress :value="$internship->percent()" />
                                                 <div class="cell-sub" @if ($internship->last_activity_at) title="{{ $internship->last_activity_at->locale('id')->translatedFormat('j F Y, H:i') }}" @endif>
-                                                    Bukti terakhir: {{ $internship->last_activity_at ? \App\Support\Relative::label($internship->last_activity_at) : 'belum ada' }}
+                                                    Kegiatan terakhir: {{ $internship->last_activity_at ? \App\Support\Relative::label($internship->last_activity_at) : 'belum ada' }}
                                                 </div>
                                             @endif
                                         </td>
@@ -102,90 +103,97 @@
                 @endif
             </section>
 
-        <div class="grid-cards">
-            @if ($user->hasRole('ketua_divisi'))
-                <section class="card">
-                    <div class="card-head">
-                        <div>
-                            <h2 class="card-title">Menunggu validasi</h2>
-                            <p class="card-sub">Penilaian akhir dari mentor</p>
+        <div class="split">
+            <div class="col">
+                @if ($user->hasRole('dospem'))
+                    <section class="card">
+                        <div class="card-head">
+                            <div>
+                                <h2 class="card-title">Menunggu validasi</h2>
+                                <p class="card-sub">Penilaian akhir dari Company Supervisor</p>
+                            </div>
+                            <a href="{{ route('validasi.index') }}" class="btn btn-sm">Semua</a>
                         </div>
-                        <a href="{{ route('divisi.validasi') }}" class="btn btn-sm">Semua</a>
+                        @if ($waitingValidation->isEmpty())
+                            <p class="meeting-empty">Tidak ada yang menunggu.</p>
+                        @else
+                            <ul class="item-list">
+                                @foreach ($waitingValidation as $internship)
+                                    <li class="item-row">
+                                        <div class="grow"><x-person :user="$internship->student" /></div>
+                                        <a href="{{ route('validasi.show', $internship) }}" class="btn btn-sm btn-primary">Periksa</a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </section>
+                @endif
+
+                <section class="card" id="perlu-perhatian">
+                    <div class="card-head">
+                        <h2 class="card-title">Perlu perhatian</h2>
+                        @if ($attention->isEmpty())
+                            <x-chip tone="green">Aman</x-chip>
+                        @else
+                            <x-chip tone="amber">{{ $attention->count() }} mahasiswa</x-chip>
+                        @endif
                     </div>
-                    @if ($waitingValidation->isEmpty())
-                        <p class="meeting-empty">Tidak ada yang menunggu.</p>
+
+                    @if ($attention->isEmpty())
+                        <div class="calm">
+                            <span class="calm-icon"><x-ikon name="check" :size="20" /></span>
+                            <p>Semua mahasiswa aktif mencatat kegiatan dan progresnya baik.</p>
+                        </div>
                     @else
-                        <ul class="item-list">
-                            @foreach ($waitingValidation as $internship)
-                                <li class="item-row">
-                                    <div class="grow"><x-person :user="$internship->student" /></div>
-                                    <a href="{{ route('divisi.validasi.show', $internship) }}" class="btn btn-sm btn-primary">Periksa</a>
+                        <ul class="watch-list">
+                            @foreach ($attention->take(5) as $row)
+                                @php($i = $row['internship'])
+                                <li class="watch">
+                                    <x-avatar :user="$i->student" small />
+                                    <div class="watch-body">
+                                        <div class="watch-name">{{ $i->student->name }}</div>
+                                        <div class="watch-meta">{{ $i->student->nim }} · {{ $i->placeName() }}</div>
+                                        <div class="watch-flags">
+                                            @foreach ($row['reasons'] as $reason)
+                                                <span class="watch-flag"><x-ikon name="alert" :size="12" /> {{ $reason }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </li>
                             @endforeach
                         </ul>
                     @endif
+
+                    <p class="card-foot">
+                        Ditandai otomatis jika tidak ada kegiatan {{ $rules::IDLE_DAYS }} hari, progres di bawah {{ $rules::LOW_PROGRESS }}%,
+                        atau KP tinggal {{ $rules::ENDING_DAYS }} hari tapi nilai belum divalidasi.
+                    </p>
                 </section>
-            @endif
 
-            <section class="card" id="perlu-perhatian">
-                <div class="card-head">
-                    <h2 class="card-title">Perlu perhatian</h2>
-                    @if ($attention->isEmpty())
-                        <x-chip tone="green">Aman</x-chip>
-                    @else
-                        <x-chip tone="amber">{{ $attention->count() }} mahasiswa</x-chip>
-                    @endif
-                </div>
+                @include('dashboard._activity')
+            </div>
 
-                @if ($attention->isEmpty())
-                    <div class="calm">
-                        <span class="calm-icon"><x-icon name="check" :size="20" /></span>
-                        <p>Semua mahasiswa aktif mengirim bukti dan progresnya baik.</p>
+            <div class="col">
+                <section class="card">
+                    <div class="card-head">
+                        <div>
+                            <h2 class="card-title">Penilaian akhir</h2>
+                            <p class="card-sub">Status penilaian mahasiswa yang magang</p>
+                        </div>
                     </div>
-                @else
-                    <ul class="watch-list">
-                        @foreach ($attention->take(5) as $row)
-                            @php($i = $row['internship'])
-                            <li class="watch">
-                                <x-avatar :user="$i->student" small />
-                                <div class="watch-body">
-                                    <div class="watch-name">{{ $i->student->name }}</div>
-                                    <div class="watch-meta">{{ $i->student->nim }} · {{ $i->company->name }}</div>
-                                    <div class="watch-flags">
-                                        @foreach ($row['reasons'] as $reason)
-                                            <span class="watch-flag"><x-icon name="alert" :size="12" /> {{ $reason }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                <p class="card-foot">
-                    Ditandai otomatis jika tidak ada bukti {{ $rules::IDLE_DAYS }} hari, progres di bawah {{ $rules::LOW_PROGRESS }}%,
-                    atau KP tinggal {{ $rules::ENDING_DAYS }} hari tapi nilai belum divalidasi.
-                </p>
-            </section>
-
-            <section class="card">
-                <div class="card-head">
-                    <div>
-                        <h2 class="card-title">Penilaian akhir</h2>
-                        <p class="card-sub">Status penilaian mahasiswa yang magang</p>
+                    <div class="card-body">
+                        <x-donut caption="mahasiswa" unit="mahasiswa" :segments="[
+                            ['label' => 'Tervalidasi', 'value' => $assessment['validated'], 'color' => 'green'],
+                            ['label' => 'Menunggu validasi', 'value' => $assessment['submitted'], 'color' => 'blue'],
+                            ['label' => 'Draft supervisor', 'value' => $assessment['draft'], 'color' => 'amber'],
+                            ['label' => 'Belum dinilai', 'value' => $assessment['none'], 'color' => 'gray'],
+                        ]" />
+                        <h3 class="label" style="margin: 22px 0 10px">Sebaran huruf mutu</h3>
+                        @include('dashboard._grades', ['grades' => $grades])
                     </div>
-                </div>
-                <div class="card-body">
-                    <dl class="kv">
-                        <div><dt>Belum dinilai</dt><dd>{{ $assessment['none'] }}</dd></div>
-                        <div><dt>Draft mentor</dt><dd>{{ $assessment['draft'] }}</dd></div>
-                        <div><dt>Menunggu validasi</dt><dd>{{ $assessment['submitted'] }}</dd></div>
-                        <div><dt>Tervalidasi</dt><dd>{{ $assessment['validated'] }}</dd></div>
-                    </dl>
-                    <h3 class="label" style="margin: 18px 0 10px">Sebaran huruf mutu</h3>
-                    @include('dashboard._grades', ['grades' => $grades])
-                </div>
-            </section>
+                </section>
+
+            </div>
         </div>
 
         @if ($user->hasRole('kaprodi') && $companies->isNotEmpty())

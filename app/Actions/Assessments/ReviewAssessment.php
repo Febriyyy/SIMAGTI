@@ -10,8 +10,8 @@ use App\Support\Num;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Ketua divisi memvalidasi penilaian (nilai dan huruf mutu dikunci permanen)
- * atau mengembalikannya ke mentor dengan catatan.
+ * Dosen pembimbing memvalidasi penilaian (nilai dan huruf mutu dikunci permanen)
+ * atau mengembalikannya ke penilai (Company Supervisor) dengan catatan.
  */
 class ReviewAssessment
 {
@@ -38,7 +38,7 @@ class ReviewAssessment
                     'supervisor_note' => $note,
                 ]);
 
-                ActivityLog::record('penilaian.kembalikan', "Mengembalikan penilaian akhir {$student} ke mentor", $assessment);
+                ActivityLog::record('penilaian.kembalikan', "Mengembalikan penilaian akhir {$student} ke penilai", $assessment);
             }
 
             return $assessment;

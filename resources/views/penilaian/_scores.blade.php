@@ -5,9 +5,9 @@
         <thead>
             <tr>
                 <th>Aspek</th>
-                <th>Bobot</th>
-                <th>Nilai</th>
-                <th>Kontribusi</th>
+                <th class="col-num">Bobot</th>
+                <th class="col-num">Nilai</th>
+                <th class="col-num">Kontribusi</th>
             </tr>
         </thead>
         <tbody>
@@ -22,11 +22,21 @@
                             <div class="cell-sub">{{ $aspect->description }}</div>
                         @endif
                     </td>
-                    <td>{{ \App\Support\Num::short($aspect->weight) }}%</td>
-                    <td class="cell-title">{{ \App\Support\Num::short($s?->score) }}</td>
-                    <td class="muted">{{ $s ? \App\Support\Num::short((float) $s->score * (float) $aspect->weight / 100) : '–' }}</td>
+                    <td class="col-num">{{ \App\Support\Num::short($aspect->weight) }}%</td>
+                    <td class="col-num cell-title">{{ \App\Support\Num::short($s?->score) }}</td>
+                    <td class="col-num muted">{{ $s ? \App\Support\Num::short((float) $s->score * (float) $aspect->weight / 100) : '–' }}</td>
                 </tr>
             @endforeach
         </tbody>
+        @if ($assessment?->final_score !== null)
+            <tfoot>
+                <tr>
+                    <td class="cell-title">Nilai akhir</td>
+                    <td class="col-num">100%</td>
+                    <td></td>
+                    <td class="col-num cell-title">{{ \App\Support\Num::short($assessment->final_score) }}</td>
+                </tr>
+            </tfoot>
+        @endif
     </table>
 </div>

@@ -5,8 +5,8 @@
 @section('content')
     <div class="page-head">
         <div>
-            <h1 class="page-title">Persetujuan KP Mandiri</h1>
-            <p class="page-sub">Pengajuan yang perusahaannya sudah diverifikasi Biro Kerjasama.</p>
+            <h1 class="page-title">Persetujuan KP</h1>
+            <p class="page-sub">Magang yang perusahaannya sudah diverifikasi Biro Kerjasama, dan pengajuan seminar.</p>
         </div>
     </div>
 
@@ -14,7 +14,7 @@
         <div class="card">
             <div class="empty">
                 <strong>Tidak ada pengajuan yang menunggu</strong>
-                Pengajuan akan muncul setelah diverifikasi Biro Kerjasama.
+                Pengajuan magang muncul setelah diverifikasi Biro Kerjasama; seminar langsung muncul di sini.
             </div>
         </div>
     @else
@@ -24,50 +24,57 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">{{ $item->student->name }} ({{ $item->student->nim }})</h2>
-                        <p class="card-sub">{{ $item->company->name }}@if ($item->division) · {{ $item->division->name }}@endif</p>
+                        <p class="card-sub">{{ $item->programTypeLabel() }} · {{ $item->placeName() }}@if ($item->placeDetail()) · {{ $item->placeDetail() }}@endif</p>
                     </div>
-                    <x-chip tone="green">Terverifikasi biro</x-chip>
+                    @if ($item->isSeminar())
+                        <x-chip tone="purple">Seminar</x-chip>
+                    @else
+                        <x-chip tone="green">Terverifikasi biro</x-chip>
+                    @endif
                 </div>
 
                 <div class="card-body">
                     <dl class="kv">
-                        <div><dt>Bidang</dt><dd>{{ $item->company->industry ?? '–' }}</dd></div>
-                        <div><dt>Alamat</dt><dd>{{ $item->company->address ?? '–' }}@if ($item->company->city), {{ $item->company->city }}@endif</dd></div>
-                        <div><dt>Periode</dt><dd>{{ $item->start_date->locale('id')->translatedFormat('j F Y') }} – {{ $item->end_date->locale('id')->translatedFormat('j F Y') }}</dd></div>
-                        <div><dt>Diverifikasi</dt><dd>{{ $biro?->reviewer?->name ?? '–' }}@if ($biro?->reviewed_at), {{ $biro->reviewed_at->locale('id')->translatedFormat('j F Y') }}@endif</dd></div>
-                        <div>
-                        <dt>Undangan</dt>
-                        <dd>
-                            @forelse ($item->invitations as $invitation)
-                                {{ $invitation->email }} ({{ \App\Models\User::ROLE_LABELS[$invitation->role] ?? $invitation->role }})@if (! $loop->last), @endif
-                            @empty
-                                –
-                            @endforelse
-                        </dd>
-                        </div>
+                        <div><dt>Program studi</dt><dd><x-academic :user="$item->student" compact /></dd></div>
+                        @if ($item->isSeminar())
+                            <div><dt>Kegiatan</dt><dd>{{ $item->topic }}</dd></div>
+                            <div><dt>Penyelenggara</dt><dd>{{ $item->organizer ?? '–' }}</dd></div>
+                        @else
+                            <div><dt>Bidang</dt><dd>{{ $item->company?->industry ?? '–' }}</dd></div>
+                            <div><dt>Alamat</dt><dd>{{ $item->company?->address ?? '–' }}@if ($item->company?->city), {{ $item->company->city }}@endif</dd></div>
+                            <div><dt>Company Supervisor</dt><dd>{{ $item->supervisor_name ?? '–' }}@if ($item->supervisor_email)<small>{{ $item->supervisor_title ? $item->supervisor_title.' · ' : '' }}{{ $item->supervisor_email }}</small>@endif</dd></div>
+                            <div><dt>Diverifikasi</dt><dd>{{ $biro?->reviewer?->name ?? '–' }}@if ($biro?->reviewed_at), {{ $biro->reviewed_at->locale('id')->translatedFormat('j F Y') }}@endif</dd></div>
+                        @endif
+                        <div><dt>Periode</dt><dd>{{ $item->periodLabel() }}</dd></div>
                     </dl>
 
-                    <div class="toolbar">
-                        <form method="POST" action="{{ route('kaprodi.persetujuan.update', $item) }}" class="inline-form">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="decision" value="approve">
-                            <select name="lecturer_id" class="select select-sm" required aria-label="Dosen pembimbing untuk {{ $item->student->name }}">
-                                <option value="">Pilih dosen pembimbing</option>
-                                @foreach ($lecturers as $lecturer)
-                                    <option value="{{ $lecturer->id }}">{{ $lecturer->name }}</option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-primary btn-sm">Setujui</button>
-                        </form>
+                    <div class="decision">
+                        <div class="decision-col">
+                            <p class="decision-label">Setujui dan tetapkan dosen pembimbing</p>
+                            <form method="POST" action="{{ route('kaprodi.persetujuan.update', $item) }}" class="inline-form">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="decision" value="approve">
+                                <select name="lecturer_id" class="select" required aria-label="Dosen pembimbing untuk {{ $item->student->name }}">
+                                    <option value="">Pilih dosen pembimbing</option>
+                                    @foreach ($lecturers as $lecturer)
+                                        <option value="{{ $lecturer->id }}">{{ $lecturer->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary">Setujui</button>
+                            </form>
+                        </div>
 
-                        <form method="POST" action="{{ route('kaprodi.persetujuan.update', $item) }}" class="inline-form">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="decision" value="reject">
-                            <input type="text" name="note" class="input" placeholder="Alasan penolakan" maxlength="500" required aria-label="Alasan penolakan untuk {{ $item->student->name }}">
-                            <button type="submit" class="btn btn-sm">Tolak</button>
-                        </form>
+                        <div class="decision-col">
+                            <p class="decision-label">Tolak dengan alasan</p>
+                            <form method="POST" action="{{ route('kaprodi.persetujuan.update', $item) }}" class="inline-form">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="decision" value="reject">
+                                <input type="text" name="note" class="input" placeholder="Alasan penolakan" maxlength="500" required aria-label="Alasan penolakan untuk {{ $item->student->name }}">
+                                <button type="submit" class="btn">Tolak</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </section>

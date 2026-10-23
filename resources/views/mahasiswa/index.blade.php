@@ -42,7 +42,7 @@
                                 <td>
                                     @if ($latest)
                                         <x-chip :tone="$latest->statusTone()">{{ $latest->statusLabel() }}</x-chip>
-                                        <div class="cell-sub">{{ $latest->company->name }}</div>
+                                        <div class="cell-sub">{{ $latest->placeName() }}</div>
                                     @else
                                         <span class="muted">Belum ada</span>
                                     @endif
@@ -96,7 +96,7 @@
                     <p class="hint">Minimal 8 karakter. Sampaikan ke mahasiswa agar diganti setelah masuk.</p>
                 </div>
                 <div class="span-all">
-                    <button type="submit" class="btn btn-primary"><x-icon name="plus" :size="16" /> Tambah mahasiswa</button>
+                    <button type="submit" class="btn btn-primary"><x-ikon name="plus" :size="16" /> Tambah mahasiswa</button>
                 </div>
             </form>
         </div>

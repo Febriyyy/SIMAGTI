@@ -9,11 +9,13 @@ use App\Models\User;
 use App\Models\WeeklyTask;
 use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-/** Mentor melampirkan materi (PDF, PPT, gambar) pada task; hanya mahasiswa pemilik dan mentornya yang bisa mengunduh. */
+/**
+ * Lampiran materi lama (versi awal, saat task dibuat mentor). Sejak KP v2 tidak bisa ditambah lagi,
+ * tetapi tetap bisa dibuka oleh mahasiswa pemilik, Company Supervisor, dosen pembimbing, dan kaprodi.
+ */
 class TaskAttachmentTest extends TestCase
 {
     use RefreshDatabase;
@@ -30,175 +32,63 @@ class TaskAttachmentTest extends TestCase
         return User::where('email', $email)->firstOrFail();
     }
 
-    private function rinaTask(): WeeklyTask
+    private function task(string $email): WeeklyTask
     {
-        $rina = Internship::where('student_id', $this->user('mahasiswa@kp.test')->id)->firstOrFail();
-
-        return $rina->tasks()->firstOrFail();
+        return Internship::where('student_id', $this->user($email)->id)->firstOrFail()->tasks()->orderBy('id')->firstOrFail();
     }
 
-    private function pdf(string $name = 'panduan.pdf'): UploadedFile
+    private function attach(WeeklyTask $task, string $name = 'panduan.pdf'): TaskAttachment
     {
-        return UploadedFile::fake()->create($name, 300, 'application/pdf');
+        $path = "lampiran/{$task->id}/".uniqid().'.pdf';
+        Storage::disk('local')->put($path, '%PDF-1.4 contoh');
+        $file = StoredFile::create([
+            'disk' => 'local', 'path' => $path, 'original_name' => $name, 'mime_type' => 'application/pdf', 'size' => 15,
+            'uploaded_by' => $this->user('supervisor@kp.test')->id,
+        ]);
+
+        return TaskAttachment::create(['weekly_task_id' => $task->id, 'file_id' => $file->id, 'uploaded_by' => $file->uploaded_by]);
     }
 
-    private function pptx(): UploadedFile
+    public function test_lampiran_lama_bisa_dibuka_yang_berhak_saja(): void
     {
-        return UploadedFile::fake()->create('materi.pptx', 800, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
-    }
-
-    public function test_mentor_membuat_task_beserta_lampiran_pdf_ppt_dan_gambar(): void
-    {
-        $rina = Internship::where('student_id', $this->user('mahasiswa@kp.test')->id)->firstOrFail();
-
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post('/mentor/tugas', [
-                'magang' => $rina->id,
-                'minggu' => $rina->currentWeek(),
-                'day' => 'jumat',
-                'title' => 'Pelajari alur checkout',
-                'lampiran' => [$this->pdf(), $this->pptx(), UploadedFile::fake()->image('contoh.png')],
-            ])
-            ->assertRedirect()
-            ->assertSessionHasNoErrors();
-
-        $task = WeeklyTask::where('title', 'Pelajari alur checkout')->firstOrFail();
-        $this->assertCount(3, $task->attachments);
-
-        foreach ($task->attachments as $attachment) {
-            Storage::disk('local')->assertExists($attachment->file->path);
-            $this->assertNotEmpty($attachment->file->checksum);
-        }
-    }
-
-    public function test_jenis_berkas_lain_dan_berkas_terlalu_besar_ditolak(): void
-    {
-        $task = $this->rinaTask();
-        $mentor = $this->user('mentor@kp.test');
-
-        $this->actingAs($mentor)
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [UploadedFile::fake()->create('virus.exe', 10, 'application/x-msdownload')]])
-            ->assertSessionHasErrors('lampiran.0');
-
-        // Program yang diganti namanya menjadi .pdf tetap ditolak karena isinya bukan PDF
-        $this->actingAs($mentor)
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [UploadedFile::fake()->create('materi.pdf', 10, 'application/x-msdownload')]])
-            ->assertSessionHasErrors('lampiran.0');
-
-        $this->actingAs($mentor)
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [UploadedFile::fake()->create('besar.pdf', TaskAttachment::MAX_KB + 1, 'application/pdf')]])
-            ->assertSessionHasErrors('lampiran.0');
-
-        $this->assertSame(0, TaskAttachment::count());
-    }
-
-    public function test_jumlah_lampiran_per_task_dibatasi(): void
-    {
-        $task = $this->rinaTask();
-        $files = array_map(fn ($i) => $this->pdf("materi-{$i}.pdf"), range(1, TaskAttachment::MAX_FILES));
-
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => $files])
-            ->assertSessionHasNoErrors();
-
-        $this->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf('lebih.pdf')]])
-            ->assertSessionHasErrors('lampiran');
-
-        $this->assertSame(TaskAttachment::MAX_FILES, $task->attachments()->count());
-    }
-
-    public function test_mahasiswa_pemilik_dan_mentornya_bisa_mengunduh_orang_lain_tidak(): void
-    {
-        $task = $this->rinaTask();
-
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]]);
-
-        $attachment = $task->attachments()->firstOrFail();
+        $task = $this->task('mahasiswa@kp.test');
+        $attachment = $this->attach($task);
         $url = "/tugas/{$task->id}/lampiran/{$attachment->id}";
 
         $this->actingAs($this->user('mahasiswa@kp.test'))->get($url)->assertOk();
-        $this->actingAs($this->user('mentor@kp.test'))->get($url.'?unduh=1')->assertOk()->assertDownload('panduan.pdf');
+        $this->actingAs($this->user('supervisor@kp.test'))->get($url.'?unduh=1')->assertOk()->assertDownload('panduan.pdf');
+        $this->actingAs($this->user('dospem@kp.test'))->get($url)->assertOk();
 
-        $this->actingAs($this->user('fajar@kp.test'))->get($url)->assertForbidden();     // mahasiswa lain
-        $this->actingAs($this->user('mentor2@kp.test'))->get($url)->assertForbidden();   // mentor lain
+        $this->actingAs($this->user('fajar@kp.test'))->get($url)->assertForbidden();        // mahasiswa lain
+        $this->actingAs($this->user('supervisor2@kp.test'))->get($url)->assertForbidden();  // supervisor lain
         $this->post('/logout');
-        $this->get($url)->assertRedirect('/login');                                       // tamu
+        $this->get($url)->assertRedirect('/login');                                          // tamu
     }
 
     public function test_lampiran_tidak_bisa_diambil_lewat_task_lain(): void
     {
-        $task = $this->rinaTask();
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]]);
-        $attachment = $task->attachments()->firstOrFail();
-
-        // Fajar mencoba memakai task miliknya sendiri untuk mengambil lampiran task Rina
-        $fajarTask = Internship::where('student_id', $this->user('fajar@kp.test')->id)->firstOrFail()->tasks()->firstOrFail();
+        $attachment = $this->attach($this->task('mahasiswa@kp.test'));
+        $fajarTask = $this->task('fajar@kp.test');
 
         $this->actingAs($this->user('fajar@kp.test'))
             ->get("/tugas/{$fajarTask->id}/lampiran/{$attachment->id}")
             ->assertNotFound();
     }
 
-    public function test_mentor_lain_dan_mahasiswa_tidak_bisa_menambah_lampiran(): void
+    public function test_lampiran_lama_tampil_di_detail_task_tanpa_tombol_unggah(): void
     {
-        $task = $this->rinaTask();
+        $task = $this->task('mahasiswa@kp.test');
+        $this->attach($task, 'materi-lama.pdf');
 
-        $this->actingAs($this->user('mentor2@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]])
-            ->assertForbidden();
-
-        $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]])
-            ->assertForbidden();
-
-        $this->assertSame(0, TaskAttachment::count());
+        $this->actingAs($this->user('mahasiswa@kp.test'))->get("/tugas/{$task->id}")
+            ->assertOk()->assertSee('Lampiran lama')->assertSee('materi-lama.pdf')->assertDontSee('Unggah lampiran');
     }
 
-    public function test_kp_yang_sudah_selesai_tidak_bisa_diberi_lampiran(): void
+    public function test_tidak_ada_lagi_rute_untuk_menambah_lampiran(): void
     {
-        $salsa = Internship::where('student_id', $this->user('salsa@kp.test')->id)->firstOrFail();
-        $task = $salsa->tasks()->firstOrFail();
+        $task = $this->task('mahasiswa@kp.test');
 
-        $this->actingAs($this->user('mentor2@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]])
-            ->assertForbidden();
-    }
-
-    public function test_mentor_menghapus_lampiran_beserta_berkasnya(): void
-    {
-        $task = $this->rinaTask();
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf()]]);
-
-        $attachment = $task->attachments()->with('file')->firstOrFail();
-        $path = $attachment->file->path;
-
-        $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->delete("/mentor/tugas/{$task->id}/lampiran/{$attachment->id}")
-            ->assertForbidden();
-
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->delete("/mentor/tugas/{$task->id}/lampiran/{$attachment->id}")
-            ->assertRedirect();
-
-        $this->assertSame(0, TaskAttachment::count());
-        $this->assertNull(StoredFile::withTrashed()->find($attachment->file_id));
-        Storage::disk('local')->assertMissing($path);
-    }
-
-    public function test_lampiran_tampil_di_detail_task_mahasiswa(): void
-    {
-        $task = $this->rinaTask();
-        $this->actingAs($this->user('mentor@kp.test'))
-            ->post("/mentor/tugas/{$task->id}/lampiran", ['lampiran' => [$this->pdf('panduan-modul.pdf')]]);
-
-        $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->get("/tugas/{$task->id}")
-            ->assertOk()
-            ->assertSee('Materi dari mentor')
-            ->assertSee('panduan-modul.pdf')
-            ->assertDontSee('Unggah lampiran');
+        $this->actingAs($this->user('supervisor@kp.test'))->post("/mentor/tugas/{$task->id}/lampiran")->assertNotFound();
+        $this->actingAs($this->user('supervisor@kp.test'))->post('/mentor/tugas', ['title' => 'x'])->assertNotFound();
     }
 }

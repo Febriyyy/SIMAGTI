@@ -5,9 +5,9 @@
 @section('content')
     <div class="page-head">
         <div>
-            <a href="{{ route('penempatan.index') }}" class="back"><x-icon name="back" :size="16" /> Penempatan</a>
+            <a href="{{ route('penempatan.index') }}" class="back"><x-ikon name="back" :size="16" /> Penempatan</a>
             <h1 class="page-title">Tambah penempatan</h1>
-            <p class="page-sub">Penempatan langsung berstatus berjalan. Mentor dan ketua divisi harus staf dari perusahaan yang dipilih.</p>
+            <p class="page-sub">Penempatan jalur kampus langsung berstatus berjalan. Company Supervisor harus staf dari perusahaan yang dipilih.</p>
         </div>
     </div>
 
@@ -54,23 +54,28 @@
                 </div>
 
                 <div>
-                    <label for="mentor_id" class="label">Mentor</label>
-                    <select id="mentor_id" name="mentor_id" class="select" required>
-                        <option value="">Pilih mentor</option>
-                        @foreach ($mentors as $profile)
-                            <option value="{{ $profile->user_id }}" @selected((string) old('mentor_id') === (string) $profile->user_id)>{{ $profile->user->name }} · {{ $profile->company->name }}</option>
+                    <label for="program_type" class="label">Jenis magang</label>
+                    <select id="program_type" name="program_type" class="select" required>
+                        @foreach (\App\Models\Internship::PROGRAMS['magang'][1] as $key => $label)
+                            <option value="{{ $key }}" @selected(old('program_type', 'industri') === $key)>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div>
-                    <label for="supervisor_id" class="label">Ketua divisi (opsional)</label>
-                    <select id="supervisor_id" name="supervisor_id" class="select">
-                        <option value="">Belum ditentukan</option>
+                    <label for="position" class="label">Posisi (opsional)</label>
+                    <input id="position" name="position" type="text" class="input" value="{{ old('position') }}" maxlength="100" placeholder="Misalnya Backend Developer Intern">
+                </div>
+
+                <div class="span-all">
+                    <label for="supervisor_id" class="label">Company Supervisor</label>
+                    <select id="supervisor_id" name="supervisor_id" class="select" required>
+                        <option value="">Pilih Company Supervisor</option>
                         @foreach ($supervisors as $profile)
                             <option value="{{ $profile->user_id }}" @selected((string) old('supervisor_id') === (string) $profile->user_id)>{{ $profile->user->name }} · {{ $profile->company->name }}</option>
                         @endforeach
                     </select>
+                    <p class="hint">Belum ada akunnya? Minta TU Fakultas mengundang supervisor terlebih dahulu.</p>
                 </div>
 
                 <div class="span-all">

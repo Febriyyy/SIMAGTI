@@ -5,10 +5,10 @@
 @section('content')
     <div class="page-head">
         <div>
-            <a href="{{ route('divisi.validasi') }}" class="back"><x-icon name="back" :size="16" /> Kembali ke validasi penilaian</a>
+            <a href="{{ route('validasi.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke validasi penilaian</a>
             <h1 class="page-title">Penilaian {{ $internship->student->name }}</h1>
             <p class="page-sub">
-                Dinilai {{ $assessment?->assessor?->name ?? 'mentor' }}
+                Dinilai {{ $assessment?->assessor?->name ?? 'penilai' }}
                 @if ($assessment?->submitted_at) · dikirim {{ $assessment->submitted_at->locale('id')->translatedFormat('j M Y, H:i') }} @endif
             </p>
         </div>
@@ -25,7 +25,7 @@
                 @else
                     <div class="empty">
                         <strong>Belum ada penilaian</strong>
-                        Mentor belum mengisi penilaian untuk mahasiswa ini.
+                        Company Supervisor belum mengisi penilaian untuk mahasiswa ini.
                     </div>
                 @endif
             </section>
@@ -39,15 +39,15 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('divisi.validasi.update', $internship) }}" class="stack">
+                        <form method="POST" action="{{ route('validasi.update', $internship) }}" class="stack">
                             @csrf
                             @method('PATCH')
                             <div>
                                 <label for="catatan" class="label">Catatan</label>
-                                <textarea id="catatan" name="catatan" class="textarea" maxlength="500" placeholder="Wajib diisi jika dikembalikan ke mentor">{{ old('catatan') }}</textarea>
+                                <textarea id="catatan" name="catatan" class="textarea" maxlength="500" placeholder="Wajib diisi jika dikembalikan ke penilai">{{ old('catatan') }}</textarea>
                             </div>
                             <div class="btn-row">
-                                <button type="submit" name="keputusan" value="kembalikan" class="btn">Kembalikan ke mentor</button>
+                                <button type="submit" name="keputusan" value="kembalikan" class="btn">Kembalikan ke penilai</button>
                                 <button type="submit" name="keputusan" value="validasi" class="btn btn-primary">Validasi dan kunci nilai</button>
                             </div>
                         </form>
@@ -59,7 +59,7 @@
                     <div class="card-body"><p>{{ $assessment->supervisor_note }}</p></div>
                 </section>
             @elseif ($assessment?->wasReturned())
-                <div class="alert alert-error" role="status">Dikembalikan ke mentor: {{ $assessment->supervisor_note }}</div>
+                <div class="alert alert-error" role="status">Dikembalikan ke penilai: {{ $assessment->supervisor_note }}</div>
             @endif
         </div>
 

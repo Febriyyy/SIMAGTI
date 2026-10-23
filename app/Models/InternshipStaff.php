@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/** Company Supervisor yang ditugaskan pada satu penempatan. */
 class InternshipStaff extends Model
 {
-    public const ROLE_MENTOR = 'mentor';
-    public const ROLE_SUPERVISOR = 'ketua_divisi';
+    public const ROLE_SUPERVISOR = 'supervisor';
 
     protected $table = 'internship_staff';
 

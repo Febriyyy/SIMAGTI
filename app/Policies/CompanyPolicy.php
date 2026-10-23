@@ -31,7 +31,7 @@ class CompanyPolicy
             return Response::allow();
         }
 
-        $isStaff = $user->hasRole('mentor', 'ketua_divisi')
+        $isStaff = $user->hasRole('supervisor')
             && $user->staffProfile()->where('company_id', $company->id)->exists();
 
         return $isStaff

@@ -5,119 +5,172 @@ namespace App\Http\Controllers;
 use App\Actions\Dashboard\BuildMonitoringDashboard;
 use App\Models\Company;
 use App\Models\Internship;
+use App\Models\InternshipStaff;
+use App\Models\Invitation;
+use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
+use App\Support\KpProgress;
+use App\Support\Period;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    /** Jumlah minggu di grafik jam kegiatan mahasiswa. */
+    private const HOUR_WEEKS = 8;
+
     public function __invoke(Request $request): View
     {
         $user = $request->user();
 
         return match ($user->role) {
             'mahasiswa' => $this->mahasiswa($user),
-            'mentor' => $this->mentor($user),
+            'supervisor' => $this->supervisor($user),
+            'tu' => $this->tu($user),
             'biro' => $this->biro($user),
-            default => $this->pantau($user), // ketua_divisi, dospem, kaprodi
+            default => $this->pantau($user), // dospem, kaprodi
         };
     }
 
     private function mahasiswa(User $user): View
     {
-        $internship = Internship::with(['company', 'mentor', 'supervisor', 'lecturer', 'assessment'])
+        $internship = Internship::with(['company', 'division', 'supervisor', 'lecturer', 'assessment'])
             ->withProgress()
+            ->withSum('timeEntries as logged_hours', 'hours')
             ->where('student_id', $user->id)
+            ->orderByRaw("CASE status WHEN 'berjalan' THEN 0 WHEN 'diajukan' THEN 1 WHEN 'selesai' THEN 2 ELSE 3 END")
             ->latest('start_date')
             ->first();
 
-        $tasks = collect();
-        $meeting = null;
-        $weekly = collect();
+        $data = ['user' => $user, 'internship' => $internship, 'tasks' => collect(), 'meeting' => null,
+            'hours' => null, 'period' => null, 'next' => null, 'periodHours' => 0.0];
 
-        if ($internship) {
-            $week = $internship->currentWeek();
-
-            $tasks = $internship->tasks()
-                ->withCount(['evidences', 'comments', 'attachments'])
-                ->where('week_number', $week)
-                ->get()
-                ->sortBy(fn (WeeklyTask $task) => $task->dayOrder())
-                ->values();
-
-            $meeting = $internship->currentMeeting();
-
-            // Task selesai per minggu (maksimal 5 minggu terakhir)
-            $weekly = $internship->tasks()
-                ->selectRaw("week_number, COUNT(*) as total, SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as done")
-                ->where('week_number', '<=', $week)
-                ->groupBy('week_number')
-                ->orderBy('week_number')
-                ->get()
-                ->take(-5)
-                ->values();
+        if (! $internship) {
+            return view('dashboard.mahasiswa', $data);
         }
 
-        return view('dashboard.mahasiswa', compact('user', 'internship', 'tasks', 'meeting', 'weekly'));
+        $data['next'] = KpProgress::current($internship);
+
+        if (in_array($internship->status, ['berjalan', 'selesai'], true)) {
+            $period = Period::for($internship);
+
+            // Task yang perlu dikerjakan: belum selesai, jatuh tempo sampai akhir periode ini (atau tanpa tenggat tapi sedang dikerjakan)
+            $data['tasks'] = $internship->tasks()
+                ->with(['project', 'column'])
+                ->withCount(['evidences', 'comments'])
+                ->where('status', '!=', 'completed')
+                ->where(fn ($q) => $q->where('due_date', '<=', $period->end->toDateTimeString())
+                    ->orWhere(fn ($q) => $q->whereNull('due_date')->where('status', 'in_progress')))
+                ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('due_date')
+                ->limit(6)
+                ->get();
+
+            $data['period'] = $period;
+            $data['periodHours'] = (float) $internship->timeEntries()
+                ->whereBetween('work_date', [$period->start->toDateString(), $period->end->toDateTimeString()])
+                ->sum('hours');
+            $data['meeting'] = $internship->currentMeeting();
+            $data['hours'] = $this->weeklyHours(collect([$internship->id]));
+        }
+
+        return view('dashboard.mahasiswa', $data);
     }
 
-    private function mentor(User $user): View
+    /** Company Supervisor: memantau mahasiswa magang, menyetujui silabus, mengatur meeting. */
+    private function supervisor(User $user): View
     {
-        $internships = Internship::with(['student', 'company'])
+        $internships = Internship::with(['student.studentProfile.studyProgram', 'company', 'division', 'assessment'])
             ->withProgress()
-            ->visibleTo($user)
+            ->withSum('timeEntries as logged_hours', 'hours')
+            ->supervisedBy($user)
             ->where('status', 'berjalan')
+            ->orderBy('start_date')
             ->get();
 
         $ids = $internships->pluck('id');
+        $weekStart = Carbon::today()->startOfWeek();
 
-        $reviewQuery = WeeklyTask::whereIn('internship_id', $ids)
-            ->has('evidences')
-            ->doesntHave('comments');
+        $weekHours = TimeEntry::whereIn('internship_id', $ids)
+            ->where('work_date', '>=', $weekStart->toDateString())
+            ->selectRaw('internship_id, SUM(hours) as total')
+            ->groupBy('internship_id')
+            ->pluck('total', 'internship_id');
+
+        $syllabus = $internships->where('syllabus_status', 'submitted')->values();
 
         $stats = [
             'students' => $internships->count(),
-            'review' => (clone $reviewQuery)->count(),
-            'done' => (int) $internships->sum('completed_tasks_count'),
-            // Belum dinilai atau masih draft (belum dikirim ke ketua divisi)
-            'to_assess' => Internship::mentoredBy($user)
+            'syllabus' => $syllabus->count(),
+            'week_hours' => (float) $weekHours->sum(),
+            'to_assess' => Internship::supervisedBy($user)
                 ->whereIn('status', ['berjalan', 'selesai'])
                 ->whereDoesntHave('assessment', fn ($q) => $q->whereIn('status', ['submitted', 'validated']))
                 ->count(),
         ];
 
-        $review = $reviewQuery->with('internship.student')->latest('updated_at')->limit(5)->get();
+        $statusCounts = WeeklyTask::whereIn('internship_id', $ids)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
-        // Kelompokkan meeting minggu ini: mahasiswa yang jadwalnya sama digabung
-        $meetings = WeeklyMeeting::whereIn('internship_id', $ids)->get()
-            ->keyBy(fn (WeeklyMeeting $m) => $m->internship_id.'-'.$m->week_number);
+        $recent = TimeEntry::with(['internship.student', 'task'])
+            ->whereIn('internship_id', $ids)
+            ->latest('work_date')
+            ->latest('id')
+            ->limit(6)
+            ->get();
 
-        $groups = [];
-        $withoutMeeting = [];
-        foreach ($internships as $internship) {
-            $m = $meetings->get($internship->id.'-'.$internship->currentWeek());
-            if ($m) {
-                $key = $m->day.'|'.$m->time.'|'.$m->url;
-                $groups[$key] ??= ['meeting' => $m, 'students' => []];
-                $groups[$key]['students'][] = $internship->student;
-            } else {
-                $withoutMeeting[] = $internship->student;
-            }
-        }
-        $groups = collect($groups)
-            ->sortBy(fn (array $g) => $g['meeting']->dayOrder() * 10000 + (int) str_replace(':', '', $g['meeting']->time))
-            ->values();
+        [$groups, $withoutMeeting] = $this->meetingGroups($internships);
 
-        return view('dashboard.mentor', compact('user', 'internships', 'stats', 'review', 'groups', 'withoutMeeting'));
+        return view('dashboard.supervisor', compact('user', 'internships', 'stats', 'syllabus', 'statusCounts', 'recent', 'groups', 'withoutMeeting', 'weekHours'));
     }
 
-    /** Ketua divisi, dosen pembimbing, dan kaprodi: daftar pemantauan. */
+    /** TU Fakultas: antrean aktivasi Company Supervisor. */
+    private function tu(User $user): View
+    {
+        $pending = Internship::awaitingSupervisor()->with(['student', 'company'])->orderBy('start_date')->get();
+
+        $invited = Invitation::whereIn('email', $pending->pluck('supervisor_email')->unique())
+            ->whereNull('accepted_at')
+            ->where('expires_at', '>', now())
+            ->pluck('email')
+            ->unique();
+
+        $groups = $pending
+            ->groupBy(fn (Internship $i) => $i->company_id.'|'.$i->supervisor_email)
+            ->map(fn (Collection $items) => [
+                'first' => $items->first(),
+                'count' => $items->count(),
+                'invited' => $invited->contains($items->first()->supervisor_email),
+            ])
+            ->values();
+
+        $stats = [
+            'pending' => $groups->count(),
+            'students' => $pending->count(),
+            'invited' => $groups->where('invited', true)->count(),
+            'active' => InternshipStaff::where('role', InternshipStaff::ROLE_SUPERVISOR)->distinct('user_id')->count('user_id'),
+            'running' => Internship::where('program', 'magang')->where('status', 'berjalan')->count(),
+        ];
+
+        $recent = InternshipStaff::with(['user', 'internship.student', 'internship.company'])
+            ->where('role', InternshipStaff::ROLE_SUPERVISOR)
+            ->latest('id')
+            ->limit(5)
+            ->get();
+
+        return view('dashboard.tu', compact('user', 'groups', 'stats', 'recent'));
+    }
+
+    /** Dosen pembimbing dan kaprodi: daftar pemantauan. */
     private function pantau(User $user): View
     {
         $subtitle = [
-            'ketua_divisi' => 'Mahasiswa magang di divisi Anda.',
             'dospem' => 'Mahasiswa bimbingan Anda.',
             'kaprodi' => 'Seluruh mahasiswa kerja praktik.',
         ][$user->role] ?? '';
@@ -139,11 +192,72 @@ class DashboardController extends Controller
         $stats = [
             'partners' => $companies->whereIn('status', ['mitra', 'mandiri_terverifikasi'])->count(),
             'waiting' => $companies->where('status', 'mandiri_menunggu')->count(),
-            'students' => Internship::where('status', 'berjalan')->count(),
+            'students' => Internship::where('program', 'magang')->where('status', 'berjalan')->count(),
         ];
 
         $waiting = $companies->where('status', 'mandiri_menunggu')->values();
 
         return view('dashboard.biro', compact('user', 'companies', 'stats', 'waiting'));
+    }
+
+    /**
+     * Meeting minggu ini, mahasiswa dengan jadwal sama digabung.
+     *
+     * @return array{0: Collection, 1: list<User>}
+     */
+    private function meetingGroups(Collection $internships): array
+    {
+        $meetings = WeeklyMeeting::whereIn('internship_id', $internships->pluck('id'))->get()
+            ->keyBy(fn (WeeklyMeeting $m) => $m->internship_id.'-'.$m->week_number);
+
+        $groups = [];
+        $without = [];
+        foreach ($internships as $internship) {
+            $m = $meetings->get($internship->id.'-'.$internship->currentWeek());
+            if ($m) {
+                $key = $m->day.'|'.$m->time.'|'.$m->url;
+                $groups[$key] ??= ['meeting' => $m, 'students' => []];
+                $groups[$key]['students'][] = $internship->student;
+            } else {
+                $without[] = $internship->student;
+            }
+        }
+
+        $groups = collect($groups)
+            ->sortBy(fn (array $g) => $g['meeting']->dayOrder() * 10000 + (int) str_replace(':', '', $g['meeting']->time))
+            ->values();
+
+        return [$groups, $without];
+    }
+
+    /**
+     * Jam kegiatan per minggu kalender, beberapa minggu terakhir.
+     *
+     * @return array{labels: list<string>, tips: list<string>, values: list<float>}
+     */
+    private function weeklyHours(Collection $ids): array
+    {
+        $first = Carbon::today()->startOfWeek()->subWeeks(self::HOUR_WEEKS - 1);
+        $rows = TimeEntry::whereIn('internship_id', $ids)
+            ->where('work_date', '>=', $first->toDateString())
+            ->get(['work_date', 'hours']);
+
+        $values = array_fill(0, self::HOUR_WEEKS, 0.0);
+        foreach ($rows as $row) {
+            $i = (int) floor($first->diffInDays($row->work_date->copy()->startOfDay()) / 7);
+            if ($i >= 0 && $i < self::HOUR_WEEKS) {
+                $values[$i] += (float) $row->hours;
+            }
+        }
+
+        $labels = [];
+        $tips = [];
+        for ($i = 0; $i < self::HOUR_WEEKS; $i++) {
+            $start = $first->copy()->addWeeks($i)->locale('id');
+            $labels[] = $start->translatedFormat('j M');
+            $tips[] = $start->translatedFormat('j M').' – '.$start->copy()->endOfWeek()->translatedFormat('j M');
+        }
+
+        return ['labels' => $labels, 'tips' => $tips, 'values' => array_map(fn ($v) => round($v, 1), $values)];
     }
 }

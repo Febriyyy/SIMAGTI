@@ -13,12 +13,14 @@ Website untuk memantau kerja praktik (magang) mahasiswa, dibuat untuk **pameran 
 
 | Peran | Tugas utama |
 |---|---|
-| Mahasiswa | Mengerjakan task mingguan, melampirkan bukti, mengajukan KP mandiri |
-| Mentor (di perusahaan) | Memberi task, menilai pekerjaan, mengatur meeting mingguan |
-| Ketua divisi | Mengonfirmasi dan memvalidasi penilaian |
-| Dosen pembimbing | Memantau mahasiswa bimbingan |
-| Kaprodi | Menyetujui KP mandiri, mengelola mahasiswa dan penempatan |
-| Biro kerjasama | Mengelola perusahaan dan memverifikasi perusahaan KP mandiri |
+| Mahasiswa | Mengajukan KP (Magang: KP Industri / MBKM; Seminar), menyusun silabus, membuat task di board, mengisi timesheet, mengirim bukti |
+| Company Supervisor (perusahaan) | Memantau kegiatan dan timesheet, menyetujui silabus, mengatur meeting, mengoreksi posisi, menilai |
+| Dosen pembimbing | Memantau bimbingan, memvalidasi penilaian; untuk seminar sekaligus peninjau |
+| Kaprodi (Koordinator KP) | Menyetujui pengajuan, menunjuk dosen, mengelola mahasiswa dan penempatan |
+| Biro kerjasama | Mengelola perusahaan dan memverifikasi perusahaan pengajuan magang |
+| TU Fakultas | Mengaktifkan Company Supervisor dari data pengajuan mahasiswa |
+
+Sejak v7 (KP v2) peran mentor dan ketua divisi digabung menjadi Company Supervisor.
 
 Alumni sengaja ditunda ke tahap update.
 
@@ -82,10 +84,23 @@ Untuk presentasi progres ke dosen pada 19 Oktober:
 | v4: refactor, KP mandiri, data master, API v1 | Terbukti jalan: 86 tes lolos (17 Okt) |
 | v5: penilaian akhir, dashboard data nyata, statistik perusahaan | Lolos tes dan dicoba di browser (SQLite) |
 | v6: tampilan SIMAGTI, lampiran task, data realistis | 118 tes lolos dan alur dicoba di browser (SQLite). Belum dicoba di MySQL Laragon |
+| v7: KP v2 tahap 1 (peran baru, jalur KP, silabus, board, timesheet, pemantauan per kloter, unduhan) | 163 tes lolos, audit tampilan 1280px dan 390px (SQLite). Perlu `migrate:fresh --seed` di Laragon |
 
-Jumlah tes sekarang: 118 (KpFlow 16, Schema 18, ApplicationFlow 18, MasterData 16, Api 16, AssessmentFlow 13, DashboardData 8, TaskAttachment 9, DataSeeder 2, Example 1).
+Jumlah tes sekarang: 163 (ApplicationFlow 25, Schema 19, MasterData 16, Api 16, KpFlow 15, AssessmentFlow 14, ActivityBoard 13, DashboardData 12, Monitor 7, Syllabus 6, Timesheet 6, TaskEvidenceFile 6, TaskAttachment 4, DataSeeder 2, Example 2).
+
+### v7: KP v2 tahap 1 (23 Oktober 2026)
+- Peran: Company Supervisor (gabungan mentor + ketua divisi, hanya memantau) dan TU Fakultas (aktivasi supervisor per kelompok email, satu undangan untuk banyak mahasiswa, tautkan akun lama, koreksi email).
+- Pengajuan dua jalur: Magang (KP Industri / MBKM Mandiri) dan Seminar (Pelaksana / Peserta), cek semester, perusahaan mitra dipakai ulang tanpa verifikasi ulang.
+- Menu "Status KP" dengan langkah detail; silabus hard skill / soft skill / attitude dengan persetujuan; board dan list ala Jira/ClickUp dengan proyek, kolom bebas, checklist, filter; timesheet harian dengan foto.
+- Pemantauan per kloter dengan identitas akademik; unduhan Excel dan PDF cetak per periode / proyek.
+- Divisi, posisi, dan kloter tampil di banner dashboard mahasiswa.
 
 ## 6. Belum dikerjakan
+
+KP v2 tahap 2: penilaian bulanan supervisor, kuesioner akhir dari template dospem, nilai MBKM (60% mitra + 40% dosen) dan rekognisi SKS, log bimbingan (minimal 5), hasil Diterima / Tidak.
+KP v2 tahap 3: laporan per bab dengan persetujuan, dokumen Word dari template kampus (lampiran dan MB.xx), presentasi dan pengesahan, pengingat Google Calendar, audit privasi.
+
+Dari rencana awal:
 
 - Input nilai sidang, halaman skala nilai kaprodi
 - UI konversi jadi karyawan

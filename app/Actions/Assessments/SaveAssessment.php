@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Mentor menyimpan penilaian akhir (draft) atau mengirimnya ke ketua divisi.
+ * Company Supervisor (seminar: dosen pembimbing) menyimpan penilaian akhir (draft) atau mengirimnya untuk divalidasi dosen pembimbing.
  * Nilai akhir dihitung ulang dari bobot rubrik setiap kali disimpan.
  */
 class SaveAssessment

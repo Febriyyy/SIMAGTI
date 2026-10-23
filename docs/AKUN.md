@@ -7,46 +7,55 @@ Data ini dimuat oleh `php artisan migrate:fresh --seed` (berkas `database/seeder
 
 > Daftar ini sengaja tidak ditampilkan di halaman login. Simpan berkas ini untuk keperluan demo saja.
 
+Sejak KP v2 (Oktober 2026) peran mentor dan ketua divisi digabung menjadi **Company Supervisor**, dan ada peran baru **TU Fakultas**.
+
 ## Kampus
 
 | Peran | Nama | Email |
 |---|---|---|
-| Kaprodi | Dr. Arief Rahman Hakim, S.Kom., M.T. | arief.hakim@kampus.ac.id |
+| Kaprodi (sekaligus Koordinator KP) | Dr. Arief Rahman Hakim, S.Kom., M.T. | arief.hakim@kampus.ac.id |
 | Dosen Pembimbing | Dewi Lestari Wulandari, S.Kom., M.Kom. | dewi.lestari@kampus.ac.id |
 | Dosen Pembimbing | Ir. Bambang Sutrisno, M.T. | bambang.sutrisno@kampus.ac.id |
 | Dosen Pembimbing | Rizky Aditya Pratama, S.T., M.Cs. | rizky.pratama@kampus.ac.id |
 | Biro Kerjasama | Wulan Sari Anggraini, S.E. | wulan.anggraini@kampus.ac.id |
+| TU Fakultas | Retno Kusumaningrum, A.Md. | retno.kusumaningrum@kampus.ac.id |
 
-## Perusahaan
+## Company Supervisor
 
-| Perusahaan | Mentor | Ketua Divisi |
+| Perusahaan | Company Supervisor | Mahasiswa |
 |---|---|---|
-| PT Cakrawala Solusi Digital (Bandung) | Andika Saputra · andika.saputra@cakrawaladigital.co.id<br>Maya Kartika Sari · maya.sari@cakrawaladigital.co.id | Hendro Wibisono · hendro.wibisono@cakrawaladigital.co.id |
-| PT Arunika Data Analitika (Jakarta Selatan) | Fitri Handayani · fitri.handayani@arunikadata.co.id | Yoga Prasetya Nugroho · yoga.nugroho@arunikadata.co.id |
-| PT Sinergi Telematika Nusantara (Surabaya) | Agus Setiawan · agus.setiawan@sinergitelematika.co.id | Ratna Dewi Puspita · ratna.puspita@sinergitelematika.co.id |
-| CV Kreasi Visual Mandala (Sleman) | Galih Permana · galih.permana@kreasivisual.id | Intan Permatasari · intan.permatasari@kreasivisual.id |
+| PT Cakrawala Solusi Digital (Bandung) | Andika Saputra · andika.saputra@cakrawaladigital.co.id | Nabila, Aulia (kloter 1) |
+| | Maya Kartika Sari · maya.sari@cakrawaladigital.co.id | Rafi (kloter 2, divisi sama, periode beda) |
+| PT Arunika Data Analitika (Jakarta Selatan) | Fitri Handayani · fitri.handayani@arunikadata.co.id | Dimas, Salsabila, Fajar |
+| PT Sinergi Telematika Nusantara (Surabaya) | Agus Setiawan · agus.setiawan@sinergitelematika.co.id | Bagas, Annisa, Raka |
+| CV Kreasi Visual Mandala (Sleman) | Galih Permana · galih.permana@kreasivisual.id | Putri, Kevin |
 
-## Mahasiswa
+## Mahasiswa (angkatan 2023, semester 7)
 
 | Nama | NIM | Email | Kondisi untuk demo |
 |---|---|---|---|
-| Nabila Azzahra Putri | 2210511021 | nabila.azzahra@mhs.kampus.ac.id | Cakrawala, rajin, **belum dinilai** (dinilai langsung saat demo) |
-| Muhammad Rafi Alfarizi | 2210511034 | muhammad.rafi@mhs.kampus.ac.id | Cakrawala, penilaian **menunggu validasi** Hendro |
-| Aulia Rahmawati | 2210512007 | aulia.rahmawati@mhs.kampus.ac.id | Cakrawala, progres task rendah |
-| Dimas Arya Wicaksono | 2210511052 | dimas.arya@mhs.kampus.ac.id | Arunika, **lebih dari seminggu tanpa bukti** |
-| Salsabila Khairunnisa | 2210512015 | salsabila.khairunnisa@mhs.kampus.ac.id | Arunika, **selesai**, nilai A, sertifikat, ditawari kerja |
-| Fajar Nugraha Ramadhan | 2210512029 | fajar.nugraha@mhs.kampus.ac.id | Arunika, KP hampir selesai, nilai masih draft |
-| Bagas Satria Putra | 2210511066 | bagas.satria@mhs.kampus.ac.id | Sinergi, berjalan |
-| Annisa Fitriani | 2210511073 | annisa.fitriani@mhs.kampus.ac.id | Sinergi, baru mulai, rajin |
-| Raka Mahendra | 2210511018 | raka.mahendra@mhs.kampus.ac.id | Sinergi, **selesai**, nilai B+ |
-| Putri Ayu Lestari | 2210512041 | putri.ayu@mhs.kampus.ac.id | Kreasi Visual, berjalan |
-| Kevin Pratama Halim | 2210511087 | kevin.pratama@mhs.kampus.ac.id | Kreasi Visual, penilaian **menunggu validasi** Intan |
-| Zahra Amalia | 2210512053 | zahra.amalia@mhs.kampus.ac.id | KP mandiri PT Lumbung Tani, **menunggu verifikasi biro** |
-| Ilham Maulana Yusuf | 2210511095 | ilham.maulana@mhs.kampus.ac.id | KP mandiri PT Medika, **menunggu persetujuan kaprodi** |
-| Citra Kirana Dewi | 2210512062 | citra.kirana@mhs.kampus.ac.id | Belum punya tempat KP |
+| Nabila Azzahra Putri | 2310511021 | nabila.azzahra@mhs.kampus.ac.id | KP Industri Cakrawala, rajin, silabus disetujui, **belum dinilai** |
+| Aulia Rahmawati | 2310512007 | aulia.rahmawati@mhs.kampus.ac.id | Cakrawala, progres rendah, **silabus perlu revisi** |
+| Muhammad Rafi Alfarizi | 2310511034 | muhammad.rafi@mhs.kampus.ac.id | Cakrawala, penilaian **menunggu validasi** dosen |
+| Dimas Arya Wicaksono | 2310511052 | dimas.arya@mhs.kampus.ac.id | **MBKM Mandiri** Arunika, silabus **menunggu persetujuan**, 11 hari tanpa catatan |
+| Salsabila Khairunnisa | 2310512015 | salsabila.khairunnisa@mhs.kampus.ac.id | Arunika, **selesai**, nilai A, sertifikat, ditawari kerja |
+| Fajar Nugraha Ramadhan | 2310512029 | fajar.nugraha@mhs.kampus.ac.id | Arunika, ritme bulanan, nilai masih draft |
+| Bagas Satria Putra | 2310511066 | bagas.satria@mhs.kampus.ac.id | Sinergi, berjalan |
+| Annisa Fitriani | 2310511073 | annisa.fitriani@mhs.kampus.ac.id | MBKM Mandiri Sinergi, baru mulai, silabus masih draf |
+| Raka Mahendra | 2310511018 | raka.mahendra@mhs.kampus.ac.id | Sinergi, **selesai**, nilai B+ |
+| Putri Ayu Lestari | 2310512041 | putri.ayu@mhs.kampus.ac.id | Kreasi Visual, berjalan |
+| Kevin Pratama Halim | 2310511087 | kevin.pratama@mhs.kampus.ac.id | Kreasi Visual, penilaian **menunggu validasi** dosen |
+| Yudha Pradana | 2310511044 | yudha.pradana@mhs.kampus.ac.id | **Seminar (pelaksana)**, dipantau Rizky, silabus menunggu |
+| Larasati Wening | 2310512068 | larasati.wening@mhs.kampus.ac.id | **Seminar (peserta)**, dipantau Bambang |
+| Zahra Amalia | 2310512053 | zahra.amalia@mhs.kampus.ac.id | Pengajuan PT Lumbung Tani, **menunggu verifikasi biro** |
+| Ilham Maulana Yusuf | 2310511095 | ilham.maulana@mhs.kampus.ac.id | Pengajuan PT Medika, **menunggu persetujuan kaprodi** |
+| Farhan Akbar Siregar | 2310511102 | farhan.akbar@mhs.kampus.ac.id | Disetujui, supervisor (Bayu Prakoso) **menunggu aktivasi TU** |
+| Tiara Maharani | 2310512077 | tiara.maharani@mhs.kampus.ac.id | Satu surat dengan Farhan, supervisor sama (satu undangan untuk berdua) |
+| Citra Kirana Dewi | 2310512062 | citra.kirana@mhs.kampus.ac.id | Belum punya KP (coba alur pengajuan) |
 
 ## Mengganti data
 
+- Nama kampus, fakultas, kota, dan aturan (minimal semester, jam logbook MBKM) ada di `config/simagti.php`.
 - Domain email kampus ada di konstanta `CAMPUS` dan `STUDENT` di `DataSeeder.php`.
 - Kata sandi bersama ada di konstanta `PASSWORD`.
-- Untuk tes otomatis dipakai data terpisah (`DemoSeeder`, akun `*@kp.test`), jadi mengubah `DataSeeder` tidak merusak tes.
+- Tes otomatis memakai data terpisah (`DemoSeeder`, akun `*@kp.test`, kata sandi `password`), jadi mengubah `DataSeeder` tidak merusak tes.

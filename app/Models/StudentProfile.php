@@ -31,4 +31,21 @@ class StudentProfile extends Model
     {
         return $this->belongsTo(StudyProgram::class);
     }
+
+    /**
+     * Semester berjalan dihitung dari angkatan. Tahun akademik dimulai September (semester ganjil):
+     * angkatan 2023 → Oktober 2026 = semester 7.
+     */
+    public function semester(?\DateTimeInterface $at = null): ?int
+    {
+        if (! $this->entry_year) {
+            return null;
+        }
+
+        $at ??= now();
+        $year = (int) $at->format('Y');
+        $month = (int) $at->format('n');
+
+        return max(1, ($year - (int) $this->entry_year) * 2 + ($month >= 9 ? 1 : 0));
+    }
 }

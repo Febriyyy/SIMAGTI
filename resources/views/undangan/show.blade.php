@@ -23,14 +23,15 @@
                 @if ($invitation->isAccepted())
                     Undangan ini sudah dipakai. Silakan <a href="{{ route('login') }}">masuk</a> dengan akun Anda.
                 @else
-                    Undangan ini sudah kedaluwarsa. Minta mahasiswa atau kampus mengirim ulang.
+                    Undangan ini sudah kedaluwarsa. Minta TU Fakultas kampus mengirim ulang.
                 @endif
             </p>
         @else
             <h1 class="auth-title">Aktivasi akun</h1>
             <p class="auth-sub">
                 Anda diundang sebagai {{ \App\Models\User::ROLE_LABELS[$invitation->role] ?? $invitation->role }}
-                di {{ $invitation->company->name }}@if ($invitation->internship) untuk membimbing {{ $invitation->internship->student->name }}@endif.
+                di {{ $invitation->company->name }}@if ($students->isNotEmpty()) untuk membimbing {{ $students->pluck('name')->join(', ', ' dan ') }}@endif.
+                Anda memantau kegiatan, timesheet, dan silabus mahasiswa, lalu memberi penilaian.
             </p>
 
             <form method="POST" action="{{ route('undangan.store', $invitation->token) }}" class="stack">

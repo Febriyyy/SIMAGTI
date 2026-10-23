@@ -17,7 +17,7 @@
         <img class="hero-mark" src="{{ asset('images/logo-simagti-mark.svg') }}" alt="" aria-hidden="true">
             <div class="hero-eyebrow">Sistem Monitoring Kerja Praktik</div>
         <p class="auth-panel-title">Task mingguan, penilaian, dan progres KP dalam satu tempat.</p>
-        <p class="auth-panel-sub">Untuk mahasiswa, mentor, ketua divisi, dosen pembimbing, kaprodi, dan biro kerjasama.</p>
+        <p class="auth-panel-sub">Untuk mahasiswa, Company Supervisor, dosen pembimbing, kaprodi, biro kerjasama, dan TU Fakultas.</p>
     </div>
     <div class="auth-card">
         <div class="brand">

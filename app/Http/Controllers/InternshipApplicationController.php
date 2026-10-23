@@ -2,33 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Applications\SubmitIndependentInternship;
+use App\Actions\Applications\SubmitInternshipApplication;
 use App\Http\Requests\Applications\SubmitInternshipRequest;
 use App\Models\Internship;
+use App\Support\KpProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Halaman "Pengajuan KP" milik mahasiswa (jalur KP mandiri). */
+/** Halaman "Status KP" mahasiswa: pengajuan (dua jalur) dan kemajuannya langkah demi langkah. */
 class InternshipApplicationController extends Controller
 {
     public function index(Request $request): View
     {
-        $internship = Internship::with(['company', 'approvals.reviewer', 'invitations'])
-            ->where('student_id', $request->user()->id)
+        $user = $request->user()->load('studentProfile.studyProgram');
+
+        $internship = Internship::with(['company', 'division', 'lecturer', 'supervisor', 'approvals.reviewer', 'invitations', 'staff'])
+            ->where('student_id', $user->id)
             ->latest('id')
             ->first();
 
         // Formulir tampil jika belum ada pengajuan, atau pengajuan terakhir sudah ditolak.
         $canSubmit = ! $internship || $internship->status === 'ditolak';
+        $steps = $internship ? KpProgress::steps($internship) : [];
+        $semester = $user->studentProfile?->semester();
 
-        return view('pengajuan.index', compact('internship', 'canSubmit'));
+        return view('pengajuan.index', compact('internship', 'canSubmit', 'steps', 'semester', 'user'));
     }
 
-    public function store(SubmitInternshipRequest $request, SubmitIndependentInternship $submit): RedirectResponse
+    public function store(SubmitInternshipRequest $request, SubmitInternshipApplication $submit): RedirectResponse
     {
-        $submit->handle($request->user(), $request->validated());
+        $internship = $submit->handle($request->user(), $request->validated());
 
-        return redirect()->route('pengajuan.index')->with('status', 'Pengajuan KP terkirim. Menunggu verifikasi Biro Kerjasama.');
+        return redirect()->route('kp.status')->with('status', $internship->isSeminar()
+            ? 'Pengajuan KP terkirim. Menunggu persetujuan Kaprodi.'
+            : 'Pengajuan KP terkirim. Menunggu verifikasi Biro Kerjasama.');
     }
 }

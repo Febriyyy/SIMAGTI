@@ -70,7 +70,7 @@ class ApiTest extends TestCase
 
     public function test_token_bisa_dicabut(): void
     {
-        $token = $this->postJson('/api/v1/auth/token', ['email' => 'mentor@kp.test', 'password' => 'password', 'device_name' => 'x'])
+        $token = $this->postJson('/api/v1/auth/token', ['email' => 'supervisor@kp.test', 'password' => 'password', 'device_name' => 'x'])
             ->json('token');
 
         $this->assertDatabaseCount('personal_access_tokens', 1);
@@ -87,7 +87,7 @@ class ApiTest extends TestCase
 
     public function test_akun_yang_dinonaktifkan_tidak_bisa_memakai_token_lama(): void
     {
-        $user = $this->user('mentor@kp.test');
+        $user = $this->user('supervisor@kp.test');
         Sanctum::actingAs($user);
         $user->update(['is_active' => false]);
 
@@ -104,12 +104,12 @@ class ApiTest extends TestCase
 
         $this->assertSame([$rina->id], $ids('mahasiswa@kp.test'));
 
-        $mentorIds = $ids('mentor@kp.test');
+        $supervisorIds = $ids('supervisor@kp.test');
         $this->assertEqualsCanonicalizing(
-            Internship::mentoredBy($this->user('mentor@kp.test'))->pluck('id')->all(),
-            $mentorIds
+            Internship::supervisedBy($this->user('supervisor@kp.test'))->pluck('id')->all(),
+            $supervisorIds
         );
-        $this->assertNotContains($this->internshipOf('dimas@kp.test')->id, $mentorIds);
+        $this->assertNotContains($this->internshipOf('dimas@kp.test')->id, $supervisorIds);
 
         $this->assertSame(Internship::count(), count($ids('kaprodi@kp.test')));
     }
@@ -129,9 +129,9 @@ class ApiTest extends TestCase
         $rina = $this->internshipOf('mahasiswa@kp.test');
 
         $this->signIn('mahasiswa@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertOk()->assertJsonPath('data.id', $rina->id);
-        $this->signIn('mentor@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertOk();
+        $this->signIn('supervisor@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertOk();
         $this->signIn('dimas@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertForbidden();
-        $this->signIn('mentor2@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertForbidden();
+        $this->signIn('supervisor2@kp.test')->getJson("/api/v1/internships/{$rina->id}")->assertForbidden();
     }
 
     public function test_task_penempatan_mengikuti_aturan_akses_yang_sama(): void
@@ -182,8 +182,8 @@ class ApiTest extends TestCase
     {
         $nusantara = Company::where('name', 'PT Nusantara Digital')->firstOrFail();
 
-        $this->signIn('mentor@kp.test')->getJson("/api/v1/companies/{$nusantara->id}/stats")->assertOk();
-        $this->signIn('mentor2@kp.test')->getJson("/api/v1/companies/{$nusantara->id}/stats")->assertForbidden();
+        $this->signIn('supervisor@kp.test')->getJson("/api/v1/companies/{$nusantara->id}/stats")->assertOk();
+        $this->signIn('supervisor2@kp.test')->getJson("/api/v1/companies/{$nusantara->id}/stats")->assertForbidden();
         $this->signIn('mahasiswa@kp.test')->getJson("/api/v1/companies/{$nusantara->id}/stats")->assertForbidden();
     }
 

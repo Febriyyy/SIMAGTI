@@ -45,6 +45,8 @@ class TaskTemplate extends Model
     public function applyTo(Internship $internship, int $createdBy, int $weekOffset = 0): int
     {
         $count = 0;
+        $column = $internship->ensureBoard()->first();
+        $days = array_keys(WeeklyTask::DAYS);
 
         foreach ($this->items()->orderBy('week_number')->orderBy('sort_order')->get() as $item) {
             $week = $item->week_number + $weekOffset;
@@ -53,13 +55,19 @@ class TaskTemplate extends Model
                 continue;
             }
 
+            // Tenggat = hari template di minggu KP tersebut (minggu ke-1 mulai di tanggal mulai KP).
+            $dayIndex = max(0, (int) array_search($item->day, $days, true));
+            $due = $internship->start_date->copy()->addWeeks($week - 1)->addDays($dayIndex);
+
             WeeklyTask::create([
                 'internship_id' => $internship->id,
-                'week_number' => $week,
+                'board_column_id' => $column?->id,
                 'day' => $item->day,
                 'title' => $item->title,
                 'description' => $item->description,
                 'status' => 'todo',
+                'priority' => 'medium',
+                'due_date' => $due->min($internship->end_date),
                 'created_by' => $createdBy,
             ]);
             $count++;

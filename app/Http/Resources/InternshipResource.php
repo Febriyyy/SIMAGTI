@@ -26,11 +26,15 @@ class InternshipResource extends JsonResource
                 'name' => $this->student->name,
                 'nim' => $this->student->nim,
             ]),
-            'company' => $this->whenLoaded('company', fn () => [
+            'company' => $this->whenLoaded('company', fn () => $this->company ? [
                 'id' => $this->company->id,
                 'name' => $this->company->name,
-            ]),
-            'mentor' => $this->whenLoaded('mentor', fn () => $this->mentor?->name),
+            ] : null),
+            'topic' => $this->topic,
+            'program' => $this->program,
+            'program_type' => $this->program_type,
+            'position' => $this->position,
+            'company_supervisor' => $this->whenLoaded('supervisor', fn () => $this->supervisor?->name),
             'lecturer' => $this->whenLoaded('lecturer', fn () => $this->lecturer?->name),
         ];
     }

@@ -66,4 +66,50 @@
             </div>
         @endif
     </section>
+
+    @php($active = $companies->where('active_internships_count', '>', 0)->sortByDesc('active_internships_count')->values())
+    @php($maxActive = max(1, (int) $active->max('active_internships_count')))
+    <div class="split">
+        <section class="card">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Status perusahaan</h2>
+                    <p class="card-sub">Mitra kampus dan perusahaan dari jalur KP mandiri</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <x-donut caption="perusahaan" unit="perusahaan" :segments="[
+                    ['label' => 'Mitra', 'value' => $companies->where('status', 'mitra')->count(), 'color' => 'blue'],
+                    ['label' => 'Mandiri terverifikasi', 'value' => $companies->where('status', 'mandiri_terverifikasi')->count(), 'color' => 'green'],
+                    ['label' => 'Menunggu verifikasi', 'value' => $companies->where('status', 'mandiri_menunggu')->count(), 'color' => 'amber'],
+                ]" />
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Magang aktif per perusahaan</h2>
+                    <p class="card-sub">Mahasiswa yang sedang magang saat ini</p>
+                </div>
+            </div>
+            <div class="card-body">
+                @if ($active->isEmpty())
+                    <p class="muted">Belum ada mahasiswa yang sedang magang.</p>
+                @else
+                    <ul class="hbars">
+                        @foreach ($active as $company)
+                            <li>
+                                <div class="hbar-head">
+                                    <span class="hbar-name">{{ $company->name }}</span>
+                                    <span class="hbar-value">{{ $company->active_internships_count }} mahasiswa</span>
+                                </div>
+                                <div class="hbar-track"><span class="hbar-fill" style="width: {{ round($company->active_internships_count / $maxActive * 100) }}%"></span></div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </section>
+    </div>
 @endsection

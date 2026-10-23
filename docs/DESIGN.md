@@ -102,7 +102,7 @@ Blade merender HTML di server, CSS ditulis manual di satu berkas.
 - **Tanpa animasi** selain transisi warna 150 ms.
 - **Responsif**: di layar kecil sidebar menjadi bilah atas, kartu angka dua kolom, tabel bisa digulir.
 - **Logo**: `public/images/logo-simagti.svg` (logo lengkap, latar transparan, dipakai di sidebar, login, dan halaman aktivasi) dan `logo-simagti-mark.svg` (simbol saja, untuk ikon tab browser). Keduanya dibuat dari berkas logo asli tanpa mengubah bentuk dan warnanya, hanya latar putih dibuang dan ruang kosong dipotong.
-- **Ikon**: komponen `x-icon` memetakan nama ikon aplikasi (misalnya `tasks`) ke Heroicons (`clipboard-document-check`). Jika paket belum terpasang atau nama ikon tidak ditemukan, komponen memakai ikon cadangan sehingga halaman tetap tampil.
+- **Ikon**: komponen `x-ikon` (bukan `x-icon`, karena nama itu dipakai paket blade-icons) memetakan nama ikon aplikasi (misalnya `tasks`) ke Heroicons (`clipboard-document-check`). Jika paket belum terpasang atau nama ikon tidak ditemukan, komponen memakai ikon cadangan sehingga halaman tetap tampil.
 - **Kartu angka** (acuan gaya Donezo): judul dan tombol panah melingkar bila bisa diklik, angka besar, satu baris keterangan, tanpa ikon; kartu pertama di setiap baris otomatis menjadi kartu sorotan berlatar hijau tua. Menu aktif ditandai garis hijau di tepi kiri sidebar; tombol berbentuk kapsul.
 - **Komponen Blade**: `hero` (banner sapaan di semua dashboard, tombolnya menuju halaman yang paling perlu dibuka peran itu), `stat` (kartu angka, satu-satunya gaya ringkasan angka), `person` (avatar + nama + NIM), `avatar` (inisial berwarna tetap per orang), `chip`, `progress`, `icon`, `task-table`.
 - **Grafik tanpa JavaScript**: batang mendatar (`hbars`) untuk sebaran skill dan performa per aspek, kolom (`grade-bars`) untuk sebaran huruf mutu. Semuanya HTML + CSS biasa.
@@ -157,7 +157,8 @@ PHPUnit dengan SQLite in-memory, data demo diisi ulang tiap tes. Tes dikelompokk
 - `ApiTest`: token, akses per peran, statistik, verifikasi sertifikat
 - `AssessmentFlowTest`: penilaian mentor, validasi dan pengembalian oleh ketua divisi, kunci nilai
 - `DashboardDataTest`: data dashboard per peran, daftar perlu perhatian, statistik perusahaan
-- `TaskAttachmentTest`: unggah materi, jenis dan ukuran berkas, hak unduh, hapus
+- `TaskAttachmentTest`: lampiran lama hanya bisa dibuka yang berhak, tidak bisa ditambah lagi
+- `ActivityBoardTest`, `TimesheetTest`, `SyllabusTest`, `MonitorTest`: fitur KP v2 (board, timesheet, silabus, pemantauan per kloter, unduhan)
 - `DataSeederTest`: data bawaan termuat, setiap peran bisa masuk, akun tidak tampil di login
 
 ## 8. Menjalankan
@@ -180,3 +181,45 @@ Akun dan kata sandi untuk demo ada di `docs/AKUN.md` (tidak ditampilkan di halam
 - Tanpa Vite/Tailwind: tidak ada langkah build, lebih mudah di-hosting.
 - Email belum dikirim: link aktivasi undangan ditampilkan agar bisa disalin dan dikirim manual.
 - API belum punya operasi tulis: ditambah setelah web stabil.
+
+## Aturan tata letak (hasil audit UI)
+
+- **Kartu berdampingan** memakai `.split` (dua kolom sama lebar). Setiap kolom (`.col`) menumpuk kartunya sendiri, jadi kartu pendek tidak menyisakan celah kosong. Di layar ≤900px menjadi satu kolom.
+- **Kolom tabel yang panjang** (nama mahasiswa, perusahaan) diberi `class="col-fluid"` dan lebar persen pada `<th>`. Kolom ini ikut lebar tabel, dan teks baru dipotong (…) kalau memang tidak muat. Nama lengkap tetap muncul saat kursor diarahkan.
+- **Angka di tabel** (bobot, nilai, kontribusi) memakai `col-num`: rata kanan dengan lebar digit yang sama, jadi angka sejajar dengan judul kolomnya.
+- **Baris berisi nama + tombol** (`.item-row`): nama dipotong, tombol tidak pernah tertimpa.
+- **Area keputusan** (setujui/tolak) memakai `.decision`: dua kolom berlabel, di HP menjadi bertumpuk.
+
+## Kartu angka, menu kiri, dan grafik
+
+- **Kartu angka**: kartu pertama di setiap baris berwarna hijau tua. Saat kursor diarahkan ke kartu lain, hijau pindah ke kartu itu (transisi halus), lalu kembali ke kartu pertama saat kursor keluar.
+- **Menu kiri** tetap di tempat saat halaman di-scroll (`position: sticky`). Di HP menu kembali berada di atas halaman seperti biasa.
+- **Grafik** dibuat sendiri dengan SVG dari server, tanpa library dan tanpa CDN. Tooltip ada di `public/js/charts.js`.
+  - `<x-donut>`: diagram lingkaran untuk bagian dari keseluruhan (status penilaian, status task minggu ini, status perusahaan). Legenda selalu tampil dengan angka dan persen.
+  - `<x-line-chart>`: grafik garis untuk perubahan dari waktu ke waktu (bukti per minggu, progres task kumulatif mahasiswa). Satu sumbu Y saja. Atur `width` mendekati lebar kartu supaya ukuran hurufnya pas.
+  - Diagram batang tetap dipakai untuk sebaran huruf mutu, dan batang mendatar untuk skill serta magang aktif per perusahaan.
+  - Warna grafik mengikuti makna: hijau = selesai/tervalidasi, biru = berjalan/menunggu, kuning = draft/perlu dicek, abu-abu = belum. Kombinasi warnanya sudah dicek aman untuk buta warna.
+
+## Layar penuh, ikon Material, dan bukti berkas
+
+- **Layar penuh**: bingkai aplikasi menempel ke tepi layar (tanpa jarak atas/bawah dan tanpa sudut melengkung). Menu kiri tetap "sticky" setinggi layar.
+- **Ikon**: Google Material Symbols (Rounded) dimuat dari Google Fonts, hanya ikon yang dipakai (peta di `app/Support/Icons.php`). Menu yang aktif memakai versi terisi (`<x-ikon name="..." fill />`). Kalau font gagal dimuat (misalnya tanpa internet), otomatis tampil ikon cadangan, jadi tidak pernah muncul tulisan nama ikon.
+- **Bukti pengerjaan**: mahasiswa bisa mengirim link, berkas, atau keduanya. Berkas yang diterima: foto (JPG/PNG/WEBP/GIF), PDF, Word, Excel/CSV, PowerPoint, TXT/MD, ZIP/RAR/7Z, dan MP4. Maksimal 20 MB per berkas, 5 berkas sekali kirim, 15 berkas per task. Program, skrip, HTML, dan SVG ditolak; isi berkas ikut dicek, bukan hanya namanya. Berkas disimpan privat dan hanya bisa dibuka mahasiswa pemilik, Company Supervisor, dosen pembimbing, dan kaprodi. Mahasiswa bisa menghapus bukti yang salah kirim selama KP belum selesai.
+
+## KP v2 (Tahap 1, Oktober 2026)
+
+**Peran.** Mentor dan ketua divisi digabung menjadi satu peran perusahaan: **Company Supervisor** (`supervisor`). Supervisor hanya memantau, berkomentar, menyetujui silabus, mengatur meeting, mengoreksi posisi, dan menilai; ia tidak membuat task. Peran baru **TU Fakultas** (`tu`) mengaktifkan Company Supervisor dari data yang diisi mahasiswa. "Campus Supervisor" hanya label untuk dosen pembimbing di mata supervisor (`User::roleLabelFor`); di tempat lain tetap "Dosen pembimbing".
+
+**Jalur KP.** `internships.program` = `magang` (sub-jenis KP Industri / MBKM Mandiri) atau `seminar` (Pelaksana / Peserta). Seminar tidak punya perusahaan dan ditinjau dosen pembimbing (`Internship::isReviewedBy`). Syarat semester (minimal V, MBKM 5 sampai 7), jam logbook MBKM (450), dan identitas kampus disimpan di `config/simagti.php` dan bisa ditimpa lewat tabel `settings` (`App\Support\Campus`).
+
+**Kegiatan ala Jira/ClickUp.** Mahasiswa membuat proyek berkode (ORD, DOC), task dengan nomor urut (ORD-12), kolom board bebas (arti kolom menentukan status), prioritas, tenggat, label, checklist, bukti, dan komentar. Tampilan board (tarik-lepas, `public/js/app.js`, PATCH + CSRF) dan list dengan filter periode (ini / lalu / rentang), proyek, status, prioritas, kategori silabus, dan pencarian (`App\Support\TaskFilter`). Ritme kerja harian / mingguan / bulanan menentukan arti "periode ini" (`App\Support\Period`).
+
+**Timesheet.** Satu catatan = tanggal, jam (maks 16, total per hari maks 24), aktivitas, task opsional, foto opsional (disk privat `timesheet/{id}`). Menjadi Form Absensi dan Aktivitas KP / logbook MBKM.
+
+**Status KP.** Menu "Pengajuan KP" menjadi "Status KP" di bawah Dashboard, berisi langkah demi langkah (`App\Support\KpProgress`): pengajuan, biro, kaprodi, aktivasi supervisor, silabus, pelaksanaan, lalu laporan, presentasi, dan hasil (tahap berikutnya).
+
+**Pemantauan per kloter.** `/pantau` mengelompokkan mahasiswa per perusahaan + divisi + periode (`Internship::cohortKey`), diberi nomor kloter bila satu divisi punya lebih dari satu periode. Detail mahasiswa menampilkan universitas, fakultas, prodi, angkatan, dan semester (`<x-academic>`).
+
+**Unduhan.** Kegiatan dan timesheet per periode atau proyek bisa diunduh sebagai Excel (`App\Support\SimpleXlsx`, tanpa paket tambahan) dan PDF lewat halaman cetak berformat Form Absensi dan Aktivitas KP. Unduhan mengikuti filter yang aktif.
+
+**Privasi.** Semua perubahan memakai POST / PATCH / DELETE dengan CSRF; URL hanya berisi id, tidak berisi data pribadi; berkas dan foto disimpan privat dan dibuka lewat pengecekan akses.

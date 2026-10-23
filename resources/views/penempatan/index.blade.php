@@ -6,10 +6,10 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Penempatan KP</h1>
-            <p class="page-sub">Seluruh mahasiswa beserta tempat, mentor, dan dosen pembimbingnya.</p>
+            <p class="page-sub">Seluruh mahasiswa beserta tempat, Company Supervisor, dan dosen pembimbingnya.</p>
         </div>
         @if ($canCreate)
-            <a href="{{ route('penempatan.create') }}" class="btn btn-primary"><x-icon name="plus" :size="16" /> Tambah penempatan</a>
+            <a href="{{ route('penempatan.create') }}" class="btn btn-primary"><x-ikon name="plus" :size="16" /> Tambah penempatan</a>
         @endif
     </div>
 
@@ -35,10 +35,9 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Mahasiswa</th>
-                            <th>Perusahaan</th>
-                            <th>Dospem</th>
-                            <th>Jalur</th>
+                            <th style="width: 26%">Mahasiswa</th>
+                            <th style="width: 26%">Tempat</th>
+                            <th>Dospem · jalur</th>
                             <th>Task selesai</th>
                             <th>Status</th>
                         </tr>
@@ -46,13 +45,19 @@
                     <tbody>
                         @foreach ($internships as $internship)
                             <tr>
-                                <td><x-person :user="$internship->student" /></td>
-                                <td>
-                                    <div class="cell-title truncate" title="{{ $internship->company->name }}">{{ $internship->company->name }}</div>
-                                    <div class="cell-sub truncate" title="Mentor: {{ $internship->mentor?->name ?? 'belum ada' }}">Mentor: {{ $internship->mentor?->name ?? 'belum ada' }}</div>
+                                <td class="col-fluid"><x-person :user="$internship->student" /></td>
+                                <td class="col-fluid">
+                                    <div class="cell-title truncate" title="{{ $internship->placeName() }}">{{ $internship->placeName() }}</div>
+                                    @if ($internship->isSeminar())
+                                        <div class="cell-sub truncate">{{ $internship->programTypeLabel() }}</div>
+                                    @else
+                                        <div class="cell-sub truncate" title="Company Supervisor: {{ $internship->supervisor?->name ?? 'belum aktif' }}">Supervisor: {{ $internship->supervisor?->name ?? 'belum aktif' }}</div>
+                                    @endif
                                 </td>
-                                <td><span title="{{ $internship->lecturer?->name }}">{{ $internship->lecturer?->shortName() ?? '–' }}</span></td>
-                                <td>{{ $internship->track === 'mandiri' ? 'Mandiri' : 'Kampus' }}</td>
+                                <td>
+                                    <span title="{{ $internship->lecturer?->name }}">{{ $internship->lecturer?->shortName() ?? '–' }}</span>
+                                    <div class="cell-sub">{{ $internship->programTypeLabel() }} · {{ $internship->track === 'mandiri' ? 'mandiri' : 'kampus' }}</div>
+                                </td>
                                 <td><x-progress :value="$internship->percent()" /></td>
                                 <td><x-chip :tone="$internship->statusTone()">{{ $internship->statusLabel() }}</x-chip></td>
                             </tr>

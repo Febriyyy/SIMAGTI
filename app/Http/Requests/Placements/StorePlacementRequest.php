@@ -48,26 +48,25 @@ class StorePlacementRequest extends FormRequest
                 'required',
                 Rule::exists('users', 'id')->where(fn ($q) => $q->where('role', 'dospem')->where('is_active', true)->whereNull('deleted_at')),
             ],
-            'mentor_id' => ['required', $this->staffOfCompany('mentor', $companyId)],
-            'supervisor_id' => ['nullable', $this->staffOfCompany('ketua_divisi', $companyId)],
+            'supervisor_id' => ['required', $this->supervisorOfCompany($companyId)],
+            'program_type' => ['required', Rule::in(array_keys(Internship::PROGRAMS['magang'][1]))],
+            'position' => ['nullable', 'string', 'max:100'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
         ];
     }
 
-    /** Mentor / ketua divisi harus terdaftar sebagai staf di perusahaan yang dipilih. */
-    private function staffOfCompany(string $role, int $companyId): \Closure
+    /** Company Supervisor harus terdaftar sebagai staf di perusahaan yang dipilih. */
+    private function supervisorOfCompany(int $companyId): \Closure
     {
-        return function (string $attribute, mixed $value, \Closure $fail) use ($role, $companyId) {
+        return function (string $attribute, mixed $value, \Closure $fail) use ($companyId) {
             $valid = CompanyStaffProfile::where('user_id', $value)
                 ->where('company_id', $companyId)
-                ->whereHas('user', fn ($q) => $q->where('role', $role)->where('is_active', true))
+                ->whereHas('user', fn ($q) => $q->where('role', 'supervisor')->where('is_active', true))
                 ->exists();
 
             if (! $valid) {
-                $fail($role === 'mentor'
-                    ? 'Mentor harus staf dari perusahaan yang dipilih.'
-                    : 'Ketua divisi harus staf dari perusahaan yang dipilih.');
+                $fail('Company Supervisor harus staf dari perusahaan yang dipilih.');
             }
         };
     }
@@ -79,8 +78,9 @@ class StorePlacementRequest extends FormRequest
             'company_id' => 'perusahaan',
             'division_id' => 'divisi',
             'lecturer_id' => 'dosen pembimbing',
-            'mentor_id' => 'mentor',
-            'supervisor_id' => 'ketua divisi',
+            'supervisor_id' => 'Company Supervisor',
+            'program_type' => 'jenis magang',
+            'position' => 'posisi',
             'start_date' => 'tanggal mulai',
             'end_date' => 'tanggal selesai',
         ];

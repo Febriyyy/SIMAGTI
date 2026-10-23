@@ -12,13 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
-/** Ketua divisi: validasi penilaian akhir yang dikirim mentor. */
+/** Dosen pembimbing: validasi penilaian akhir yang dikirim Company Supervisor. */
 class AssessmentReviewController extends Controller
 {
     public function index(Request $request): View
     {
-        $internships = Internship::with(['student', 'company', 'mentor', 'assessment'])
-            ->supervisedBy($request->user())
+        $internships = Internship::with(['student', 'company', 'supervisor', 'assessment'])
+            ->where('lecturer_id', $request->user()->id)
             ->whereIn('status', ['berjalan', 'selesai'])
             ->get()
             // Yang menunggu validasi di atas, lalu draft, lalu yang sudah tervalidasi.
@@ -30,14 +30,14 @@ class AssessmentReviewController extends Controller
             })
             ->values();
 
-        return view('penilaian.divisi-index', compact('internships'));
+        return view('penilaian.validasi-index', compact('internships'));
     }
 
     public function show(Request $request, Internship $internship): View
     {
         Gate::authorize('view', $internship);
 
-        $internship->load(['student', 'company', 'mentor', 'assessment.scores', 'assessment.assessor', 'assessment.validator']);
+        $internship->load(['student', 'company', 'supervisor', 'assessment.scores', 'assessment.assessor', 'assessment.validator']);
         $assessment = $internship->assessment;
         $rubric = Assessment::rubricFor($internship);
         $canReview = $request->user()->can('validateAssessment', $internship);
@@ -52,8 +52,8 @@ class AssessmentReviewController extends Controller
 
         $message = $data['keputusan'] === 'validasi'
             ? "Penilaian {$internship->student->name} tervalidasi: {$assessment->letter_grade} (".Num::short($assessment->final_score).")."
-            : "Penilaian {$internship->student->name} dikembalikan ke mentor.";
+            : "Penilaian {$internship->student->name} dikembalikan ke penilai.";
 
-        return redirect()->route('divisi.validasi')->with('status', $message);
+        return redirect()->route('validasi.index')->with('status', $message);
     }
 }

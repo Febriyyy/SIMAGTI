@@ -14,7 +14,7 @@ class KaprodiApprovalController extends Controller
 {
     public function index(): View
     {
-        $waiting = Internship::with(['student', 'company', 'division', 'approvals.reviewer', 'invitations'])
+        $waiting = Internship::with(['student.studentProfile.studyProgram', 'company', 'division', 'approvals.reviewer'])
             ->awaitingKaprodi()
             ->oldest()
             ->get();

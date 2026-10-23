@@ -5,15 +5,15 @@
 @section('content')
     <div class="page-head">
         <div>
-            <a href="{{ route('mentor.penilaian') }}" class="back"><x-icon name="back" :size="16" /> Kembali ke penilaian akhir</a>
+            <a href="{{ route('penilaian.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke penilaian akhir</a>
             <h1 class="page-title">Penilaian {{ $internship->student->name }}</h1>
-            <p class="page-sub">{{ $internship->company->name }} · {{ $rubric?->name ?? 'Rubrik penilaian' }}</p>
+            <p class="page-sub">{{ $internship->placeName() }} · {{ $rubric?->name ?? 'Rubrik penilaian' }}</p>
         </div>
     </div>
 
     @if ($assessment?->wasReturned())
         <div class="alert alert-error" role="status">
-            <strong>Dikembalikan oleh ketua divisi:</strong> {{ $assessment->supervisor_note }}
+            <strong>Dikembalikan oleh dosen pembimbing:</strong> {{ $assessment->supervisor_note }}
         </div>
     @endif
 
@@ -34,7 +34,7 @@
                     </div>
                 @elseif ($canEdit)
                     @php($scores = $assessment ? $assessment->scores->keyBy('rubric_aspect_id') : collect())
-                    <form method="POST" action="{{ route('mentor.penilaian.update', $internship) }}">
+                    <form method="POST" action="{{ route('penilaian.update', $internship) }}">
                         @csrf
                         @method('PUT')
                         <div class="table-wrap">
@@ -42,7 +42,7 @@
                                 <thead>
                                     <tr>
                                         <th>Aspek</th>
-                                        <th>Bobot</th>
+                                        <th class="col-num">Bobot</th>
                                         <th style="width: 110px">Nilai</th>
                                         <th>Catatan (opsional)</th>
                                     </tr>
@@ -57,7 +57,7 @@
                                                     <div class="cell-sub">{{ $aspect->description }}</div>
                                                 @endif
                                             </td>
-                                            <td>{{ \App\Support\Num::short($aspect->weight) }}%</td>
+                                            <td class="col-num">{{ \App\Support\Num::short($aspect->weight) }}%</td>
                                             <td>
                                                 <input id="score-{{ $aspect->id }}" type="number" name="scores[{{ $aspect->id }}][score]" class="input input-score"
                                                        min="0" max="100" step="0.5" inputmode="decimal"
@@ -73,10 +73,10 @@
                             </table>
                         </div>
                         <div class="form-actions">
-                            <p class="hint">Draft bisa diubah kapan saja. Setelah dikirim, penilaian menunggu validasi ketua divisi dan tidak bisa diubah.</p>
+                            <p class="hint">Draft bisa diubah kapan saja. Setelah dikirim, penilaian menunggu validasi dosen pembimbing dan tidak bisa diubah.</p>
                             <div class="btn-row">
                                 <button type="submit" name="aksi" value="simpan" class="btn">Simpan draft</button>
-                                <button type="submit" name="aksi" value="kirim" class="btn btn-primary">Kirim ke ketua divisi</button>
+                                <button type="submit" name="aksi" value="kirim" class="btn btn-primary">Kirim ke dosen pembimbing</button>
                             </div>
                         </div>
                     </form>
@@ -86,7 +86,7 @@
                         @if ($assessment?->isValidated())
                             Penilaian sudah divalidasi dan terkunci permanen.
                         @elseif ($assessment?->status === 'submitted')
-                            Penilaian dikirim {{ $assessment->submitted_at?->locale('id')->translatedFormat('j M Y, H:i') }} dan sedang menunggu validasi ketua divisi.
+                            Penilaian dikirim {{ $assessment->submitted_at?->locale('id')->translatedFormat('j M Y, H:i') }} dan sedang menunggu validasi dosen pembimbing.
                         @else
                             Penilaian tidak bisa diubah untuk penempatan ini.
                         @endif
@@ -96,7 +96,7 @@
 
             @if ($assessment?->isValidated() && $assessment->supervisor_note)
                 <section class="card">
-                    <div class="card-head"><h2 class="card-title">Catatan ketua divisi</h2></div>
+                    <div class="card-head"><h2 class="card-title">Catatan dosen pembimbing</h2></div>
                     <div class="card-body"><p>{{ $assessment->supervisor_note }}</p></div>
                 </section>
             @endif

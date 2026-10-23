@@ -30,7 +30,7 @@ class ReviewAssessmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'catatan.required_if' => 'Tulis alasan agar mentor tahu apa yang perlu diperbaiki.',
+            'catatan.required_if' => 'Tulis alasan agar penilai tahu apa yang perlu diperbaiki.',
             'catatan.max' => 'Catatan maksimal 500 karakter.',
         ];
     }

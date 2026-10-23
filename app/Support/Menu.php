@@ -18,31 +18,42 @@ class Menu
         return match ($user->role) {
             'mahasiswa' => [
                 $dashboard,
-                ['label' => 'Task Mingguan', 'route' => 'tugas.index', 'icon' => 'tasks', 'active' => 'tugas.*'],
-                ['label' => 'Pengajuan KP', 'route' => 'pengajuan.index', 'icon' => 'building', 'active' => 'pengajuan.*'],
+                // Poin 14: "Pengajuan KP" diganti "Status KP" dan diletakkan tepat di bawah Dashboard
+                ['label' => 'Status KP', 'route' => 'kp.status', 'icon' => 'approval', 'active' => 'kp.*'],
+                ['label' => 'Silabus', 'route' => 'silabus.index', 'icon' => 'syllabus', 'active' => 'silabus.*'],
+                ['label' => 'Kegiatan', 'route' => 'kegiatan.index', 'icon' => 'board', 'active' => ['kegiatan.*', 'tugas.show']],
+                ['label' => 'Timesheet', 'route' => 'timesheet.index', 'icon' => 'clock', 'active' => 'timesheet.*'],
             ],
-            'mentor' => [
+            'supervisor' => [
                 $dashboard,
-                ['label' => 'Task Mingguan', 'route' => 'mentor.tugas', 'icon' => 'tasks', 'active' => ['mentor.tugas*', 'tugas.show']],
-                ['label' => 'Penilaian Akhir', 'route' => 'mentor.penilaian', 'icon' => 'award', 'active' => 'mentor.penilaian*'],
+                ['label' => 'Mahasiswa Magang', 'route' => 'pantau.index', 'icon' => 'student', 'active' => ['pantau.*', 'tugas.show']],
+                ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
             ],
-            'ketua_divisi' => [
+            'dospem' => [
                 $dashboard,
-                ['label' => 'Validasi Penilaian', 'route' => 'divisi.validasi', 'icon' => 'award', 'active' => 'divisi.validasi*'],
+                ['label' => 'Mahasiswa Bimbingan', 'route' => 'pantau.index', 'icon' => 'student', 'active' => ['pantau.*', 'tugas.show']],
+                ['label' => 'Penilaian Seminar', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
+                ['label' => 'Validasi Penilaian', 'route' => 'validasi.index', 'icon' => 'verify', 'active' => 'validasi.*'],
+            ],
+            'tu' => [
+                $dashboard,
+                ['label' => 'Aktivasi Supervisor', 'route' => 'tu.aktivasi', 'icon' => 'verify', 'active' => 'tu.aktivasi*'],
+                ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'placement', 'active' => 'penempatan.*'],
             ],
             'biro' => [
                 $dashboard,
-                ['label' => 'Verifikasi KP Mandiri', 'route' => 'biro.verifikasi', 'icon' => 'building', 'active' => 'biro.verifikasi*'],
+                ['label' => 'Verifikasi KP Mandiri', 'route' => 'biro.verifikasi', 'icon' => 'verify', 'active' => 'biro.verifikasi*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
-                ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'users', 'active' => 'penempatan.*'],
+                ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'placement', 'active' => 'penempatan.*'],
             ],
             'kaprodi' => [
                 $dashboard,
-                ['label' => 'Persetujuan KP', 'route' => 'kaprodi.persetujuan', 'icon' => 'tasks', 'active' => 'kaprodi.persetujuan*'],
-                ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'users', 'active' => 'penempatan.*'],
-                ['label' => 'Mahasiswa', 'route' => 'mahasiswa.index', 'icon' => 'users', 'active' => 'mahasiswa.*'],
+                ['label' => 'Persetujuan KP', 'route' => 'kaprodi.persetujuan', 'icon' => 'approval', 'active' => 'kaprodi.persetujuan*'],
+                ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'placement', 'active' => 'penempatan.*'],
+                ['label' => 'Pantau Kegiatan', 'route' => 'pantau.index', 'icon' => 'board', 'active' => ['pantau.*', 'tugas.show']],
+                ['label' => 'Mahasiswa', 'route' => 'mahasiswa.index', 'icon' => 'student', 'active' => 'mahasiswa.*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
-                ['label' => 'Log Aktivitas', 'route' => 'log.index', 'icon' => 'activity', 'active' => 'log.*'],
+                ['label' => 'Log Aktivitas', 'route' => 'log.index', 'icon' => 'history', 'active' => 'log.*'],
             ],
             default => [$dashboard],
         };

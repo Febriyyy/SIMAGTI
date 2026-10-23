@@ -24,9 +24,9 @@
         @endif
         <p class="hint" style="margin-bottom: 14px">
             @if ($assessment?->isValidated())
-                Dikunci {{ $assessment->validated_at->locale('id')->translatedFormat('j M Y') }} oleh {{ $assessment->validator?->name ?? 'ketua divisi' }} · skala versi {{ $assessment->grade_scale_version }}.
+                Dikunci {{ $assessment->validated_at->locale('id')->translatedFormat('j M Y') }} oleh {{ $assessment->validator?->name ?? 'dosen pembimbing' }} · skala versi {{ $assessment->grade_scale_version }}.
             @else
-                @if ($assessment && ! $assessment->isValidated() && $letter) Huruf di atas masih perkiraan. @endif Nilai akhir = jumlah (nilai aspek × bobot). Huruf mutu baru dikunci saat ketua divisi memvalidasi.
+                @if ($assessment && ! $assessment->isValidated() && $letter) Huruf di atas masih perkiraan. @endif Nilai akhir = jumlah (nilai aspek × bobot). Huruf mutu baru dikunci saat dosen pembimbing memvalidasi.
             @endif
         </p>
         <dl class="kv kv-tight">

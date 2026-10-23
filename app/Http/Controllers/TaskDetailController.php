@@ -9,20 +9,30 @@ use Illuminate\View\View;
 
 class TaskDetailController extends Controller
 {
-    /** Detail satu task: dilihat mahasiswa pemiliknya atau mentornya (aturan di WeeklyTaskPolicy). */
+    /** Detail satu task: mahasiswa pemilik (bisa mengubah), Company Supervisor dan dosen pembimbing (memantau, berkomentar). */
     public function show(Request $request, WeeklyTask $task): View
     {
-        $task->load('internship.student', 'internship.company', 'internship.mentor', 'evidences.submitter', 'comments.author', 'attachments.file');
+        $task->load([
+            'internship.student.studentProfile.studyProgram', 'internship.company', 'internship.supervisor', 'internship.lecturer',
+            'project', 'column', 'syllabusItem', 'checklist', 'timeEntries.creator',
+            'evidences.submitter', 'evidences.file', 'comments.author', 'attachments.file',
+        ]);
 
         Gate::authorize('view', $task);
 
         $user = $request->user();
         $internship = $task->internship;
-
+        $canEdit = $user->can('update', $task);
+        $canComment = $user->can('comment', $task);
         $isStudent = $user->role === 'mahasiswa';
-        $isMentor = $user->role === 'mentor';
+        $isMentor = ! $isStudent; // dipakai partial bukti (pesan kosong)
         $locked = $internship->isLocked();
 
-        return view('tugas.detail', compact('task', 'internship', 'isStudent', 'isMentor', 'locked'));
+        $backUrl = $isStudent ? route('kegiatan.index') : route('pantau.show', $internship);
+        $columns = $canEdit ? $internship->ensureBoard() : collect();
+        $projects = $canEdit ? $internship->projects()->get() : collect();
+        $syllabusItems = $canEdit ? $internship->syllabusItems()->get() : collect();
+
+        return view('tugas.detail', compact('task', 'internship', 'canEdit', 'canComment', 'isStudent', 'isMentor', 'locked', 'backUrl', 'columns', 'projects', 'syllabusItems'));
     }
 }

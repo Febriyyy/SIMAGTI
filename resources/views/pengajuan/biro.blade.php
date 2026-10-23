@@ -34,25 +34,33 @@
                         <div><dt>Alamat</dt><dd>{{ $item->company->address ?? '–' }}@if ($item->company->city), {{ $item->company->city }}@endif</dd></div>
                         <div><dt>Kontak</dt><dd>{{ $item->company->email ?? '–' }}@if ($item->company->phone) · {{ $item->company->phone }}@endif</dd></div>
                         <div><dt>Website</dt><dd>{{ $item->company->website ?? '–' }}</dd></div>
+                        <div><dt>Jenis magang</dt><dd>{{ $item->programTypeLabel() }}@if ($item->position)<small>{{ $item->position }}</small>@endif</dd></div>
+                        <div><dt>Company Supervisor</dt><dd>{{ $item->supervisor_name ?? '–' }}@if ($item->supervisor_email)<small>{{ $item->supervisor_title ? $item->supervisor_title.' · ' : '' }}{{ $item->supervisor_email }}</small>@endif</dd></div>
                         <div><dt>Divisi</dt><dd>{{ $item->division?->name ?? '–' }}</dd></div>
                         <div><dt>Periode</dt><dd>{{ $item->start_date->locale('id')->translatedFormat('j F Y') }} – {{ $item->end_date->locale('id')->translatedFormat('j F Y') }}</dd></div>
                     </dl>
 
-                    <div class="toolbar">
-                        <form method="POST" action="{{ route('biro.verifikasi.update', $item) }}" class="inline-form">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="decision" value="approve">
-                            <button type="submit" class="btn btn-primary btn-sm">Verifikasi</button>
-                        </form>
+                    <div class="decision">
+                        <div class="decision-col">
+                            <p class="decision-label">Perusahaan valid dan bisa dihubungi</p>
+                            <form method="POST" action="{{ route('biro.verifikasi.update', $item) }}" class="inline-form">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="decision" value="approve">
+                                <button type="submit" class="btn btn-primary">Verifikasi</button>
+                            </form>
+                        </div>
 
-                        <form method="POST" action="{{ route('biro.verifikasi.update', $item) }}" class="inline-form">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="decision" value="reject">
-                            <input type="text" name="note" class="input" placeholder="Alasan penolakan" maxlength="500" required aria-label="Alasan penolakan untuk {{ $item->company->name }}">
-                            <button type="submit" class="btn btn-sm">Tolak</button>
-                        </form>
+                        <div class="decision-col">
+                            <p class="decision-label">Tolak dengan alasan</p>
+                            <form method="POST" action="{{ route('biro.verifikasi.update', $item) }}" class="inline-form">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="decision" value="reject">
+                                <input type="text" name="note" class="input" placeholder="Alasan penolakan" maxlength="500" required aria-label="Alasan penolakan untuk {{ $item->company->name }}">
+                                <button type="submit" class="btn">Tolak</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </section>

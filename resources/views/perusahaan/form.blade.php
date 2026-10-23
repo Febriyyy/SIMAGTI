@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-head">
         <div>
-            <a href="{{ route('perusahaan.index') }}" class="back"><x-icon name="back" :size="16" /> Perusahaan</a>
+            <a href="{{ route('perusahaan.index') }}" class="back"><x-ikon name="back" :size="16" /> Perusahaan</a>
             <h1 class="page-title">{{ $company ? 'Ubah perusahaan' : 'Tambah perusahaan' }}</h1>
         </div>
     </div>

@@ -2,36 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Tasks\AttachTaskFiles;
-use App\Actions\Tasks\RemoveTaskAttachment;
-use App\Http\Requests\Tasks\StoreAttachmentRequest;
 use App\Models\TaskAttachment;
 use App\Models\WeeklyTask;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** Lampiran materi task: mentor menambah/menghapus, mahasiswa pemilik dan mentornya mengunduh. */
+/**
+ * Lampiran materi dari versi awal (saat mentor masih membuat task). Sejak v2 task dibuat mahasiswa,
+ * jadi lampiran lama hanya bisa dibuka; berkas baru dikirim sebagai bukti pengerjaan.
+ */
 class TaskAttachmentController extends Controller
 {
-    public function store(StoreAttachmentRequest $request, WeeklyTask $task, AttachTaskFiles $attach): RedirectResponse
-    {
-        $attach->handle($request->user(), $task, $request->attachments());
-
-        return back()->with('status', 'Lampiran ditambahkan.');
-    }
-
-    public function destroy(WeeklyTask $task, TaskAttachment $attachment, RemoveTaskAttachment $remove): RedirectResponse
-    {
-        Gate::authorize('update', $task);
-
-        $remove->handle($attachment);
-
-        return back()->with('status', 'Lampiran dihapus.');
-    }
-
     /** Berkas hanya bisa diambil lewat sini, setelah hak akses atas task-nya dicek. */
     public function show(Request $request, WeeklyTask $task, TaskAttachment $attachment): StreamedResponse
     {

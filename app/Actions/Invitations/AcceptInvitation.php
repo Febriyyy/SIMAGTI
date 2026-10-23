@@ -4,12 +4,13 @@ namespace App\Actions\Invitations;
 
 use App\Models\ActivityLog;
 use App\Models\CompanyStaffProfile;
+use App\Models\Internship;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/** Mentor / ketua divisi mengaktifkan akun lewat link undangan. */
+/** Company Supervisor mengaktifkan akun lewat link undangan yang diterbitkan TU Fakultas. */
 class AcceptInvitation
 {
     public function handle(Invitation $invitation, string $name, string $password): User
@@ -38,9 +39,21 @@ class AcceptInvitation
                 'user_id' => $user->id,
                 'company_id' => $invitation->company_id,
                 'division_id' => $invitation->internship?->division_id,
+                'job_title' => $invitation->internship?->supervisor_title,
             ]);
 
-            $invitation->internship?->assignStaff($user, $invitation->role);
+            // Satu undangan berlaku untuk seluruh kloter: semua mahasiswa di perusahaan ini yang
+            // mencantumkan email supervisor yang sama dan belum punya Company Supervisor.
+            $internships = Internship::awaitingSupervisor()
+                ->where('company_id', $invitation->company_id)
+                ->where('supervisor_email', $invitation->email)
+                ->get();
+            if ($invitation->internship && ! $internships->contains($invitation->internship)) {
+                $internships->push($invitation->internship);
+            }
+            foreach ($internships as $internship) {
+                $internship->assignSupervisor($user);
+            }
 
             $invitation->update(['accepted_at' => now(), 'user_id' => $user->id]);
 

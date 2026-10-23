@@ -13,22 +13,24 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Data dashboard pemantauan untuk ketua divisi, dosen pembimbing, dan kaprodi.
+ * Data dashboard pemantauan untuk dosen pembimbing dan kaprodi.
  * Hanya penempatan yang boleh dilihat pengguna (scope visibleTo) yang dihitung.
  */
 class BuildMonitoringDashboard
 {
     /** Batas aturan "perlu perhatian" ditulis di satu tempat. */
-    public const IDLE_DAYS = 7;          // tidak ada bukti baru selama 7 hari
+    public const IDLE_DAYS = 7;          // tidak ada catatan kegiatan selama 7 hari
 
     public const LOW_PROGRESS = 60;      // progres task di bawah 60%
 
     public const ENDING_DAYS = 21;       // KP berakhir dalam 3 minggu tetapi belum dinilai
 
+    public const ACTIVITY_WEEKS = 8;     // panjang grafik jam kegiatan
+
     /** @return array<string, mixed> */
     public function handle(User $user): array
     {
-        $internships = Internship::with(['student', 'company', 'mentor', 'assessment'])
+        $internships = Internship::with(['student', 'company', 'division', 'supervisor', 'assessment'])
             ->withProgress()
             ->visibleTo($user)
             ->whereIn('status', ['diajukan', 'berjalan', 'selesai'])
@@ -36,7 +38,7 @@ class BuildMonitoringDashboard
             ->orderBy('end_date')
             ->get();
 
-        $lastActivity = $this->lastEvidenceAt($internships->pluck('id')->all());
+        $lastActivity = $this->lastActivityAt($internships->pluck('id')->all());
         foreach ($internships as $internship) {
             $internship->setAttribute('last_activity_at', $lastActivity[$internship->id] ?? null);
         }
@@ -48,12 +50,13 @@ class BuildMonitoringDashboard
             'internships' => $internships,
             'stats' => [
                 'active' => $ongoing->count(),
-                'companies' => $ongoing->pluck('company_id')->unique()->count(),
+                'companies' => $ongoing->pluck('company_id')->filter()->unique()->count(),
                 'average' => $ongoing->isEmpty() ? 0 : (int) round($ongoing->avg(fn (Internship $i) => $i->percent())),
                 'finished' => $internships->where('status', 'selesai')->count(),
                 'average_score' => $validated->isEmpty() ? null : round((float) $validated->avg('final_score'), 2),
             ],
             'attention' => $this->attention($ongoing),
+            'activity' => $this->weeklyHours($internships->pluck('id')->all()),
             'grades' => Grading::distribution($validated->pluck('letter_grade')),
             'assessment' => [
                 'none' => $internships->whereIn('status', ['berjalan', 'selesai'])->filter(fn ($i) => $i->assessment === null)->count(),
@@ -63,7 +66,7 @@ class BuildMonitoringDashboard
             ],
         ];
 
-        if ($user->hasRole('ketua_divisi')) {
+        if ($user->hasRole('dospem')) {
             $data['waitingValidation'] = $internships->filter(fn ($i) => $i->assessment?->status === 'submitted')->values();
         }
 
@@ -89,9 +92,9 @@ class BuildMonitoringDashboard
                 $last = $i->last_activity_at;
 
                 if ($last === null) {
-                    $reasons[] = 'Belum pernah mengirim bukti';
+                    $reasons[] = 'Belum pernah mencatat kegiatan';
                 } elseif (($days = Relative::daysAgo($last)) >= self::IDLE_DAYS) {
-                    $reasons[] = "Tidak ada bukti baru {$days} hari";
+                    $reasons[] = "Tidak ada kegiatan baru {$days} hari";
                 }
 
                 if ($i->tasks_count > 0 && $i->percent() < self::LOW_PROGRESS) {
@@ -110,25 +113,73 @@ class BuildMonitoringDashboard
     }
 
     /**
-     * Waktu bukti terakhir per penempatan.
+     * Waktu kegiatan terakhir per penempatan: timesheet atau bukti task, mana yang paling baru.
      *
      * @param  list<int>  $ids
      * @return array<int, Carbon>
      */
-    private function lastEvidenceAt(array $ids): array
+    private function lastActivityAt(array $ids): array
     {
         if ($ids === []) {
             return [];
         }
 
-        return DB::table('task_evidences')
+        $times = DB::table('time_entries')
+            ->whereIn('internship_id', $ids)
+            ->groupBy('internship_id')
+            ->select('internship_id', DB::raw('MAX(created_at) as last_at'))
+            ->pluck('last_at', 'internship_id');
+
+        $evidences = DB::table('task_evidences')
             ->join('weekly_tasks', 'weekly_tasks.id', '=', 'task_evidences.weekly_task_id')
             ->whereIn('weekly_tasks.internship_id', $ids)
             ->groupBy('weekly_tasks.internship_id')
             ->select('weekly_tasks.internship_id', DB::raw('MAX(task_evidences.created_at) as last_at'))
-            ->pluck('last_at', 'internship_id')
-            ->map(fn ($value) => Carbon::parse($value))
-            ->all();
+            ->pluck('last_at', 'internship_id');
+
+        $result = [];
+        foreach ($ids as $id) {
+            $dates = array_filter([$times[$id] ?? null, $evidences[$id] ?? null]);
+            if ($dates !== []) {
+                $result[$id] = Carbon::parse(max($dates));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Jam kegiatan yang dicatat per minggu kalender (Senin–Minggu), beberapa minggu terakhir.
+     *
+     * @param  list<int>  $ids
+     * @return array{labels: list<string>, ranges: list<string>, values: list<float>}
+     */
+    private function weeklyHours(array $ids): array
+    {
+        $first = now()->startOfWeek()->subWeeks(self::ACTIVITY_WEEKS - 1)->startOfDay();
+
+        $rows = $ids === [] ? collect() : DB::table('time_entries')
+            ->whereIn('internship_id', $ids)
+            ->where('work_date', '>=', $first->toDateString())
+            ->get(['work_date', 'hours']);
+
+        $values = array_fill(0, self::ACTIVITY_WEEKS, 0.0);
+        foreach ($rows as $row) {
+            $index = (int) floor($first->diffInDays(Carbon::parse($row->work_date)->startOfDay()) / 7);
+            if ($index >= 0 && $index < self::ACTIVITY_WEEKS) {
+                $values[$index] += (float) $row->hours;
+            }
+        }
+
+        $labels = [];
+        $ranges = [];
+        for ($i = 0; $i < self::ACTIVITY_WEEKS; $i++) {
+            $start = $first->copy()->addWeeks($i)->locale('id');
+            $labels[] = $start->translatedFormat('j M');
+            $ranges[] = $start->translatedFormat('j M').' – '.$start->copy()->endOfWeek()->translatedFormat('j M');
+        }
+
+        return ['labels' => $labels, 'ranges' => $ranges, 'values' => array_map(fn ($v) => round($v, 1), $values)];
     }
 
     /**
@@ -141,6 +192,7 @@ class BuildMonitoringDashboard
     {
         return $internships
             ->whereIn('status', ['berjalan', 'selesai'])
+            ->filter(fn (Internship $i) => $i->company_id !== null)
             ->groupBy('company_id')
             ->map(function (Collection $group) {
                 $active = $group->where('status', 'berjalan');

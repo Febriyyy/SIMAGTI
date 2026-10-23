@@ -9,7 +9,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/** Langkah 2 KP mandiri: kaprodi menyetujui dan menunjuk dosen pembimbing, atau menolak. */
+/**
+ * Persetujuan kaprodi: menyetujui dan menunjuk dosen pembimbing, atau menolak.
+ * Magang harus sudah diverifikasi biro; seminar (tanpa perusahaan) langsung ke kaprodi.
+ */
 class ReviewKaprodiApproval
 {
     public function handle(User $actor, Internship $internship, bool $approve, ?int $lecturerId = null, ?string $note = null): Internship
@@ -21,9 +24,9 @@ class ReviewKaprodiApproval
                 throw ValidationException::withMessages(['aturan' => 'Pengajuan ini tidak sedang menunggu persetujuan.']);
             }
 
-            $biro = $internship->approvals()->where('step', InternshipApproval::STEP_BIRO)->firstOrFail();
+            $biro = $internship->approvals()->where('step', InternshipApproval::STEP_BIRO)->first();
 
-            if ($biro->status !== 'approved') {
+            if (! $internship->isSeminar() && $biro?->status !== 'approved') {
                 throw ValidationException::withMessages(['aturan' => 'Perusahaan belum diverifikasi Biro Kerjasama.']);
             }
 
@@ -48,7 +51,7 @@ class ReviewKaprodiApproval
 
             ActivityLog::record(
                 $approve ? 'kp.setujui' : 'kp.tolak',
-                ($approve ? 'Menyetujui' : 'Menolak')." KP mandiri {$internship->student->name} di {$internship->company->name}",
+                ($approve ? 'Menyetujui' : 'Menolak')." KP {$internship->programTypeLabel()} {$internship->student->name}: {$internship->placeName()}",
                 $internship
             );
 

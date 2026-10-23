@@ -19,7 +19,7 @@
     <div class="stat-head">
         <span class="stat-label">{{ $label }}</span>
         @if ($href)
-            <span class="stat-go" aria-hidden="true"><x-icon name="arrow-up-right" :size="16" /></span>
+            <span class="stat-go" aria-hidden="true"><x-ikon name="arrow-up-right" :size="16" /></span>
         @endif
     </div>
     @if ($value === null || $value === '')

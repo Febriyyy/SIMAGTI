@@ -5,13 +5,12 @@ namespace App\Actions\Placements;
 use App\Models\AcademicPeriod;
 use App\Models\ActivityLog;
 use App\Models\Internship;
-use App\Models\InternshipStaff;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Kaprodi menempatkan mahasiswa di perusahaan mitra (jalur lowongan kampus).
- * Penempatan langsung aktif dengan dosen pembimbing, mentor, dan (opsional) ketua divisi.
+ * Penempatan langsung aktif dengan dosen pembimbing dan Company Supervisor (jalur Magang · KP Industri).
  */
 class CreatePlacement
 {
@@ -28,16 +27,15 @@ class CreatePlacement
                 'lecturer_id' => $data['lecturer_id'],
                 'academic_period_id' => AcademicPeriod::current()?->id,
                 'track' => 'lowongan',
+                'program' => 'magang',
+                'program_type' => $data['program_type'] ?? 'industri',
+                'position' => $data['position'] ?? null,
                 'status' => 'berjalan',
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
             ]);
 
-            $internship->assignStaff((int) $data['mentor_id'], InternshipStaff::ROLE_MENTOR);
-
-            if (filled($data['supervisor_id'] ?? null)) {
-                $internship->assignStaff((int) $data['supervisor_id'], InternshipStaff::ROLE_SUPERVISOR);
-            }
+            $internship->assignSupervisor((int) $data['supervisor_id']);
 
             $internship->load('student', 'company');
 

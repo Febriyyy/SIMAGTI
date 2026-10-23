@@ -17,7 +17,7 @@ class InternshipController extends Controller
     {
         $status = $request->query('status');
 
-        $internships = Internship::with(['student', 'company', 'mentor', 'lecturer'])
+        $internships = Internship::with(['student', 'company', 'supervisor', 'lecturer'])
             ->withProgress()
             ->visibleTo($request->user())
             ->when(is_string($status) && array_key_exists($status, Internship::STATUSES), fn ($q) => $q->where('status', $status))
@@ -32,7 +32,7 @@ class InternshipController extends Controller
         Gate::authorize('view', $internship);
 
         return new InternshipResource(
-            Internship::with(['student', 'company', 'mentor', 'lecturer'])->withProgress()->findOrFail($internship->id)
+            Internship::with(['student', 'company', 'supervisor', 'lecturer'])->withProgress()->findOrFail($internship->id)
         );
     }
 

@@ -96,27 +96,46 @@ class SchemaTest extends TestCase
         $task->update(['title' => 'Diubah diam-diam']);
     }
 
-    public function test_mentor_dan_ketua_divisi_diatur_per_penempatan(): void
+    public function test_company_supervisor_diatur_per_penempatan(): void
     {
         $rina = $this->activeInternship('mahasiswa@kp.test');
 
-        $this->assertTrue($rina->isMentoredBy($this->user('mentor@kp.test')));
-        $this->assertFalse($rina->isMentoredBy($this->user('mentor2@kp.test')));
-        $this->assertTrue($rina->isSupervisedBy($this->user('divisi@kp.test')));
-        $this->assertSame('Anita Wulandari', $rina->mentor->name);
+        $this->assertTrue($rina->isSupervisedBy($this->user('supervisor@kp.test')));
+        $this->assertFalse($rina->isSupervisedBy($this->user('supervisor2@kp.test')));
+        $this->assertSame('Anita Wulandari', $rina->supervisor->name);
+        $this->assertTrue($rina->isReviewedBy($this->user('supervisor@kp.test')));
+        $this->assertFalse($rina->isReviewedBy($this->user('dospem@kp.test')), 'Magang ditinjau Company Supervisor');
+
+        $gilang = $this->activeInternship('gilang@kp.test');
+        $this->assertNull($gilang->company_id);
+        $this->assertTrue($gilang->isReviewedBy($this->user('dospem@kp.test')), 'Seminar ditinjau dosen pembimbing');
     }
 
-    public function test_mentor_yang_sama_tidak_bisa_dipasang_dua_kali_dengan_peran_sama(): void
+    public function test_supervisor_yang_sama_tidak_bisa_dipasang_dua_kali(): void
     {
         $rina = $this->activeInternship('mahasiswa@kp.test');
-        $mentor = $this->user('mentor@kp.test');
+        $supervisor = $this->user('supervisor@kp.test');
 
-        $rina->assignStaff($mentor, InternshipStaff::ROLE_MENTOR);
-
-        $this->assertSame(1, $rina->staff()->where('user_id', $mentor->id)->where('role', 'mentor')->count());
+        $rina->assignSupervisor($supervisor);
+        $this->assertSame(1, $rina->staff()->where('user_id', $supervisor->id)->count());
 
         $this->expectException(QueryException::class);
-        InternshipStaff::create(['internship_id' => $rina->id, 'user_id' => $mentor->id, 'role' => 'mentor']);
+        InternshipStaff::create(['internship_id' => $rina->id, 'user_id' => $supervisor->id, 'role' => InternshipStaff::ROLE_SUPERVISOR]);
+    }
+
+    public function test_kode_task_dan_status_mengikuti_kolom(): void
+    {
+        $rina = $this->activeInternship('mahasiswa@kp.test');
+        $done = $rina->boardColumns()->where('category', 'done')->firstOrFail();
+        $task = $rina->tasks()->where('status', 'todo')->firstOrFail();
+
+        $this->assertMatchesRegularExpression('/^(PMS|DOC)-\d+$/', $task->key());
+        $task->update(['board_column_id' => $done->id]);
+        $this->assertSame('completed', $task->fresh()->status);
+
+        // Nomor task unik per penempatan
+        $this->expectException(QueryException::class);
+        WeeklyTask::create(['internship_id' => $rina->id, 'number' => $task->number, 'title' => 'Kembar', 'created_by' => $rina->student_id]);
     }
 
     // ---------- Task dan meeting ----------
@@ -153,11 +172,18 @@ class SchemaTest extends TestCase
 
     public function test_template_task_bisa_disalin_ke_penempatan(): void
     {
-        $template = TaskTemplate::firstOrFail();
+        $template = TaskTemplate::create(['owner_id' => $this->user('supervisor@kp.test')->id, 'name' => 'Onboarding', 'is_shared' => true]);
+        foreach ([[1, 'senin', 'Siapkan lingkungan kerja'], [1, 'jumat', 'Rangkuman minggu pertama'], [2, 'senin', 'Perbaikan kecil pertama']] as $i => [$week, $day, $title]) {
+            $template->items()->create(['week_number' => $week, 'day' => $day, 'title' => $title, 'sort_order' => $i]);
+        }
         $fajar = $this->activeInternship('fajar@kp.test');
         $sebelum = $fajar->tasks()->count();
 
-        $jumlah = $template->applyTo($fajar, $this->user('mentor@kp.test')->id);
+        $jumlah = $template->applyTo($fajar, $fajar->student_id);
+        $copied = $fajar->tasks()->where('title', 'Rangkuman minggu pertama')->firstOrFail();
+        $this->assertSame(1, $copied->week_number);
+        $this->assertSame($fajar->start_date->copy()->addDays(4)->toDateString(), $copied->due_date->toDateString());
+        $this->assertNotNull($copied->board_column_id);
 
         $this->assertSame($template->items()->count(), $jumlah);
         $this->assertSame($sebelum + $jumlah, $fajar->tasks()->count());
@@ -232,7 +258,7 @@ class SchemaTest extends TestCase
 
         $this->assertSame('ditawari', $candidate->status);
 
-        $candidate->moveTo('diterima', $this->user('divisi2@kp.test')->id, 'Menerima tawaran.');
+        $candidate->moveTo('diterima', $this->user('supervisor2@kp.test')->id, 'Menerima tawaran.');
 
         $this->assertSame('diterima', $candidate->fresh()->status);
         $this->assertSame(3, $candidate->histories()->count());
@@ -252,10 +278,11 @@ class SchemaTest extends TestCase
 
     public function test_kp_mandiri_menunggu_dua_tahap_persetujuan(): void
     {
-        $nadia = Internship::where('track', 'mandiri')->firstOrFail();
+        $nadia = Internship::where('student_id', $this->user('nadia@kp.test')->id)->firstOrFail();
 
         $this->assertSame('diajukan', $nadia->status);
         $this->assertSame(2, $nadia->approvals()->where('status', 'pending')->count());
-        $this->assertDatabaseHas('invitations', ['internship_id' => $nadia->id, 'role' => 'mentor']);
+        $this->assertSame('yusuf@karyamandiri.test', $nadia->supervisor_email);
+        $this->assertSame(0, $nadia->invitations()->count(), 'Undangan diterbitkan TU setelah disetujui');
     }
 }

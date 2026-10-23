@@ -22,7 +22,7 @@ class PlacementController extends Controller
 
         $status = $request->query('status');
 
-        $internships = Internship::with(['student', 'company', 'mentor', 'lecturer'])
+        $internships = Internship::with(['student', 'company', 'division', 'supervisor', 'lecturer'])
             ->withProgress()
             ->when(array_key_exists((string) $status, Internship::STATUSES), fn ($q) => $q->where('status', $status))
             ->latest('id')
@@ -59,8 +59,7 @@ class PlacementController extends Controller
             'students' => $students,
             'companies' => $companies,
             'lecturers' => $lecturers,
-            'mentors' => $staff->filter(fn ($p) => $p->user->role === 'mentor'),
-            'supervisors' => $staff->filter(fn ($p) => $p->user->role === 'ketua_divisi'),
+            'supervisors' => $staff->filter(fn ($p) => $p->user->role === 'supervisor'),
         ]);
     }
 

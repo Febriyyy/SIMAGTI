@@ -91,13 +91,13 @@ class Assessment extends Model
         return round($total, 2);
     }
 
-    /** Mentor mengirim penilaian untuk divalidasi ketua divisi. */
+    /** Penilai mengirim penilaian untuk divalidasi dosen pembimbing. */
     public function submit(): void
     {
         $this->update(['status' => 'submitted', 'submitted_at' => now()]);
     }
 
-    /** Ketua divisi memvalidasi: nilai akhir dan huruf mutu dikunci memakai skala yang berlaku saat ini. */
+    /** Dosen pembimbing memvalidasi: nilai akhir dan huruf mutu dikunci memakai skala yang berlaku saat ini. */
     public function validateBy(User $user, ?string $note = null): void
     {
         $version = Grading::currentVersion();
@@ -122,7 +122,7 @@ class Assessment extends Model
         return $rubric?->load(['aspects' => fn ($q) => $q->orderBy('sort_order')]);
     }
 
-    /** Draft yang pernah dikirim lalu dikembalikan ketua divisi (ada catatan). */
+    /** Draft yang pernah dikirim lalu dikembalikan dosen pembimbing (ada catatan). */
     public function wasReturned(): bool
     {
         return $this->status === 'draft' && filled($this->supervisor_note);

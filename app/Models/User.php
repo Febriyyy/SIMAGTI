@@ -17,11 +17,11 @@ class User extends Authenticatable
 
     public const ROLE_LABELS = [
         'mahasiswa' => 'Mahasiswa',
-        'mentor' => 'Mentor',
-        'ketua_divisi' => 'Ketua Divisi',
+        'supervisor' => 'Company Supervisor',
         'dospem' => 'Dosen Pembimbing',
         'kaprodi' => 'Kaprodi',
         'biro' => 'Biro Kerjasama',
+        'tu' => 'TU Fakultas',
     ];
 
     protected $fillable = [
@@ -60,6 +60,19 @@ class User extends Authenticatable
         return self::ROLE_LABELS[$this->role] ?? ucfirst((string) $this->role);
     }
 
+    /**
+     * Label peran sesuai siapa yang melihat. Dosen pembimbing tampil sebagai "Campus Supervisor"
+     * di hadapan Company Supervisor (istilah yang dipakai perusahaan), dan "Dosen Pembimbing" di tempat lain.
+     */
+    public function roleLabelFor(?User $viewer): string
+    {
+        if ($this->role === 'dospem' && $viewer?->role === 'supervisor') {
+            return 'Campus Supervisor';
+        }
+
+        return $this->roleLabel();
+    }
+
     /** Nama tanpa gelar (Dr., Ir., S.Kom., M.T., ...) untuk tabel yang sempit. Nama lengkap tetap dipakai di tempat lain. */
     public function shortName(): string
     {
@@ -81,6 +94,26 @@ class User extends Authenticatable
         }
 
         return $words[0];
+    }
+
+    /**
+     * Identitas akademik mahasiswa untuk tampilan perusahaan (poin 19/10 no. 7):
+     * universitas, fakultas, prodi, dan angkatan.
+     *
+     * @return array{university: string, faculty: ?string, program: ?string, entry_year: ?int, semester: ?int}
+     */
+    public function academicIdentity(): array
+    {
+        $profile = $this->studentProfile;
+        $program = $profile?->studyProgram;
+
+        return [
+            'university' => \App\Support\Campus::university(),
+            'faculty' => $program?->faculty ?: \App\Support\Campus::faculty(),
+            'program' => $program?->name,
+            'entry_year' => $profile?->entry_year,
+            'semester' => $profile?->semester(),
+        ];
     }
 
     // ---------- Relasi ----------
@@ -106,7 +139,7 @@ class User extends Authenticatable
         return $this->hasMany(Internship::class, 'student_id');
     }
 
-    /** Penempatan yang ditangani mentor atau ketua divisi ini. */
+    /** Penempatan yang ditangani Company Supervisor ini. */
     public function staffInternships(): BelongsToMany
     {
         return $this->belongsToMany(Internship::class, 'internship_staff')->withPivot('role')->withTimestamps();

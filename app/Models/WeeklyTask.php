@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LogicException;
 
+/**
+ * Task kegiatan mahasiswa (nama kelas dipertahankan dari versi awal: dulu task mingguan dari mentor).
+ * Sejak v2 task dibuat mahasiswa sendiri, berada di satu kolom board, opsional di satu proyek,
+ * dan bisa dikaitkan ke satu tujuan silabus.
+ */
 class WeeklyTask extends Model
 {
     use SoftDeletes;
@@ -24,16 +29,34 @@ class WeeklyTask extends Model
     public const STATUSES = [
         'todo' => ['To Do', 'gray'],
         'in_progress' => ['In Progress', 'blue'],
-        'completed' => ['Completed', 'green'],
+        'completed' => ['Selesai', 'green'],
+    ];
+
+    /** prioritas => [label, warna chip, urutan] */
+    public const PRIORITIES = [
+        'urgent' => ['Urgent', 'red', 0],
+        'high' => ['Tinggi', 'amber', 1],
+        'medium' => ['Sedang', 'blue', 2],
+        'low' => ['Rendah', 'gray', 3],
     ];
 
     protected $fillable = [
         'internship_id',
+        'project_id',
+        'board_column_id',
+        'syllabus_item_id',
+        'number',
         'week_number',
         'day',
         'title',
         'description',
         'status',
+        'priority',
+        'start_date',
+        'due_date',
+        'estimate_hours',
+        'labels',
+        'position',
         'completed_at',
         'created_by',
     ];
@@ -42,6 +65,10 @@ class WeeklyTask extends Model
     {
         return [
             'completed_at' => 'datetime',
+            'start_date' => 'date',
+            'due_date' => 'date',
+            'estimate_hours' => 'decimal:2',
+            'labels' => 'array',
         ];
     }
 
@@ -51,6 +78,22 @@ class WeeklyTask extends Model
             // Penempatan yang sudah selesai dikunci: task tidak bisa diubah lagi.
             if ($task->internship_id && $task->internship?->isLocked()) {
                 throw new LogicException('Penempatan ini sudah selesai dan dikunci.');
+            }
+
+            // Status mengikuti kategori kolom board tempat task berada.
+            if ($task->isDirty('board_column_id') && $task->board_column_id) {
+                $task->status = BoardColumn::find($task->board_column_id)?->taskStatus() ?? $task->status;
+            }
+
+            // Nomor urut per penempatan (dipakai untuk kode seperti PMS-12).
+            if ($task->number === null && $task->internship_id) {
+                $task->number = (int) static::withTrashed()->where('internship_id', $task->internship_id)->max('number') + 1;
+            }
+
+            // Minggu ke- dihitung dari tenggat (atau tanggal dibuat), dipakai filter dan grafik mingguan.
+            if ($task->internship && ($task->isDirty('due_date') || $task->week_number === null)) {
+                $date = $task->due_date ?? $task->created_at ?? now();
+                $task->week_number = $task->internship->weekOf($date);
             }
 
             if ($task->isDirty('status')) {
@@ -69,15 +112,81 @@ class WeeklyTask extends Model
         return $this->hasMany(TaskEvidence::class);
     }
 
+    /**
+     * Alias untuk route /tugas/{task}/bukti/{evidence} (scopeBindings): Laravel menganggap
+     * "evidence" tidak punya bentuk jamak, jadi mencari relasi bernama evidence().
+     */
+    public function evidence(): HasMany
+    {
+        return $this->evidences();
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(TaskComment::class);
     }
 
-    /** Materi dari mentor untuk task ini. */
+    /** Lampiran lama dari versi awal (materi dari mentor). Tetap bisa dibuka, tidak bisa ditambah lagi. */
     public function attachments(): HasMany
     {
         return $this->hasMany(TaskAttachment::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function column(): BelongsTo
+    {
+        return $this->belongsTo(BoardColumn::class, 'board_column_id');
+    }
+
+    public function syllabusItem(): BelongsTo
+    {
+        return $this->belongsTo(SyllabusItem::class);
+    }
+
+    public function checklist(): HasMany
+    {
+        return $this->hasMany(TaskChecklistItem::class)->orderBy('position');
+    }
+
+    /** Alias untuk route binding bertingkat /tugas/{task}/checklist/{item}. */
+    public function items(): HasMany
+    {
+        return $this->checklist();
+    }
+
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
+    /** Kode task seperti Jira: PMS-12 (proyek) atau KP-12 (tanpa proyek). */
+    public function key(): string
+    {
+        return ($this->project?->key ?: 'KP').'-'.$this->number;
+    }
+
+    public function priorityLabel(): string
+    {
+        return self::PRIORITIES[$this->priority][0] ?? $this->priority;
+    }
+
+    public function priorityTone(): string
+    {
+        return self::PRIORITIES[$this->priority][1] ?? 'gray';
+    }
+
+    public function isDone(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isOverdue(): bool
+    {
+        return ! $this->isDone() && $this->due_date !== null && $this->due_date->isBefore(today());
     }
 
     public function creator(): BelongsTo
@@ -87,6 +196,10 @@ class WeeklyTask extends Model
 
     public function dayLabel(): string
     {
+        if ($this->day === null) {
+            return $this->due_date ? $this->due_date->locale('id')->translatedFormat('l') : '–';
+        }
+
         return self::DAYS[$this->day] ?? ucfirst($this->day);
     }
 
