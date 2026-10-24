@@ -1124,6 +1124,122 @@ button.check-btn:hover { border-color: var(--primary); color: var(--primary-soft
 .howto { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: var(--gray); font-size: 13px; }
 .howto strong { color: var(--text); }
 
+/* ---------- Halaman masuk: formulir di kiri, cuplikan aplikasi di kanan ---------- */
+
+.signin-body { margin: 0; min-height: 100vh; background: var(--surface); }
+.signin { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); min-height: 100vh; }
+
+.signin-form-side { display: flex; align-items: center; justify-content: center; padding: 48px 32px; }
+.signin-form-box { width: 100%; max-width: 410px; }
+.signin-logo { display: block; width: 150px; height: auto; margin-bottom: 44px; }
+.signin-title { font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); }
+.signin-sub { margin-top: 10px; color: var(--muted); font-size: 15px; }
+
+.signin-form { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+.signin-field { position: relative; display: block; }
+.signin-field-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.signin-field input {
+    width: 100%; min-height: 54px; padding: 14px 52px 14px 48px;
+    border: 1px solid transparent; border-radius: 14px; background: var(--surface-2);
+    font: inherit; font-size: 15px; color: var(--text);
+    transition: border-color 150ms, box-shadow 150ms, background-color 150ms;
+}
+.signin-field input::placeholder { color: var(--muted-2); }
+.signin-field input:hover { border-color: var(--line-strong); }
+.signin-field input:focus { outline: none; background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+.signin-field:focus-within .signin-field-icon { color: var(--primary); }
+.signin-eye {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+    border: 0; border-radius: 10px; background: transparent; color: var(--gray); cursor: pointer;
+}
+.signin-eye:hover { color: var(--text); background: var(--gray-soft); }
+.signin-eye .eye-closed { display: none; }
+.signin-eye.is-open .eye-closed { display: block; }
+.signin-eye.is-open .eye-open { display: none; }
+
+.signin-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.signin-check { display: inline-flex; align-items: center; gap: 9px; color: var(--gray); font-size: 14px; cursor: pointer; }
+.signin-check input { width: 17px; height: 17px; margin: 0; accent-color: var(--primary); }
+.signin-link { padding: 0; border: 0; background: none; cursor: pointer; color: var(--primary); font: 600 14px var(--font); }
+.signin-link:hover { color: var(--primary-dark); text-decoration: underline; }
+.signin-help { margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--primary-tint); color: var(--gray); font-size: 13px; }
+
+.signin-submit {
+    min-height: 54px; margin-top: 10px; border: 0; border-radius: 14px; cursor: pointer;
+    background: var(--primary); color: #fff; font: 700 15px var(--font);
+    box-shadow: 0 10px 22px var(--primary-shadow);
+    transition: background-color 150ms, transform 150ms;
+}
+.signin-submit:hover { background: var(--primary-dark); }
+.signin-submit:active { transform: translateY(1px); }
+
+/* Panel kanan: latar gradasi hijau-teal + awan lembut (sama seperti versi sebelumnya) */
+.signin-showcase {
+    position: relative; overflow: hidden; margin: 16px 16px 16px 0; border-radius: 28px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 48px;
+    padding: 56px 48px; color: #fff;
+    background:
+        radial-gradient(120% 90% at 15% 10%, #9fe3c9 0%, rgba(159, 227, 201, 0) 55%),
+        radial-gradient(90% 80% at 90% 90%, #5fc8a8 0%, rgba(95, 200, 168, 0) 60%),
+        linear-gradient(160deg, #3fae94 0%, #1f8f7c 45%, #0f6f62 100%);
+}
+.login-cloud { position: absolute; border-radius: 50%; background: #fff; filter: blur(46px); opacity: 0.38; pointer-events: none; }
+.login-cloud-1 { width: 520px; height: 260px; left: -160px; top: 4%; }
+.login-cloud-2 { width: 420px; height: 220px; right: -120px; top: 26%; opacity: 0.3; }
+.login-cloud-3 { width: 640px; height: 300px; left: 0; bottom: -160px; opacity: 0.32; }
+.login-cloud-4 { width: 360px; height: 200px; right: 6%; bottom: 10%; opacity: 0.2; }
+
+.signin-visual { position: relative; z-index: 1; width: 100%; max-width: 560px; }
+.signin-shot {
+    margin: 0; overflow: hidden; border-radius: 16px; background: #fff;
+    box-shadow: 0 30px 60px rgba(3, 50, 46, 0.32);
+    border: 6px solid rgba(255, 255, 255, 0.55); background-clip: padding-box;
+}
+.signin-shot img { display: block; width: 100%; height: auto; }
+.signin-badge {
+    position: absolute; right: -22px; top: -30px; z-index: 2;
+    display: grid; place-items: center; width: 84px; height: 84px; border-radius: 26px;
+    background: #fff; box-shadow: 0 16px 34px rgba(3, 50, 46, 0.28); transform: rotate(8deg);
+}
+.signin-badge img { transform: rotate(-8deg); }
+.signin-float {
+    position: absolute; left: -36px; bottom: -34px; z-index: 2; width: 200px; padding: 14px 16px;
+    border-radius: 16px; background: #fff; color: var(--text); box-shadow: 0 18px 38px rgba(3, 50, 46, 0.28);
+}
+.signin-float-head { display: flex; align-items: center; gap: 10px; }
+.signin-float-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); }
+.signin-float-title { font-size: 13px; font-weight: 700; }
+.signin-float-sub { color: var(--muted); font-size: 11px; }
+.signin-spark { display: block; width: 100%; height: 40px; margin: 10px 0 6px; }
+.signin-float-value { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+.signin-float-value small { color: var(--muted); font-size: 12px; font-weight: 500; }
+.signin-float-up { display: block; margin-top: 2px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 0; }
+
+.signin-tagline { position: relative; z-index: 1; max-width: 460px; text-align: center; }
+.signin-tagline h2 { font-size: 30px; font-weight: 800; line-height: 1.25; letter-spacing: -0.02em; }
+.signin-tagline p { margin-top: 12px; font-size: 15px; opacity: 0.9; }
+
+@media (max-width: 1100px) {
+    .signin-float { left: -12px; }
+    .signin-badge { right: -8px; }
+}
+@media (max-width: 900px) {
+    .signin { grid-template-columns: minmax(0, 1fr); }
+    .signin-showcase { display: none; }
+    /* HP: latar gradasi hijau-teal tetap tampil sebagai pita atas, formulir di kartu putih */
+    .signin-body {
+        background:
+            radial-gradient(120% 60% at 10% 0%, #9fe3c9 0%, rgba(159, 227, 201, 0) 60%),
+            linear-gradient(170deg, #3fae94 0%, #1f8f7c 30%, #0f6f62 48%, var(--bg) 48.2%);
+        background-repeat: no-repeat; background-size: 100% 520px; background-color: var(--bg);
+    }
+    .signin-form-side { padding: 28px 16px 40px; align-items: flex-start; }
+    .signin-form-box { padding: 28px 22px 24px; border-radius: 24px; background: var(--surface); box-shadow: 0 20px 44px rgba(3, 50, 46, 0.18); }
+    .signin-logo { margin-bottom: 28px; }
+    .signin-title { font-size: 26px; }
+}
+
 /* ---------- Layar sempit ---------- */
 
 @media (max-width: 1100px) {
