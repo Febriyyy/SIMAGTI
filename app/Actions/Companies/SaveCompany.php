@@ -7,7 +7,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-/** Biro menambah perusahaan mitra baru, atau mengubah data perusahaan yang ada. */
+/** TU Fakultas menambah perusahaan mitra baru, atau mengubah data perusahaan yang ada. */
 class SaveCompany
 {
     /**

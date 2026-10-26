@@ -8,7 +8,7 @@ use Illuminate\Http\RedirectResponse;
 
 class MeetingController extends Controller
 {
-    /** Company Supervisor (seminar: dosen pembimbing) mengatur meeting minggu ini, satu link boleh dipakai beberapa mahasiswa. */
+    /** Company Supervisor mengatur meeting minggu ini, satu link boleh dipakai beberapa mahasiswa. */
     public function store(StoreMeetingRequest $request, ScheduleMeeting $schedule): RedirectResponse
     {
         $data = $request->validated();

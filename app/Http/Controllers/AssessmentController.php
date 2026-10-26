@@ -11,16 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
-/** Penilaian akhir (sementara): Company Supervisor untuk magang, dosen pembimbing untuk seminar. */
+/** Penilaian akhir oleh Company Supervisor di akhir periode KP, memakai standar penilaian kampus. */
 class AssessmentController extends Controller
 {
     public function index(Request $request): View
     {
         $internships = Internship::with(['student', 'company', 'assessment'])
             ->withProgress()
-            ->where(fn ($q) => $request->user()->role === 'dospem'
-                ? $q->where('program', 'seminar')->where('lecturer_id', $request->user()->id)
-                : $q->supervisedBy($request->user()))
+            ->supervisedBy($request->user())
             ->whereIn('status', ['berjalan', 'selesai'])
             ->orderBy('end_date')
             ->get();
@@ -42,7 +40,7 @@ class AssessmentController extends Controller
 
     public function update(SaveAssessmentRequest $request, Internship $internship, SaveAssessment $save): RedirectResponse
     {
-        $save->handle($request->user(), $internship, $request->scores(), $request->submitting());
+        $save->handle($request->user(), $internship, $request->scores(), $request->submitting(), $request->comment());
 
         return $request->submitting()
             ? redirect()->route('penilaian.index')->with('status', 'Penilaian dikirim ke dosen pembimbing untuk divalidasi.')

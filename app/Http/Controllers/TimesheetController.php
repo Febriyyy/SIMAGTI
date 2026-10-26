@@ -6,7 +6,7 @@ use App\Actions\Activities\LogTime;
 use App\Http\Requests\Activities\SaveTimeEntryRequest;
 use App\Models\TimeEntry;
 use App\Support\ActiveInternship;
-use App\Support\Campus;
+use App\Support\Gantt;
 use App\Support\Period;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** Timesheet / logbook harian mahasiswa: tanggal, kegiatan, durasi jam, foto dokumentasi. */
+/**
+ * Timesheet mahasiswa: rencana kegiatan dalam bentuk Gantt (diisi lebih dulu, tanpa jam),
+ * lalu catatan kegiatan harian (tanggal, kegiatan, task, foto dokumentasi).
+ */
 class TimesheetController extends Controller
 {
     public function index(Request $request): View
@@ -36,15 +39,21 @@ class TimesheetController extends Controller
         }
         $entries = $query->get();
 
+        $plans = $internship->activityPlans()
+            ->with(['goal', 'tasks' => fn ($q) => $q->with('column')->orderByRaw('COALESCE(start_date, due_date) IS NULL')->orderByRaw('COALESCE(start_date, due_date)')->orderBy('number')])
+            ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])
+            ->get();
+
         return view('timesheet.index', [
             'internship' => $internship,
+            'plans' => $plans,
+            'gantt' => Gantt::build($internship, $plans),
+            'goals' => $internship->goals()->get(),
             'entries' => $entries,
             'days' => $entries->groupBy(fn (TimeEntry $e) => $e->work_date->toDateString()),
             'period' => $period,
             'offset' => $offset,
             'all' => $all,
-            'totalHours' => (float) $internship->timeEntries()->sum('hours'),
-            'targetHours' => $internship->isMbkm() ? (int) Campus::rule('mbkm_min_hours') : null,
             'tasks' => $internship->tasks()->with('project')->where('status', '!=', 'completed')->orderByDesc('updated_at')->limit(50)->get(),
             'canEdit' => $request->user()->can('manageActivities', $internship),
         ]);
@@ -54,14 +63,14 @@ class TimesheetController extends Controller
     {
         $log->create($request->user(), $request->internship(), $request->validated(), $request->file('foto'));
 
-        return back()->with('status', 'Catatan waktu tersimpan.');
+        return back()->with('status', 'Catatan kegiatan tersimpan.');
     }
 
     public function update(SaveTimeEntryRequest $request, TimeEntry $entry, LogTime $log): RedirectResponse
     {
         $log->update($request->user(), $entry, $request->validated(), $request->file('foto'));
 
-        return back()->with('status', 'Catatan waktu diperbarui.');
+        return back()->with('status', 'Catatan kegiatan diperbarui.');
     }
 
     public function destroy(Request $request, TimeEntry $entry, LogTime $log): RedirectResponse
@@ -71,7 +80,7 @@ class TimesheetController extends Controller
 
         $log->delete($entry);
 
-        return back()->with('status', 'Catatan waktu dihapus.');
+        return back()->with('status', 'Catatan kegiatan dihapus.');
     }
 
     /** Foto dokumentasi hanya untuk yang boleh melihat kegiatan mahasiswa itu. */

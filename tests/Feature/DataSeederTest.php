@@ -23,11 +23,13 @@ class DataSeederTest extends TestCase
         $this->assertSame(0, User::whereIn('role', ['mentor', 'ketua_divisi'])->count());
         $this->assertSame(1, Internship::awaitingKaprodi()->count());      // Ilham
         $this->assertSame(2, Internship::awaitingSupervisor()->count());   // Farhan dan Tiara, satu supervisor
-        $this->assertSame(2, Internship::where('program', 'seminar')->count());
+        $this->assertSame(1, User::where('role', 'admin')->count());       // Wulan (dulu Biro Kerjasama)
+        $this->assertSame(0, User::where('role', 'biro')->count());
+        $this->assertSame(1, Internship::where('status', 'berjalan')->whereDoesntHave('activityPlans')->whereHas('staff')->count()); // Laras baru mulai
 
         foreach (['arief.hakim@kampus.ac.id', 'bambang.sutrisno@kampus.ac.id', 'wulan.anggraini@kampus.ac.id', 'retno.kusumaningrum@kampus.ac.id',
-                  'andika.saputra@cakrawaladigital.co.id', 'nabila.azzahra@mhs.kampus.ac.id', 'yudha.pradana@mhs.kampus.ac.id',
-                  'citra.kirana@mhs.kampus.ac.id'] as $email) {
+            'andika.saputra@cakrawaladigital.co.id', 'nabila.azzahra@mhs.kampus.ac.id', 'yudha.pradana@mhs.kampus.ac.id',
+            'citra.kirana@mhs.kampus.ac.id'] as $email) {
             $this->post('/login', ['email' => $email, 'password' => DataSeeder::PASSWORD])->assertRedirect('/dashboard');
             $this->get('/dashboard')->assertOk();
             $this->post('/logout');
@@ -35,10 +37,12 @@ class DataSeederTest extends TestCase
 
         // Halaman utama tiap peran terbuka tanpa galat dengan data bawaan
         $pages = [
-            'nabila.azzahra@mhs.kampus.ac.id' => ['/status-kp', '/silabus', '/kegiatan', '/kegiatan?tampilan=list', '/timesheet'],
-            'andika.saputra@cakrawaladigital.co.id' => ['/pantau', '/penilaian'],
-            'retno.kusumaningrum@kampus.ac.id' => ['/tu/aktivasi', '/penempatan'],
-            'arief.hakim@kampus.ac.id' => ['/pantau', '/kaprodi/persetujuan', '/penempatan'],
+            'nabila.azzahra@mhs.kampus.ac.id' => ['/status-kp', '/kegiatan', '/kegiatan?tampilan=list', '/timesheet', '/dokumen'],
+            'andika.saputra@cakrawaladigital.co.id' => ['/pantau', '/penilaian', '/aktivitas'],
+            'retno.kusumaningrum@kampus.ac.id' => ['/tu/aktivasi', '/tu/verifikasi', '/tu/dokumen', '/penempatan', '/perusahaan'],
+            'arief.hakim@kampus.ac.id' => ['/pantau', '/kaprodi/persetujuan', '/penempatan', '/kaprodi/bobot', '/aktivitas'],
+            'wulan.anggraini@kampus.ac.id' => ['/admin/akun', '/admin/penilaian', '/admin/log-aktivitas'],
+            'bambang.sutrisno@kampus.ac.id' => ['/validasi', '/hasil', '/aktivitas', '/antrean-bimbingan'],
         ];
         foreach ($pages as $email => $urls) {
             $this->actingAs(User::where('email', $email)->firstOrFail());

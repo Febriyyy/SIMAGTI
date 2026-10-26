@@ -31,10 +31,10 @@
             </div>
         </div>
         <dl class="profile-strip-facts">
-            <div><dt>{{ $internship->isSeminar() ? 'Jenis' : 'Posisi' }}</dt><dd>{{ $internship->isSeminar() ? $internship->programTypeLabel() : ($internship->position ?? '–') }}</dd></div>
+            <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
             <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>{{ $internship->durationMonths() }} bulan · {{ $internship->status === 'berjalan' ? 'sisa '.$internship->daysLeft().' hari' : $internship->statusLabel() }}</small></dd></div>
             <div><dt>Task selesai</dt><dd>{{ $stats['done'] }} / {{ $stats['tasks'] }}</dd></div>
-            <div><dt>Jam tercatat</dt><dd>{{ \App\Support\Num::short($stats['hours']) }} jam<small>{{ $stats['days'] }} hari</small></dd></div>
+            <div><dt>Rencana</dt><dd>{{ $stats['plans'] }} kegiatan<small>{{ $stats['days'] }} hari tercatat</small></dd></div>
             <div><dt>{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
         </dl>
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
@@ -76,12 +76,9 @@
     <nav class="tabs" aria-label="Bagian">
         <a href="{{ route('pantau.show', $internship) }}" @class(['tab', 'is-active' => $tab === 'kegiatan' && request('status') !== 'completed'])><x-ikon name="board" :size="16" /> Kegiatan</a>
         <a href="{{ route('pantau.show', [$internship, 'tab' => 'kegiatan', 'tampilan' => 'list', 'status' => 'completed']) }}" @class(['tab', 'is-active' => $tab === 'kegiatan' && request('status') === 'completed'])><x-ikon name="check" :size="16" /> Task selesai</a>
-        <a href="{{ route('pantau.show', [$internship, 'tab' => 'timesheet']) }}" @class(['tab', 'is-active' => $tab === 'timesheet'])><x-ikon name="clock" :size="16" /> Timesheet</a>
-        <a href="{{ route('pantau.show', [$internship, 'tab' => 'silabus']) }}" @class(['tab', 'is-active' => $tab === 'silabus'])>
-            <x-ikon name="syllabus" :size="16" /> Silabus
-            @if ($internship->syllabus_status === 'submitted')<span class="tab-dot" title="Menunggu persetujuan"></span>@endif
-        </a>
-        <a href="{{ route('pantau.show', [$internship, 'tab' => 'bulanan']) }}" @class(['tab', 'is-active' => $tab === 'bulanan'])><x-ikon name="chart" :size="16" /> Bulanan</a>
+        <a href="{{ route('pantau.show', [$internship, 'tab' => 'rencana']) }}" @class(['tab', 'is-active' => $tab === 'rencana'])><x-ikon name="calendar" :size="16" /> Rencana</a>
+        <a href="{{ route('pantau.show', [$internship, 'tab' => 'timesheet']) }}" @class(['tab', 'is-active' => $tab === 'timesheet'])><x-ikon name="clock" :size="16" /> Catatan</a>
+        <a href="{{ route('pantau.show', [$internship, 'tab' => 'aktivitas']) }}" @class(['tab', 'is-active' => $tab === 'aktivitas'])><x-ikon name="activity" :size="16" /> Aktivitas</a>
         <a href="{{ route('pantau.show', [$internship, 'tab' => 'bimbingan']) }}" @class(['tab', 'is-active' => $tab === 'bimbingan'])><x-ikon name="chat" :size="16" /> Bimbingan</a>
     </nav>
 
@@ -97,7 +94,6 @@
                 <span><strong>{{ $summary['total'] }}</strong> task</span>
                 <span><strong>{{ $summary['done'] }}</strong> selesai</span>
                 @if ($summary['overdue'] > 0)<span class="is-late"><strong>{{ $summary['overdue'] }}</strong> lewat tenggat</span>@endif
-                <span><strong>{{ \App\Support\Num::short($summary['hours']) }}</strong> jam</span>
             </div>
         </div>
         @include('kegiatan._filters', ['action' => route('pantau.show', $internship)])
@@ -113,7 +109,7 @@
                     <a href="{{ route('pantau.show', [$internship, 'tab' => 'timesheet', 'p' => $offset - 1]) }}" class="btn btn-sm btn-icon" aria-label="Periode sebelumnya"><x-ikon name="back" :size="18" /></a>
                     <div>
                         <h2 class="card-title">{{ $all ? 'Seluruh periode KP' : $period->label }}</h2>
-                        <p class="card-sub">{{ $entries->count() }} catatan · {{ \App\Support\Num::short((float) $entries->sum('hours')) }} jam</p>
+                        <p class="card-sub">{{ $entries->count() }} catatan kegiatan</p>
                     </div>
                     @if ($offset < 0)
                         <a href="{{ route('pantau.show', [$internship, 'tab' => 'timesheet', 'p' => $offset + 1]) }}" class="btn btn-sm btn-icon" aria-label="Periode berikutnya"><x-ikon name="arrow" :size="18" /></a>
@@ -133,12 +129,12 @@
                         <div class="day">
                             <div class="day-head">
                                 <span class="day-date"><strong>{{ $day->translatedFormat('l') }}</strong>, {{ $day->translatedFormat('j F Y') }}</span>
-                                <span class="day-total">{{ \App\Support\Num::short((float) $items->sum('hours')) }} jam</span>
+                                <span class="day-total">{{ $items->count() }} catatan</span>
                             </div>
                             <ul class="time-list">
                                 @foreach ($items as $entry)
                                     <li>
-                                        <span class="time-hours">{{ \App\Support\Num::short((float) $entry->hours) }} j</span>
+                                        <span class="time-dot" aria-hidden="true"></span>
                                         <div class="grow min0">
                                             <div class="time-desc">{{ $entry->description }}</div>
                                             @if ($entry->task)
@@ -156,12 +152,35 @@
                 </div>
             @endif
         </section>
-    @elseif ($tab === 'bulanan')
-        @forelse ($months as $entry)
-            @include('bulanan._month', ['entry' => $entry, 'canReview' => $canReview, 'canNote' => $canNote])
-        @empty
-            <div class="card"><div class="empty"><strong>KP belum dimulai</strong> Evaluasi bulan pertama muncul setelah KP dimulai.</div></div>
-        @endforelse
+    @elseif ($tab === 'rencana')
+        <section class="card">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Rencana kegiatan</h2>
+                    <p class="card-sub">{{ $internship->periodLabel() }} · {{ $internship->totalWeeks() }} minggu</p>
+                </div>
+            </div>
+            @if ($plans->isEmpty())
+                <div class="empty"><strong>Belum ada rencana</strong> Mahasiswa menyusun rencana kegiatan di timesheet sebelum membuat task.</div>
+            @else
+                @include('timesheet._gantt', ['canEdit' => false])
+            @endif
+        </section>
+        @include('kegiatan._goals', ['canEdit' => false])
+    @elseif ($tab === 'aktivitas')
+        <section class="card">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Aktivitas</h2>
+                    <p class="card-sub">60 aktivitas terakhir mahasiswa</p>
+                </div>
+            </div>
+            @if ($feed->isEmpty())
+                <div class="empty"><strong>Belum ada aktivitas</strong> Aktivitas muncul saat mahasiswa menyusun rencana, task, dan catatan.</div>
+            @else
+                @include('aktivitas._feed', ['days' => \App\Support\ActivityFeed::byDay($feed), 'showStudent' => false])
+            @endif
+        </section>
     @elseif ($tab === 'bimbingan')
         <section class="card">
             <div class="card-head">
@@ -173,33 +192,5 @@
             </div>
             @include('bimbingan._list', ['sessions' => $sessions, 'canDecide' => $canDecide])
         </section>
-    @else
-        @if ($internship->syllabus_status === 'submitted' && $canReviewSyllabus)
-            <section class="card callout">
-                <div class="card-head">
-                    <div>
-                        <h2 class="card-title">Silabus menunggu persetujuan Anda</h2>
-                        <p class="card-sub">Setujui jika tujuan sudah sesuai rencana magang, atau minta revisi dengan catatan.</p>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('silabus.review', $internship) }}" class="stack">
-                        @csrf
-                        @method('PATCH')
-                        <textarea name="catatan" class="textarea" rows="2" maxlength="1000" placeholder="Catatan untuk mahasiswa (wajib jika meminta revisi)" aria-label="Catatan"></textarea>
-                        <div class="row-actions">
-                            <button type="submit" name="keputusan" value="revisi" class="btn">Minta revisi</button>
-                            <button type="submit" name="keputusan" value="setujui" class="btn btn-primary"><x-ikon name="check" :size="18" /> Setujui silabus</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-        @else
-            <div class="alert alert-{{ ['approved' => 'success', 'revision' => 'warning', 'submitted' => 'info'][$internship->syllabus_status] ?? 'info' }}" role="status">
-                Status silabus: <strong>{{ $internship->syllabusStatusLabel() }}</strong>
-                @if ($internship->syllabus_note) · Catatan: {{ $internship->syllabus_note }} @endif
-            </div>
-        @endif
-        @include('silabus._items', ['internship' => $internship, 'canEdit' => false])
     @endif
 @endsection

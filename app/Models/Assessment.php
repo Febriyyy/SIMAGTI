@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AssessmentStandard;
 use App\Support\Grading;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,8 @@ class Assessment extends Model
         'final_score',
         'letter_grade',
         'grade_scale_version',
+        'category_weights',
+        'comment',
         'submitted_at',
         'validated_by',
         'validated_at',
@@ -34,6 +37,7 @@ class Assessment extends Model
     {
         return [
             'final_score' => 'decimal:2',
+            'category_weights' => 'array',
             'submitted_at' => 'datetime',
             'validated_at' => 'datetime',
         ];
@@ -79,19 +83,18 @@ class Assessment extends Model
         return $this->status === 'validated';
     }
 
-    /** Nilai akhir = jumlah (skor aspek x bobot aspek / 100). */
+    /** Nilai akhir = jumlah (rata-rata nilai kategori x bobot kategori / 100), lihat AssessmentStandard. */
     public function computeFinalScore(): float
     {
-        $total = 0.0;
+        return $this->breakdown()['final'];
+    }
 
-        foreach ($this->scores()->with('aspect')->get() as $score) {
-            if ($score->score === null || $score->aspect->isText()) {
-                continue; // pertanyaan isian tidak dihitung
-            }
-            $total += (float) $score->score * (float) $score->aspect->weight / 100;
-        }
+    /** Rincian nilai per kategori (hard skill, soft skill, attitude). */
+    public function breakdown(): array
+    {
+        $rubric = $this->rubric?->loadMissing('aspects') ?? AssessmentStandard::rubric();
 
-        return round($total, 2);
+        return AssessmentStandard::breakdown($rubric, $this->scores()->get(), AssessmentStandard::weightsFor($this));
     }
 
     /** Penilai mengirim penilaian untuk divalidasi dosen pembimbing. */
@@ -117,13 +120,12 @@ class Assessment extends Model
         ]);
     }
 
-    /** Rubrik yang dipakai: rubrik penilaian yang sudah ada, atau rubrik aktif untuk penilaian baru. */
-    public static function rubricFor(Internship $internship): ?AssessmentRubric
+    /** Rubrik yang dipakai: rubrik penilaian yang sudah ada, atau standar penilaian kampus untuk penilaian baru. */
+    public static function rubricFor(Internship $internship): AssessmentRubric
     {
-        // Urutan: rubrik yang sudah dipakai penilaian ini, kuesioner pilihan dosen pembimbing, rubrik kampus.
-        $rubric = $internship->assessment?->rubric ?? $internship->rubric ?? AssessmentRubric::active();
+        $rubric = $internship->assessment?->rubric ?? AssessmentStandard::rubric();
 
-        return $rubric?->load(['aspects' => fn ($q) => $q->orderBy('sort_order')]);
+        return $rubric->load(['aspects' => fn ($q) => $q->orderBy('sort_order')->orderBy('id')]);
     }
 
     /** Draft yang pernah dikirim lalu dikembalikan dosen pembimbing (ada catatan). */

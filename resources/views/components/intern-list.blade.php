@@ -6,8 +6,8 @@
             <span>Mahasiswa</span>
             @unless ($compact)<span>Posisi</span>@endunless
             <span>Task</span>
-            <span class="srow-num">{{ $compact ? 'Jam minggu ini' : 'Jam' }}</span>
-            @unless ($compact)<span>Minggu</span><span>Silabus</span>@endunless
+            <span class="srow-num">{{ $compact ? 'Catatan' : 'Rencana' }}</span>
+            @unless ($compact)<span>Minggu</span><span>Penilaian</span>@endunless
             <span></span>
         </li>
         {{ $slot }}

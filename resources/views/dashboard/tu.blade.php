@@ -5,18 +5,21 @@
 @section('content')
     <x-hero eyebrow="TU Fakultas"
             :title="\App\Support\Greeting::now().', '.$user->firstName()"
-            :sub="$stats['pending'] > 0
-                ? $stats['pending'].' Company Supervisor ('.$stats['students'].' mahasiswa) menunggu diaktifkan.'
-                : 'Semua Company Supervisor dari pengajuan mahasiswa sudah aktif.'"
-            action="Buka aktivasi" :href="route('tu.aktivasi')" />
+            :sub="$stats['verify'] > 0
+                ? $stats['verify'].' KP mandiri menunggu verifikasi perusahaan.'
+                : ($stats['pending'] > 0
+                    ? $stats['pending'].' Company Supervisor ('.$stats['students'].' mahasiswa) menunggu diaktifkan.'
+                    : 'Tidak ada antrean verifikasi maupun aktivasi supervisor.')"
+            :action="$stats['verify'] > 0 ? 'Buka verifikasi' : 'Buka aktivasi'" :href="$stats['verify'] > 0 ? route('tu.verifikasi') : route('tu.aktivasi')" />
 
     <div class="stat-grid">
+        <x-stat label="Perlu verifikasi" :value="$stats['verify']" unit="KP" :tone="$stats['verify'] > 0 ? 'amber' : 'gray'" :href="route('tu.verifikasi')"
+                hint="KP mandiri" />
         <x-stat label="Menunggu aktivasi" :value="$stats['pending']" unit="supervisor" :href="route('tu.aktivasi')"
                 :hint="$stats['students'].' mahasiswa belum punya supervisor'" />
-        <x-stat label="Undangan terkirim" :value="$stats['invited']" unit="supervisor" :tone="$stats['invited'] > 0 ? 'amber' : 'gray'"
-                hint="Menunggu supervisor membuat akun" />
-        <x-stat label="Supervisor aktif" :value="$stats['active']" unit="orang" tone="green" hint="Punya akun dan mahasiswa" />
-        <x-stat label="Magang berjalan" :value="$stats['running']" unit="mahasiswa" tone="gray" :href="route('penempatan.index')" hint="KP Industri dan MBKM" />
+        <x-stat label="Surat pengantar" :value="$stats['letters']" unit="diminta" :tone="$stats['letters'] > 0 ? 'amber' : 'gray'" :href="route('tu.surat')"
+                hint="Menunggu diterbitkan" />
+        <x-stat label="KP berjalan" :value="$stats['running']" unit="mahasiswa" tone="gray" :href="route('penempatan.index')" :hint="$stats['partners'].' perusahaan mitra'" />
     </div>
 
     <div class="layout">
@@ -92,4 +95,58 @@
             </section>
         </div>
     </div>
+    <section class="card">
+        <div class="card-head">
+            <div>
+                <h2 class="card-title">Perusahaan</h2>
+                <p class="card-sub">Urut dari yang paling banyak mahasiswa magang</p>
+            </div>
+            <a href="{{ route('perusahaan.index') }}" class="btn btn-sm">Kelola perusahaan</a>
+        </div>
+
+        @if ($companies->isEmpty())
+            <div class="empty">
+                <strong>Belum ada perusahaan</strong>
+                Perusahaan akan muncul setelah ditambahkan.
+            </div>
+        @else
+            <div class="table-wrap">
+                <table class="table dt">
+                    <thead>
+                        <tr>
+                            <th>Perusahaan</th>
+                            <th class="w-meta hide-md">Bidang</th>
+                            <th class="w-num num">Magang aktif</th>
+                            <th class="w-grade num hide-md">Nilai</th>
+                            <th class="w-status">Status</th>
+                            <th class="w-action" aria-label="Aksi"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($companies as $company)
+                            <tr>
+                                <td>
+                                    <a href="{{ route('perusahaan.show', $company) }}" class="ident">
+                                        <x-org :name="$company->name" />
+                                        <span>
+                                            <span class="c-main" title="{{ $company->name }}">{{ $company->name }}</span>
+                                            <span class="c-sub">{{ $company->city ?? 'Kota belum diisi' }}</span>
+                                        </span>
+                                    </a>
+                                </td>
+                                <td class="hide-md"><span class="c-main c-plain" title="{{ $company->industry }}">{{ $company->industry ?? '–' }}</span></td>
+                                <td class="num">
+                                    <span class="c-main">{{ $company->active_internships_count }}</span>
+                                    <span class="c-sub">dari {{ $company->internships_count }}</span>
+                                </td>
+                                <td class="num hide-md"><span class="c-main">{{ $company->average_score ? \App\Support\Num::short($company->average_score) : '–' }}</span></td>
+                                <td><x-chip :tone="$company->statusTone()">{{ $company->statusLabel() }}</x-chip></td>
+                                <td class="act"><a href="{{ route('perusahaan.show', $company) }}" class="btn btn-quiet">Statistik</a></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
 @endsection

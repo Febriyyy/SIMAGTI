@@ -252,6 +252,11 @@ Hierarki teks: judul halaman `--text-4xl` (HP `--text-3xl`), judul banner `--tex
 | Tabel daftar | `.table.dt` + kelas lebar kolom (`w-*`), `.ident`, `.c-main`/`.c-sub`, `.num`, `.act`, `.btn-quiet`, `.hide-md` |
 | Tanda perusahaan | `<x-org :name>` (kotak inisial) |
 | Kosong / tidak ada antrean | `.empty` atau `.calm` |
+| Rencana kegiatan (Gantt) | `timesheet/_gantt` + `App\Support\Gantt` (`.gt`, `.gt-side`, `.gt-row.gt-plan` / `.gt-task`, `.gt-bar`; `gt-compact` untuk dashboard, `gt-readonly` bila hanya baca). Warna rencana: token `--gc-*` |
+| Pilihan skala nilai | `.rate-group` > `.rate-row` > `.rate-options` (`.rate-opt` radio berbentuk pil, grid selebar kartu) |
+| Linimasa aktivitas | `aktivitas/_feed` (`.feed`, `.feed-item`, `.feed-icon feed-{jenis}`) |
+| Langkah yang bisa diklik | `.mini-steps` (dashboard) dan `a.step-link` (Status KP) |
+| Bidang usaha | `<x-industry-select :value>` (pilihan + "Lainnya" diisi sendiri) |
 
 **7. Sebelum selesai.** Setiap halaman baru dicek di 1920, 1440, 1280, 768, 390, dan 375px: tidak ada geser horizontal halaman, tidak ada teks terpotong di HP, tombol di kanan, jarak sesuai skala.
 
@@ -312,3 +317,13 @@ Hierarki teks: judul halaman `--text-4xl` (HP `--text-3xl`), judul banner `--tex
 **Kuesioner.** Rubrik dipilih berurutan: rubrik yang sudah dipakai penilaian → kuesioner yang dipilih dosen untuk mahasiswa → rubrik aktif kampus (`Assessment::rubricFor`). Kuesioner yang sudah dipakai menilai tidak bisa diubah (buat salinan).
 
 **Perubahan.** `App\Actions\Changes\HandleChangeRequest`. Satu pengajuan aktif per penempatan. Perpanjangan memperbarui `end_date` dan periode bulan yang sudah tercatat; ganti supervisor melepas akun lama dan mengembalikan penempatan ke antrean aktivasi TU.
+
+## v8 (revisi dosen, 27 Oktober 2026)
+
+Bagian KP v2 di atas menjelaskan riwayat; yang berlaku sekarang:
+
+- **Peran**: mahasiswa, Company Supervisor, dosen pembimbing, kaprodi, TU Fakultas, admin. Biro Kerjasama dihapus; verifikasi KP mandiri, surat pengantar, surat balasan, dan data perusahaan dikerjakan TU Fakultas. Admin mengelola akun, standar penilaian, dan log aktivitas.
+- **Satu jenis KP**: tidak ada jalur MBKM / seminar, silabus, evaluasi bulanan, kuesioner dosen, dan rekognisi SKS.
+- **Timesheet**: kartu "Rencana kegiatan" berupa Gantt sepanjang periode KP, mengikuti pola aplikasi manajemen proyek. Kiri tabel Kegiatan / Durasi / Status (bar progres + %), menempel saat sumbu digeser; rencana bisa dilipat untuk menyembunyikan task-nya. Kanan sumbu bulan + hari (hari ini = pil merah dan garis merah, akhir pekan diarsir). Batang rencana berbentuk pil dengan warna pilihan mahasiswa (7 warna, dipilih di form rencana); bagian gelap = persen task selesai, pil muda = belum ada task, cincin merah = lewat waktu dengan task belum selesai. Task tampil sebagai pil kecil di bawah rencananya (muda = belum selesai, penuh + centang = selesai). Kontrol: Gantt / Daftar, zoom Hari (40px/hari) / Minggu (16px) / Penuh (muat selebar kartu), geser seminggu, Hari ini; pilihan disimpan di localStorage. Klik batang rencana membuka form ubah; klik task membuka detail task. Dashboard memakai versi ringkas (Penuh, tanpa toolbar dan task). Di HP kolom Durasi/Status disembunyikan pada tampilan Gantt, tetap ada di tampilan Daftar. Di bawahnya "Catatan kegiatan" harian tanpa jam.
+- **Kegiatan**: kartu Goals di atas board; tombol "Task baru" diganti "Isi rencana" bila belum ada rencana. Board bawaan To Do, In Progress, Done.
+- **Penilaian akhir**: satu kartu per kategori dengan rata-rata langsung terhitung (JS), setiap pertanyaan memakai pilihan skala; di kartu sempit pilihan turun ke bawah pertanyaan dalam grid sama lebar. Perkiraan nilai akhir baru tampil setelah semua pertanyaan dinilai.

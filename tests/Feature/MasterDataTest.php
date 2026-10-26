@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-/** Data master: perusahaan (biro), mahasiswa dan penempatan (kaprodi). */
+/** Data master: perusahaan (TU Fakultas), mahasiswa dan penempatan (kaprodi). */
 class MasterDataTest extends TestCase
 {
     use RefreshDatabase;
@@ -50,7 +50,6 @@ class MasterDataTest extends TestCase
             'student_id' => $student->id,
             'company_id' => $this->nusantara()->id,
             'supervisor_id' => $this->user('supervisor@kp.test')->id,
-            'program_type' => 'industri',
             'lecturer_id' => $this->user('dospem@kp.test')->id,
             'start_date' => now()->addDays(7)->toDateString(),
             'end_date' => now()->addMonths(4)->toDateString(),
@@ -59,18 +58,18 @@ class MasterDataTest extends TestCase
 
     // ---------- Perusahaan ----------
 
-    public function test_biro_dan_kaprodi_melihat_daftar_perusahaan_peran_lain_tidak(): void
+    public function test_tu_dan_kaprodi_melihat_daftar_perusahaan_peran_lain_tidak(): void
     {
-        $this->actingAs($this->user('biro@kp.test'))->get('/perusahaan')->assertOk()->assertSee('PT Nusantara Digital');
+        $this->actingAs($this->user('tu@kp.test'))->get('/perusahaan')->assertOk()->assertSee('PT Nusantara Digital');
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/perusahaan')->assertOk();
         $this->actingAs($this->user('supervisor@kp.test'))->get('/perusahaan')->assertForbidden();
-        $this->actingAs($this->user('tu@kp.test'))->get('/perusahaan')->assertForbidden();
+        $this->actingAs($this->user('admin@kp.test'))->get('/perusahaan')->assertForbidden();
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/perusahaan')->assertForbidden();
     }
 
-    public function test_biro_menambah_perusahaan_beserta_divisinya(): void
+    public function test_tu_menambah_perusahaan_beserta_divisinya(): void
     {
-        $this->actingAs($this->user('biro@kp.test'))
+        $this->actingAs($this->user('tu@kp.test'))
             ->post('/perusahaan', [
                 'name' => 'PT Mitra Baru',
                 'industry' => 'Logistik',
@@ -86,16 +85,16 @@ class MasterDataTest extends TestCase
 
     public function test_nama_perusahaan_tidak_boleh_kembar(): void
     {
-        $this->actingAs($this->user('biro@kp.test'))
+        $this->actingAs($this->user('tu@kp.test'))
             ->post('/perusahaan', ['name' => 'PT Nusantara Digital'])
             ->assertSessionHasErrors('name');
     }
 
-    public function test_biro_mengubah_perusahaan_tanpa_bentrok_dengan_namanya_sendiri(): void
+    public function test_tu_mengubah_perusahaan_tanpa_bentrok_dengan_namanya_sendiri(): void
     {
         $company = $this->nusantara();
 
-        $this->actingAs($this->user('biro@kp.test'))
+        $this->actingAs($this->user('tu@kp.test'))
             ->patch("/perusahaan/{$company->id}", ['name' => 'PT Nusantara Digital', 'city' => 'Jakarta'])
             ->assertRedirect('/perusahaan');
 
@@ -158,7 +157,7 @@ class MasterDataTest extends TestCase
     public function test_hanya_kaprodi_yang_mengelola_mahasiswa(): void
     {
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/mahasiswa')->assertOk()->assertSee('Rina Putri');
-        $this->actingAs($this->user('biro@kp.test'))->get('/mahasiswa')->assertForbidden();
+        $this->actingAs($this->user('tu@kp.test'))->get('/mahasiswa')->assertForbidden();
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/mahasiswa')->assertForbidden();
     }
 
@@ -176,7 +175,6 @@ class MasterDataTest extends TestCase
         $this->assertSame('lowongan', $internship->track);
         $this->assertSame('berjalan', $internship->status);
         $this->assertSame($this->user('dospem@kp.test')->id, $internship->lecturer_id);
-        $this->assertSame(['magang', 'industri'], [$internship->program, $internship->program_type]);
         $this->assertTrue($internship->isSupervisedBy($this->user('supervisor@kp.test')));
         $this->assertDatabaseHas('internship_status_histories', ['internship_id' => $internship->id, 'to_status' => 'berjalan']);
     }
@@ -218,14 +216,14 @@ class MasterDataTest extends TestCase
             ->assertSessionHasErrors('end_date');
     }
 
-    public function test_biro_boleh_melihat_penempatan_tetapi_tidak_membuatnya(): void
+    public function test_tu_boleh_melihat_penempatan_tetapi_tidak_membuatnya(): void
     {
-        $biro = $this->user('biro@kp.test');
+        $tu = $this->user('tu@kp.test');
         $student = $this->freeStudent();
 
-        $this->actingAs($biro)->get('/penempatan')->assertOk();
-        $this->actingAs($biro)->get('/penempatan/tambah')->assertForbidden();
-        $this->actingAs($biro)->post('/penempatan', $this->placementPayload($student))->assertForbidden();
+        $this->actingAs($tu)->get('/penempatan')->assertOk();
+        $this->actingAs($tu)->get('/penempatan/tambah')->assertForbidden();
+        $this->actingAs($tu)->post('/penempatan', $this->placementPayload($student))->assertForbidden();
 
         $this->assertDatabaseMissing('internships', ['student_id' => $student->id]);
     }

@@ -10,8 +10,8 @@ use LogicException;
 
 /**
  * Task kegiatan mahasiswa (nama kelas dipertahankan dari versi awal: dulu task mingguan dari mentor).
- * Sejak v2 task dibuat mahasiswa sendiri, berada di satu kolom board, opsional di satu proyek,
- * dan bisa dikaitkan ke satu tujuan silabus.
+ * Task dibuat mahasiswa sendiri di bawah satu rencana kegiatan (timesheet), berada di satu kolom board,
+ * opsional di satu proyek dan dikaitkan ke satu goal.
  */
 class WeeklyTask extends Model
 {
@@ -44,7 +44,8 @@ class WeeklyTask extends Model
         'internship_id',
         'project_id',
         'board_column_id',
-        'syllabus_item_id',
+        'activity_plan_id',
+        'goal_id',
         'number',
         'week_number',
         'day',
@@ -54,7 +55,6 @@ class WeeklyTask extends Model
         'priority',
         'start_date',
         'due_date',
-        'estimate_hours',
         'labels',
         'position',
         'completed_at',
@@ -67,7 +67,6 @@ class WeeklyTask extends Model
             'completed_at' => 'datetime',
             'start_date' => 'date',
             'due_date' => 'date',
-            'estimate_hours' => 'decimal:2',
             'labels' => 'array',
         ];
     }
@@ -142,9 +141,14 @@ class WeeklyTask extends Model
         return $this->belongsTo(BoardColumn::class, 'board_column_id');
     }
 
-    public function syllabusItem(): BelongsTo
+    public function plan(): BelongsTo
     {
-        return $this->belongsTo(SyllabusItem::class);
+        return $this->belongsTo(ActivityPlan::class, 'activity_plan_id');
+    }
+
+    public function goal(): BelongsTo
+    {
+        return $this->belongsTo(Goal::class);
     }
 
     public function checklist(): HasMany

@@ -4,18 +4,14 @@ namespace Tests\Feature;
 
 use App\Actions\Applications\ReviewKaprodiApproval;
 use App\Actions\Results\FinalizeResult;
-use App\Models\AssessmentRubric;
 use App\Models\ChangeRequest;
-use App\Models\CreditRecognition;
 use App\Models\GuidanceSession;
 use App\Models\Internship;
 use App\Models\InternshipApproval;
 use App\Models\InternshipDocument;
-use App\Models\MonthlyReview;
 use App\Models\User;
 use App\Notifications\KpNotice;
 use App\Support\ActionItems;
-use App\Support\Grading;
 use App\Support\KpProgress;
 use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +19,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-/** Alur KP tahap 2: konfirmasi supervisor, evaluasi bulanan, bimbingan, dokumen, hasil, perubahan, rekognisi, kuesioner. */
+/** Alur KP: konfirmasi supervisor, bimbingan, dokumen, hasil, perubahan, notifikasi. */
 class StageTwoFlowTest extends TestCase
 {
     use RefreshDatabase;
@@ -81,50 +77,6 @@ class StageTwoFlowTest extends TestCase
         $this->assertFalse($dimas->isSupervisedBy($ratna));
     }
 
-    // ---------- Evaluasi bulanan ----------
-
-    public function test_refleksi_nilai_dan_catatan_bulanan(): void
-    {
-        $rina = $this->internshipOf('mahasiswa@kp.test');
-        $open = $rina->monthlyReviews()->whereNotNull('reflected_at')->whereNull('reviewed_at')->firstOrFail();
-        $m = $open->month_number;
-
-        // Mahasiswa memperbarui refleksi yang belum dinilai
-        $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->patch("/bulanan/{$m}", ['learned' => 'Belajar membuat API dan menulis tes.', 'plan' => 'Lanjut modul laporan.'])
-            ->assertSessionHasNoErrors();
-        $this->assertSame('Belajar membuat API dan menulis tes.', $open->fresh()->learned);
-
-        // Nilai harus 1-4
-        $sup = $this->user('supervisor@kp.test');
-        $this->actingAs($sup)->patch("/pantau/{$rina->id}/bulanan/{$m}", ['score_hard' => 5, 'score_soft' => 3, 'score_attitude' => 3])
-            ->assertSessionHasErrors('score_hard');
-        $this->actingAs($sup)->patch("/pantau/{$rina->id}/bulanan/{$m}", ['score_hard' => 3, 'score_soft' => 4, 'score_attitude' => 4, 'reviewer_note' => 'Bagus.'])
-            ->assertSessionHasNoErrors();
-        $review = $open->fresh();
-        $this->assertTrue($review->isReviewed());
-        $this->assertEquals(3.67, $review->averageScore());
-
-        // Setelah dinilai, mahasiswa tidak bisa mengubah refleksi lagi
-        $this->actingAs($this->user('mahasiswa@kp.test'))->patch("/bulanan/{$m}", ['learned' => 'Ubah'])->assertSessionHasErrors();
-
-        // Dosen pembimbing memberi catatan, lalu nilai terkunci untuk supervisor
-        $this->actingAs($this->user('dospem@kp.test'))->patch("/pantau/{$rina->id}/bulanan/{$m}/catatan", ['lecturer_note' => 'Lanjutkan.'])
-            ->assertSessionHasNoErrors();
-        $this->assertSame('Selesai', $review->fresh()->statusLabel());
-        $this->actingAs($sup)->patch("/pantau/{$rina->id}/bulanan/{$m}", ['score_hard' => 1, 'score_soft' => 1, 'score_attitude' => 1])
-            ->assertSessionHasErrors();
-    }
-
-    public function test_bulan_yang_belum_dimulai_ditolak(): void
-    {
-        $rina = $this->internshipOf('mahasiswa@kp.test');
-        $future = $rina->monthCount();
-
-        $this->actingAs($this->user('mahasiswa@kp.test'))->patch("/bulanan/{$future}", ['learned' => 'Terlalu cepat'])->assertSessionHasErrors();
-        $this->assertNull(MonthlyReview::where('internship_id', $rina->id)->where('month_number', $future)->value('reflected_at'));
-    }
-
     // ---------- Bimbingan dan hasil KP ----------
 
     public function test_bimbingan_dicatat_mahasiswa_dan_dikonfirmasi_dosen(): void
@@ -166,15 +118,9 @@ class StageTwoFlowTest extends TestCase
         $fajar->refresh();
         $this->assertSame('selesai', $fajar->status);
         $this->assertSame('Diterima', $fajar->resultLabel());
+        $this->assertSame('A', $fajar->final_grade, 'Nilai diambil dari penilaian akhir yang divalidasi');
         $this->assertNotNull($fajar->locked_at);
         $this->assertSame('done', collect(KpProgress::steps($fajar))->firstWhere('key', 'result')['state']);
-    }
-
-    public function test_nilai_mbkm_60_persen_mitra_40_persen_dosen(): void
-    {
-        [$final, $grade] = FinalizeResult::mbkmScore(85, 75);
-        $this->assertEquals(81.0, $final);
-        $this->assertSame(Grading::letterFor(81.0), $grade);
     }
 
     // ---------- Dokumen ----------
@@ -195,16 +141,16 @@ class StageTwoFlowTest extends TestCase
         $this->actingAs($this->user('mahasiswa@kp.test'))->get("/dokumen/{$letter->id}/cetak")->assertForbidden();
     }
 
-    public function test_biro_menolak_surat_balasan_dan_mahasiswa_mengunggah_ulang(): void
+    public function test_tu_menolak_surat_balasan_dan_mahasiswa_mengunggah_ulang(): void
     {
         Storage::fake('local');
         $tari = $this->internshipOf('tari@kp.test');
         $reply = $tari->document(InternshipDocument::REPLY);
         $due = $reply->due_on->copy();
-        $biro = $this->user('biro@kp.test');
+        $tu = $this->user('tu@kp.test');
 
-        $this->actingAs($biro)->patch("/biro/dokumen/{$reply->id}", ['keputusan' => 'tolak'])->assertSessionHasErrors();
-        $this->actingAs($biro)->patch("/biro/dokumen/{$reply->id}", ['keputusan' => 'tolak', 'catatan' => 'Tidak ada cap perusahaan.'])->assertSessionHasNoErrors();
+        $this->actingAs($tu)->patch("/tu/dokumen/{$reply->id}", ['keputusan' => 'tolak'])->assertSessionHasErrors();
+        $this->actingAs($tu)->patch("/tu/dokumen/{$reply->id}", ['keputusan' => 'tolak', 'catatan' => 'Tidak ada cap perusahaan.'])->assertSessionHasNoErrors();
         $reply->refresh();
         $this->assertSame('ditolak', $reply->status);
         $this->assertTrue($reply->due_on->gte($due));
@@ -217,14 +163,14 @@ class StageTwoFlowTest extends TestCase
         ])->assertSessionHasNoErrors();
         $this->assertSame('diunggah', $reply->fresh()->status);
 
-        $this->actingAs($biro)->patch("/biro/dokumen/{$reply->id}", ['keputusan' => 'terima'])->assertSessionHasNoErrors();
+        $this->actingAs($tu)->patch("/tu/dokumen/{$reply->id}", ['keputusan' => 'terima'])->assertSessionHasNoErrors();
         $this->assertTrue($reply->fresh()->isComplete());
     }
 
     public function test_dokumen_dibuat_saat_kaprodi_menyetujui_kp_mandiri(): void
     {
         $nadia = $this->internshipOf('nadia@kp.test');
-        $nadia->approvals()->where('step', InternshipApproval::STEP_BIRO)->update(['status' => 'approved', 'reviewed_at' => now()]);
+        $nadia->approvals()->where('step', InternshipApproval::STEP_VERIFY)->update(['status' => 'approved', 'reviewed_at' => now()]);
 
         app(ReviewKaprodiApproval::class)
             ->handle($this->user('kaprodi@kp.test'), $nadia, true, $this->user('dospem@kp.test')->id);
@@ -232,7 +178,7 @@ class StageTwoFlowTest extends TestCase
         $reply = $nadia->fresh()->document(InternshipDocument::REPLY);
         $this->assertSame('menunggu', $reply->status);
         $this->assertTrue($reply->due_on->equalTo($nadia->start_date->copy()->addDays((int) config('simagti.rules.reply_letter_days'))));
-        $this->assertNull($nadia->fresh()->document(InternshipDocument::PACT)); // bukan MBKM
+        $this->assertSame(1, $nadia->fresh()->documents()->where('type', '!=', InternshipDocument::LETTER)->count(), 'Hanya surat balasan');
     }
 
     // ---------- Pengajuan perubahan ----------
@@ -289,63 +235,6 @@ class StageTwoFlowTest extends TestCase
         $this->assertSame('bima@nusantaradigital.test', $rina->supervisor_email);
         $this->assertNull($rina->supervisor);
         $this->assertTrue(Internship::awaitingSupervisor()->whereKey($rina->id)->exists());
-    }
-
-    // ---------- Rekognisi SKS ----------
-
-    public function test_rekognisi_sks_mbkm(): void
-    {
-        $student = $this->user('dimas@kp.test');
-        $this->actingAs($student)->put('/rekognisi', ['courses' => [['name' => 'Besar', 'credits' => 6], ['name' => 'Besar 2', 'credits' => 6], ['name' => 'Besar 3', 'credits' => 6], ['name' => 'Besar 4', 'credits' => 6]]])
-            ->assertSessionHasErrors('courses');
-        $this->actingAs($student)->put('/rekognisi', ['courses' => [['code' => 'TIF601', 'name' => 'Analisis Data Lanjut', 'credits' => 3], ['name' => '', 'credits' => '']]])
-            ->assertSessionHasNoErrors();
-
-        $cr = CreditRecognition::firstOrFail();
-        $this->assertSame(3, $cr->totalCredits());
-        $this->actingAs($this->user('kaprodi@kp.test'))->patch("/kaprodi/rekognisi/{$cr->id}", ['keputusan' => 'setujui'])->assertSessionHasNoErrors();
-        $this->assertSame('disetujui', $cr->fresh()->status);
-
-        // KP Industri tidak punya rekognisi
-        $this->actingAs($this->user('mahasiswa@kp.test'))->put('/rekognisi', ['courses' => [['name' => 'X', 'credits' => 2]]])->assertNotFound();
-    }
-
-    // ---------- Kuesioner ----------
-
-    public function test_dosen_menyusun_kuesioner_dan_supervisor_mengisi_pertanyaan_isian(): void
-    {
-        $dospem = $this->user('dospem@kp.test');
-        $this->actingAs($dospem)->post('/kuesioner', ['name' => 'Kuesioner Backend'])->assertSessionHasNoErrors();
-        $rubric = AssessmentRubric::where('name', 'Kuesioner Backend')->firstOrFail();
-        $this->assertSame($dospem->id, $rubric->owner_id);
-
-        $aspects = [
-            ['name' => 'Kualitas kode', 'kind' => 'score', 'weight' => 60],
-            ['name' => 'Kerja tim', 'kind' => 'score', 'weight' => 30],
-            ['name' => 'Saran', 'kind' => 'text'],
-        ];
-        $this->actingAs($dospem)->put("/kuesioner/{$rubric->id}", ['name' => 'Kuesioner Backend', 'aspects' => $aspects])->assertSessionHasErrors('aspects');
-        $aspects[1]['weight'] = 40;
-        $this->actingAs($dospem)->put("/kuesioner/{$rubric->id}", ['name' => 'Kuesioner Backend', 'aspects' => $aspects])->assertSessionHasNoErrors();
-        $this->assertSame(3, $rubric->aspects()->count());
-
-        $rina = $this->internshipOf('mahasiswa@kp.test');
-        $this->actingAs($dospem)->patch('/kuesioner/pakai', ['assign' => [$rina->id => $rubric->id]])->assertSessionHasNoErrors();
-        $this->assertSame($rubric->id, $rina->fresh()->assessment_rubric_id);
-
-        $ids = $rubric->aspects()->pluck('id', 'name');
-        $scores = [$ids['Kualitas kode'] => ['score' => 80], $ids['Kerja tim'] => ['score' => 90], $ids['Saran'] => ['note' => '']];
-        $sup = $this->user('supervisor@kp.test');
-        $this->actingAs($sup)->put("/penilaian/{$rina->id}", ['aksi' => 'kirim', 'scores' => $scores])->assertSessionHasErrors('scores');
-        $scores[$ids['Saran']]['note'] = 'Perbanyak menulis tes.';
-        $this->actingAs($sup)->put("/penilaian/{$rina->id}", ['aksi' => 'kirim', 'scores' => $scores])->assertSessionHasNoErrors();
-
-        $assessment = $rina->fresh()->assessment;
-        $this->assertEquals(84.0, (float) $assessment->final_score); // 80 x 60% + 90 x 40%
-        $this->assertSame('Perbanyak menulis tes.', $assessment->scores()->where('rubric_aspect_id', $ids['Saran'])->value('note'));
-
-        // Sudah dipakai menilai: terkunci
-        $this->actingAs($dospem)->put("/kuesioner/{$rubric->id}", ['name' => 'Ubah', 'aspects' => $aspects])->assertSessionHasErrors('aspects');
     }
 
     // ---------- Notifikasi ----------

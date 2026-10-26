@@ -18,7 +18,7 @@
         <div class="col">
             <section class="card">
                 <div class="card-head">
-                    <h2 class="card-title">Nilai per aspek</h2>
+                    <h2 class="card-title">Rincian nilai</h2>
                 </div>
                 @if ($assessment && $rubric)
                     @include('penilaian._scores')
@@ -46,9 +46,9 @@
                                 <label for="catatan" class="label">Catatan</label>
                                 <textarea id="catatan" name="catatan" class="textarea" maxlength="500" placeholder="Wajib diisi jika dikembalikan ke penilai">{{ old('catatan') }}</textarea>
                             </div>
-                            <div class="btn-row">
-                                <button type="submit" name="keputusan" value="kembalikan" class="btn">Kembalikan ke penilai</button>
-                                <button type="submit" name="keputusan" value="validasi" class="btn btn-primary">Validasi dan kunci nilai</button>
+                            <div class="row-actions">
+                                <button type="submit" name="keputusan" value="kembalikan" class="btn">Kembalikan</button>
+                                <button type="submit" name="keputusan" value="validasi" class="btn btn-primary">Validasi</button>
                             </div>
                         </form>
                     </div>

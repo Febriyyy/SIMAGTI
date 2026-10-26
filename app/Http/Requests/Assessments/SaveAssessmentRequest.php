@@ -4,11 +4,15 @@ namespace App\Http\Requests\Assessments;
 
 use App\Models\Assessment;
 use App\Models\Internship;
+use App\Support\AssessmentStandard;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Penilaian akhir Company Supervisor: setiap pertanyaan dijawab dengan memilih satu nilai dari skala standar kampus.
+ */
 class SaveAssessmentRequest extends FormRequest
 {
     public function internship(): Internship
@@ -23,63 +27,66 @@ class SaveAssessmentRequest extends FormRequest
 
     public function rules(): array
     {
+        $values = array_map(fn ($row) => (string) (0 + $row['value']), AssessmentStandard::scale());
+
         return [
             'aksi' => ['required', Rule::in(['simpan', 'kirim'])],
-            'scores' => ['required', 'array'],
-            'scores.*.score' => ['nullable', 'numeric', 'between:0,100'],
-            'scores.*.note' => ['nullable', 'string', 'max:1000'],
+            'scores' => ['nullable', 'array'],
+            'scores.*' => ['nullable', Rule::in($values)],
+            'comment' => ['nullable', 'string', 'max:2000'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'scores.*.score.numeric' => 'Nilai harus berupa angka.',
-            'scores.*.score.between' => 'Nilai harus di antara 0 dan 100.',
-            'scores.*.note.max' => 'Catatan atau jawaban maksimal 1000 karakter.',
+            'scores.*.in' => 'Pilih salah satu nilai dari skala yang tersedia.',
+            'comment.max' => 'Catatan maksimal 2000 karakter.',
         ];
     }
 
-    /** Hanya aspek dari rubrik yang dipakai; saat dikirim semua aspek wajib terisi. */
+    /** Hanya pertanyaan dari standar penilaian; saat dikirim semua pertanyaan wajib dijawab dan bobot harus 100%. */
     public function after(): array
     {
         return [
             function (Validator $validator) {
-                $rubric = Assessment::rubricFor($this->internship());
-                $aspects = $rubric ? $rubric->aspects : collect();
-                $aspectIds = $aspects->pluck('id')->map(fn ($id) => (string) $id)->all();
-                $scores = (array) $this->input('scores', []);
+                $aspects = Assessment::rubricFor($this->internship())->aspects->where('kind', '!=', 'text');
+                $ids = $aspects->pluck('id')->map(fn ($id) => (string) $id)->all();
+                $scores = array_filter((array) $this->input('scores', []), fn ($v) => $v !== null && $v !== '');
 
                 foreach (array_keys($scores) as $id) {
-                    if (! in_array((string) $id, $aspectIds, true)) {
-                        $validator->errors()->add('scores', 'Ada aspek penilaian yang tidak dikenal.');
+                    if (! in_array((string) $id, $ids, true)) {
+                        $validator->errors()->add('scores', 'Ada pertanyaan penilaian yang tidak dikenal.');
 
                         return;
                     }
                 }
 
                 if ($this->input('aksi') === 'kirim') {
-                    foreach ($aspects as $aspect) {
-                        $row = $scores[(string) $aspect->id] ?? $scores[$aspect->id] ?? [];
-                        $field = $aspect->isText() ? 'note' : 'score';
-                        if (! isset($row[$field]) || trim((string) $row[$field]) === '') {
-                            $validator->errors()->add('scores', 'Semua aspek dan pertanyaan harus diisi sebelum dikirim ke dosen pembimbing.');
-
-                            return;
-                        }
+                    $missing = $aspects->reject(fn ($a) => isset($scores[$a->id]) || isset($scores[(string) $a->id]))->count();
+                    if ($missing > 0) {
+                        $validator->errors()->add('scores', "Masih ada {$missing} pertanyaan yang belum dinilai.");
+                    }
+                    if (abs(AssessmentStandard::totalWeight() - 100) > 0.001) {
+                        $validator->errors()->add('scores', 'Bobot penilaian belum 100%. Hubungi kaprodi.');
                     }
                 }
             },
         ];
     }
 
-    /** @return array<int, array{score: string|null, note: string|null}> aspek yang diberi nilai atau pertanyaan yang dijawab */
+    /** @return array<int, float> rubric_aspect_id => nilai yang dipilih */
     public function scores(): array
     {
-        return collect($this->validated('scores'))
-            ->filter(fn ($row) => (isset($row['score']) && $row['score'] !== '') || filled($row['note'] ?? null))
-            ->map(fn ($row) => ['score' => isset($row['score']) && $row['score'] !== '' ? $row['score'] : null, 'note' => $row['note'] ?? null])
+        return collect($this->validated('scores') ?? [])
+            ->filter(fn ($v) => $v !== null && $v !== '')
+            ->map(fn ($v) => (float) $v)
             ->all();
+    }
+
+    public function comment(): ?string
+    {
+        return filled($this->validated('comment')) ? trim($this->validated('comment')) : null;
     }
 
     public function submitting(): bool

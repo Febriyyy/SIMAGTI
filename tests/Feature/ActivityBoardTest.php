@@ -44,9 +44,11 @@ class ActivityBoardTest extends TestCase
 
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/kegiatan')
             ->assertOk()
-            ->assertSee('To Do')->assertSee('In Progress')->assertSee('Review')->assertSee('Done')
+            ->assertSee('To Do')->assertSee('In Progress')->assertSee('Done')
             ->assertSee($task->key())
-            ->assertSee('Task baru');
+            ->assertSee('Task baru')
+            ->assertSee('Goals');
+        $this->assertSame(['To Do', 'In Progress', 'Done'], $rina->boardColumns()->pluck('name')->all(), 'Kolom Review dihapus');
 
         $this->get('/kegiatan?tampilan=list')->assertOk()->assertSee('Prioritas')->assertSee($task->title);
     }
@@ -55,11 +57,20 @@ class ActivityBoardTest extends TestCase
     {
         $rina = $this->internshipOf('mahasiswa@kp.test');
         $project = $rina->projects()->where('key', 'PMS')->firstOrFail();
+        $plan = $rina->activityPlans()->where('title', 'Modul Pemesanan')->firstOrFail();
+        $goal = $rina->goals()->firstOrFail();
         $next = (int) $rina->tasks()->max('number') + 1;
+
+        // Task wajib di bawah rencana kegiatan
+        $this->actingAs($this->user('mahasiswa@kp.test'))
+            ->post('/kegiatan/tugas', ['title' => 'Tanpa rencana', 'project_id' => $project->id])
+            ->assertSessionHasErrors('activity_plan_id');
 
         $this->actingAs($this->user('mahasiswa@kp.test'))
             ->post('/kegiatan/tugas', [
                 'title' => 'Rancang halaman checkout',
+                'activity_plan_id' => $plan->id,
+                'goal_id' => $goal->id,
                 'project_id' => $project->id,
                 'priority' => 'high',
                 'start_date' => now()->toDateString(),
@@ -69,6 +80,8 @@ class ActivityBoardTest extends TestCase
 
         $task = WeeklyTask::where('title', 'Rancang halaman checkout')->firstOrFail();
         $this->assertSame("PMS-{$next}", $task->key());
+        $this->assertSame($plan->id, $task->activity_plan_id);
+        $this->assertSame($goal->id, $task->goal_id);
         $this->assertSame('todo', $task->status);
         $this->assertSame(['ui', 'frontend'], $task->labels);
         $this->assertSame($rina->weekOf(now()->addDays(3)), $task->week_number);
@@ -80,11 +93,13 @@ class ActivityBoardTest extends TestCase
         $dimas = $this->internshipOf('dimas@kp.test');
 
         $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->post('/kegiatan/tugas', ['title' => 'Salah tempat', 'project_id' => $dimas->projects()->first()->id, 'board_column_id' => $dimas->boardColumns()->first()->id])
-            ->assertSessionHasErrors(['project_id', 'board_column_id']);
+            ->post('/kegiatan/tugas', ['title' => 'Salah tempat', 'project_id' => $dimas->projects()->first()->id, 'board_column_id' => $dimas->boardColumns()->first()->id,
+                'activity_plan_id' => $dimas->activityPlans()->first()->id, 'goal_id' => $dimas->goals()->first()->id])
+            ->assertSessionHasErrors(['project_id', 'board_column_id', 'activity_plan_id', 'goal_id']);
 
+        $plan = $this->internshipOf('mahasiswa@kp.test')->activityPlans()->first()->id;
         $this->actingAs($this->user('mahasiswa@kp.test'))
-            ->post('/kegiatan/tugas', ['title' => 'Tenggat terbalik', 'start_date' => now()->toDateString(), 'due_date' => now()->subDay()->toDateString()])
+            ->post('/kegiatan/tugas', ['title' => 'Tenggat terbalik', 'activity_plan_id' => $plan, 'start_date' => now()->toDateString(), 'due_date' => now()->subDay()->toDateString()])
             ->assertSessionHasErrors('due_date');
     }
 
@@ -253,5 +268,35 @@ class ActivityBoardTest extends TestCase
         $this->actingAs($this->user('supervisor@kp.test'))->get("/pantau/{$rina->id}/unduh?format=xlsx")->assertOk();
         $this->actingAs($this->user('supervisor@kp.test'))->get("/pantau/{$dimas->id}/unduh?format=pdf")->assertForbidden();
         $this->actingAs($this->user('mahasiswa@kp.test'))->get("/pantau/{$rina->id}/unduh")->assertForbidden();
+    }
+
+    public function test_goals_di_halaman_kegiatan(): void
+    {
+        $rina = $this->internshipOf('mahasiswa@kp.test');
+        $student = $this->user('mahasiswa@kp.test');
+
+        $this->actingAs($student)->get('/kegiatan')->assertOk()->assertSee('Goals')->assertSee('Membangun REST API dengan Laravel')->assertSee('1 dari 4 tercapai');
+
+        $this->post('/kegiatan/goals', ['title' => ''])->assertSessionHasErrors('title');
+        $this->post('/kegiatan/goals', ['title' => 'Memahami CI/CD'])->assertSessionHasNoErrors();
+        $goal = $rina->goals()->where('title', 'Memahami CI/CD')->firstOrFail();
+
+        $this->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 1])->assertSessionHasNoErrors();
+        $this->assertTrue($goal->fresh()->isAchieved());
+        $this->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 0]);
+        $this->assertFalse($goal->fresh()->isAchieved());
+
+        // Filter task per goal
+        $first = $rina->goals()->orderBy('position')->first();
+        $task = $rina->tasks()->where('goal_id', $first->id)->firstOrFail();
+        $other = $rina->tasks()->where('goal_id', '!=', $first->id)->firstOrFail();
+        $this->get("/kegiatan?tampilan=list&goal={$first->id}")->assertOk()->assertSee($task->title)->assertDontSee($other->title);
+
+        // Goal milik orang lain tidak bisa diubah; supervisor hanya melihat
+        $this->actingAs($this->user('dimas@kp.test'))->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 1])->assertNotFound();
+        $this->actingAs($this->user('supervisor@kp.test'))->post('/kegiatan/goals', ['title' => 'x'])->assertForbidden();
+
+        $this->actingAs($student)->delete("/kegiatan/goals/{$first->id}")->assertSessionHasNoErrors();
+        $this->assertNull($task->fresh()->goal_id, 'Task tetap ada, kaitannya dilepas');
     }
 }

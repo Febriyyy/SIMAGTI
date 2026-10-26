@@ -57,7 +57,6 @@
                                     <label class="label" for="type">Jenis perubahan</label>
                                     <select id="type" name="type" class="select" required data-type>
                                         @foreach (\App\Models\ChangeRequest::TYPES as $k => [$label, $desc])
-                                            @continue($k === 'replace_supervisor' && $internship->isSeminar())
                                             <option value="{{ $k }}" @selected(old('type') === $k)>{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -69,7 +68,7 @@
                                         <input id="new_end_date" type="date" name="new_end_date" class="input" value="{{ old('new_end_date') }}"
                                                min="{{ $internship->end_date->copy()->addDay()->toDateString() }}" max="{{ $internship->end_date->copy()->addMonths(6)->toDateString() }}">
                                     </div>
-                                    <p class="hint">Sekarang selesai {{ $internship->end_date->locale('id')->translatedFormat('j F Y') }}. {{ $internship->isSeminar() ? 'Diputuskan kaprodi.' : 'Company Supervisor menyatakan setuju, lalu diputuskan kaprodi.' }}</p>
+                                    <p class="hint">Sekarang selesai {{ $internship->end_date->locale('id')->translatedFormat('j F Y') }}. Company Supervisor menyatakan setuju, lalu diputuskan kaprodi.</p>
                                 </div>
 
                                 <div data-show="transfer" class="stack">
@@ -84,7 +83,6 @@
                                     <p class="hint">Setelah disetujui kaprodi, KP ini dibatalkan.</p>
                                 </div>
 
-                                @unless ($internship->isSeminar())
                                     <div data-show="replace_supervisor" class="stack">
                                         <div class="field">
                                             <label class="label" for="supervisor_name">Nama supervisor baru</label>
@@ -100,7 +98,6 @@
                                             <p class="hint">TU Fakultas memproses lalu mengaktifkan akun supervisor baru.</p>
                                         </div>
                                     </div>
-                                @endunless
 
                                 <div class="field">
                                     <label class="label" for="reason">Alasan</label>

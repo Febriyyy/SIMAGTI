@@ -27,10 +27,6 @@ class HandleChangeRequest
         if ($internship->changeRequests()->where('status', 'pending')->exists()) {
             throw ValidationException::withMessages(['type' => 'Masih ada pengajuan perubahan yang sedang diproses.']);
         }
-        if ($type === 'replace_supervisor' && $internship->isSeminar()) {
-            throw ValidationException::withMessages(['type' => 'Seminar tidak memiliki Company Supervisor.']);
-        }
-
         $payload = match ($type) {
             'extend' => ['new_end_date' => Carbon::parse($data['new_end_date'])->toDateString(), 'old_end_date' => $internship->end_date->toDateString()],
             'replace_supervisor' => [
@@ -47,7 +43,7 @@ class HandleChangeRequest
         }
 
         $step = match ($type) {
-            'extend' => $internship->isSeminar() || ! $internship->supervisor ? 'kaprodi' : 'supervisor',
+            'extend' => ! $internship->supervisor ? 'kaprodi' : 'supervisor',
             'replace_supervisor' => 'tu',
             default => 'kaprodi',
         };
@@ -123,11 +119,6 @@ class HandleChangeRequest
     private function extend(Internship $internship, Carbon $end): void
     {
         $internship->update(['end_date' => $end->toDateString()]);
-        // Bulan terakhir yang sudah tercatat ikut diperpanjang sampai tanggal selesai baru
-        foreach ($internship->monthlyReviews()->get() as $review) {
-            [$start, $finish] = $internship->monthRange($review->month_number);
-            $review->update(['period_start' => $start->toDateString(), 'period_end' => $finish->toDateString()]);
-        }
     }
 
     private function replaceSupervisor(Internship $internship, array $p): void

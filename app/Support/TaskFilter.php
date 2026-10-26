@@ -28,7 +28,8 @@ class TaskFilter
             'sampai' => self::date($values['sampai'] ?? null),
             'status' => in_array($values['status'] ?? null, array_keys(WeeklyTask::STATUSES), true) ? $values['status'] : null,
             'prioritas' => in_array($values['prioritas'] ?? null, array_keys(WeeklyTask::PRIORITIES), true) ? $values['prioritas'] : null,
-            'kategori' => in_array($values['kategori'] ?? null, ['hard', 'soft', 'attitude'], true) ? $values['kategori'] : null,
+            'rencana' => isset($values['rencana']) && $values['rencana'] !== '' ? (int) $values['rencana'] : null,
+            'goal' => isset($values['goal']) && $values['goal'] !== '' ? (int) $values['goal'] : null,
             'cari' => isset($values['cari']) ? mb_substr(trim((string) $values['cari']), 0, 80) : null,
         ], fn ($v) => $v !== null && $v !== '');
 
@@ -43,7 +44,7 @@ class TaskFilter
 
     public static function fromRequest(Internship $internship, Request $request, array $defaults = []): self
     {
-        return new self($internship, $request->only(['proyek', 'periode', 'dari', 'sampai', 'status', 'prioritas', 'kategori', 'cari']) + $defaults);
+        return new self($internship, $request->only(['proyek', 'periode', 'dari', 'sampai', 'status', 'prioritas', 'rencana', 'goal', 'cari']) + $defaults);
     }
 
     private static function date(mixed $value): ?string
@@ -79,7 +80,8 @@ class TaskFilter
         $query->when($v['proyek'] ?? null, fn ($q, $id) => $q->where('project_id', $id))
             ->when($v['status'] ?? null, fn ($q, $s) => $q->where('status', $s))
             ->when($v['prioritas'] ?? null, fn ($q, $p) => $q->where('priority', $p))
-            ->when($v['kategori'] ?? null, fn ($q, $c) => $q->whereHas('syllabusItem', fn ($s) => $s->where('category', $c)))
+            ->when($v['rencana'] ?? null, fn ($q, $id) => $q->where('activity_plan_id', $id))
+            ->when($v['goal'] ?? null, fn ($q, $id) => $q->where('goal_id', $id))
             ->when($v['cari'] ?? null, fn ($q, $term) => $q->where(fn ($w) => $w
                 ->where('title', 'like', '%'.$term.'%')
                 ->orWhere('description', 'like', '%'.$term.'%')));

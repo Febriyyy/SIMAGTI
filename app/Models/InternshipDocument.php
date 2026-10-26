@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Dokumen KP: surat pengantar (diterbitkan TU Fakultas), surat balasan perusahaan dan
- * pakta integritas MBKM (diunggah mahasiswa, boleh menyusul sampai batas waktu).
+ * Dokumen KP: surat pengantar (diminta mahasiswa, diverifikasi dan diterbitkan TU Fakultas) dan
+ * surat balasan perusahaan (diunggah mahasiswa, boleh menyusul sampai batas waktu, diperiksa TU Fakultas).
  */
 class InternshipDocument extends Model
 {
@@ -15,13 +15,10 @@ class InternshipDocument extends Model
 
     public const REPLY = 'surat_balasan';
 
-    public const PACT = 'pakta_integritas';
-
     /** jenis => [label, keterangan] */
     public const TYPES = [
         self::LETTER => ['Surat pengantar', 'Diterbitkan TU Fakultas untuk dibawa ke perusahaan'],
         self::REPLY => ['Surat balasan perusahaan', 'Bukti resmi perusahaan menerima mahasiswa'],
-        self::PACT => ['Pakta integritas MBKM', 'Ditandatangani mahasiswa (MB.04)'],
     ];
 
     /** status => [label, warna chip] */

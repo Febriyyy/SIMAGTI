@@ -55,7 +55,7 @@
         <tr><td>Nama</td><td>:</td><td>{{ $student->name }}</td></tr>
         <tr><td>NIM</td><td>:</td><td>{{ $student->nim }}</td></tr>
         <tr><td>Program studi</td><td>:</td><td>{{ $id['program'] ?? $campus['program'] }}</td></tr>
-        <tr><td>Program</td><td>:</td><td>{{ $internship->programTypeLabel() }}</td></tr>
+        <tr><td>Program</td><td>:</td><td>Kerja Praktik</td></tr>
         @if ($internship->division || $internship->position)
             <tr><td>Penempatan</td><td>:</td><td>{{ collect([$internship->division?->name, $internship->position])->filter()->join(' · ') }}</td></tr>
         @endif

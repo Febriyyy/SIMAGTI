@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-/** Dashboard setiap peran (mahasiswa, Company Supervisor, dospem, kaprodi, biro, TU) memakai data nyata. */
+/** Dashboard setiap peran (mahasiswa, Company Supervisor, dospem, kaprodi, TU, admin) memakai data nyata. */
 class DashboardDataTest extends TestCase
 {
     use RefreshDatabase;
@@ -39,10 +39,10 @@ class DashboardDataTest extends TestCase
         // Company Supervisor Data Prima: Dimas (berjalan) dan Salsa (selesai); Tari belum punya supervisor
         $this->assertSame(['Dimas Aditya', 'Salsa Nabila'], $names($this->build('supervisor2@kp.test')));
 
-        // Company Supervisor Nusantara: Fajar dan Rina
-        $this->assertSame(['Fajar Pratama', 'Rina Putri'], $names($this->build('supervisor@kp.test')));
+        // Company Supervisor Nusantara: Fajar, Gilang, dan Rina
+        $this->assertSame(['Fajar Pratama', 'Gilang Ramadhan', 'Rina Putri'], $names($this->build('supervisor@kp.test')));
 
-        // Dosen pembimbing: semua bimbingannya, termasuk seminar
+        // Dosen pembimbing: semua bimbingannya
         $this->assertSame(['Dimas Aditya', 'Fajar Pratama', 'Gilang Ramadhan', 'Rina Putri', 'Salsa Nabila', 'Tari Anjani'], $names($this->build('dospem@kp.test')));
 
         // Kaprodi melihat semuanya, termasuk KP mandiri yang masih diajukan
@@ -57,7 +57,7 @@ class DashboardDataTest extends TestCase
         $this->assertNotNull($dimas);
         $this->assertStringContainsString('Tidak ada kegiatan baru', implode(' ', $dimas['reasons']));
 
-        // Rina mencatat timesheet setiap hari, jadi tidak ditandai karena itu
+        // Rina mencatat kegiatan setiap hari, jadi tidak ditandai karena itu
         $rina = $attention->first(fn ($row) => $row['internship']->student->name === 'Rina Putri');
         $this->assertTrue($rina === null || ! str_contains(implode(' ', $rina['reasons']), 'kegiatan'));
 
@@ -77,7 +77,7 @@ class DashboardDataTest extends TestCase
         $this->assertSame(1, $data['assessment']['draft']);       // Dimas
         $this->assertSame(3, $data['assessment']['none']);        // Rina, Tari, Gilang
         $this->assertSame(1, $data['grades']['A']);
-        $this->assertSame(88.75, $data['stats']['average_score']);
+        $this->assertSame(90.88, $data['stats']['average_score']);
         $this->assertSame(array_key_first($data['grades']), 'A'); // urut dari huruf tertinggi
     }
 
@@ -85,14 +85,14 @@ class DashboardDataTest extends TestCase
     {
         $data = $this->build('kaprodi@kp.test');
 
-        $this->assertSame(0, $data['waitingApproval']); // Nadia belum diverifikasi biro
+        $this->assertSame(0, $data['waitingApproval']); // Nadia belum diverifikasi TU
         $this->assertSame(Internship::awaitingKaprodi()->count(), $data['waitingApproval']);
 
         $companies = $data['companies']->keyBy(fn ($row) => $row['company']->name);
-        $this->assertCount(2, $companies, 'Seminar (tanpa perusahaan) tidak masuk ringkasan perusahaan');
-        $this->assertSame(2, $companies['PT Nusantara Digital']['active']);
+        $this->assertCount(2, $companies, 'Pengajuan yang belum berjalan tidak masuk ringkasan perusahaan');
+        $this->assertSame(3, $companies['PT Nusantara Digital']['active']); // Rina, Fajar, Gilang
         $this->assertSame(2, $companies['PT Data Prima']['active']); // Dimas dan Tari
-        $this->assertSame(88.75, $companies['PT Data Prima']['score']);
+        $this->assertSame(90.88, $companies['PT Data Prima']['score']);
 
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/dashboard')->assertOk()->assertSee('Per perusahaan');
     }
@@ -109,15 +109,15 @@ class DashboardDataTest extends TestCase
         $this->assertCount(0, app(BuildMonitoringDashboard::class)->handle($other)['waitingValidation']);
     }
 
-    public function test_halaman_statistik_perusahaan_untuk_biro_dan_kaprodi(): void
+    public function test_halaman_statistik_perusahaan_untuk_tu_dan_kaprodi(): void
     {
         $dataPrima = Company::where('name', 'PT Data Prima')->firstOrFail();
 
-        $this->actingAs($this->user('biro@kp.test'))
+        $this->actingAs($this->user('tu@kp.test'))
             ->get("/perusahaan/{$dataPrima->id}")
             ->assertOk()
             ->assertSee('Sebaran skill')
-            ->assertSee('Performa per aspek')
+            ->assertSee('Performa per kategori')
             ->assertSee('Salsa Nabila');
 
         $this->actingAs($this->user('kaprodi@kp.test'))->get("/perusahaan/{$dataPrima->id}")->assertOk();
@@ -128,14 +128,15 @@ class DashboardDataTest extends TestCase
     public function test_statistik_perusahaan_memuat_durasi_dan_performa_dari_nilai_tervalidasi(): void
     {
         $dataPrima = Company::where('name', 'PT Data Prima')->firstOrFail();
-        Sanctum::actingAs($this->user('biro@kp.test'));
+        Sanctum::actingAs($this->user('tu@kp.test'));
 
         $data = $this->getJson("/api/v1/companies/{$dataPrima->id}/stats")->assertOk()->json('data');
 
         $this->assertSame(1, $data['performance']['assessed_count']);
-        $this->assertEquals(88.75, $data['performance']['average_final_score']);
+        $this->assertEquals(90.88, $data['performance']['average_final_score']);
         $this->assertSame(1, $data['performance']['grades']['A']);
-        $this->assertCount(4, $data['performance']['aspects']);
+        $this->assertSame(['Hard skill', 'Soft skill', 'Attitude'], array_column($data['performance']['aspects'], 'name'));
+        $this->assertEquals(90, $data['performance']['aspects'][0]['average']);
         $this->assertGreaterThan(0, $data['average_duration_months']);
 
         // Nilai mahasiswa hanya dibuka jika sudah divalidasi (Dimas masih draft)
@@ -144,30 +145,32 @@ class DashboardDataTest extends TestCase
         $this->assertNull($students['Dimas Aditya']['final_score']);
     }
 
-    public function test_dashboard_biro_menampilkan_tautan_statistik(): void
+    public function test_dashboard_tu_menampilkan_tautan_statistik(): void
     {
-        $this->actingAs($this->user('biro@kp.test'))
+        $this->actingAs($this->user('tu@kp.test'))
             ->get('/dashboard')
             ->assertOk()
             ->assertSee('Statistik')
             ->assertSee('PT Data Prima');
     }
 
-    public function test_grafik_jam_kegiatan_per_minggu_menghitung_yang_terlihat_saja(): void
+    public function test_grafik_aktivitas_per_minggu_menghitung_yang_terlihat_saja(): void
     {
         $kaprodi = $this->build('kaprodi@kp.test')['activity'];
         $supervisor = $this->build('supervisor2@kp.test')['activity'];
 
-        $this->assertCount(BuildMonitoringDashboard::ACTIVITY_WEEKS, $kaprodi['values']);
+        $this->assertCount(BuildMonitoringDashboard::ACTIVITY_WEEKS, $kaprodi['notes']);
+        $this->assertCount(BuildMonitoringDashboard::ACTIVITY_WEEKS, $kaprodi['done']);
         $this->assertCount(BuildMonitoringDashboard::ACTIVITY_WEEKS, $kaprodi['labels']);
-        // Kaprodi melihat jam semua mahasiswa, supervisor hanya mahasiswanya
-        $this->assertGreaterThan(0, array_sum($kaprodi['values']));
-        $this->assertLessThan(array_sum($kaprodi['values']), array_sum($supervisor['values']));
+        // Kaprodi melihat catatan semua mahasiswa, supervisor hanya mahasiswanya
+        $this->assertGreaterThan(0, array_sum($kaprodi['notes']));
+        $this->assertGreaterThan(0, array_sum($kaprodi['done']));
+        $this->assertLessThan(array_sum($kaprodi['notes']), array_sum($supervisor['notes']));
 
         $this->actingAs($this->user('kaprodi@kp.test'))
             ->get('/dashboard')
             ->assertOk()
-            ->assertSee('Jam kegiatan per minggu')
+            ->assertSee('Aktivitas per minggu')
             ->assertSee('class="donut"', false)
             ->assertSee('class="line-chart"', false);
     }
@@ -178,7 +181,8 @@ class DashboardDataTest extends TestCase
             ->assertOk()
             ->assertSee('Company Supervisor')
             ->assertSee('Status task')->assertSee('class="donut"', false)
-            ->assertSee('Silabus menunggu')
+            ->assertSee('Catatan minggu ini')
+            ->assertDontSee('Silabus')
             ->assertSee('Dimas Aditya')
             ->assertSee('Data Analyst Intern')
             ->assertDontSee('Rina Putri')
@@ -188,19 +192,25 @@ class DashboardDataTest extends TestCase
             ->assertOk()->assertSee('Rina Putri')->assertSee('Atur meeting')->assertDontSee('Dimas Aditya');
     }
 
-    public function test_dashboard_mahasiswa_menampilkan_divisi_posisi_dan_grafik_jam(): void
+    public function test_dashboard_mahasiswa_menampilkan_rencana_dan_kemajuan_yang_bisa_diklik(): void
     {
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/dashboard')
             ->assertOk()
             ->assertSee('PT Nusantara Digital')
             ->assertSee('Divisi Engineering')
             ->assertSee('Backend Developer Intern')
-            ->assertSee('Jam kegiatan per minggu')
-            ->assertSee('class="line-chart"', false)
+            ->assertSee('Rencana kegiatan')
+            ->assertSee('class="gt gt-compact gt-readonly"', false)
+            ->assertSee('Kemajuan KP')
+            ->assertSee('href="'.route('timesheet.index').'" class="mini-step-title"', false)
+            ->assertSee('href="'.route('bimbingan.index').'" class="mini-step-title"', false)
+            ->assertDontSee('Silabus')
+            ->assertDontSee('Jam tercatat')
             ->assertSee('Perlu dikerjakan');
 
+        // Gilang belum menyusun rencana kegiatan
         $this->actingAs($this->user('gilang@kp.test'))->get('/dashboard')
-            ->assertOk()->assertSee('Seminar Nasional Transformasi Digital UMKM')->assertSee('Pelaksana Kegiatan Seminar');
+            ->assertOk()->assertSee('Isi rencana dulu di timesheet')->assertSee('Belum ada rencana');
 
         $this->actingAs($this->user('nadia@kp.test'))->get('/dashboard')
             ->assertOk()->assertSee('sedang diproses')->assertSee('Lihat Status KP');
@@ -209,12 +219,13 @@ class DashboardDataTest extends TestCase
             ->assertOk()->assertSee('Belum ada KP')->assertSee('Ajukan KP');
     }
 
-    public function test_dashboard_tu_dan_biro(): void
+    public function test_dashboard_tu_dan_admin(): void
     {
         $this->actingAs($this->user('tu@kp.test'))->get('/dashboard')
-            ->assertOk()->assertSee('Antrean aktivasi')->assertSee('Hendra Gunawan')->assertSee('PT Data Prima');
+            ->assertOk()->assertSee('Antrean aktivasi')->assertSee('Hendra Gunawan')->assertSee('PT Data Prima')
+            ->assertSee('Perlu verifikasi')->assertSee('Surat pengantar')->assertSee('Perusahaan');
 
-        $this->actingAs($this->user('biro@kp.test'))->get('/dashboard')
-            ->assertOk()->assertSee('Status perusahaan')->assertSee('Magang aktif per perusahaan');
+        $this->actingAs($this->user('admin@kp.test'))->get('/dashboard')
+            ->assertOk()->assertSee('Total akun')->assertSee('Aktivitas terbaru')->assertSee('Akun per peran');
     }
 }

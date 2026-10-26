@@ -23,34 +23,40 @@ Rincian teknologi ada di `DESIGN.md`, struktur data di `DATABASE.md`. Dokumen in
 
 Manfaat: web dan API memakai Action, Policy, dan scope yang sama, jadi aturan tidak ditulis dua kali.
 
-## Alur pengajuan KP (v2)
+## Alur pengajuan KP (v3, satu jenis KP)
 
 ```
-Mahasiswa mengajukan  → SubmitInternshipApplication (pilih jalur: Magang [KP Industri / MBKM Mandiri] atau Seminar [Pelaksana / Peserta];
-                                                     cek minimal semester V, MBKM semester 5-7; magang menyimpan data Company Supervisor)
-Biro memverifikasi    → ReviewBiroVerification      (hanya magang; perusahaan yang sudah mitra otomatis lolos)
-Kaprodi memutuskan    → ReviewKaprodiApproval       (setuju: "berjalan" + dosen pembimbing; seminar langsung ke kaprodi)
+Mahasiswa mengajukan  → SubmitInternshipApplication (cek minimal semester V; bidang usaha dari pilihan atau "Lainnya";
+                                                     website opsional; data Company Supervisor disimpan di penempatan)
+TU memverifikasi      → ReviewVerification          (perusahaan yang sudah mitra otomatis lolos)
+Kaprodi memutuskan    → ReviewKaprodiApproval       (setuju: "berjalan" + dosen pembimbing; surat balasan boleh menyusul)
 TU Fakultas           → ActivateCompanySupervisor   (dikelompokkan per perusahaan + email supervisor: undang, tautkan akun lama, atau koreksi email)
 Company Supervisor    → AcceptInvitation            (link sekali pakai 14 hari; satu undangan memasang semua mahasiswa kelompoknya)
 ```
 
-## Alur kegiatan (v2)
+## Alur kegiatan (v3)
 
 ```
-Mahasiswa: silabus      → SyllabusWorkflow (hard skill / soft skill / attitude, minimal satu per kelompok, kirim → disetujui atau direvisi)
-Mahasiswa: board        → CreateTask, MoveTask (proyek berkode seperti ORD-12, kolom bebas, checklist, bukti, komentar)
-Mahasiswa: timesheet    → LogTime (jam per hari maks 24, foto opsional di disk privat)
-Supervisor / dospem     → pantau per kloter, komentar, setujui silabus, koreksi posisi, unduh Excel / cetak PDF
+Mahasiswa: rencana      → ActivityPlanController (timesheet / Gantt: nama kegiatan + rentang tanggal di dalam periode KP)
+Mahasiswa: goals        → GoalController (di halaman Kegiatan, ditandai tercapai)
+Mahasiswa: board        → CreateTask, MoveTask (task wajib di bawah rencana, opsional goal; proyek berkode seperti ORD-12, checklist, bukti)
+Mahasiswa: catatan      → LogTime (catatan kegiatan harian tanpa jam, foto opsional di disk privat)
+Supervisor / dospem     → pantau per kloter, tab Rencana (Gantt + goals), Activity monitor, komentar, koreksi posisi, unduh Excel / cetak PDF
 ```
 
-## Alur penilaian akhir
+## Alur penilaian akhir (standar kampus)
 
 ```
-Supervisor mengisi rubrik → SaveAssessment    (draft boleh sebagian; nilai akhir = jumlah nilai x bobot; seminar: dospem)
-Supervisor mengirim       → SaveAssessment    (semua aspek wajib terisi; status "menunggu validasi", tidak bisa diubah lagi)
+Admin                     → AssessmentStandardController (pertanyaan per kategori, skala nilai, huruf mutu;
+                                                          pertanyaan yang sudah dipakai diubah sebagai versi baru)
+Kaprodi                   → AssessmentWeightController   (bobot hard skill / soft skill / attitude, total 100%)
+Supervisor (akhir KP)     → SaveAssessment    (dibuka 14 hari sebelum KP berakhir; klik skala per pertanyaan;
+                                               nilai kategori = rata-rata, nilai akhir = jumlah nilai kategori x bobot)
+Supervisor mengirim       → SaveAssessment    (semua pertanyaan wajib dinilai; bobot ikut disimpan; tidak bisa diubah lagi)
 Dosen pembimbing          → ReviewAssessment  (validasi: nilai + huruf mutu + versi skala dikunci permanen
                                                | kembalikan: wajib catatan, kembali ke draft, supervisor memperbaiki)
-Mahasiswa               → dashboard menampilkan nilai hanya setelah tervalidasi
+Dosen pembimbing          → FinalizeResult    (Diterima / Tidak; nilai diambil dari penilaian tervalidasi; KP ditutup)
+Mahasiswa                 → dashboard menampilkan nilai hanya setelah tervalidasi
 ```
 
 Baris penilaian dikunci (`lockForUpdate`) saat diputuskan, jadi dua klik bersamaan tidak memproses dua kali.

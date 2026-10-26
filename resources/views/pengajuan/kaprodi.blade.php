@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Persetujuan KP</h1>
-            <p class="page-sub">Sudah diverifikasi biro, atau seminar.</p>
+            <p class="page-sub">Sudah diverifikasi TU Fakultas.</p>
         </div>
     </div>
 
@@ -14,43 +14,34 @@
         <div class="card">
             <div class="empty">
                 <strong>Tidak ada pengajuan yang menunggu</strong>
-                Pengajuan magang muncul setelah diverifikasi Biro Kerjasama; seminar langsung muncul di sini.
+                Pengajuan muncul di sini setelah perusahaannya diverifikasi TU Fakultas.
             </div>
         </div>
     @else
         @foreach ($waiting as $item)
-            @php($biro = $item->approvals->firstWhere('step', \App\Models\InternshipApproval::STEP_BIRO))
+            @php($verified = $item->approvals->firstWhere('step', \App\Models\InternshipApproval::STEP_VERIFY))
             <section class="card">
                 <div class="card-head">
                     <div>
                         <h2 class="card-title" title="{{ $item->student->name }}">{{ $item->student->listName() }}</h2>
-                        <p class="card-sub">{{ $item->student->nim }} · {{ $item->programTypeLabel() }}</p>
+                        <p class="card-sub">{{ $item->student->nim }}{{ $item->position ? ' · '.$item->position : '' }}</p>
                     </div>
-                    @if ($item->isSeminar())
-                        <x-chip tone="purple">Seminar</x-chip>
-                    @else
-                        <x-chip tone="green">Terverifikasi biro</x-chip>
-                    @endif
+                    <x-chip tone="green">Terverifikasi TU</x-chip>
                 </div>
 
                 <div class="card-body">
                     <dl class="kv">
-                        <div><dt>{{ $item->isSeminar() ? 'Kegiatan' : 'Tempat' }}</dt><dd>{{ $item->isSeminar() ? \Illuminate\Support\Str::limit($item->topic, 40) : $item->placeName() }}</dd></div>
+                        <div><dt>Tempat</dt><dd>{{ $item->placeName() }}</dd></div>
                         <div><dt>Periode</dt><dd>{{ $item->periodLabel() }}</dd></div>
                     </dl>
                     <x-detail>
                         <dl>
                             <div><dt>Mahasiswa</dt><dd>{{ $item->student->name }} · {{ $item->student->nim }} · <x-academic :user="$item->student" compact /></dd></div>
-                            @if ($item->isSeminar())
-                                <div><dt>Kegiatan</dt><dd>{{ $item->topic }}</dd></div>
-                                <div><dt>Penyelenggara</dt><dd>{{ $item->organizer ?? '–' }}</dd></div>
-                            @else
                                 <div><dt>Penempatan</dt><dd>{{ $item->placeName() }}@if ($item->placeDetail()) · {{ $item->placeDetail() }}@endif</dd></div>
                                 <div><dt>Bidang</dt><dd>{{ $item->company?->industry ?? '–' }}</dd></div>
                                 <div><dt>Alamat</dt><dd>{{ $item->company?->address ?? '–' }}@if ($item->company?->city), {{ $item->company->city }}@endif</dd></div>
                                 <div><dt>Company Supervisor</dt><dd>{{ $item->supervisor_name ?? '–' }}{{ $item->supervisor_title ? ' · '.$item->supervisor_title : '' }}{{ $item->supervisor_email ? ' · '.$item->supervisor_email : '' }}</dd></div>
-                                <div><dt>Diverifikasi</dt><dd>{{ $biro?->reviewer?->name ?? '–' }}@if ($biro?->reviewed_at), {{ $biro->reviewed_at->locale('id')->translatedFormat('j F Y') }}@endif</dd></div>
-                            @endif
+                                <div><dt>Diverifikasi</dt><dd>{{ $verified?->reviewer?->name ?? '–' }}@if ($verified?->reviewed_at), {{ $verified->reviewed_at->locale('id')->translatedFormat('j F Y') }}@endif</dd></div>
                         </dl>
                     </x-detail>
 

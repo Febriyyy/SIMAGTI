@@ -1,8 +1,10 @@
 {{-- Ringkasan nilai akhir satu penilaian. Variabel: $assessment (boleh null) --}}
 @php
     $version = $assessment?->grade_scale_version ?? \App\Support\Grading::currentVersion();
-    $scale = \App\Models\GradeScale::where('version', $version)->orderByDesc('min_score')->get();
-    $letter = $assessment?->letter();
+    $scale = collect(\App\Support\Grading::scale($version))->map(fn ($min, $grade) => (object) ['grade' => $grade, 'min_score' => $min])->values();
+    $complete = $assessment && ($assessment->status !== 'draft' || $assessment->breakdown()['complete']);
+    // Draft yang belum semua pertanyaannya dinilai belum punya perkiraan nilai yang berarti
+    $letter = $complete ? $assessment->letter() : null;
 @endphp
 <section class="card">
     <div class="card-head">
@@ -20,13 +22,13 @@
                 <span class="score-number">{{ \App\Support\Num::short($assessment->final_score) }}<small>/100</small></span>
             </div>
         @else
-            <p class="cell-title" style="margin-bottom: var(--space-1)">Belum ada nilai</p>
+            <p class="cell-title" style="margin-bottom: var(--space-1)">{{ $assessment ? 'Belum semua pertanyaan dinilai' : 'Belum ada nilai' }}</p>
         @endif
         <p class="hint" style="margin-bottom: var(--space-4)">
             @if ($assessment?->isValidated())
                 Dikunci {{ $assessment->validated_at->locale('id')->translatedFormat('j M Y') }} oleh {{ $assessment->validator?->name ?? 'dosen pembimbing' }} · skala versi {{ $assessment->grade_scale_version }}.
             @else
-                @if ($assessment && ! $assessment->isValidated() && $letter) Huruf di atas masih perkiraan. @endif Nilai akhir = jumlah (nilai aspek × bobot). Huruf mutu baru dikunci saat dosen pembimbing memvalidasi.
+                @if ($assessment && ! $assessment->isValidated() && $letter) Huruf di atas masih perkiraan. @endif Nilai akhir = jumlah (rata-rata tiap kategori × bobot kategori). Huruf mutu dikunci saat dosen pembimbing memvalidasi.
             @endif
         </p>
         <dl class="kv kv-tight">

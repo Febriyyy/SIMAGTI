@@ -9,7 +9,7 @@ use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** Masuk, akses per peran, bukti task, komentar, dan meeting (KP v2). */
+/** Masuk, akses per peran, bukti task, komentar, dan meeting. */
 class KpFlowTest extends TestCase
 {
     use RefreshDatabase;
@@ -38,8 +38,8 @@ class KpFlowTest extends TestCase
 
     public function test_setiap_peran_bisa_masuk_dan_melihat_dashboard(): void
     {
-        $emails = ['mahasiswa@kp.test', 'supervisor@kp.test', 'dospem@kp.test', 'kaprodi@kp.test', 'biro@kp.test', 'tu@kp.test',
-                   'gilang@kp.test', 'nadia@kp.test', 'citra@kp.test', 'salsa@kp.test'];
+        $emails = ['mahasiswa@kp.test', 'supervisor@kp.test', 'dospem@kp.test', 'kaprodi@kp.test', 'tu@kp.test', 'admin@kp.test',
+            'gilang@kp.test', 'nadia@kp.test', 'citra@kp.test', 'salsa@kp.test'];
 
         foreach ($emails as $email) {
             $this->post('/login', ['email' => $email, 'password' => 'password'])->assertRedirect('/dashboard');
@@ -51,12 +51,15 @@ class KpFlowTest extends TestCase
     public function test_menu_mengikuti_peran(): void
     {
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/dashboard')
-            ->assertSee('Status KP')->assertSee('Silabus')->assertSee('Kegiatan')->assertSee('Timesheet');
+            ->assertSee('Status KP')->assertSee('Kegiatan')->assertSee('Timesheet')->assertDontSee('Silabus')->assertDontSee('Evaluasi Bulanan');
 
         $this->actingAs($this->user('supervisor@kp.test'))->get('/dashboard')
             ->assertSee('Mahasiswa Magang')->assertSee('Penilaian Akhir')->assertDontSee('Timesheet');
 
-        $this->actingAs($this->user('tu@kp.test'))->get('/dashboard')->assertSee('Aktivasi Supervisor');
+        $this->actingAs($this->user('tu@kp.test'))->get('/dashboard')->assertSee('Aktivasi Supervisor')->assertSee('Verifikasi KP Mandiri')->assertSee('Dokumen KP');
+        $this->actingAs($this->user('dospem@kp.test'))->get('/dashboard')->assertSee('Aktivitas')->assertDontSee('Kuesioner');
+        $this->actingAs($this->user('kaprodi@kp.test'))->get('/dashboard')->assertSee('Bobot Penilaian')->assertDontSee('Rekognisi');
+        $this->actingAs($this->user('admin@kp.test'))->get('/dashboard')->assertSee('Standar Penilaian')->assertSee('Log Aktivitas');
     }
 
     public function test_akun_nonaktif_tidak_bisa_masuk(): void
@@ -77,14 +80,16 @@ class KpFlowTest extends TestCase
         $supervisor = $this->user('supervisor@kp.test');
         $this->actingAs($supervisor)->get('/kegiatan')->assertForbidden();
         $this->actingAs($supervisor)->get('/timesheet')->assertForbidden();
-        $this->actingAs($supervisor)->get('/silabus')->assertForbidden();
+        $this->actingAs($supervisor)->get('/kaprodi/bobot')->assertForbidden();
         $this->actingAs($supervisor)->post('/kegiatan/tugas', ['title' => 'Tidak boleh'])->assertForbidden();
     }
 
-    public function test_hanya_kaprodi_yang_melihat_log_aktivitas(): void
+    public function test_hanya_admin_yang_melihat_log_aktivitas(): void
     {
-        $this->actingAs($this->user('supervisor@kp.test'))->get('/log-aktivitas')->assertForbidden();
-        $this->actingAs($this->user('kaprodi@kp.test'))->get('/log-aktivitas')->assertOk();
+        $this->actingAs($this->user('supervisor@kp.test'))->get('/admin/log-aktivitas')->assertForbidden();
+        $this->actingAs($this->user('kaprodi@kp.test'))->get('/admin/log-aktivitas')->assertForbidden();
+        $this->actingAs($this->user('admin@kp.test'))->get('/admin/log-aktivitas')->assertOk()->assertSee('Menambah task PMS-6');
+        $this->actingAs($this->user('admin@kp.test'))->get('/admin/log-aktivitas?peran=admin')->assertOk()->assertDontSee('Menambah task PMS-6');
     }
 
     public function test_mahasiswa_bisa_mengirim_bukti_untuk_task_sendiri(): void
@@ -164,17 +169,11 @@ class KpFlowTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_dosen_pembimbing_mengatur_meeting_seminar(): void
+    public function test_dosen_pembimbing_tidak_mengatur_meeting(): void
     {
-        $gilang = Internship::where('student_id', $this->user('gilang@kp.test')->id)->firstOrFail();
         $rina = Internship::where('student_id', $this->user('mahasiswa@kp.test')->id)->firstOrFail();
 
-        $this->actingAs($this->user('dospem@kp.test'))
-            ->post('/meeting', ['magang' => [$gilang->id], 'day' => 'jumat', 'time' => '13:00', 'url' => 'https://meet.google.com/sem-inar'])
-            ->assertRedirect('/dashboard');
-        $this->assertDatabaseHas('weekly_meetings', ['internship_id' => $gilang->id, 'day' => 'jumat']);
-
-        // Magang dijadwalkan Company Supervisor, bukan dospem
+        // Meeting dijadwalkan Company Supervisor, bukan dospem
         $this->actingAs($this->user('dospem@kp.test'))
             ->post('/meeting', ['magang' => [$rina->id], 'day' => 'jumat', 'time' => '13:00', 'url' => 'https://meet.google.com/x'])
             ->assertForbidden();

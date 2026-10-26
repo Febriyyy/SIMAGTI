@@ -57,11 +57,11 @@
                                 </td>
                                 <td>
                                     <span class="c-main" title="{{ $internship->placeName() }}">{{ $internship->placeName() }}</span>
-                                    <span class="c-sub" title="{{ $internship->isSeminar() ? '' : 'Company Supervisor: '.($internship->supervisor?->name ?? 'belum aktif') }}">{{ $internship->isSeminar() ? $internship->programTypeLabel() : ($internship->supervisor ? 'Supervisor '.$internship->supervisor->listName() : 'Supervisor belum aktif') }}</span>
+                                    <span class="c-sub" title="Company Supervisor: {{ $internship->supervisor?->name ?? 'belum aktif' }}">{{ $internship->supervisor ? 'Supervisor '.$internship->supervisor->listName() : 'Supervisor belum aktif' }}</span>
                                 </td>
                                 <td class="hide-md">
                                     <span class="c-main c-plain" title="{{ $internship->lecturer?->name }}">{{ $internship->lecturer?->listName() ?? '–' }}</span>
-                                    <span class="c-sub">{{ $internship->programTypeLabel() }} · {{ $internship->track === 'mandiri' ? 'mandiri' : 'kampus' }}</span>
+                                    <span class="c-sub">{{ $internship->track === 'mandiri' ? 'Pengajuan mandiri' : 'Penempatan kampus' }}</span>
                                 </td>
                                 <td><x-progress :value="$internship->percent()" /></td>
                                 <td><x-chip :tone="$internship->statusTone()">{{ $internship->statusLabel() }}</x-chip></td>

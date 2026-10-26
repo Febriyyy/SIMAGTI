@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AssessmentStandard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ class RubricAspect extends Model
 {
     protected $fillable = [
         'rubric_id',
+        'category',
         'name',
         'description',
         'kind',
@@ -32,6 +34,11 @@ class RubricAspect extends Model
     public function scores(): HasMany
     {
         return $this->hasMany(AssessmentScore::class);
+    }
+
+    public function categoryLabel(): string
+    {
+        return AssessmentStandard::categoryLabel($this->category);
     }
 
     public function isText(): bool

@@ -23,9 +23,19 @@
                 <p class="page-sub">{{ $internship->placeName() }} · ritme {{ mb_strtolower(\App\Models\Internship::CADENCES[$internship->cadence]) }} · {{ $currentPeriod->label }}</p>
             </div>
             @if ($canEdit)
-                <button type="button" class="btn btn-primary" data-open="dlg-task"><x-ikon name="plus" :size="18" /> Task baru</button>
+                @if ($plans->isEmpty())
+                    <a href="{{ route('timesheet.index') }}" class="btn btn-primary"><x-ikon name="calendar" :size="18" /> Isi rencana</a>
+                @else
+                    <button type="button" class="btn btn-primary" data-open="dlg-task"><x-ikon name="plus" :size="18" /> Task baru</button>
+                @endif
             @endif
         </div>
+
+        @if ($canEdit && $plans->isEmpty())
+            <div class="alert alert-warning" role="status"><strong>Isi rencana kegiatan dulu.</strong> Task dibuat di bawah rencana pada <a href="{{ route('timesheet.index') }}">Timesheet</a>.</div>
+        @endif
+
+        @include('kegiatan._goals')
 
         <div class="toolbar board-toolbar">
             <div class="segmented" role="tablist" aria-label="Tampilan">
@@ -38,7 +48,6 @@
                 @if ($summary['overdue'] > 0)
                     <span class="is-late"><strong>{{ $summary['overdue'] }}</strong> lewat tenggat</span>
                 @endif
-                <span><strong>{{ \App\Support\Num::short($summary['hours']) }}</strong> jam</span>
             </div>
             <div class="toolbar-actions">
                 @if ($canEdit)
@@ -66,13 +75,14 @@
 
         @if ($canEdit)
             {{-- Task baru --}}
-            <dialog id="dlg-task" class="dialog">
+            <dialog id="dlg-task" class="dialog" @if ($plans->isNotEmpty() && (request('baru') || ($errors->any() && old('_task')))) data-autoopen @endif>
                 <form method="POST" action="{{ route('kegiatan.tugas.store') }}" class="dialog-body">
                     @csrf
                     <div class="dialog-head">
                         <h2 class="card-title">Task baru</h2>
                         <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                     </div>
+                    <input type="hidden" name="_task" value="1">
                     @include('kegiatan._task-form', ['task' => null])
                     <div class="dialog-foot">
                         <label class="check"><input type="checkbox" name="buka" value="1"> Buka task setelah dibuat</label>

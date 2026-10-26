@@ -14,8 +14,7 @@
                     <th>Status</th>
                     <th>Prioritas</th>
                     <th>Tenggat</th>
-                    <th class="col-num">Jam</th>
-                    <th>Silabus</th>
+                    <th>Rencana</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,8 +32,7 @@
                         <td><x-chip :tone="$task->column?->tone() ?? $task->statusTone()">{{ $task->column?->name ?? $task->statusLabel() }}</x-chip></td>
                         <td><span class="prio prio-{{ $task->priority }}"><x-ikon name="flag" :size="14" :fill="in_array($task->priority, ['urgent', 'high'], true)" /> {{ $task->priorityLabel() }}</span></td>
                         <td @class(['is-late' => $task->isOverdue()])>{{ $task->due_date?->locale('id')->translatedFormat('j M Y') ?? '–' }}</td>
-                        <td class="col-num">{{ ($task->logged_hours ?? 0) > 0 ? \App\Support\Num::short((float) $task->logged_hours) : '–' }}</td>
-                        <td>{{ $task->syllabusItem?->categoryLabel() ?? '–' }}</td>
+                        <td><span class="truncate" title="{{ $task->plan?->title }}">{{ $task->plan ? \Illuminate\Support\Str::limit($task->plan->title, 28) : '–' }}</span></td>
                     </tr>
                 @endforeach
             </tbody>

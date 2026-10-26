@@ -22,10 +22,7 @@
                     <label for="name" class="label">Nama perusahaan</label>
                     <input id="name" name="name" type="text" class="input" value="{{ old('name', $company?->name) }}" maxlength="150" required>
                 </div>
-                <div>
-                    <label for="industry" class="label">Bidang usaha</label>
-                    <input id="industry" name="industry" type="text" class="input" value="{{ old('industry', $company?->industry) }}" maxlength="100">
-                </div>
+                <x-industry-select :value="$company?->industry" />
                 <div>
                     <label for="city" class="label">Kota</label>
                     <input id="city" name="city" type="text" class="input" value="{{ old('city', $company?->city) }}" maxlength="100">
@@ -43,8 +40,8 @@
                     <input id="phone" name="phone" type="text" class="input" value="{{ old('phone', $company?->phone) }}" maxlength="20">
                 </div>
                 <div class="span-all">
-                    <label for="website" class="label">Website</label>
-                    <input id="website" name="website" type="url" class="input" value="{{ old('website', $company?->website) }}" maxlength="200" placeholder="https://">
+                    <label for="website" class="label">Website <span class="label-opt">(opsional)</span></label>
+                    <input id="website" name="website" type="text" inputmode="url" class="input" value="{{ old('website', $company?->website) }}" maxlength="200" placeholder="perusahaan.co.id">
                 </div>
                 <div class="span-all">
                     <label for="divisions" class="label">Tambah divisi</label>

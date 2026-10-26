@@ -13,14 +13,14 @@ Website untuk memantau kerja praktik (magang) mahasiswa, dibuat untuk **pameran 
 
 | Peran | Tugas utama |
 |---|---|
-| Mahasiswa | Mengajukan KP (Magang: KP Industri / MBKM; Seminar), menyusun silabus, membuat task di board, mengisi timesheet, mengirim bukti |
-| Company Supervisor (perusahaan) | Memantau kegiatan dan timesheet, menyetujui silabus, mengatur meeting, mengoreksi posisi, menilai |
-| Dosen pembimbing | Memantau bimbingan, memvalidasi penilaian; untuk seminar sekaligus peninjau |
-| Kaprodi (Koordinator KP) | Menyetujui pengajuan, menunjuk dosen, mengelola mahasiswa dan penempatan |
-| Biro kerjasama | Mengelola perusahaan dan memverifikasi perusahaan pengajuan magang |
-| TU Fakultas | Mengaktifkan Company Supervisor dari data pengajuan mahasiswa |
+| Mahasiswa | Mengajukan KP mandiri (satu jenis KP), menyusun rencana kegiatan (Gantt) dan goals, membuat task di bawah rencana, mencatat kegiatan harian, mengirim bukti |
+| Company Supervisor (perusahaan) | Memantau kegiatan dan activity monitor, mengatur meeting, mengoreksi posisi, menilai di akhir periode KP (klik skala standar kampus) |
+| Dosen pembimbing | Memantau kegiatan dan activity monitor, mengonfirmasi bimbingan, memvalidasi penilaian, memutuskan hasil KP |
+| Kaprodi (Koordinator KP) | Menyetujui pengajuan, menunjuk dosen, mengelola mahasiswa dan penempatan, mengatur bobot kategori penilaian (persen) |
+| TU Fakultas | Memverifikasi KP mandiri dan perusahaan, menerbitkan surat pengantar, memeriksa surat balasan, mengelola perusahaan, mengaktifkan Company Supervisor |
+| Admin | Mengubah peran dan menonaktifkan akun, mengatur standar penilaian (pertanyaan, skala nilai, huruf mutu), melihat log aktivitas |
 
-Sejak v7 (KP v2) peran mentor dan ketua divisi digabung menjadi Company Supervisor.
+Sejak v7 (KP v2) peran mentor dan ketua divisi digabung menjadi Company Supervisor. Sejak v8 (revisi dosen) peran Biro Kerjasama dihapus dan diganti Admin.
 
 Alumni sengaja ditunda ke tahap update.
 
@@ -87,7 +87,25 @@ Untuk presentasi progres ke dosen pada 19 Oktober:
 | v7: KP v2 tahap 1 (peran baru, jalur KP, silabus, board, timesheet, pemantauan per kloter, unduhan) | 163 tes lolos, audit tampilan 1280px dan 390px (SQLite). Perlu `migrate:fresh --seed` di Laragon |
 | v7: KP v2 tahap 2 (notifikasi, konfirmasi supervisor, evaluasi bulanan, bimbingan, dokumen, hasil, perubahan, rekognisi, kuesioner) | 182 tes lolos, audit tampilan 1280px dan 390px (SQLite). Perlu `migrate:fresh --seed` |
 
-Jumlah tes sekarang: 182 (ApplicationFlow 25, StageTwoFlow 16, StageTwoPages 3, Schema 19, MasterData 16, Api 16, KpFlow 15, AssessmentFlow 14, ActivityBoard 13, DashboardData 12, Monitor 7, Syllabus 6, Timesheet 6, TaskEvidenceFile 6, TaskAttachment 4, DataSeeder 2, Example 2).
+| v8: revisi dosen (18 poin, lihat di bawah) | 190 tes lolos, dicek di browser 1280px dan 390px (SQLite). Perlu `migrate:fresh --seed` |
+
+Jumlah tes sekarang: 190 (ApplicationFlow 25, Schema 19, AssessmentFlow 18, MasterData 16, Api 16, KpFlow 15, ActivityBoard 14, DashboardData 12, StageTwoFlow 11, Timesheet 10, Monitor 7, Admin 6, TaskEvidenceFile 6, StageTwoPages 4, TaskAttachment 4, ActivityMonitor 3, DataSeeder 2, Example 2).
+
+### v8: revisi dosen (27 Oktober 2026)
+1. Pengajuan KP untuk mahasiswa yang belum mendapat tempat dari kampus: **satu jenis KP**, tidak ada lagi MBKM dan Seminar (rekognisi SKS, pakta integritas, logbook 450 jam, nilai 60/40 ikut dihapus).
+2. **Bidang usaha** berupa pilihan (Pendidikan, Keuangan, Teknologi dan IT, Industri / Manufaktur, Perdagangan) + "Lainnya" yang diisi sendiri (`Company::INDUSTRIES`, `<x-industry-select>`), juga di form perusahaan TU.
+3. **Website perusahaan opsional** (boleh tanpa `https://`).
+4. Verifikasi KP mandiri dan **surat pengantar hanya oleh TU Fakultas**.
+5. **Kemajuan KP bisa diklik**: setiap langkah menaut ke halaman mahasiswa terkait (dokumen, timesheet, kegiatan, bimbingan), tampil di Status KP dan kartu "Kemajuan KP" di dashboard mahasiswa (`KpProgress` kunci `url`, `cta`).
+6–8. **Penilaian akhir standar kampus**: pertanyaan per kategori hard skill / soft skill / attitude (admin), skala nilai yang diklik supervisor (admin), huruf mutu A 80 · B+ 74 · B 68 · C+ 62 · C 56 · D 45 (admin), bobot kategori dalam persen 35/35/30 (kaprodi). Nilai tampil sebagai persen bobot dan angka (`App\Support\AssessmentStandard`).
+9. **Admin**: ubah peran (dikunci bila akun masih terhubung data KP), aktifkan / nonaktifkan akun (sesi akun nonaktif langsung berakhir), minimal satu admin aktif.
+10, 13. **Activity monitor** (`/aktivitas` dan tab Aktivitas di detail mahasiswa) untuk supervisor, dosen pembimbing, dan kaprodi; menandai mahasiswa yang belum ada aktivitas (`App\Support\ActivityFeed`).
+11, 16. **Timesheet = rencana kegiatan dulu**: mahasiswa menyusun kegiatan per minggu / bulan (nama, tanggal mulai–selesai) dalam tampilan **Gantt** (`App\Support\Gantt`), baru bisa membuat task (task wajib punya rencana).
+12. **Goals** di halaman Kegiatan; kolom **Review** dihapus dari board; supervisor menilai **di akhir periode KP** (dibuka 14 hari sebelum KP berakhir).
+14. **Biro Kerjasama dihapus**, Admin ditambahkan (migrasi mengubah akun biro menjadi admin).
+15. **Silabus dihapus** dari Kemajuan KP (dan seluruh fiturnya).
+17. **Durasi (jam) dihapus** dari catatan kegiatan, task, dashboard, dan unduhan.
+18. **Evaluasi bulanan dihapus**.
 
 ### v7: KP v2 tahap 1 (23 Oktober 2026)
 - Peran: Company Supervisor (gabungan mentor + ketua divisi, hanya memantau) dan TU Fakultas (aktivasi supervisor per kelompok email, satu undangan untuk banyak mahasiswa, tautkan akun lama, koreksi email).
@@ -112,28 +130,29 @@ Prinsipnya: pihak perusahaan sesedikit mungkin direpotkan. Supervisor hanya konf
 
 ## 6. Belum dikerjakan
 
+Catatan v8: kuesioner milik dosen diganti standar penilaian kampus yang diatur admin.
+
 Ditunda atas keputusan Anda: persetujuan timesheet per periode oleh supervisor (agar perusahaan tidak terbebani) dan laporan IKU / akreditasi.
 KP v2 tahap 3: laporan per bab dengan persetujuan, dokumen Word dari template kampus (lampiran dan MB.xx), presentasi dan pengesahan, pengingat Google Calendar, audit privasi.
 
 Dari rencana awal:
 
-- Input nilai sidang, halaman skala nilai kaprodi
+- Input nilai sidang
 - UI konversi jadi karyawan
 - Sertifikat PDF + QR
 - Dokumen dan template, surat pengantar
 - Lowongan magang, skill, template task (UI)
 - Ekspor Excel/PDF
 - Email notifikasi
-- Halaman rubrik (kaprodi mengubah aspek dan bobot)
 
 Urutan yang dikorbankan jika waktu mepet: lowongan, template laporan dan surat, ekspor laporan, status konversi lanjutan.
 
 ## 7. Pertanyaan yang masih terbuka
 
-- Skala nilai C, D, E sesuai aturan kampus?
 - Maksud dosen dengan "40%": jumlah fitur, jumlah halaman, atau alur utama?
 - Maksud pertanyaan dosen soal API: arsitektur, integrasi, atau penyediaan data?
 - Apakah mahasiswa boleh melihat status rekomendasi lebih awal (usul saya: hanya setelah "ditawari")?
+- Apakah rencana kegiatan perlu disetujui supervisor? (v8: tidak, supaya perusahaan tidak terbebani; supervisor cukup melihat Gantt di tab Rencana.)
 
 ## 8. Akun demo
 

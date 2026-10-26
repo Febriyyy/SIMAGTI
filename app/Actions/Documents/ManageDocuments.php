@@ -18,8 +18,8 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Dokumen KP. Tidak ada dokumen yang menghentikan alur:
- * surat balasan perusahaan dan pakta integritas boleh menyusul sampai batas waktu,
- * keterlambatan hanya ditandai (pengingat ke mahasiswa, daftar di biro).
+ * surat balasan perusahaan boleh menyusul sampai batas waktu,
+ * keterlambatan hanya ditandai (pengingat ke mahasiswa, daftar di TU).
  */
 class ManageDocuments
 {
@@ -30,32 +30,22 @@ class ManageDocuments
     /** Saat KP mulai berjalan: siapkan dokumen yang wajib diunggah beserta batas waktunya. */
     public static function ensureFor(Internship $internship): void
     {
-        if ($internship->isSeminar()) {
-            return;
-        }
-
         $due = $internship->start_date->copy()->addDays((int) Campus::rule('reply_letter_days'))->toDateString();
-        $types = [InternshipDocument::REPLY];
-        if ($internship->isMbkm()) {
-            $types[] = InternshipDocument::PACT;
-        }
 
-        foreach ($types as $type) {
-            $doc = InternshipDocument::firstOrCreate(
-                ['internship_id' => $internship->id, 'type' => $type],
-                ['status' => 'menunggu', 'due_on' => $due]
-            );
-            if ($doc->due_on === null) {
-                $doc->update(['due_on' => $due]);
-            }
+        $doc = InternshipDocument::firstOrCreate(
+            ['internship_id' => $internship->id, 'type' => InternshipDocument::REPLY],
+            ['status' => 'menunggu', 'due_on' => $due]
+        );
+        if ($doc->due_on === null) {
+            $doc->update(['due_on' => $due]);
         }
     }
 
     /** Mahasiswa meminta surat pengantar ke TU Fakultas. */
     public function requestLetter(User $student, Internship $internship): InternshipDocument
     {
-        if ($internship->isSeminar() || ! in_array($internship->status, ['diajukan', 'berjalan'], true)) {
-            throw ValidationException::withMessages(['dokumen' => 'Surat pengantar hanya untuk KP magang yang sedang diajukan atau berjalan.']);
+        if (! in_array($internship->status, ['diajukan', 'berjalan'], true)) {
+            throw ValidationException::withMessages(['dokumen' => 'Surat pengantar hanya untuk KP yang sedang diajukan atau berjalan.']);
         }
 
         $existing = $internship->document(InternshipDocument::LETTER);
@@ -106,14 +96,11 @@ class ManageDocuments
         return sprintf('%03d/%s/%s/%d', $last + 1, Campus::get('campus.letter_code'), $roman, $year);
     }
 
-    /** Mahasiswa mengunggah surat balasan atau pakta integritas (PDF/JPG/PNG, disimpan privat). */
+    /** Mahasiswa mengunggah surat balasan perusahaan (PDF/JPG/PNG, disimpan privat). */
     public function upload(User $student, Internship $internship, string $type, UploadedFile $file): InternshipDocument
     {
-        if (! in_array($type, [InternshipDocument::REPLY, InternshipDocument::PACT], true) || $internship->isSeminar()) {
+        if ($type !== InternshipDocument::REPLY) {
             throw ValidationException::withMessages(['berkas' => 'Jenis dokumen tidak dikenal.']);
-        }
-        if ($type === InternshipDocument::PACT && ! $internship->isMbkm()) {
-            throw ValidationException::withMessages(['berkas' => 'Pakta integritas hanya untuk MBKM Mandiri.']);
         }
 
         $doc = $internship->document($type);
@@ -145,13 +132,13 @@ class ManageDocuments
             }
 
             ActivityLog::record('dokumen.unggah', 'Mengunggah '.mb_strtolower($doc->label()), $doc);
-            Notify::send(Notify::role('biro'), mb_strtolower($doc->label()).' '.$internship->student->name.' perlu diperiksa', null, route('biro.dokumen'), 'file');
+            Notify::send(Notify::role('tu'), mb_strtolower($doc->label()).' '.$internship->student->name.' perlu diperiksa', null, route('tu.dokumen'), 'file');
 
             return $doc;
         });
     }
 
-    /** Biro memeriksa unggahan: diterima, atau diminta unggah ulang dengan catatan. */
+    /** TU Fakultas memeriksa unggahan: diterima, atau diminta unggah ulang dengan catatan. */
     public function review(User $actor, InternshipDocument $doc, bool $accept, ?string $note): InternshipDocument
     {
         if ($doc->status !== 'diunggah') {

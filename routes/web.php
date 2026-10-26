@@ -1,42 +1,45 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ActivityMonitorController;
+use App\Http\Controllers\ActivityPlanController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentReviewController;
+use App\Http\Controllers\AssessmentStandardController;
+use App\Http\Controllers\AssessmentWeightController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\BiroVerificationController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\CreditRecognitionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentQueueController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\GuidanceController;
 use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\KaprodiApprovalController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitorController;
-use App\Http\Controllers\MonthlyController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTaskController;
 use App\Http\Controllers\SupervisorActivationController;
 use App\Http\Controllers\SupervisorConfirmationController;
-use App\Http\Controllers\SyllabusController;
 use App\Http\Controllers\TaskAttachmentController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskDetailController;
 use App\Http\Controllers\TaskEvidenceController;
 use App\Http\Controllers\TimesheetController;
+use App\Http\Controllers\VerificationController;
+use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Support\Facades\Route;
 
@@ -56,7 +59,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', EnsureActiveAccount::class])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
@@ -85,14 +88,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/status-kp', [InternshipApplicationController::class, 'index'])->name('kp.status');
         Route::post('/status-kp', [InternshipApplicationController::class, 'store'])->middleware('throttle:10,1')->name('kp.apply');
 
-        // Silabus
-        Route::get('/silabus', [SyllabusController::class, 'index'])->name('silabus.index');
-        Route::post('/silabus', [SyllabusController::class, 'store'])->name('silabus.store');
-        Route::patch('/silabus/{item}', [SyllabusController::class, 'update'])->whereNumber('item')->name('silabus.update');
-        Route::delete('/silabus/{item}', [SyllabusController::class, 'destroy'])->whereNumber('item')->name('silabus.destroy');
-        Route::post('/silabus/kirim', [SyllabusController::class, 'submit'])->name('silabus.submit');
-        Route::post('/silabus/ubah', [SyllabusController::class, 'reopen'])->name('silabus.reopen');
-
         // Kegiatan: board, list, proyek, kolom, task
         Route::get('/kegiatan', [StudentTaskController::class, 'index'])->name('kegiatan.index');
         Route::patch('/kegiatan/pengaturan', [StudentTaskController::class, 'settings'])->name('kegiatan.pengaturan');
@@ -105,6 +100,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/kegiatan/kolom/{column}', [BoardColumnController::class, 'destroy'])->whereNumber('column')->name('kegiatan.kolom.destroy');
         Route::post('/kegiatan/proyek', [ProjectController::class, 'store'])->name('kegiatan.proyek.store');
         Route::patch('/kegiatan/proyek/{project}', [ProjectController::class, 'update'])->whereNumber('project')->name('kegiatan.proyek.update');
+        Route::post('/kegiatan/goals', [GoalController::class, 'store'])->name('goal.store');
+        Route::patch('/kegiatan/goals/{goal}', [GoalController::class, 'update'])->whereNumber('goal')->name('goal.update');
+        Route::delete('/kegiatan/goals/{goal}', [GoalController::class, 'destroy'])->whereNumber('goal')->name('goal.destroy');
         Route::post('/tugas/{task}/checklist', [ChecklistController::class, 'store'])->whereNumber('task')->name('checklist.store');
         Route::patch('/tugas/{task}/checklist/{item}', [ChecklistController::class, 'update'])
             ->whereNumber(['task', 'item'])->scopeBindings()->name('checklist.update');
@@ -116,17 +114,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/tugas/{task}/bukti/{evidence}', [TaskEvidenceController::class, 'destroy'])
             ->whereNumber(['task', 'evidence'])->scopeBindings()->name('tugas.bukti.destroy');
 
-        // Timesheet / logbook
+        // Timesheet: rencana kegiatan (Gantt) diisi dulu, lalu catatan kegiatan harian
         Route::get('/timesheet', [TimesheetController::class, 'index'])->name('timesheet.index');
+        Route::post('/timesheet/rencana', [ActivityPlanController::class, 'store'])->middleware('throttle:60,1')->name('rencana.store');
+        Route::patch('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'update'])->whereNumber('plan')->name('rencana.update');
+        Route::delete('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'destroy'])->whereNumber('plan')->name('rencana.destroy');
         Route::post('/timesheet', [TimesheetController::class, 'store'])->middleware('throttle:60,1')->name('timesheet.store');
         Route::patch('/timesheet/{entry}', [TimesheetController::class, 'update'])->whereNumber('entry')->name('timesheet.update');
         Route::delete('/timesheet/{entry}', [TimesheetController::class, 'destroy'])->whereNumber('entry')->name('timesheet.destroy');
 
         Route::get('/kegiatan/unduh', [ExportController::class, 'mine'])->name('kegiatan.unduh');
-
-        // Evaluasi bulanan (refleksi)
-        Route::get('/bulanan', [MonthlyController::class, 'index'])->name('bulanan.index');
-        Route::patch('/bulanan/{month}', [MonthlyController::class, 'reflect'])->whereNumber('month')->name('bulanan.update');
 
         // Bimbingan dengan dosen
         Route::get('/bimbingan', [GuidanceController::class, 'index'])->name('bimbingan.index');
@@ -137,12 +134,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/dokumen', [DocumentController::class, 'index'])->name('dokumen.index');
         Route::post('/dokumen/surat-pengantar', [DocumentController::class, 'requestLetter'])->name('dokumen.minta');
         Route::post('/dokumen/unggah/{type}', [DocumentController::class, 'upload'])
-            ->whereIn('type', ['surat_balasan', 'pakta_integritas'])->middleware('throttle:20,1')->name('dokumen.unggah');
+            ->whereIn('type', ['surat_balasan'])->middleware('throttle:20,1')->name('dokumen.unggah');
 
-        // Pengajuan perubahan dan rekognisi SKS
+        // Pengajuan perubahan
         Route::get('/perubahan', [ChangeRequestController::class, 'index'])->name('perubahan.index');
         Route::post('/perubahan', [ChangeRequestController::class, 'store'])->middleware('throttle:10,1')->name('perubahan.store');
-        Route::put('/rekognisi', [CreditRecognitionController::class, 'update'])->name('rekognisi.update');
     });
 
     // ---------- Pemantauan: Company Supervisor, dosen pembimbing, kaprodi ----------
@@ -150,23 +146,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/pantau', [MonitorController::class, 'index'])->name('pantau.index');
         Route::get('/pantau/{internship}', [MonitorController::class, 'show'])->whereNumber('internship')->name('pantau.show');
         Route::get('/pantau/{internship}/unduh', [ExportController::class, 'internship'])->whereNumber('internship')->name('pantau.unduh');
-    });
-
-    Route::middleware(EnsureRole::class.':supervisor,dospem')->group(function () {
-        Route::patch('/pantau/{internship}/silabus', [SyllabusController::class, 'review'])->whereNumber('internship')->name('silabus.review');
-        Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
-
-        // Penilaian bulanan singkat (Company Supervisor; seminar: dosen pembimbing)
-        Route::patch('/pantau/{internship}/bulanan/{month}', [MonthlyController::class, 'review'])
-            ->whereNumber(['internship', 'month'])->name('bulanan.review');
-
-        // Penilaian akhir (sementara): diisi Company Supervisor (seminar: dosen pembimbing)
-        Route::get('/penilaian', [AssessmentController::class, 'index'])->name('penilaian.index');
-        Route::get('/penilaian/{internship}', [AssessmentController::class, 'edit'])->whereNumber('internship')->name('penilaian.edit');
-        Route::put('/penilaian/{internship}', [AssessmentController::class, 'update'])->whereNumber('internship')->name('penilaian.update');
+        // Activity monitor: aktivitas terbaru mahasiswa yang dipantau
+        Route::get('/aktivitas', [ActivityMonitorController::class, 'index'])->name('aktivitas.index');
     });
 
     Route::middleware(EnsureRole::class.':supervisor')->group(function () {
+        // Meeting mingguan diatur Company Supervisor
+        Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
+
+        // Penilaian akhir di akhir periode KP: diisi Company Supervisor dengan skala standar kampus
+        Route::get('/penilaian', [AssessmentController::class, 'index'])->name('penilaian.index');
+        Route::get('/penilaian/{internship}', [AssessmentController::class, 'edit'])->whereNumber('internship')->name('penilaian.edit');
+        Route::put('/penilaian/{internship}', [AssessmentController::class, 'update'])->whereNumber('internship')->name('penilaian.update');
+
         Route::patch('/pantau/{internship}/posisi', [MonitorController::class, 'position'])->whereNumber('internship')->name('pantau.posisi');
         Route::patch('/pantau/{internship}/konfirmasi', [SupervisorConfirmationController::class, 'update'])->whereNumber('internship')->name('supervisor.konfirmasi');
         Route::post('/pantau/{internship}/ganti-supervisor', [ChangeRequestController::class, 'storeBySupervisor'])->whereNumber('internship')->name('perubahan.supervisor');
@@ -179,22 +171,13 @@ Route::middleware('auth')->group(function () {
         Route::patch('/validasi/{internship}', [AssessmentReviewController::class, 'update'])
             ->whereNumber('internship')->middleware('throttle:30,1')->name('validasi.update');
 
-        Route::patch('/pantau/{internship}/bulanan/{month}/catatan', [MonthlyController::class, 'lecturerNote'])
-            ->whereNumber(['internship', 'month'])->name('bulanan.catatan');
-
         Route::get('/antrean-bimbingan', [GuidanceController::class, 'queue'])->name('bimbingan.antrean');
         Route::patch('/antrean-bimbingan/{session}', [GuidanceController::class, 'decide'])->whereNumber('session')->name('bimbingan.decide');
 
-        // Hasil akhir KP dan kuesioner penilaian
+        // Hasil akhir KP
         Route::get('/hasil', [ResultController::class, 'index'])->name('hasil.index');
         Route::get('/hasil/{internship}', [ResultController::class, 'edit'])->whereNumber('internship')->name('hasil.edit');
         Route::patch('/hasil/{internship}', [ResultController::class, 'update'])->whereNumber('internship')->name('hasil.update');
-
-        Route::get('/kuesioner', [QuestionnaireController::class, 'index'])->name('kuesioner.index');
-        Route::post('/kuesioner', [QuestionnaireController::class, 'store'])->name('kuesioner.store');
-        Route::patch('/kuesioner/pakai', [QuestionnaireController::class, 'assign'])->name('kuesioner.assign');
-        Route::get('/kuesioner/{rubric}', [QuestionnaireController::class, 'edit'])->whereNumber('rubric')->name('kuesioner.edit');
-        Route::put('/kuesioner/{rubric}', [QuestionnaireController::class, 'update'])->whereNumber('rubric')->name('kuesioner.update');
     });
 
     // Antrean pengajuan perubahan: Company Supervisor (perpanjangan), kaprodi, TU Fakultas (ganti supervisor)
@@ -217,24 +200,19 @@ Route::middleware('auth')->group(function () {
     });
 
     // ---------- Data master ----------
-    Route::middleware(EnsureRole::class.':biro,kaprodi')->group(function () {
+    Route::middleware(EnsureRole::class.':tu,kaprodi')->group(function () {
         Route::get('/perusahaan', [CompanyController::class, 'index'])->name('perusahaan.index');
         Route::get('/perusahaan/{company}', [CompanyController::class, 'show'])->whereNumber('company')->name('perusahaan.show');
-    });
-
-    Route::middleware(EnsureRole::class.':biro,kaprodi,tu')->group(function () {
         Route::get('/penempatan', [PlacementController::class, 'index'])->name('penempatan.index');
     });
 
-    // Biro kerjasama
-    Route::middleware(EnsureRole::class.':biro')->prefix('biro')->group(function () {
-        Route::get('/verifikasi', [BiroVerificationController::class, 'index'])->name('biro.verifikasi');
-        Route::patch('/verifikasi/{internship}', [BiroVerificationController::class, 'update'])->whereNumber('internship')->name('biro.verifikasi.update');
-        Route::get('/dokumen', [DocumentQueueController::class, 'uploads'])->name('biro.dokumen');
-        Route::patch('/dokumen/{document}', [DocumentQueueController::class, 'review'])->whereNumber('document')->name('biro.dokumen.review');
-    });
+    // TU Fakultas juga memverifikasi perusahaan KP mandiri, memeriksa dokumen, dan mengelola data perusahaan
+    Route::middleware(EnsureRole::class.':tu')->group(function () {
+        Route::get('/tu/verifikasi', [VerificationController::class, 'index'])->name('tu.verifikasi');
+        Route::patch('/tu/verifikasi/{internship}', [VerificationController::class, 'update'])->whereNumber('internship')->name('tu.verifikasi.update');
+        Route::get('/tu/dokumen', [DocumentQueueController::class, 'uploads'])->name('tu.dokumen');
+        Route::patch('/tu/dokumen/{document}', [DocumentQueueController::class, 'review'])->whereNumber('document')->name('tu.dokumen.review');
 
-    Route::middleware(EnsureRole::class.':biro')->group(function () {
         Route::get('/perusahaan/tambah', [CompanyController::class, 'create'])->name('perusahaan.create');
         Route::post('/perusahaan', [CompanyController::class, 'store'])->name('perusahaan.store');
         Route::get('/perusahaan/{company}/ubah', [CompanyController::class, 'edit'])->whereNumber('company')->name('perusahaan.edit');
@@ -245,14 +223,28 @@ Route::middleware('auth')->group(function () {
     Route::middleware(EnsureRole::class.':kaprodi')->group(function () {
         Route::get('/kaprodi/persetujuan', [KaprodiApprovalController::class, 'index'])->name('kaprodi.persetujuan');
         Route::patch('/kaprodi/persetujuan/{internship}', [KaprodiApprovalController::class, 'update'])->whereNumber('internship')->name('kaprodi.persetujuan.update');
-        Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
-        Route::get('/kaprodi/rekognisi', [CreditRecognitionController::class, 'queue'])->name('rekognisi.antrean');
-        Route::patch('/kaprodi/rekognisi/{recognition}', [CreditRecognitionController::class, 'decide'])->whereNumber('recognition')->name('rekognisi.decide');
+        Route::get('/kaprodi/bobot', [AssessmentWeightController::class, 'edit'])->name('kaprodi.bobot');
+        Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
 
         Route::get('/mahasiswa', [StudentController::class, 'index'])->name('mahasiswa.index');
         Route::post('/mahasiswa', [StudentController::class, 'store'])->name('mahasiswa.store');
 
         Route::get('/penempatan/tambah', [PlacementController::class, 'create'])->name('penempatan.create');
         Route::post('/penempatan', [PlacementController::class, 'store'])->name('penempatan.store');
+    });
+
+    // ---------------------------------------------------------------- Admin
+    Route::middleware(EnsureRole::class.':admin')->prefix('admin')->group(function () {
+        Route::get('/akun', [AdminUserController::class, 'index'])->name('admin.akun');
+        Route::patch('/akun/{account}', [AdminUserController::class, 'update'])->whereNumber('account')->name('admin.akun.update');
+        Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
+
+        // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
+        Route::get('/penilaian', [AssessmentStandardController::class, 'index'])->name('admin.penilaian');
+        Route::post('/penilaian/pertanyaan', [AssessmentStandardController::class, 'storeQuestion'])->name('admin.penilaian.pertanyaan.store');
+        Route::patch('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'updateQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.update');
+        Route::delete('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'destroyQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.destroy');
+        Route::put('/penilaian/skala', [AssessmentStandardController::class, 'updateScale'])->name('admin.penilaian.skala');
+        Route::put('/penilaian/huruf', [AssessmentStandardController::class, 'updateGrades'])->name('admin.penilaian.huruf');
     });
 });

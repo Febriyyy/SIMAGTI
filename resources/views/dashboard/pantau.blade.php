@@ -81,7 +81,7 @@
                                         </td>
                                         <td>
                                             <span class="c-main" title="{{ $internship->placeName() }}">{{ $internship->placeName() }}</span>
-                                            <span class="c-sub" title="{{ $internship->placeDetail() }}">{{ $internship->isSeminar() ? $internship->programTypeLabel() : ($internship->position ?? $internship->programTypeLabel()) }}</span>
+                                            <span class="c-sub" title="{{ $internship->placeDetail() }}">{{ $internship->position ?? 'Posisi belum diisi' }}</span>
                                         </td>
                                         <td>
                                             @if ($internship->status === 'diajukan')

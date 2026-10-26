@@ -162,9 +162,8 @@
                         <div><dt>Prioritas</dt><dd><span class="prio prio-{{ $task->priority }}"><x-ikon name="flag" :size="14" :fill="in_array($task->priority, ['urgent', 'high'], true)" /> {{ $task->priorityLabel() }}</span></dd></div>
                         <div><dt>Mulai</dt><dd>{{ $task->start_date?->locale('id')->translatedFormat('j M Y') ?? '–' }}</dd></div>
                         <div><dt>Tenggat</dt><dd @class(['is-late' => $task->isOverdue()])>{{ $task->due_date?->locale('id')->translatedFormat('j M Y') ?? '–' }}</dd></div>
-                        <div><dt>Estimasi</dt><dd>{{ $task->estimate_hours !== null ? \App\Support\Num::short((float) $task->estimate_hours).' jam' : '–' }}</dd></div>
-                        <div><dt>Jam tercatat</dt><dd>{{ \App\Support\Num::short((float) $task->timeEntries->sum('hours')) }} jam</dd></div>
-                        <div><dt>Silabus</dt><dd>{{ $task->syllabusItem?->title ?? '–' }}@if ($task->syllabusItem)<small>{{ $task->syllabusItem->categoryLabel() }}</small>@endif</dd></div>
+                        <div><dt>Rencana</dt><dd>{{ $task->plan?->title ?? '–' }}@if ($task->plan)<small>{{ $task->plan->rangeLabel() }}</small>@endif</dd></div>
+                        <div><dt>Goal</dt><dd>{{ $task->goal?->title ?? '–' }}</dd></div>
                         @if ($task->labels)
                             <div><dt>Label</dt><dd>@foreach ($task->labels as $label)<span class="tag tag-gray">{{ $label }}</span> @endforeach</dd></div>
                         @endif
@@ -187,40 +186,34 @@
             <section class="card">
                 <div class="card-head">
                     <div>
-                        <h2 class="card-title">Catatan waktu</h2>
-                        <p class="card-sub">Masuk ke timesheet / logbook</p>
+                        <h2 class="card-title">Catatan kegiatan</h2>
+                        <p class="card-sub">Masuk ke timesheet</p>
                     </div>
                 </div>
                 <div class="card-body">
                     <ul class="time-list">
                         @forelse ($task->timeEntries->sortByDesc('work_date') as $entry)
                             <li>
-                                <span class="time-hours">{{ \App\Support\Num::short((float) $entry->hours) }} j</span>
+                                <span class="time-dot" aria-hidden="true"></span>
                                 <div class="grow min0">
                                     <div class="cell-sub">{{ $entry->work_date->locale('id')->translatedFormat('D, j M Y') }}</div>
                                     <div class="time-desc">{{ $entry->description }}</div>
                                 </div>
                             </li>
                         @empty
-                            <li class="muted">Belum ada waktu yang dicatat.</li>
+                            <li class="muted">Belum ada catatan kegiatan.</li>
                         @endforelse
                     </ul>
                     @if ($canEdit)
                         <form method="POST" action="{{ route('timesheet.store') }}" enctype="multipart/form-data" class="stack time-form">
                             @csrf
                             <input type="hidden" name="weekly_task_id" value="{{ $task->id }}">
-                            <div class="form-grid">
-                                <div>
-                                    <label class="label" for="tl-date">Tanggal</label>
-                                    <input id="tl-date" type="date" name="work_date" class="input" value="{{ now()->toDateString() }}" required>
-                                </div>
-                                <div>
-                                    <label class="label" for="tl-hours">Durasi (jam)</label>
-                                    <input id="tl-hours" type="number" name="hours" class="input" min="0.25" max="16" step="0.25" required placeholder="2">
-                                </div>
+                            <div>
+                                <label class="label" for="tl-date">Tanggal</label>
+                                <input id="tl-date" type="date" name="work_date" class="input" value="{{ now()->min($internship->end_date)->toDateString() }}" required>
                             </div>
                             <input type="text" name="description" class="input" maxlength="1000" required value="{{ $task->title }}" aria-label="Kegiatan">
-                            <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary"><x-ikon name="timer" :size="16" /> Catat waktu</button></div>
+                            <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary">Catat</button></div>
                         </form>
                     @endif
                 </div>

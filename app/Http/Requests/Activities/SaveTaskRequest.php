@@ -9,7 +9,10 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-/** Buat atau ubah task kegiatan. Semua rujukan (proyek, kolom, silabus) harus milik penempatan yang sama. */
+/**
+ * Buat atau ubah task kegiatan. Task baru wajib berada di bawah satu rencana kegiatan (timesheet).
+ * Semua rujukan (rencana, goal, proyek, kolom) harus milik penempatan yang sama.
+ */
 class SaveTaskRequest extends FormRequest
 {
     private ?Internship $internship = null;
@@ -45,11 +48,11 @@ class SaveTaskRequest extends FormRequest
             'description' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'project_id' => ['sometimes', 'nullable', 'integer', $own('projects')],
             'board_column_id' => ['sometimes', 'nullable', 'integer', $own('board_columns')],
-            'syllabus_item_id' => ['sometimes', 'nullable', 'integer', $own('syllabus_items')],
+            'activity_plan_id' => [$creating ? 'required' : 'sometimes', 'integer', $own('activity_plans')],
+            'goal_id' => ['sometimes', 'nullable', 'integer', $own('goals')],
             'priority' => ['sometimes', Rule::in(array_keys(WeeklyTask::PRIORITIES))],
             'start_date' => ['sometimes', 'nullable', 'date'],
             'due_date' => ['sometimes', 'nullable', 'date', Rule::when($this->filled('start_date'), 'after_or_equal:start_date')],
-            'estimate_hours' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:500'],
             'labels' => ['sometimes', 'nullable', 'string', 'max:120'],
         ];
     }
@@ -73,17 +76,24 @@ class SaveTaskRequest extends FormRequest
         return $data;
     }
 
+    public function messages(): array
+    {
+        return [
+            'activity_plan_id.required' => 'Pilih rencana kegiatan. Isi rencana di Timesheet dulu bila belum ada.',
+        ];
+    }
+
     public function attributes(): array
     {
         return [
             'title' => 'judul task',
             'project_id' => 'proyek',
             'board_column_id' => 'kolom',
-            'syllabus_item_id' => 'tujuan silabus',
+            'activity_plan_id' => 'rencana kegiatan',
+            'goal_id' => 'goal',
             'priority' => 'prioritas',
             'start_date' => 'tanggal mulai',
             'due_date' => 'tenggat',
-            'estimate_hours' => 'estimasi jam',
         ];
     }
 }

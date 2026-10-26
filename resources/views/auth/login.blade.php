@@ -83,20 +83,20 @@
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
                     </span>
                     <div>
-                        <div class="signin-float-title">Jam kegiatan</div>
+                        <div class="signin-float-title">Catatan kegiatan</div>
                         <div class="signin-float-sub">8 minggu terakhir</div>
                     </div>
                 </div>
                 <svg class="signin-spark" viewBox="0 0 120 40" preserveAspectRatio="none">
                     <path d="M2 30 C14 28 18 18 30 20 S48 32 60 24 S80 8 92 14 S110 10 118 6" fill="none" stroke="#0e9b6b" stroke-width="2.4" stroke-linecap="round"/>
                 </svg>
-                <div class="signin-float-value">38 <small>jam minggu ini</small> <span class="signin-float-up">Timesheet terisi setiap hari</span></div>
+                <div class="signin-float-value">12 <small>catatan minggu ini</small> <span class="signin-float-up">Timesheet terisi setiap hari</span></div>
             </div>
         </div>
 
         <div class="signin-tagline">
             <h2>Semua kegiatan KP dalam satu tempat.</h2>
-            <p>Silabus, kegiatan, timesheet, dan penilaian, untuk mahasiswa, perusahaan, dan kampus.</p>
+            <p>Rencana kegiatan, task, timesheet, dan penilaian, untuk mahasiswa, perusahaan, dan kampus.</p>
         </div>
     </section>
 </main>

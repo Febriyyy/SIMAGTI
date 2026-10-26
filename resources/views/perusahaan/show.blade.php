@@ -119,8 +119,8 @@
             <section class="card">
                 <div class="card-head">
                     <div>
-                        <h2 class="card-title">Performa per aspek</h2>
-                        <p class="card-sub">Rata-rata nilai rubrik dari penilaian yang sudah divalidasi</p>
+                        <h2 class="card-title">Performa per kategori</h2>
+                        <p class="card-sub">Rata-rata hard skill, soft skill, dan attitude dari penilaian yang sudah divalidasi</p>
                     </div>
                 </div>
                 <div class="card-body">

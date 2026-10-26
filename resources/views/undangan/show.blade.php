@@ -31,7 +31,7 @@
             <p class="auth-sub">
                 Anda diundang sebagai {{ \App\Models\User::ROLE_LABELS[$invitation->role] ?? $invitation->role }}
                 di {{ $invitation->company->name }}@if ($students->isNotEmpty()) untuk membimbing {{ $students->pluck('name')->join(', ', ' dan ') }}@endif.
-                Anda memantau kegiatan, timesheet, dan silabus mahasiswa, lalu memberi penilaian.
+                Anda memantau rencana, kegiatan, dan timesheet mahasiswa, lalu memberi penilaian di akhir periode KP.
             </p>
 
             <form method="POST" action="{{ route('undangan.store', $invitation->token) }}" class="stack">

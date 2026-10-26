@@ -28,14 +28,16 @@ class ResultController extends Controller
     public function edit(Request $request, Internship $internship): View
     {
         $this->authorizeLecturer($request, $internship);
-        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'assessment', 'monthlyReviews', 'creditRecognition']);
+        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'assessment.scores', 'assessment.rubric.aspects']);
 
         return view('hasil.edit', [
             'internship' => $internship,
             'blockers' => FinalizeResult::blockers($internship),
             'guidance' => $internship->confirmedGuidanceCount(),
             'min' => (int) Campus::rule('min_guidance'),
-            'weights' => [(int) Campus::rule('mbkm_partner_weight'), (int) Campus::rule('mbkm_lecturer_weight')],
+            'plans' => $internship->activityPlans()->count(),
+            'goals' => $internship->goals()->get(),
+            'tasks' => [$internship->tasks()->where('status', 'completed')->count(), $internship->tasks()->count()],
         ]);
     }
 
@@ -43,10 +45,9 @@ class ResultController extends Controller
     {
         $this->authorizeLecturer($request, $internship);
 
-        $data = $request->validate($internship->isMbkm()
-            ? ['lecturer_score' => ['required', 'numeric', 'between:0,100'], 'result_note' => ['nullable', 'string', 'max:1000']]
-            : ['result' => ['required', Rule::in(array_keys(Internship::RESULTS))], 'result_note' => ['nullable', 'string', 'max:1000']],
-            [], ['lecturer_score' => 'nilai dosen', 'result' => 'hasil', 'result_note' => 'catatan']);
+        $data = $request->validate(
+            ['result' => ['required', Rule::in(array_keys(Internship::RESULTS))], 'result_note' => ['nullable', 'string', 'max:1000']],
+            [], ['result' => 'hasil', 'result_note' => 'catatan']);
 
         $finalize->handle($request->user(), $internship, $data);
 

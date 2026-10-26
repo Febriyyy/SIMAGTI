@@ -8,12 +8,13 @@ use App\Models\GradeScale;
 use App\Models\Setting;
 use App\Models\Skill;
 use App\Models\StudyProgram;
+use App\Support\AssessmentStandard;
 use App\Support\Grading;
 use Illuminate\Database\Seeder;
 
 /**
  * Data master yang dibutuhkan sistem agar bisa berjalan (juga di server sungguhan):
- * program studi, periode, skill, skala nilai huruf, dan rubrik penilaian.
+ * program studi, periode, skill, skala huruf mutu, dan standar penilaian akhir.
  */
 class MasterSeeder extends Seeder
 {
@@ -40,24 +41,14 @@ class MasterSeeder extends Seeder
             }
         }
 
-        // Skala nilai huruf awal. Kaprodi dapat membuat versi baru kapan saja.
+        // Skala huruf mutu standar kampus. Admin dapat membuat versi baru kapan saja.
         if (GradeScale::count() === 0) {
             Grading::publishScale(Grading::DEFAULT_SCALE);
         }
 
+        // Standar penilaian akhir kampus: pertanyaan hard skill, soft skill, attitude (diatur admin)
         if (! AssessmentRubric::where('is_active', true)->exists()) {
-            $rubric = AssessmentRubric::create(['name' => 'Rubrik Penilaian KP', 'is_active' => true]);
-
-            $aspects = [
-                'Disiplin' => 'Kehadiran, ketepatan waktu, dan kepatuhan pada aturan perusahaan.',
-                'Komunikasi' => 'Menyampaikan progres, bertanya, dan berdiskusi dengan tim.',
-                'Kemampuan teknis' => 'Kualitas hasil kerja dan penguasaan alat yang dipakai.',
-                'Kerja tim' => 'Kolaborasi dan sikap terhadap rekan kerja.',
-            ];
-
-            foreach (array_keys($aspects) as $i => $name) {
-                $rubric->aspects()->create(['name' => $name, 'description' => $aspects[$name], 'weight' => 25, 'sort_order' => $i + 1]);
-            }
+            AssessmentStandard::createDefaultRubric();
         }
 
         Setting::firstOrCreate(

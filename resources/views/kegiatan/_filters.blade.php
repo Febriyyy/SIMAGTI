@@ -1,4 +1,4 @@
-{{-- Baris filter board/list. Variabel: $filter, $projects, $view, $sort, $currentPeriod, $action (url) --}}
+{{-- Baris filter board/list. Variabel: $filter, $projects, $plans, $goals, $view, $sort, $currentPeriod, $action (url) --}}
 @php($v = $filter->values)
 <form method="GET" action="{{ $action }}" class="filters" data-autosubmit>
     <input type="hidden" name="tampilan" value="{{ $view }}">
@@ -34,12 +34,22 @@
             <option value="{{ $key }}" @selected(($v['prioritas'] ?? null) === $key)>{{ $label }}</option>
         @endforeach
     </select>
-    <select name="kategori" class="select select-sm" aria-label="Kategori silabus">
-        <option value="">Semua kategori</option>
-        @foreach (\App\Models\SyllabusItem::CATEGORIES as $key => [$label])
-            <option value="{{ $key }}" @selected(($v['kategori'] ?? null) === $key)>{{ $label }}</option>
-        @endforeach
-    </select>
+    @if (isset($plans) && $plans->isNotEmpty())
+        <select name="rencana" class="select select-sm" aria-label="Rencana kegiatan">
+            <option value="">Semua rencana</option>
+            @foreach ($plans as $plan)
+                <option value="{{ $plan->id }}" @selected(($v['rencana'] ?? null) === $plan->id)>{{ \Illuminate\Support\Str::limit($plan->title, 40) }}</option>
+            @endforeach
+        </select>
+    @endif
+    @if (isset($goals) && $goals->isNotEmpty())
+        <select name="goal" class="select select-sm" aria-label="Goal">
+            <option value="">Semua goal</option>
+            @foreach ($goals as $goal)
+                <option value="{{ $goal->id }}" @selected(($v['goal'] ?? null) === $goal->id)>{{ \Illuminate\Support\Str::limit($goal->title, 40) }}</option>
+            @endforeach
+        </select>
+    @endif
     @if ($view === 'list')
         <select name="urut" class="select select-sm" aria-label="Urutkan">
             @foreach (['tenggat' => 'Urut: tenggat', 'prioritas' => 'Urut: prioritas', 'terbaru' => 'Urut: terakhir diubah', 'kode' => 'Urut: terbaru dibuat'] as $key => $label)

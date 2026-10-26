@@ -2,10 +2,12 @@
 
 namespace Database\Seeders\Concerns;
 
+use App\Models\ActivityLog;
+use App\Models\ActivityPlan;
 use App\Models\BoardColumn;
+use App\Models\Goal;
 use App\Models\Internship;
 use App\Models\Project;
-use App\Models\SyllabusItem;
 use App\Models\TaskComment;
 use App\Models\TaskEvidence;
 use App\Models\TimeEntry;
@@ -14,8 +16,9 @@ use App\Models\WeeklyTask;
 use Illuminate\Support\Carbon;
 
 /**
- * Pengisi data kegiatan KP v2 yang dipakai DemoSeeder (tes) dan DataSeeder (aplikasi):
- * silabus, proyek, task di board, timesheet harian, bukti, dan komentar Company Supervisor.
+ * Pengisi data kegiatan KP yang dipakai DemoSeeder (tes) dan DataSeeder (aplikasi):
+ * goals, rencana kegiatan (timesheet / Gantt), proyek, task di board, catatan kegiatan harian, bukti,
+ * dan komentar Company Supervisor.
  *
  * Hasilnya tetap (tidak acak sungguhan): angka "acak" diturunkan dari id penempatan,
  * jadi tes bisa memakai jumlah yang sama setiap kali dijalankan.
@@ -23,35 +26,32 @@ use Illuminate\Support\Carbon;
 trait SeedsActivities
 {
     /**
-     * @param  array<string, list<string|array{0: string, 1: string}>>  $items  kategori (hard/soft/attitude) => daftar tujuan
+     * Goals mahasiswa di halaman Kegiatan.
+     *
+     * @param  list<string|array{0: string, 1: string}>  $items  judul goal (atau [judul, keterangan])
+     * @param  int  $achieved  jumlah goal pertama yang sudah tercapai
      */
-    protected function seedSyllabus(Internship $internship, array $items, string $status, ?User $reviewer = null, ?string $note = null): void
+    protected function seedGoals(Internship $internship, array $items, int $achieved = 0): void
     {
-        $position = 0;
-        foreach ($items as $category => $list) {
-            foreach ($list as $item) {
-                [$title, $description] = is_array($item) ? $item : [$item, null];
-                SyllabusItem::create([
-                    'internship_id' => $internship->id,
-                    'category' => $category,
-                    'title' => $title,
-                    'description' => $description,
-                    'position' => $position++,
-                ]);
-            }
+        foreach (array_values($items) as $i => $item) {
+            [$title, $description] = is_array($item) ? $item : [$item, null];
+            $goal = Goal::create([
+                'internship_id' => $internship->id,
+                'title' => $title,
+                'description' => $description,
+                'position' => $i,
+                'achieved_at' => $i < $achieved ? $internship->start_date->copy()->addWeeks(4 + $i * 2)->setTime(16, 0)->min(now()) : null,
+                'created_by' => $internship->student_id,
+            ]);
+            $at = $internship->start_date->copy()->addDays(2)->setTime(9, 0)->min(now());
+            $goal->forceFill(['created_at' => $at, 'updated_at' => $at])->saveQuietly();
         }
-
-        $reviewedAt = $internship->start_date->copy()->addDays(6)->setTime(14, 0);
-        $internship->forceFill([
-            'syllabus_status' => $status,
-            'syllabus_note' => $note,
-            'syllabus_reviewed_by' => in_array($status, ['approved', 'revision'], true) ? $reviewer?->id : null,
-            'syllabus_reviewed_at' => in_array($status, ['approved', 'revision'], true) ? ($reviewedAt->isFuture() ? now()->subHour() : $reviewedAt) : null,
-        ])->saveQuietly();
     }
 
     /**
-     * Isi board dan timesheet dari tanggal mulai sampai hari ini (atau sampai tanggal selesai).
+     * Isi rencana kegiatan, board, dan catatan kegiatan dari tanggal mulai sampai hari ini (atau sampai tanggal selesai).
+     * Rencana: orientasi di minggu pertama, satu rencana per proyek (rentang tanggal task-nya), dan penyusunan laporan
+     * di dua minggu terakhir. Setiap task berada di bawah rencana proyeknya.
      *
      * @param  list<array{name: string, key: string, color: string, tasks: list<string|array{0: string, 1: string}>}>  $projects
      * @param  int  $diligence  0–100: seberapa rajin mencatat timesheet dan menyelesaikan task
@@ -85,25 +85,66 @@ trait SeedsActivities
             }
         }
 
-        $syllabus = $internship->syllabusItems()->get()->values();
+        $goals = $internship->goals()->get()->values();
         $finished = $until !== null; // KP yang sudah selesai: semua task tuntas
         $span = $totalDays + ($finished ? -3 : 21);
         $count = count($all);
         $tasks = [];
         $priorities = ['medium', 'high', 'medium', 'low', 'urgent', 'medium'];
 
-        foreach ($all as $i => [$project, $title, $description]) {
-            $due = $internship->start_date->copy()->addDays((int) round(($i + 1) * $span / ($count + 1)));
+        // Jadwal task dihitung dulu supaya rentang rencana per proyek bisa diketahui
+        $schedule = [];
+        foreach ($all as $i => [$project]) {
+            $due = $internship->start_date->copy()->addDays((int) round(($i + 1) * $span / ($count + 1)))->min($internship->end_date);
             $start = $due->copy()->subDays($rand(2, 6))->max($internship->start_date);
+            $schedule[$i] = [$start, $due];
+        }
 
-            // Status menurut tenggat: lewat jauh = Done, dekat = Review/In Progress, nanti = To Do.
+        $planAt = $internship->start_date->copy()->addDay()->setTime(9, 30)->min(now());
+        $position = 0;
+        $makePlan = function (string $title, Carbon $from, Carbon $to, ?string $description = null, ?Goal $goal = null) use ($internship, $planAt, &$position): ActivityPlan {
+            $plan = ActivityPlan::create([
+                'internship_id' => $internship->id,
+                'goal_id' => $goal?->id,
+                'title' => $title,
+                'description' => $description,
+                'start_date' => $from->copy()->max($internship->start_date)->toDateString(),
+                'end_date' => $to->copy()->min($internship->end_date)->max($from)->toDateString(),
+                'position' => $position++,
+                'created_by' => $internship->student_id,
+            ]);
+            $plan->forceFill(['created_at' => $planAt, 'updated_at' => $planAt])->saveQuietly();
+
+            return $plan;
+        };
+
+        $makePlan('Orientasi dan pengenalan sistem', $internship->start_date->copy(), $internship->start_date->copy()->addDays(6), 'Mengenal tim, alur kerja, dan sistem yang dipakai perusahaan.');
+        $plans = [];
+        foreach ($all as $i => [$project]) {
+            $key = $project->id;
+            [$start, $due] = $schedule[$i];
+            $plans[$key] = isset($plans[$key])
+                ? [$plans[$key][0]->min($start), $plans[$key][1]->max($due), $project]
+                : [$start->copy(), $due->copy(), $project];
+        }
+        $planOf = [];
+        foreach (array_values($plans) as $k => [$from, $to, $project]) {
+            $goal = $goals->isNotEmpty() ? $goals[$k % $goals->count()] : null;
+            $planOf[$project->id] = $makePlan($project->name, $from, $to, $project->description, $goal);
+        }
+        $makePlan('Penyusunan laporan akhir', $internship->end_date->copy()->subDays(13), $internship->end_date->copy(), 'Merangkum kegiatan dan hasil kerja untuk laporan KP.');
+
+        foreach ($all as $i => [$project, $title, $description]) {
+            [$start, $due] = $schedule[$i];
+
+            // Status menurut tenggat: lewat jauh = Done, dekat = In Progress, nanti = To Do.
             $daysToDue = $today->diffInDays($due, false);
             $doneChance = $diligence;
             $column = match (true) {
                 $finished => 'Done',
                 $due->lt($lastActive) && $rand(1, 100) <= $doneChance => 'Done',
                 $daysToDue < -3 => 'In Progress',
-                $daysToDue <= 2 => $rand(0, 1) ? 'Review' : 'In Progress',
+                $daysToDue <= 2 => 'In Progress',
                 $daysToDue <= 9 => $rand(0, 2) === 0 ? 'In Progress' : 'To Do',
                 default => 'To Do',
             };
@@ -115,13 +156,13 @@ trait SeedsActivities
                 'internship_id' => $internship->id,
                 'project_id' => $project->id,
                 'board_column_id' => $columns[$column]->id,
-                'syllabus_item_id' => $syllabus->isNotEmpty() ? $syllabus[$i % $syllabus->count()]->id : null,
+                'activity_plan_id' => $planOf[$project->id]->id,
+                'goal_id' => $goals->isNotEmpty() ? $goals[$i % $goals->count()]->id : null,
                 'title' => $title,
                 'description' => $description,
                 'priority' => $priorities[$i % count($priorities)],
                 'start_date' => $start,
                 'due_date' => $due,
-                'estimate_hours' => [4, 6, 8, 12, 16][$i % 5],
                 'labels' => $i % 4 === 0 ? ['dokumentasi'] : ($i % 5 === 1 ? ['bug'] : null),
                 'position' => $i,
                 'created_by' => $internship->student_id,
@@ -164,7 +205,7 @@ trait SeedsActivities
             $tasks[] = $task;
         }
 
-        // Timesheet: hari kerja dari mulai sampai hari terakhir aktif (disisipkan sekaligus supaya cepat).
+        // Catatan kegiatan: hari kerja dari mulai sampai hari terakhir aktif (disisipkan sekaligus supaya cepat).
         $rows = [];
         for ($day = $internship->start_date->copy(); $day->lte($lastActive); $day->addDay()) {
             if ($day->isWeekend() || $rand(1, 100) > $diligence + 5) {
@@ -173,19 +214,15 @@ trait SeedsActivities
 
             $active = array_values(array_filter($tasks, fn (WeeklyTask $t) => $t->start_date->lte($day) && $t->due_date->copy()->addDays(2)->gte($day)));
             $entries = $rand(1, 2);
-            $left = [8, 8, 7.5, 8, 6][$rand(0, 4)];
             $at = $day->copy()->setTime(17, 0)->min(now());
 
             for ($e = 0; $e < $entries; $e++) {
                 $task = $active ? $active[$rand(0, count($active) - 1)] : null;
-                $hours = $e === $entries - 1 ? $left : [2, 3, 3.5, 4][$rand(0, 3)];
-                $left -= $hours;
 
                 $rows[] = [
                     'internship_id' => $internship->id,
                     'weekly_task_id' => $task?->id,
                     'work_date' => $day->toDateString(),
-                    'hours' => $hours,
                     'description' => $task ? $this->logLine($task->title, $rand(0, 3)) : self::GENERAL[$rand(0, count(self::GENERAL) - 1)],
                     'file_id' => null,
                     'created_by' => $internship->student_id,
@@ -197,6 +234,51 @@ trait SeedsActivities
 
         foreach (array_chunk($rows, 200) as $chunk) {
             TimeEntry::insert($chunk);
+        }
+
+        $this->seedActivityLogs($internship, $tasks, $rows, $lastActive);
+    }
+
+    /**
+     * Riwayat aktivitas 30 hari terakhir untuk activity monitor (catatan kegiatan, task dibuat dan selesai, bukti),
+     * seperti yang tercatat bila mahasiswa memakai aplikasi sungguhan.
+     *
+     * @param  list<WeeklyTask>  $tasks
+     * @param  list<array<string, mixed>>  $entries
+     */
+    private function seedActivityLogs(Internship $internship, array $tasks, array $entries, Carbon $lastActive): void
+    {
+        $since = Carbon::today()->subDays(29);
+        $taskType = (new WeeklyTask)->getMorphClass();
+        $logs = [];
+        $log = function (string $action, string $description, Carbon $at, ?int $subjectId = null) use (&$logs, $internship, $taskType) {
+            $at = $at->copy()->min(now());
+            $logs[] = [
+                'user_id' => $internship->student_id, 'action' => $action, 'description' => $description,
+                'subject_type' => $subjectId ? $taskType : null, 'subject_id' => $subjectId,
+                'ip_address' => null, 'user_agent' => null, 'properties' => null, 'created_at' => $at, 'updated_at' => $at,
+            ];
+        };
+
+        foreach ($tasks as $task) {
+            if ($task->created_at->gte($since) && $task->created_at->lte($lastActive->copy()->endOfDay())) {
+                $log('task.buat', "Menambah task {$task->key()} \"{$task->title}\"", $task->created_at, $task->id);
+            }
+            if ($task->completed_at && $task->completed_at->gte($since)) {
+                $log('bukti.kirim', "Mengirim bukti untuk task {$task->key()} \"{$task->title}\"", $task->completed_at->copy()->subMinutes(20), $task->id);
+                $log('task.selesai', "Menyelesaikan {$task->key()} \"{$task->title}\"", $task->completed_at, $task->id);
+            }
+        }
+
+        foreach ($entries as $entry) {
+            $at = Carbon::parse($entry['created_at']);
+            if ($at->gte($since)) {
+                $log('timesheet.catat', 'Mencatat kegiatan '.$at->locale('id')->translatedFormat('j M').': '.mb_strimwidth($entry['description'], 0, 80, '…'), $at);
+            }
+        }
+
+        foreach (array_chunk($logs, 200) as $chunk) {
+            ActivityLog::insert($chunk);
         }
     }
 

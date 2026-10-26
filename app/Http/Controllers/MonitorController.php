@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Internship;
 use App\Models\TimeEntry;
+use App\Support\ActivityFeed;
 use App\Support\BoardData;
 use App\Support\Campus;
+use App\Support\Gantt;
 use App\Support\Period;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,7 +31,8 @@ class MonitorController extends Controller
         $internships = Internship::visibleTo($user)
             ->with(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'lecturer'])
             ->withProgress()
-            ->withSum('timeEntries as logged_hours', 'hours')
+            ->withCount('activityPlans')
+            ->with('assessment')
             ->where('status', $status)
             ->when($term !== '', fn ($q) => $q->whereHas('student', fn ($s) => $s
                 ->where('name', 'like', '%'.$term.'%')->orWhere('nim', 'like', '%'.$term.'%')))
@@ -42,7 +45,7 @@ class MonitorController extends Controller
             ->pluck('last_date', 'internship_id');
 
         $cohorts = $internships
-            ->groupBy(fn (Internship $i) => $i->isSeminar() ? 'seminar|'.$i->start_date->toDateString().'|'.$i->end_date->toDateString() : $i->cohortKey())
+            ->groupBy(fn (Internship $i) => $i->cohortKey())
             ->map(fn ($items) => ['first' => $items->first(), 'items' => $items])
             ->sortBy(fn ($c) => $c['first']->placeName().$c['first']->start_date->toDateString())
             ->values()
@@ -69,31 +72,35 @@ class MonitorController extends Controller
     {
         Gate::authorize('view', $internship);
 
-        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'lecturer', 'syllabusItems.tasks']);
-        $tab = in_array($request->query('tab'), ['kegiatan', 'timesheet', 'silabus', 'bulanan', 'bimbingan'], true) ? $request->query('tab') : 'kegiatan';
+        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'lecturer', 'assessment']);
+        $tab = in_array($request->query('tab'), ['kegiatan', 'rencana', 'timesheet', 'aktivitas', 'bimbingan'], true) ? $request->query('tab') : 'kegiatan';
 
         $data = [
             'internship' => $internship,
             'tab' => $tab,
-            'canReviewSyllabus' => $request->user()->can('reviewSyllabus', $internship),
             'canCorrect' => $request->user()->can('correctPosition', $internship),
             'stats' => [
                 'tasks' => $internship->tasks()->count(),
                 'done' => $internship->tasks()->where('status', 'completed')->count(),
-                'hours' => (float) $internship->timeEntries()->sum('hours'),
+                'plans' => $internship->activityPlans()->count(),
                 'days' => $internship->timeEntries()->distinct('work_date')->count('work_date'),
             ],
         ];
 
         if ($tab === 'kegiatan') {
             $data += BoardData::build($internship, $request);
-        } elseif ($tab === 'bulanan') {
-            $user = $request->user();
+        } elseif ($tab === 'rencana') {
+            $plans = $internship->activityPlans()
+                ->with(['goal', 'tasks' => fn ($q) => $q->with('column')->orderByRaw('COALESCE(start_date, due_date) IS NULL')->orderByRaw('COALESCE(start_date, due_date)')->orderBy('number')])
+                ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])
+                ->get();
             $data += [
-                'months' => MonthlyController::months($internship),
-                'canReview' => $internship->isReviewedBy($user) && $internship->status === 'berjalan',
-                'canNote' => $user->role === 'dospem' && (int) $internship->lecturer_id === (int) $user->id && ! $internship->isSeminar() && $internship->status === 'berjalan',
+                'plans' => $plans,
+                'gantt' => Gantt::build($internship, $plans),
+                'goals' => $internship->goals()->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])->get(),
             ];
+        } elseif ($tab === 'aktivitas') {
+            $data += ['feed' => ActivityFeed::for(collect([$internship]), 60)];
         } elseif ($tab === 'bimbingan') {
             $data += [
                 'sessions' => $internship->guidanceSessions()->get(),

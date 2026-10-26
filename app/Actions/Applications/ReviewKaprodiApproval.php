@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Persetujuan kaprodi: menyetujui dan menunjuk dosen pembimbing, atau menolak.
- * Magang harus sudah diverifikasi biro; seminar (tanpa perusahaan) langsung ke kaprodi.
+ * Pengajuan harus sudah diverifikasi TU Fakultas.
  */
 class ReviewKaprodiApproval
 {
@@ -26,10 +26,10 @@ class ReviewKaprodiApproval
                 throw ValidationException::withMessages(['aturan' => 'Pengajuan ini tidak sedang menunggu persetujuan.']);
             }
 
-            $biro = $internship->approvals()->where('step', InternshipApproval::STEP_BIRO)->first();
+            $verified = $internship->approvals()->where('step', InternshipApproval::STEP_VERIFY)->first();
 
-            if (! $internship->isSeminar() && $biro?->status !== 'approved') {
-                throw ValidationException::withMessages(['aturan' => 'Perusahaan belum diverifikasi Biro Kerjasama.']);
+            if ($verified?->status !== 'approved') {
+                throw ValidationException::withMessages(['aturan' => 'Perusahaan belum diverifikasi TU Fakultas.']);
             }
 
             $approval = $internship->approvals()->where('step', InternshipApproval::STEP_KAPRODI)->firstOrFail();
@@ -47,7 +47,7 @@ class ReviewKaprodiApproval
 
             if ($approve) {
                 $internship->update(['status' => 'berjalan', 'lecturer_id' => $lecturerId]);
-                // KP mandiri di perusahaan: surat balasan (dan pakta integritas MBKM) boleh menyusul sampai batas waktu
+                // KP mandiri: surat balasan perusahaan boleh menyusul sampai batas waktu
                 ManageDocuments::ensureFor($internship);
             } else {
                 $internship->update(['status' => 'ditolak']);
@@ -60,7 +60,7 @@ class ReviewKaprodiApproval
 
             ActivityLog::record(
                 $approve ? 'kp.setujui' : 'kp.tolak',
-                ($approve ? 'Menyetujui' : 'Menolak')." KP {$internship->programTypeLabel()} {$internship->student->name}: {$internship->placeName()}",
+                ($approve ? 'Menyetujui' : 'Menolak')." KP {$internship->student->name}: {$internship->placeName()}",
                 $internship
             );
 

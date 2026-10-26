@@ -35,7 +35,7 @@
                                     <x-avatar :user="$i->student" />
                                     <div class="grow min0">
                                         <div class="cell-title" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
-                                        <div class="cell-sub">{{ $i->programTypeLabel() }} · s.d. {{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</div>
+                                        <div class="cell-sub">{{ $i->placeName() }} · s.d. {{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</div>
                                     </div>
                                     <x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip>
                                 </a>

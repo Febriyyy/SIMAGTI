@@ -16,15 +16,15 @@
         @else
             <div class="table-wrap">
                 <table class="table">
-                    <thead><tr><th>Mahasiswa</th><th>Program</th><th>Selesai</th><th>Penilaian</th><th>Bimbingan</th><th>Hasil</th><th></th></tr></thead>
+                    <thead><tr><th>Mahasiswa</th><th>Perusahaan</th><th>Selesai</th><th>Penilaian</th><th>Bimbingan</th><th>Hasil</th><th></th></tr></thead>
                     <tbody>
                         @foreach ($internships as $i)
                             @php($ready = $i->assessment?->isValidated() && $i->confirmed_count >= $min)
                             <tr>
                                 <td><x-person :user="$i->student" /></td>
-                                <td>{{ $i->programTypeLabel() }}</td>
+                                <td><span class="truncate" title="{{ $i->placeName() }}">{{ $i->placeName() }}</span></td>
                                 <td class="muted">{{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</td>
-                                <td><x-chip :tone="$i->assessment?->isValidated() ? 'green' : 'gray'">{{ $i->assessment?->isValidated() ? 'Divalidasi' : 'Belum' }}</x-chip></td>
+                                <td><x-chip :tone="$i->assessment?->isValidated() ? 'green' : 'gray'">{{ $i->assessment?->isValidated() ? 'Nilai '.$i->assessment->letter_grade : 'Belum' }}</x-chip></td>
                                 <td><x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip></td>
                                 <td>
                                     @if ($i->result)

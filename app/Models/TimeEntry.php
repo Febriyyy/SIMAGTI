@@ -6,17 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
-/** Satu baris timesheet/logbook: tanggal, kegiatan, durasi jam, foto dokumentasi (opsional). */
+/** Satu catatan kegiatan harian di timesheet: tanggal, kegiatan, task terkait, foto dokumentasi (opsional). */
 class TimeEntry extends Model
 {
-    /** Batas satu baris supaya salah ketik (misalnya 80 jam) tertahan. */
-    public const MAX_HOURS = 16;
-
     protected $fillable = [
         'internship_id',
         'weekly_task_id',
         'work_date',
-        'hours',
         'description',
         'file_id',
         'created_by',
@@ -26,7 +22,6 @@ class TimeEntry extends Model
     {
         return [
             'work_date' => 'date',
-            'hours' => 'decimal:2',
         ];
     }
 

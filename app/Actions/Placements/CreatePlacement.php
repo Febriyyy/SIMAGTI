@@ -27,8 +27,6 @@ class CreatePlacement
                 'lecturer_id' => $data['lecturer_id'],
                 'academic_period_id' => AcademicPeriod::current()?->id,
                 'track' => 'lowongan',
-                'program' => 'magang',
-                'program_type' => $data['program_type'] ?? 'industri',
                 'position' => $data['position'] ?? null,
                 'status' => 'berjalan',
                 'start_date' => $data['start_date'],

@@ -15,6 +15,7 @@ use App\Support\Grading;
 use Database\Seeders\TestingSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Tests\TestCase;
 
@@ -103,12 +104,16 @@ class SchemaTest extends TestCase
         $this->assertTrue($rina->isSupervisedBy($this->user('supervisor@kp.test')));
         $this->assertFalse($rina->isSupervisedBy($this->user('supervisor2@kp.test')));
         $this->assertSame('Anita Wulandari', $rina->supervisor->name);
-        $this->assertTrue($rina->isReviewedBy($this->user('supervisor@kp.test')));
-        $this->assertFalse($rina->isReviewedBy($this->user('dospem@kp.test')), 'Magang ditinjau Company Supervisor');
+        $this->assertTrue($this->user('supervisor@kp.test')->can('review', $rina));
+        $this->assertFalse($this->user('dospem@kp.test')->can('review', $rina), 'KP dinilai Company Supervisor');
 
-        $gilang = $this->activeInternship('gilang@kp.test');
-        $this->assertNull($gilang->company_id);
-        $this->assertTrue($gilang->isReviewedBy($this->user('dospem@kp.test')), 'Seminar ditinjau dosen pembimbing');
+        // Satu jenis KP: kolom jalur dan silabus sudah tidak ada
+        foreach (['program', 'program_type', 'topic', 'organizer', 'syllabus_status', 'lecturer_score'] as $column) {
+            $this->assertFalse(Schema::hasColumn('internships', $column), $column);
+        }
+        foreach (['syllabus_items', 'monthly_reviews', 'credit_recognitions'] as $table) {
+            $this->assertFalse(Schema::hasTable($table), $table);
+        }
     }
 
     public function test_supervisor_yang_sama_tidak_bisa_dipasang_dua_kali(): void
@@ -193,27 +198,33 @@ class SchemaTest extends TestCase
 
     public function test_huruf_mutu_mengikuti_skala_nilai(): void
     {
-        $this->assertSame('A', Grading::letterFor(88));
-        $this->assertSame('B+', Grading::letterFor(87.99));
-        $this->assertSame('B', Grading::letterFor(70));
+        // Standar kampus: A 80, B+ 74, B 68, C+ 62, C 56, D 45, E di bawahnya
+        $this->assertSame('A', Grading::letterFor(80));
+        $this->assertSame('B+', Grading::letterFor(79.99));
+        $this->assertSame('B', Grading::letterFor(68));
+        $this->assertSame('C+', Grading::letterFor(62));
         $this->assertSame('C', Grading::letterFor(56));
-        $this->assertSame('D', Grading::letterFor(40));
-        $this->assertSame('E', Grading::letterFor(39.9));
+        $this->assertSame('D', Grading::letterFor(45));
+        $this->assertSame('E', Grading::letterFor(44.9));
     }
 
-    public function test_nilai_akhir_dihitung_dari_bobot_rubrik(): void
+    public function test_nilai_akhir_dihitung_dari_bobot_kategori(): void
     {
-        $assessment = Assessment::firstOrFail();
+        $assessment = Assessment::where('status', 'validated')->firstOrFail();
 
-        // 90, 85, 92, 88 dengan bobot 25% masing-masing
-        $this->assertSame(88.75, $assessment->computeFinalScore());
+        // Rata-rata hard skill 90, soft skill 92,5, attitude 90 dengan bobot 35/35/30
+        $this->assertSame(90.88, $assessment->computeFinalScore());
+        $breakdown = $assessment->breakdown();
+        $this->assertEquals(90, $breakdown['categories']['hard']['average']);
+        $this->assertEquals(92.5, $breakdown['categories']['soft']['average']);
+        $this->assertEquals(32.38, $breakdown['categories']['soft']['contribution']);
         $this->assertSame('A', $assessment->letter_grade);
         $this->assertSame('validated', $assessment->status);
     }
 
     public function test_penilaian_tervalidasi_tidak_bisa_diubah(): void
     {
-        $assessment = Assessment::firstOrFail();
+        $assessment = Assessment::where('status', 'validated')->firstOrFail();
 
         $this->expectException(LogicException::class);
 
@@ -222,7 +233,7 @@ class SchemaTest extends TestCase
 
     public function test_skor_aspek_pada_penilaian_tervalidasi_tidak_bisa_diubah(): void
     {
-        $score = Assessment::firstOrFail()->scores()->firstOrFail();
+        $score = Assessment::where('status', 'validated')->firstOrFail()->scores()->firstOrFail();
 
         $this->expectException(LogicException::class);
 
@@ -231,22 +242,22 @@ class SchemaTest extends TestCase
 
     public function test_perubahan_skala_tidak_mengubah_huruf_mutu_lama(): void
     {
-        $assessment = Assessment::firstOrFail();
+        $assessment = Assessment::where('status', 'validated')->firstOrFail();
         $versiLama = $assessment->grade_scale_version;
 
         $versiBaru = Grading::publishScale(['A' => 95, 'B' => 80, 'C' => 60, 'D' => 40, 'E' => 0]);
 
         $this->assertGreaterThan($versiLama, $versiBaru);
         $this->assertSame('A', $assessment->fresh()->letter_grade);
-        $this->assertSame('B', Grading::letterFor(88.75, $versiBaru));
-        $this->assertSame('A', Grading::letterFor(88.75, $versiLama));
+        $this->assertSame('B', Grading::letterFor(90.88, $versiBaru));
+        $this->assertSame('A', Grading::letterFor(90.88, $versiLama));
     }
 
     public function test_nilai_sidang_mendapat_huruf_mutu_saat_disimpan(): void
     {
         $defense = Internship::where('status', 'selesai')->firstOrFail()->defenseScore;
 
-        $this->assertSame('B+', $defense->letter_grade);
+        $this->assertSame('A', $defense->letter_grade); // 86 dengan skala kampus
         $this->assertNotNull($defense->grade_scale_version);
     }
 

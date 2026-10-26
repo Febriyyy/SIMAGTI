@@ -53,7 +53,7 @@ class MonitorTest extends TestCase
         $this->assertStringStartsWith('Kloter ', $rina->cohortLabel());
     }
 
-    public function test_detail_pemantauan_punya_tab_kegiatan_timesheet_dan_silabus(): void
+    public function test_detail_pemantauan_punya_tab_kegiatan_rencana_catatan_dan_aktivitas(): void
     {
         $rina = $this->internshipOf('mahasiswa@kp.test');
         $supervisor = $this->user('supervisor@kp.test');
@@ -61,9 +61,11 @@ class MonitorTest extends TestCase
         $this->actingAs($supervisor)->get("/pantau/{$rina->id}")->assertOk()
             ->assertSee('Backend Developer Intern')->assertSee('Semester')->assertSee('Campus Supervisor')
             ->assertSee('To Do')->assertDontSee('+ Tambah task');
-        $this->get("/pantau/{$rina->id}?tab=timesheet")->assertOk()->assertSee('jam');
+        $this->get("/pantau/{$rina->id}?tab=timesheet")->assertOk()->assertSee('catatan kegiatan');
         $this->get("/pantau/{$rina->id}?tab=timesheet&periode=semua")->assertOk()->assertSee('Seluruh periode KP');
-        $this->get("/pantau/{$rina->id}?tab=silabus")->assertOk()->assertSee('Membangun REST API dengan Laravel');
+        $this->get("/pantau/{$rina->id}?tab=rencana")->assertOk()->assertSee('class="gt gt-readonly"', false)->assertSee('Membangun REST API dengan Laravel')->assertDontSee('+ Task')->assertDontSee('data-open="dlg-plan-', false);
+        $this->get("/pantau/{$rina->id}?tab=aktivitas")->assertOk()->assertSee('aktivitas terakhir');
+        $this->get("/pantau/{$rina->id}?tab=silabus")->assertOk()->assertSee('To Do'); // tab lama kembali ke Kegiatan
         $this->get("/pantau/{$rina->id}?tab=kegiatan&tampilan=list&status=completed")->assertOk()->assertSee('Task selesai');
 
         // Dospem melihat label "Dosen pembimbing", bukan "Campus Supervisor"
@@ -78,7 +80,7 @@ class MonitorTest extends TestCase
         $this->actingAs($this->user('kaprodi@kp.test'))->get("/pantau/{$rina->id}")->assertOk();
         $this->actingAs($this->user('dospem@kp.test'))->get('/pantau')->assertOk()->assertSee('Gilang Ramadhan');
         $this->actingAs($this->user('mahasiswa@kp.test'))->get("/pantau/{$rina->id}")->assertForbidden();
-        $this->actingAs($this->user('biro@kp.test'))->get('/pantau')->assertForbidden();
+        $this->actingAs($this->user('tu@kp.test'))->get('/pantau')->assertForbidden();
     }
 
     public function test_supervisor_mengoreksi_posisi_mahasiswanya(): void
@@ -108,7 +110,6 @@ class MonitorTest extends TestCase
             'company_id' => $nusantara->id,
             'division_id' => $division->id,
             'lecturer_id' => $this->user('dospem@kp.test')->id,
-            'program_type' => 'industri',
             'position' => 'QA Intern',
             'start_date' => now()->toDateString(),
             'end_date' => now()->addMonths(4)->toDateString(),

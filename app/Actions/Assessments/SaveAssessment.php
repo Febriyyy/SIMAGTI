@@ -6,33 +6,24 @@ use App\Models\ActivityLog;
 use App\Models\Assessment;
 use App\Models\Internship;
 use App\Models\User;
+use App\Support\AssessmentStandard;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 /**
- * Company Supervisor (seminar: dosen pembimbing) menyimpan penilaian akhir (draft) atau mengirimnya untuk divalidasi dosen pembimbing.
- * Nilai akhir dihitung ulang dari bobot rubrik setiap kali disimpan.
+ * Company Supervisor menyimpan penilaian akhir (draft) atau mengirimnya untuk divalidasi dosen pembimbing.
+ * Nilai akhir dihitung ulang dari standar kampus setiap kali disimpan; saat dikirim, bobot kategori ikut disimpan.
  */
 class SaveAssessment
 {
     /**
-     * @param  array<int|string, array{score: int|float|string, note?: string|null}>  $scores  rubric_aspect_id => isian
+     * @param  array<int, float>  $scores  rubric_aspect_id => nilai skala yang dipilih
      */
-    public function handle(User $actor, Internship $internship, array $scores, bool $submit): Assessment
+    public function handle(User $actor, Internship $internship, array $scores, bool $submit, ?string $comment = null): Assessment
     {
-        return DB::transaction(function () use ($actor, $internship, $scores, $submit) {
-            $assessment = $internship->assessment;
+        return DB::transaction(function () use ($actor, $internship, $scores, $submit, $comment) {
             $rubric = Assessment::rubricFor($internship);
 
-            if (! $rubric) {
-                throw ValidationException::withMessages(['scores' => 'Belum ada rubrik penilaian yang aktif.']);
-            }
-
-            if (abs($rubric->totalWeight() - 100) > 0.001) {
-                throw ValidationException::withMessages(['scores' => 'Total bobot kuesioner harus 100%. Hubungi dosen pembimbing.']);
-            }
-
-            $assessment ??= Assessment::create([
+            $assessment = $internship->assessment ?? Assessment::create([
                 'internship_id' => $internship->id,
                 'rubric_id' => $rubric->id,
                 'assessor_id' => $actor->id,
@@ -40,24 +31,17 @@ class SaveAssessment
             ]);
 
             foreach ($rubric->aspects as $aspect) {
-                if (! array_key_exists($aspect->id, $scores)) {
-                    continue;
+                if (array_key_exists($aspect->id, $scores)) {
+                    $assessment->scores()->updateOrCreate(['rubric_aspect_id' => $aspect->id], ['score' => $scores[$aspect->id]]);
                 }
-
-                $assessment->scores()->updateOrCreate(
-                    ['rubric_aspect_id' => $aspect->id],
-                    [
-                        // Pertanyaan isian: jawaban disimpan di kolom catatan, tanpa nilai
-                        'score' => $aspect->isText() ? null : $scores[$aspect->id]['score'],
-                        'note' => filled($scores[$aspect->id]['note'] ?? null) ? trim($scores[$aspect->id]['note']) : null,
-                    ]
-                );
             }
 
             $assessment->fill([
                 'assessor_id' => $actor->id,
-                'final_score' => $assessment->computeFinalScore(),
+                'comment' => $comment,
+                'category_weights' => $submit ? AssessmentStandard::weights() : null,
             ]);
+            $assessment->final_score = $assessment->computeFinalScore();
 
             if ($submit) {
                 $assessment->fill(['status' => 'submitted', 'submitted_at' => now()]);

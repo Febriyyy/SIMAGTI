@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\AcademicPeriod;
 use App\Models\ActivityLog;
-use App\Models\Assessment;
-use App\Models\AssessmentRubric;
 use App\Models\Certificate;
 use App\Models\CertificateTemplate;
 use App\Models\Company;
@@ -36,13 +34,15 @@ use Illuminate\Support\Facades\DB;
 /**
  * Data contoh untuk tes otomatis (dan demo cepat). Semua akun memakai kata sandi: password
  *
- * Isi (KP v2): Company Supervisor memantau, mahasiswa membuat silabus, task, dan timesheet sendiri.
- * - Rina dan Fajar: KP Industri di PT Nusantara Digital, divisi sama tetapi periode berbeda (dua kloter).
- * - Dimas: MBKM Mandiri di PT Data Prima, silabus menunggu persetujuan, 10 hari tanpa catatan.
+ * Isi (v3): satu jenis KP. Mahasiswa menyusun rencana kegiatan (timesheet / Gantt) lalu task, goals, dan catatan harian.
+ * Company Supervisor memantau dan menilai di akhir periode KP dengan standar penilaian kampus.
+ * - Rina: KP berjalan di PT Nusantara Digital, belum masuk masa penilaian.
+ * - Fajar: kloter lain di divisi yang sama, KP berakhir 10 hari lagi, penilaian sudah dikirim (menunggu validasi).
+ * - Dimas: PT Data Prima, KP berakhir 12 hari lagi, penilaian masih draft, 10 hari tanpa catatan.
  * - Salsa: KP selesai, nilai tervalidasi.
- * - Nadia: pengajuan KP Industri menunggu biro dan kaprodi.
+ * - Nadia: pengajuan KP menunggu verifikasi TU Fakultas dan persetujuan kaprodi.
  * - Tari: pengajuan disetujui, Company Supervisor belum diaktifkan TU Fakultas.
- * - Gilang: Seminar (pelaksana), dipantau dosen pembimbing.
+ * - Gilang: KP baru berjalan, belum menyusun rencana kegiatan.
  * - Citra: belum punya KP.
  */
 class DemoSeeder extends Seeder
@@ -77,16 +77,17 @@ class DemoSeeder extends Seeder
         ]],
     ];
 
-    private const SYLLABUS_SOFTWARE = [
-        'hard' => [['Membangun REST API dengan Laravel', 'Endpoint pesanan, autentikasi token, validasi.'], 'Menulis pengujian otomatis untuk fitur baru'],
-        'soft' => ['Menyampaikan progres di daily stand-up', 'Bekerja sama dalam code review'],
-        'attitude' => ['Hadir tepat waktu dan mengisi timesheet setiap hari', 'Menjaga kerahasiaan data perusahaan'],
+    private const GOALS_SOFTWARE = [
+        ['Membangun REST API dengan Laravel', 'Endpoint pesanan, autentikasi token, validasi.'],
+        'Menulis pengujian otomatis untuk fitur baru',
+        'Percaya diri menyampaikan progres di daily stand-up',
+        'Hadir tepat waktu dan mengisi catatan kegiatan setiap hari',
     ];
 
-    private const SYLLABUS_DATA = [
-        'hard' => ['Mengolah data dengan Python dan SQL', 'Membuat dashboard dengan Power BI'],
-        'soft' => ['Mempresentasikan temuan analisis kepada tim'],
-        'attitude' => ['Teliti dan bertanggung jawab atas akurasi data'],
+    private const GOALS_DATA = [
+        'Mengolah data dengan Python dan SQL',
+        'Membuat dashboard dengan Power BI',
+        'Mempresentasikan temuan analisis kepada tim',
     ];
 
     public function run(): void
@@ -108,7 +109,7 @@ class DemoSeeder extends Seeder
         // Staf kampus dan perusahaan
         $kaprodi = $user('Dr. Budi Santoso, M.Kom', 'kaprodi@kp.test', 'kaprodi');
         $dospem = $user('Dr. Hendra Kusuma, M.Kom', 'dospem@kp.test', 'dospem');
-        $biro = $user('Siti Rahmawati, S.E.', 'biro@kp.test', 'biro');
+        $admin = $user('Siti Rahmawati, S.E.', 'admin@kp.test', 'admin');
         $tu = $user('Wahyu Hidayat, A.Md.', 'tu@kp.test', 'tu');
         $supA = $user('Anita Wulandari', 'supervisor@kp.test', 'supervisor');
         $supB = $user('Ratna Kusumawati', 'supervisor2@kp.test', 'supervisor');
@@ -154,29 +155,29 @@ class DemoSeeder extends Seeder
         // Perusahaan
         $nusantara = Company::create([
             'name' => 'PT Nusantara Digital',
-            'industry' => 'Perangkat lunak',
+            'industry' => 'Teknologi dan IT',
             'address' => 'Jl. Soekarno Hatta No. 18, Bandung',
             'city' => 'Bandung',
             'email' => 'hrd@nusantaradigital.test',
             'status' => 'mitra',
-            'created_by' => $biro->id,
-            'verified_by' => $biro->id,
+            'created_by' => $tu->id,
+            'verified_by' => $tu->id,
             'verified_at' => now(),
         ]);
         $dataPrima = Company::create([
             'name' => 'PT Data Prima',
-            'industry' => 'Analitik data',
+            'industry' => 'Teknologi dan IT',
             'address' => 'Jl. Dipatiukur No. 4, Bandung',
             'city' => 'Bandung',
             'email' => 'hrd@dataprima.test',
             'status' => 'mitra',
-            'created_by' => $biro->id,
-            'verified_by' => $biro->id,
+            'created_by' => $tu->id,
+            'verified_by' => $tu->id,
             'verified_at' => now(),
         ]);
         $karya = Company::create([
             'name' => 'CV Karya Mandiri',
-            'industry' => 'Percetakan digital',
+            'industry' => 'Industri / Manufaktur',
             'address' => 'Jl. Cihampelas No. 52, Bandung',
             'city' => 'Bandung',
             'status' => 'mandiri_menunggu',
@@ -198,11 +199,13 @@ class DemoSeeder extends Seeder
 
         // Penempatan magang
         $today = Carbon::today();
-        $place = function (User $student, Company $company, CompanyDivision $division, User $supervisor, string $position, string $type,
-            int $startMonthsAgo, int $durationMonths, bool $finished, array $projects, array $syllabus, string $syllabusStatus,
+        // $endInDays: KP berakhir N hari dari hari ini (negatif = sudah lewat, KP selesai)
+        $place = function (User $student, Company $company, CompanyDivision $division, User $supervisor, string $position,
+            int $startMonthsAgo, int $endInDays, array $projects, array $goals, int $achieved = 0,
             int $idleDays = 0) use ($dospem, $period): Internship {
             $start = Carbon::today()->subMonthsNoOverflow($startMonthsAgo);
-            $end = $start->copy()->addMonthsNoOverflow($durationMonths);
+            $end = Carbon::today()->addDays($endInDays);
+            $finished = $endInDays < 0;
 
             // Dibuat "berjalan" dulu supaya kegiatan bisa diisi; penempatan selesai dikunci setelahnya.
             $internship = Internship::create([
@@ -212,8 +215,6 @@ class DemoSeeder extends Seeder
                 'lecturer_id' => $dospem->id,
                 'academic_period_id' => $period?->id,
                 'track' => 'lowongan',
-                'program' => 'magang',
-                'program_type' => $type,
                 'position' => $position,
                 'supervisor_name' => $supervisor->name,
                 'supervisor_title' => $supervisor->staffProfile?->job_title,
@@ -225,7 +226,7 @@ class DemoSeeder extends Seeder
             ]);
 
             $internship->assignSupervisor($supervisor);
-            $this->seedSyllabus($internship, $syllabus, $syllabusStatus, $supervisor);
+            $this->seedGoals($internship, $goals, $achieved);
             $this->seedActivities($internship, $projects, $supervisor, diligence: 88, idleDays: $idleDays, until: $finished ? $end : null);
 
             if ($finished) {
@@ -235,19 +236,17 @@ class DemoSeeder extends Seeder
             return $internship;
         };
 
-        $magangRina = $place($rina, $nusantara, $divNusantara, $supA, 'Backend Developer Intern', 'industri', 3, 5, false, self::PROJECTS_SOFTWARE, self::SYLLABUS_SOFTWARE, 'approved');
-        $magangFajar = $place($fajar, $nusantara, $divNusantara, $supA, 'Frontend Developer Intern', 'industri', 4, 5, false, self::PROJECTS_SOFTWARE, self::SYLLABUS_SOFTWARE, 'approved');
-        $magangDimas = $place($dimas, $dataPrima, $divData, $supB, 'Data Analyst Intern', 'mbkm', 2, 5, false, self::PROJECTS_DATA, self::SYLLABUS_DATA, 'submitted', idleDays: 10);
-        $magangSalsa = $place($salsa, $dataPrima, $divData, $supB, 'Data Analyst Intern', 'industri', 7, 5, true, self::PROJECTS_DATA, self::SYLLABUS_DATA, 'approved');
+        $magangRina = $place($rina, $nusantara, $divNusantara, $supA, 'Backend Developer Intern', 3, 60, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE, achieved: 1);
+        $magangFajar = $place($fajar, $nusantara, $divNusantara, $supA, 'Frontend Developer Intern', 4, 10, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE, achieved: 2);
+        $magangDimas = $place($dimas, $dataPrima, $divData, $supB, 'Data Analyst Intern', 4, 12, self::PROJECTS_DATA, self::GOALS_DATA, idleDays: 10);
+        $magangSalsa = $place($salsa, $dataPrima, $divData, $supB, 'Data Analyst Intern', 7, -60, self::PROJECTS_DATA, self::GOALS_DATA, achieved: 3);
 
-        // Pengajuan KP Industri yang masih menunggu verifikasi biro dan persetujuan kaprodi
+        // Pengajuan KP yang masih menunggu verifikasi TU Fakultas dan persetujuan kaprodi
         $magangNadia = Internship::create([
             'student_id' => $nadia->id,
             'company_id' => $karya->id,
             'academic_period_id' => $period?->id,
             'track' => 'mandiri',
-            'program' => 'magang',
-            'program_type' => 'industri',
             'position' => 'UI/UX Designer Intern',
             'supervisor_name' => 'Yusuf Maulana',
             'supervisor_title' => 'Kepala Studio Desain',
@@ -258,7 +257,7 @@ class DemoSeeder extends Seeder
             'end_date' => $today->copy()->addDays(14)->addMonthsNoOverflow(4),
             'notes' => 'Tempat KP dicari sendiri oleh mahasiswa.',
         ]);
-        foreach ([InternshipApproval::STEP_BIRO, InternshipApproval::STEP_KAPRODI] as $step) {
+        foreach ([InternshipApproval::STEP_VERIFY, InternshipApproval::STEP_KAPRODI] as $step) {
             InternshipApproval::create(['internship_id' => $magangNadia->id, 'step' => $step, 'status' => 'pending']);
         }
         LetterRequest::create([
@@ -276,8 +275,6 @@ class DemoSeeder extends Seeder
             'lecturer_id' => $dospem->id,
             'academic_period_id' => $period?->id,
             'track' => 'mandiri',
-            'program' => 'magang',
-            'program_type' => 'mbkm',
             'position' => 'Business Intelligence Intern',
             'supervisor_name' => 'Hendra Gunawan',
             'supervisor_title' => 'BI Lead',
@@ -286,55 +283,47 @@ class DemoSeeder extends Seeder
             'start_date' => $today->copy()->subDays(5),
             'end_date' => $today->copy()->subDays(5)->addMonthsNoOverflow(5),
         ]);
-        foreach ([InternshipApproval::STEP_BIRO, InternshipApproval::STEP_KAPRODI] as $step) {
+        foreach ([InternshipApproval::STEP_VERIFY, InternshipApproval::STEP_KAPRODI] as $step) {
             InternshipApproval::create([
                 'internship_id' => $magangTari->id, 'step' => $step, 'status' => 'approved',
-                'reviewed_by' => $step === InternshipApproval::STEP_BIRO ? $biro->id : $kaprodi->id, 'reviewed_at' => now()->subDays(7),
+                'reviewed_by' => $step === InternshipApproval::STEP_VERIFY ? $tu->id : $kaprodi->id, 'reviewed_at' => now()->subDays(7),
             ]);
         }
 
-        // Seminar (pelaksana): tanpa perusahaan, dipantau dan disetujui dosen pembimbing
-        $seminarGilang = Internship::create([
+        // KP baru berjalan: belum menyusun rencana kegiatan (task belum bisa dibuat)
+        $magangGilang = Internship::create([
             'student_id' => $gilang->id,
+            'company_id' => $nusantara->id,
+            'division_id' => $divNusantara->id,
             'lecturer_id' => $dospem->id,
             'academic_period_id' => $period?->id,
-            'track' => 'mandiri',
-            'program' => 'seminar',
-            'program_type' => 'pelaksana',
-            'topic' => 'Seminar Nasional Transformasi Digital UMKM',
-            'organizer' => 'Himpunan Mahasiswa Teknik Informatika',
+            'track' => 'lowongan',
+            'position' => 'QA Engineer Intern',
+            'supervisor_name' => $supA->name,
+            'supervisor_title' => 'Engineering Manager',
+            'supervisor_email' => $supA->email,
             'cadence' => 'weekly',
             'status' => 'berjalan',
-            'start_date' => $today->copy()->subWeeks(6),
-            'end_date' => $today->copy()->subWeeks(6)->addMonthsNoOverflow(3),
+            'start_date' => $today->copy()->subDays(4),
+            'end_date' => $today->copy()->subDays(4)->addMonthsNoOverflow(4),
         ]);
-        InternshipApproval::create(['internship_id' => $seminarGilang->id, 'step' => InternshipApproval::STEP_KAPRODI, 'status' => 'approved', 'reviewed_by' => $kaprodi->id, 'reviewed_at' => now()->subWeeks(7)]);
-        $this->seedSyllabus($seminarGilang, [
-            'hard' => ['Menyusun rundown dan anggaran acara'],
-            'soft' => ['Memimpin rapat panitia', 'Bernegosiasi dengan narasumber dan sponsor'],
-            'attitude' => ['Menepati tenggat persiapan acara'],
-        ], 'draft');
-        $this->seedActivities($seminarGilang, [
-            ['name' => 'Persiapan Seminar', 'key' => 'SEM', 'color' => 'purple', 'tasks' => [
-                'Susun proposal kegiatan', 'Hubungi narasumber', 'Ajukan proposal sponsor', 'Buka pendaftaran peserta', 'Gladi bersih', 'Laporan pertanggungjawaban',
-            ]],
-        ], $dospem, diligence: 80);
+        $magangGilang->assignSupervisor($supA);
 
         // Penilaian akhir, nilai sidang, sertifikat, dan konversi untuk KP yang sudah selesai
         $this->seedFinished($magangSalsa, $supB, $dospem, $kaprodi);
 
-        // Penilaian akhir yang sedang berjalan:
-        // Fajar sudah dikirim supervisor dan menunggu validasi dosen pembimbing; Dimas masih draft; Rina belum dinilai.
-        $this->seedAssessment($magangFajar, $supA, ['Disiplin' => 84, 'Komunikasi' => 78, 'Kemampuan teknis' => 86, 'Kerja tim' => 80], submit: true);
-        $this->seedAssessment($magangDimas, $supB, ['Disiplin' => 88, 'Komunikasi' => 82], submit: false);
+        // Penilaian akhir di akhir periode KP:
+        // Fajar sudah dikirim supervisor dan menunggu validasi dosen pembimbing; Dimas masih draft; Rina belum masuk masa penilaian.
+        $this->seedAssessment($magangFajar, $supA, [85, 95, 85, 75, 85, 85], submit: true, comment: 'Cepat belajar dan rapi dalam bekerja.');
+        $this->seedAssessment($magangDimas, $supB, [85, 75], submit: false, answered: 4);
 
-        // Lowongan dari biro kerjasama
+        // Lowongan dari kampus
         $php = Skill::where('name', 'PHP')->first();
         $laravel = Skill::where('name', 'Laravel')->first();
         $python = Skill::where('name', 'Python')->first();
         $posting = fn (Company $company, string $title, string $status, array $skills) => tap(JobPosting::create([
             'company_id' => $company->id,
-            'posted_by' => $biro->id,
+            'posted_by' => $tu->id,
             'title' => $title,
             'description' => 'Magang selama 4-6 bulan bersama tim produk.',
             'requirements' => 'Mahasiswa minimal semester V, bersedia magang penuh waktu.',
@@ -390,23 +379,15 @@ class DemoSeeder extends Seeder
             $this->confirmPlacement($magang);
         }
 
-        // Evaluasi bulanan: bulan terakhir Rina dan Fajar menunggu nilai, Dimas belum mengisi refleksi
-        $this->seedMonths($magangRina, $supA, $dospem, openMonths: 1);
-        $this->seedMonths($magangFajar, $supA, $dospem, openMonths: 1);
-        $this->seedMonths($magangDimas, $supB, $dospem, openMonths: 0, unreflected: 1);
-        $this->seedMonths($magangSalsa, $supB, $dospem, openMonths: 0);
-        $this->seedMonths($seminarGilang, $dospem, null, openMonths: 1);
-
         // Bimbingan dosen (minimal 5 terkonfirmasi sebelum hasil KP)
         $this->seedGuidance($magangRina, $dospem, confirmed: 3, pending: 1);
         $this->seedGuidance($magangFajar, $dospem, confirmed: 5);
         $this->seedGuidance($magangDimas, $dospem, confirmed: 1, pending: 1);
         $this->seedGuidance($magangSalsa, $dospem, confirmed: 6);
-        $this->seedGuidance($seminarGilang, $dospem, confirmed: 2);
         $this->seedResult($magangSalsa, $dospem, note: 'Laporan dan presentasi baik.');
 
-        // Dokumen: Tari (KP mandiri MBKM) sudah mengunggah surat balasan, pakta integritas menyusul; Nadia meminta surat pengantar
-        $this->seedDocuments($magangTari, $tu, $biro, reply: 'diunggah', pact: 'menunggu');
+        // Dokumen: Tari (KP mandiri) sudah mengunggah surat balasan; Nadia meminta surat pengantar
+        $this->seedDocuments($magangTari, $tu, reply: 'diunggah');
         InternshipDocument::create(['internship_id' => $magangNadia->id, 'type' => InternshipDocument::LETTER, 'status' => 'diminta', 'requested_by' => $nadia->id]);
 
         // Pengajuan perubahan: Fajar minta perpanjangan, menunggu persetujuan Company Supervisor
@@ -414,25 +395,19 @@ class DemoSeeder extends Seeder
             ['new_end_date' => $magangFajar->end_date->copy()->addMonth()->toDateString(), 'old_end_date' => $magangFajar->end_date->toDateString()],
             'Proyek dashboard pesanan belum selesai dan tim meminta saya membantu sampai rilis.');
 
-        // Rekognisi SKS MBKM Dimas menunggu kaprodi
-        $this->seedRecognition($magangDimas, [['TIF601', 'Analisis Data Lanjut', 3], ['TIF615', 'Visualisasi Data', 3], ['TIF699', 'Kerja Praktik', 2]]);
-
-        // Kuesioner milik dosen pembimbing (belum dipakai: tes penilaian memakai rubrik kampus)
-        $this->seedQuestionnaire($dospem, 'Kuesioner KP Industri 2026');
-
         // Kabar di lonceng notifikasi
         $this->seedNotices($rina, [
-            ['Nilai bulan ke-1 sudah diberikan', 'Anita Wulandari memberi nilai bulanan Anda.', 'bulanan.index', 'star', 'green'],
+            ['Komentar baru di task', 'Anita Wulandari: Sudah sesuai, lanjutkan.', 'kegiatan.index', 'chat', 'blue'],
             ['Bimbingan dikonfirmasi', 'Kerangka laporan akhir', 'bimbingan.index', 'chat', 'green'],
-            ['Silabus disetujui', null, 'silabus.index', 'syllabus', 'green'],
+            ['Penempatan dikonfirmasi', 'Company Supervisor mengonfirmasi data penempatan Anda.', 'kp.status', 'verify', 'green'],
         ], read: 1);
 
         // Beberapa riwayat aktivitas agar halaman Log Aktivitas tidak kosong
         $logs = [
             [$rina, 'task.buat', 'Menambah task PMS-6 "Optimasi query daftar pesanan"', $today->copy()->subDays(2)],
             [$rina, 'bukti.kirim', 'Mengirim bukti untuk task PMS-2 "Buat halaman daftar pesanan"', $today->copy()->subDays(2)],
-            [$supA, 'silabus.setujui', 'Menyetujui silabus Fajar Pratama', $today->copy()->subDay()],
-            [$dimas, 'silabus.kirim', 'Mengirim silabus untuk disetujui', $today->copy()->subDay()],
+            [$rina, 'rencana.buat', 'Menyusun rencana "Dokumentasi Tim"', $today->copy()->subDay()],
+            [$admin, 'akun.aktifkan', 'Mengaktifkan akun Ratna Kusumawati', $today->copy()->subDays(3)],
         ];
         foreach ($logs as [$actor, $action, $description, $when]) {
             $log = ActivityLog::create([
@@ -444,49 +419,11 @@ class DemoSeeder extends Seeder
         }
     }
 
-    /** @param  array<string, int>  $scores  nama aspek => nilai (aspek yang tidak disebut dibiarkan kosong) */
-    private function seedAssessment(Internship $internship, User $supervisor, array $scores, bool $submit): void
-    {
-        $rubric = AssessmentRubric::active();
-
-        $assessment = Assessment::create([
-            'internship_id' => $internship->id,
-            'rubric_id' => $rubric->id,
-            'assessor_id' => $supervisor->id,
-        ]);
-
-        foreach ($rubric->aspects as $aspect) {
-            if (isset($scores[$aspect->name])) {
-                $assessment->scores()->create(['rubric_aspect_id' => $aspect->id, 'score' => $scores[$aspect->name]]);
-            }
-        }
-
-        $assessment->update(['final_score' => $assessment->computeFinalScore()]);
-
-        if ($submit) {
-            $assessment->submit();
-        }
-    }
-
     /** Penilaian tervalidasi, nilai sidang, sertifikat, dan rekomendasi konversi untuk satu KP selesai. */
     private function seedFinished(Internship $internship, User $supervisor, User $lecturer, User $kaprodi): void
     {
-        $rubric = AssessmentRubric::active();
-
-        $assessment = Assessment::create([
-            'internship_id' => $internship->id,
-            'rubric_id' => $rubric->id,
-            'assessor_id' => $supervisor->id,
-        ]);
-
-        foreach ($rubric->aspects as $aspect) {
-            $assessment->scores()->create([
-                'rubric_aspect_id' => $aspect->id,
-                'score' => ['Disiplin' => 90, 'Komunikasi' => 85, 'Kemampuan teknis' => 92, 'Kerja tim' => 88][$aspect->name] ?? 85,
-            ]);
-        }
-        $assessment->submit();
-        $assessment->validateBy($lecturer, 'Kinerja konsisten selama magang.');
+        $this->seedAssessment($internship, $supervisor, [95, 85, 95, 85, 95], submit: true, validator: $lecturer,
+            note: 'Kinerja konsisten selama magang.', comment: 'Teliti dan bertanggung jawab atas akurasi data.');
 
         DefenseScore::create([
             'internship_id' => $internship->id,

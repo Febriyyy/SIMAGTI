@@ -41,7 +41,7 @@
                         @if ($first->division) <span class="muted">· Divisi {{ $first->division->name }}</span> @endif
                     </h2>
                     <p class="card-sub">
-                        <span class="cohort-badge">{{ $first->isSeminar() ? 'Seminar' : $first->cohortLabel() }}@if ($cohort['many']) · Kloter {{ $cohort['number'] }}@endif</span>
+                        <span class="cohort-badge">{{ $first->cohortLabel() }}@if ($cohort['many']) · Kloter {{ $cohort['number'] }}@endif</span>
                         {{ $first->periodLabel() }} · {{ $first->durationMonths() }} bulan · {{ $cohort['items']->count() }} mahasiswa
                     </p>
                 </div>

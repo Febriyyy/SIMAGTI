@@ -21,8 +21,8 @@ class User extends Authenticatable
         'supervisor' => 'Company Supervisor',
         'dospem' => 'Dosen Pembimbing',
         'kaprodi' => 'Kaprodi',
-        'biro' => 'Biro Kerjasama',
         'tu' => 'TU Fakultas',
+        'admin' => 'Admin',
     ];
 
     protected $fillable = [

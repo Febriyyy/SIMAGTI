@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Applications;
 
+use App\Models\Company;
 use App\Models\Internship;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 class SubmitInternshipRequest extends FormRequest
 {
@@ -14,45 +14,57 @@ class SubmitInternshipRequest extends FormRequest
         return Gate::forUser($this->user())->authorize('submitIndependent', Internship::class)->allowed();
     }
 
+    /** Bidang usaha dipilih dari daftar; "Lainnya" diisi sendiri. */
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('industry') === Company::INDUSTRY_OTHER) {
+            $this->merge(['industry' => trim((string) $this->input('industry_other')) ?: null, 'industry_choice' => Company::INDUSTRY_OTHER]);
+        }
+
+        // Website opsional: "perusahaan.co.id" diterima dan dilengkapi https://
+        $site = trim((string) $this->input('website'));
+        if ($site !== '' && ! preg_match('#^https?://#i', $site)) {
+            $this->merge(['website' => 'https://'.$site]);
+        }
+    }
+
     public function rules(): array
     {
-        $program = (string) $this->input('program');
-        $types = array_keys(Internship::PROGRAMS[$program][1] ?? []);
-        $magang = $program === 'magang';
-
         return [
-            'program' => ['required', Rule::in(array_keys(Internship::PROGRAMS))],
-            'program_type' => ['required', Rule::in($types)],
             'start_date' => ['required', 'date', 'after_or_equal:today'],
             'end_date' => ['required', 'date', 'after:start_date'],
 
-            // Magang
-            'company_name' => [Rule::requiredIf($magang), 'nullable', 'string', 'max:150'],
-            'industry' => ['nullable', 'string', 'max:100'],
+            'company_name' => ['required', 'string', 'max:150'],
+            'industry' => ['required', 'string', 'max:100'],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:100'],
             'company_email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:20'],
             'website' => ['nullable', 'url:http,https', 'max:200'],
             'division_name' => ['nullable', 'string', 'max:100'],
-            'position' => [Rule::requiredIf($magang), 'nullable', 'string', 'max:100'],
-            'supervisor_name' => [Rule::requiredIf($magang), 'nullable', 'string', 'max:150'],
+            'position' => ['required', 'string', 'max:100'],
+            'supervisor_name' => ['required', 'string', 'max:150'],
             'supervisor_title' => ['nullable', 'string', 'max:100'],
-            'supervisor_email' => [Rule::requiredIf($magang), 'nullable', 'email', 'max:150'],
+            'supervisor_email' => ['required', 'email', 'max:150'],
             'supervisor_phone' => ['nullable', 'string', 'max:30'],
+        ];
+    }
 
-            // Seminar
-            'topic' => [Rule::requiredIf($program === 'seminar'), 'nullable', 'string', 'max:200'],
-            'organizer' => ['nullable', 'string', 'max:150'],
+    public function messages(): array
+    {
+        return [
+            'industry.required' => $this->input('industry_choice') === Company::INDUSTRY_OTHER
+                ? 'Tulis bidang usaha perusahaan.'
+                : 'Pilih bidang usaha perusahaan.',
+            'website.url' => 'Alamat website tidak valid. Kosongkan bila perusahaan tidak punya website.',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'program' => 'jalur KP',
-            'program_type' => 'jenis KP',
             'company_name' => 'nama perusahaan',
+            'industry' => 'bidang usaha',
             'company_email' => 'email perusahaan',
             'division_name' => 'divisi',
             'position' => 'posisi',
@@ -62,8 +74,6 @@ class SubmitInternshipRequest extends FormRequest
             'supervisor_title' => 'jabatan Company Supervisor',
             'supervisor_email' => 'email Company Supervisor',
             'supervisor_phone' => 'nomor HP Company Supervisor',
-            'topic' => 'judul kegiatan seminar',
-            'organizer' => 'penyelenggara',
         ];
     }
 }

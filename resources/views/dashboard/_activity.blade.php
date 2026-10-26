@@ -1,16 +1,19 @@
-{{-- Grafik garis: jam kegiatan (timesheet) per minggu. Variabel: $activity --}}
+{{-- Grafik garis: catatan kegiatan dan task selesai per minggu. Variabel: $activity --}}
 @php($weeks = \App\Actions\Dashboard\BuildMonitoringDashboard::ACTIVITY_WEEKS)
 <section class="card">
     <div class="card-head">
         <div>
-            <h2 class="card-title">Jam kegiatan per minggu</h2>
-            <p class="card-sub">{{ $weeks }} minggu terakhir, dari timesheet semua mahasiswa di daftar atas</p>
+            <h2 class="card-title">Aktivitas per minggu</h2>
+            <p class="card-sub">{{ $weeks }} minggu terakhir, semua mahasiswa di daftar atas</p>
         </div>
-        <x-chip tone="green">{{ \App\Support\Num::short(array_sum($activity['values'])) }} jam</x-chip>
+        <a href="{{ route('aktivitas.index') }}" class="btn btn-sm">Aktivitas</a>
     </div>
     <div class="card-body">
-        <x-line-chart :labels="$activity['labels']" :tips="$activity['ranges']" unit="jam"
-                      :series="[['name' => 'Jam tercatat', 'values' => $activity['values'], 'color' => 'green', 'area' => true]]" />
+        <x-line-chart :labels="$activity['labels']" :tips="$activity['ranges']" unit="kali"
+                      :series="[
+                          ['name' => 'Catatan kegiatan', 'values' => $activity['notes'], 'color' => 'green', 'area' => true],
+                          ['name' => 'Task selesai', 'values' => $activity['done'], 'color' => 'blue'],
+                      ]" />
         <p class="chart-note">Arahkan kursor ke grafik untuk melihat jumlah per minggu.</p>
     </div>
 </section>

@@ -10,18 +10,18 @@
 
     @if (! $internship)
         <x-hero eyebrow="Mahasiswa" :title="$greeting"
-                sub="Anda belum punya KP. Ajukan KP Industri, MBKM Mandiri, atau Seminar untuk memulai."
+                sub="Anda belum punya KP. Ajukan KP bila sudah mendapat tempat, atau tunggu penempatan dari kampus."
                 action="Ajukan KP" :href="route('kp.status')" />
 
         <div class="card">
             <div class="empty">
                 <strong>Belum ada KP</strong>
-                Setelah pengajuan Anda disetujui, kegiatan, timesheet, dan silabus muncul di sini.
+                Setelah pengajuan Anda disetujui, timesheet, kegiatan, dan goals muncul di sini.
                 <a href="{{ route('kp.status') }}">Buka Status KP</a> untuk mengajukan.
             </div>
         </div>
     @elseif (! $running)
-        <x-hero :eyebrow="'Mahasiswa · '.$internship->programTypeLabel()" :title="$greeting"
+        <x-hero eyebrow="Mahasiswa" :title="$greeting"
                 :sub="$internship->status === 'ditolak'
                     ? 'Pengajuan KP Anda tidak disetujui. Lihat catatannya lalu ajukan ulang.'
                     : 'Pengajuan KP Anda sedang diproses'.($next ? ': '.mb_strtolower($next['title']).' oleh '.$next['actor'].'.' : '.')"
@@ -34,7 +34,7 @@
                     <div class="next-step-title">{{ $next['title'] }}</div>
                     <div class="next-step-sub">{{ $next['detail'] }}</div>
                 </div>
-                <a href="{{ route('kp.status') }}" class="btn btn-sm">Detail</a>
+                <a href="{{ $next['url'] ?? route('kp.status') }}" class="btn btn-sm">{{ $next['url'] ? ($next['cta'] ?? 'Buka') : 'Detail' }}</a>
             </div>
         @endif
     @else
@@ -42,16 +42,11 @@
         <x-hero :eyebrow="'Mahasiswa · '.$internship->placeName()" :title="$greeting"
                 :sub="$internship->status === 'selesai'
                     ? 'KP Anda sudah selesai. Data kegiatan dan timesheet tetap bisa dibuka.'
-                    : $period->label.'. Catat kegiatan dan jam kerja Anda setiap hari.'"
+                    : $period->label.'. Kerjakan task sesuai rencana dan catat kegiatan harian Anda.'"
                 action="Buka kegiatan" :href="route('kegiatan.index')">
             <x-slot:meta>
-                <span class="hero-tag"><x-ikon name="school" :size="15" /> {{ $internship->programTypeLabel() }}</span>
-                @if ($internship->isSeminar())
-                    @if ($internship->organizer)<span class="hero-tag"><x-ikon name="users" :size="15" /> {{ $internship->organizer }}</span>@endif
-                @else
-                    <span class="hero-tag"><x-ikon name="building" :size="15" /> {{ $internship->division?->name ? 'Divisi '.$internship->division->name : 'Divisi belum diisi' }}</span>
-                    <span class="hero-tag"><x-ikon name="person" :size="15" /> {{ $internship->position ?? 'Posisi belum diisi' }}</span>
-                @endif
+                <span class="hero-tag"><x-ikon name="building" :size="15" /> {{ $internship->division?->name ? 'Divisi '.$internship->division->name : 'Divisi belum diisi' }}</span>
+                <span class="hero-tag"><x-ikon name="person" :size="15" /> {{ $internship->position ?? 'Posisi belum diisi' }}</span>
                 <span class="hero-tag"><x-ikon name="calendar" :size="15" /> {{ $internship->cohortLabel() }}</span>
             </x-slot:meta>
         </x-hero>
@@ -59,9 +54,9 @@
         <div class="stat-grid">
             <x-stat label="Minggu berjalan" :value="$internship->currentWeek()" :unit="'dari '.$internship->totalWeeks()"
                     :hint="'Sisa '.$internship->daysLeft().' hari · s.d. '.$internship->end_date->locale('id')->translatedFormat('j M')" />
-            <x-stat label="Jam tercatat" :value="\App\Support\Num::short($internship->loggedHours(), 1)" unit="jam" :href="route('timesheet.index')"
-                    :percent="$internship->isMbkm() ? min(100, (int) round($internship->loggedHours() / max(1, \App\Support\Campus::rule('mbkm_min_hours')) * 100)) : null"
-                    :hint="$internship->isMbkm() ? null : \App\Support\Num::short($periodHours, 1).' jam di periode ini'" />
+            @php($activePlans = $plans->filter(fn ($p) => $p->phase() === 'active')->count())
+            <x-stat label="Rencana kegiatan" :value="$plans->count()" unit="kegiatan" :href="route('timesheet.index')"
+                    :tone="$plans->isEmpty() ? 'amber' : 'blue'" :hint="$plans->isEmpty() ? 'Isi rencana dulu di timesheet' : $activePlans.' sedang berjalan'" />
             <x-stat label="Task selesai" :value="$internship->completed_tasks_count" :unit="'dari '.$internship->tasks_count" :href="route('kegiatan.index')"
                     :percent="$internship->percent()" />
             @if ($internship->status === 'selesai' || $a?->isValidated())
@@ -69,35 +64,19 @@
                         :tone="$a?->isValidated() ? 'green' : 'gray'" empty="Belum dinilai"
                         :hint="$a?->isValidated() ? 'Sudah divalidasi' : 'Muncul setelah divalidasi dosen pembimbing'" />
             @else
-                <x-stat label="Silabus" class="stat-text" :value="$internship->syllabusStatusLabel()" :href="route('silabus.index')"
-                        :tone="$internship->syllabusStatusTone() === 'red' ? 'amber' : ($internship->syllabus_status === 'approved' ? 'green' : 'gray')"
-                        :hint="$internship->syllabus_status === 'approved' ? 'Sudah disetujui' : 'Disetujui '.($internship->isSeminar() ? 'dosen pembimbing' : 'Company Supervisor')" />
+                <x-stat label="Goals tercapai" :value="$goals->whereNotNull('achieved_at')->count()" :unit="'dari '.$goals->count()" :href="route('kegiatan.index')"
+                        tone="gray" :hint="$goals->isEmpty() ? 'Tulis goals di halaman Kegiatan' : 'Tandai di halaman Kegiatan'" />
             @endif
         </div>
 
-        @if ($internship->isMbkm())
-            @php($projected = $internship->projectedHours())
-            <p class="chart-note" style="margin-top: calc(var(--space-2) * -1)">
-                MBKM Mandiri: logbook minimal {{ \App\Support\Campus::rule('mbkm_min_hours') }} jam. Batang di kartu "Jam tercatat" menunjukkan capaian Anda.
-                @if ($projected !== null)
-                    <span @class(['text-red' => $internship->isBehindMbkmHours()])>Dengan laju sekarang, perkiraan di akhir KP {{ \App\Support\Num::short($projected) }} jam{{ $internship->isBehindMbkmHours() ? ', masih kurang dari syarat.' : '.' }}</span>
-                @endif
-            </p>
-        @endif
-
-        @php($idleGoals = $internship->status === 'berjalan' ? $internship->syllabusItems()->whereDoesntHave('tasks')->count() : 0)
-        @if ($idleGoals > 0 && $internship->syllabus_status === 'approved')
-            <p class="chart-note"><x-ikon name="syllabus" :size="14" /> {{ $idleGoals }} tujuan silabus belum punya task. Hubungkan task ke tujuan itu di <a href="{{ route('kegiatan.index') }}">Kegiatan</a> agar kemajuannya terlihat.</p>
-        @endif
-
-        @if ($next && in_array($next['state'], ['waiting', 'attention'], true))
+        @if ($next && in_array($next['state'], ['current', 'waiting', 'attention'], true) && $next['key'] !== 'activities')
             <div class="next-step next-{{ $next['state'] }}">
-                <x-ikon :name="$next['state'] === 'attention' ? 'alert' : 'clock'" :size="20" />
+                <x-ikon :name="$next['state'] === 'attention' ? 'alert' : ($next['state'] === 'waiting' ? 'clock' : 'arrow')" :size="20" />
                 <div>
-                    <div class="next-step-title">{{ $next['state'] === 'attention' ? 'Perlu tindakan' : 'Menunggu '.$next['actor'] }}: {{ $next['title'] }}</div>
+                    <div class="next-step-title">{{ ['attention' => 'Perlu tindakan', 'waiting' => 'Menunggu '.$next['actor'], 'current' => 'Giliran Anda'][$next['state']] }}: {{ $next['title'] }}</div>
                     <div class="next-step-sub">{{ $next['note'] ?? $next['detail'] }}</div>
                 </div>
-                <a href="{{ $next['key'] === 'syllabus' ? route('silabus.index') : route('kp.status') }}" class="btn btn-sm">Buka</a>
+                <a href="{{ $next['url'] ?? route('kp.status') }}" class="btn btn-sm">{{ $next['url'] ? ($next['cta'] ?? 'Buka') : 'Buka' }}</a>
             </div>
         @endif
 
@@ -137,28 +116,53 @@
                 <section class="card">
                     <div class="card-head">
                         <div>
-                            <h2 class="card-title">Jam kegiatan per minggu</h2>
-                            <p class="card-sub">Dari timesheet, 8 minggu terakhir</p>
+                            <h2 class="card-title">Rencana kegiatan</h2>
+                            <p class="card-sub">Dari timesheet · garis merah hari ini</p>
                         </div>
                         <a href="{{ route('timesheet.index') }}" class="btn btn-sm">Timesheet</a>
                     </div>
-                    <div class="card-body">
-                        @if (array_sum($hours['values']) == 0)
-                            <p class="muted">Belum ada jam yang dicatat. Isi timesheet setiap hari kerja.</p>
-                        @else
-                            <x-line-chart :width="560" :height="200" unit="jam" :labels="$hours['labels']" :tips="$hours['tips']"
-                                          :series="[['name' => 'Jam tercatat', 'values' => $hours['values'], 'color' => 'green', 'area' => true]]" />
-                        @endif
-                    </div>
+                    @if ($plans->isEmpty())
+                        <div class="empty">
+                            <strong>Belum ada rencana</strong>
+                            Susun rencana kegiatan per minggu atau per bulan di <a href="{{ route('timesheet.index') }}">Timesheet</a>, lalu buat task di bawahnya.
+                        </div>
+                    @else
+                        @include('timesheet._gantt', ['canEdit' => false, 'compact' => true])
+                    @endif
                 </section>
             </div>
 
             <div class="col">
                 <section class="card">
                     <div class="card-head">
+                        <div>
+                            <h2 class="card-title">Kemajuan KP</h2>
+                            <p class="card-sub">{{ collect($steps)->where('state', 'done')->count() }} dari {{ count($steps) }} langkah selesai</p>
+                        </div>
+                        <a href="{{ route('kp.status') }}" class="btn btn-sm">Detail</a>
+                    </div>
+                    <ul class="mini-steps">
+                        @foreach ($steps as $step)
+                            @continue($step['state'] === 'later')
+                            @php($link = $step['url'] && $step['state'] !== 'upcoming')
+                            <li @class(['mini-step', 'is-'.$step['state']])>
+                                <span class="mini-step-dot" aria-hidden="true">@if ($step['state'] === 'done')<x-ikon name="check" :size="12" />@endif</span>
+                                @if ($link)
+                                    <a href="{{ $step['url'] }}" class="mini-step-title">{{ $step['title'] }}</a>
+                                @else
+                                    <span class="mini-step-title">{{ $step['title'] }}</span>
+                                @endif
+                                <span class="mini-step-state">{{ ['done' => 'Selesai', 'current' => 'Berjalan', 'waiting' => 'Menunggu', 'attention' => 'Perlu cek', 'upcoming' => 'Belum'][$step['state']] ?? '' }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <div class="card-head">
                         <h2 class="card-title">Meeting minggu ini</h2>
                     </div>
-                    @php($host = $internship->isSeminar() ? ($internship->lecturer?->listName() ?? 'dosen pembimbing') : ($internship->supervisor?->listName() ?? 'Company Supervisor'))
+                    @php($host = $internship->supervisor?->listName() ?? 'Company Supervisor')
                     @if ($meeting)
                         <div class="meeting">
                             <div class="meeting-when">{{ $meeting->dayLabel() }}, {{ $meeting->timeLabel() }}</div>
@@ -174,19 +178,14 @@
 
                 <section class="card">
                     <div class="card-head">
-                        <h2 class="card-title">{{ $internship->isSeminar() ? 'Kegiatan seminar' : 'Tempat magang' }}</h2>
+                        <h2 class="card-title">Tempat magang</h2>
                     </div>
                     <div class="card-body">
                         <dl class="kv">
-                            @if ($internship->isSeminar())
-                                <div><dt>Kegiatan</dt><dd>{{ $internship->topic }}</dd></div>
-                                <div><dt>Penyelenggara</dt><dd>{{ $internship->organizer ?? '–' }}</dd></div>
-                            @else
-                                <div><dt>Perusahaan</dt><dd>{{ $internship->company?->name }}@if ($internship->company?->city)<small>{{ $internship->company->city }}</small>@endif</dd></div>
-                                <div><dt>Divisi</dt><dd>{{ $internship->division?->name ?? '–' }}</dd></div>
-                                <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
-                                <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}@if ($internship->supervisor_title)<small>{{ $internship->supervisor_title }}</small>@endif</dd></div>
-                            @endif
+                            <div><dt>Perusahaan</dt><dd>{{ $internship->company?->name }}@if ($internship->company?->city)<small>{{ $internship->company->city }}</small>@endif</dd></div>
+                            <div><dt>Divisi</dt><dd>{{ $internship->division?->name ?? '–' }}</dd></div>
+                            <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
+                            <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}@if ($internship->supervisor_title)<small>{{ $internship->supervisor_title }}</small>@endif</dd></div>
                             <div><dt>Dosen pembimbing</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
                             <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>Bulan ke-{{ $internship->currentMonth() }} dari {{ $internship->durationMonths() }}</small></dd></div>
                         </dl>

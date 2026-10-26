@@ -155,9 +155,9 @@ class ApiTest extends TestCase
 
     // ---------- Perusahaan ----------
 
-    public function test_daftar_perusahaan_hanya_untuk_biro_dan_kaprodi(): void
+    public function test_daftar_perusahaan_hanya_untuk_tu_dan_kaprodi(): void
     {
-        $this->signIn('biro@kp.test')->getJson('/api/v1/companies')->assertOk()->assertJsonFragment(['name' => 'PT Nusantara Digital']);
+        $this->signIn('tu@kp.test')->getJson('/api/v1/companies')->assertOk()->assertJsonFragment(['name' => 'PT Nusantara Digital']);
         $this->signIn('kaprodi@kp.test')->getJson('/api/v1/companies')->assertOk();
         $this->signIn('mahasiswa@kp.test')->getJson('/api/v1/companies')->assertForbidden();
     }
@@ -166,15 +166,15 @@ class ApiTest extends TestCase
     {
         $company = Company::where('name', 'PT Nusantara Digital')->firstOrFail();
 
-        $data = $this->signIn('biro@kp.test')->getJson("/api/v1/companies/{$company->id}/stats")->assertOk()->json('data');
+        $data = $this->signIn('tu@kp.test')->getJson("/api/v1/companies/{$company->id}/stats")->assertOk()->json('data');
 
-        $this->assertSame(2, $data['ongoing_count']);   // Rina dan Fajar
+        $this->assertSame(3, $data['ongoing_count']);   // Rina, Fajar, Gilang
         $this->assertSame(0, $data['finished_count']);
-        $this->assertCount(2, $data['students']);
+        $this->assertCount(3, $data['students']);
 
         $skills = collect($data['skills'])->keyBy('name');
-        $this->assertSame(100, $skills['Git']['percent']);   // keduanya punya Git
-        $this->assertSame(50, $skills['PHP']['percent']);    // hanya Rina
+        $this->assertSame(67, $skills['Git']['percent']);    // Rina dan Fajar dari 3 mahasiswa
+        $this->assertSame(33, $skills['PHP']['percent']);    // hanya Rina
         $this->assertSame(1, $skills['PHP']['students']);
     }
 

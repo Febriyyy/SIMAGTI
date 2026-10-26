@@ -2,8 +2,11 @@
 
 namespace App\Actions\Companies;
 
+use App\Models\Assessment;
 use App\Models\Company;
+use App\Support\AssessmentStandard;
 use App\Support\Grading;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -54,17 +57,19 @@ class BuildCompanyStats
     }
 
     /**
-     * Performa dari penilaian akhir yang sudah divalidasi: rata-rata nilai, sebaran huruf mutu, rata-rata per aspek.
+     * Performa dari penilaian akhir yang sudah divalidasi: rata-rata nilai, sebaran huruf mutu,
+     * rata-rata per kategori standar penilaian (hard skill, soft skill, attitude).
      *
-     * @param  \Illuminate\Support\Collection<int, \App\Models\Assessment>  $validated
+     * @param  Collection<int, Assessment>  $validated
      * @return array<string, mixed>
      */
     private function performance($validated): array
     {
-        $aspects = $validated
-            ->flatMap(fn ($a) => $a->scores)
-            ->groupBy(fn ($score) => $score->aspect->name)
-            ->map(fn ($scores, $name) => ['name' => $name, 'average' => round((float) $scores->avg('score'), 2)])
+        $scores = $validated->flatMap(fn ($a) => $a->scores)->filter(fn ($s) => $s->aspect && $s->score !== null);
+        $aspects = collect(AssessmentStandard::CATEGORIES)
+            ->map(fn ($c, $key) => ['key' => $key, 'name' => $c[0], 'items' => $scores->filter(fn ($s) => $s->aspect->category === $key)])
+            ->filter(fn ($row) => $row['items']->isNotEmpty())
+            ->map(fn ($row) => ['name' => $row['name'], 'average' => round((float) $row['items']->avg('score'), 2)])
             ->values()
             ->all();
 

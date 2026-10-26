@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-/** Antrean dokumen: TU Fakultas menerbitkan surat pengantar, biro memeriksa surat balasan dan pakta integritas. */
+/** Antrean dokumen: TU Fakultas menerbitkan surat pengantar, TU juga memeriksa surat balasan. */
 class DocumentQueueController extends Controller
 {
     public function letters(): View
@@ -32,13 +32,13 @@ class DocumentQueueController extends Controller
     public function uploads(): View
     {
         $base = InternshipDocument::with(['internship.student', 'internship.company', 'file'])
-            ->whereIn('type', [InternshipDocument::REPLY, InternshipDocument::PACT]);
+            ->where('type', InternshipDocument::REPLY);
 
         $toReview = (clone $base)->where('status', 'diunggah')->oldest('updated_at')->get();
         $missing = (clone $base)->whereIn('status', ['menunggu', 'ditolak'])
             ->whereHas('internship', fn ($q) => $q->where('status', 'berjalan'))->orderBy('due_on')->get();
 
-        return view('biro.dokumen', compact('toReview', 'missing'));
+        return view('tu.dokumen', compact('toReview', 'missing'));
     }
 
     public function review(Request $request, InternshipDocument $document, ManageDocuments $docs): RedirectResponse

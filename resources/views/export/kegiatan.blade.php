@@ -47,7 +47,7 @@
 
     <div class="sheet">
         <div class="kop">
-            Form Absensi dan Aktivitas Pelaksanaan {{ $internship->isSeminar() ? 'Kegiatan' : 'Kerja Praktik' }}<br>
+            Form Absensi dan Aktivitas Pelaksanaan Kerja Praktik<br>
             Pada: {{ $internship->placeName() }}<br>
             {{ $id['program'] ? 'Program Studi '.$id['program'] : '' }}<br>
             {{ $id['faculty'] }}<br>
@@ -57,7 +57,8 @@
         <table class="ident">
             <tr><td>Nama</td><td>: {{ $student->name }}</td></tr>
             <tr><td>NIM</td><td>: {{ $student->nim }}</td></tr>
-            <tr><td>{{ $internship->isSeminar() ? 'Kegiatan' : 'Unit kerja / posisi' }}</td><td>: {{ $internship->isSeminar() ? $internship->programTypeLabel() : trim(($internship->division?->name ?? '').' · '.($internship->position ?? ''), ' ·') }}</td></tr>
+            <tr><td>Perusahaan</td><td>: {{ $internship->placeName() }}</td></tr>
+            <tr><td>Unit kerja / posisi</td><td>: {{ trim(($internship->division?->name ?? '').' · '.($internship->position ?? ''), ' ·') ?: '–' }}</td></tr>
             <tr><td>Periode laporan</td><td>: {{ $report['range'] }}</td></tr>
         </table>
 
@@ -67,8 +68,7 @@
                     <th style="width: 7%">No.</th>
                     <th style="width: 20%">Hari/Tanggal</th>
                     <th>Aktivitas Pekerjaan</th>
-                    <th style="width: 9%">Jam</th>
-                    <th style="width: 17%">Paraf {{ $internship->isSeminar() ? 'Dosen' : 'Pembimbing Industri' }}</th>
+                    <th style="width: 17%">Paraf Pembimbing Industri</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,35 +77,48 @@
                         <td class="center">{{ $i + 1 }}.</td>
                         <td>{{ $entry->work_date->copy()->locale('id')->translatedFormat('l, j F Y') }}</td>
                         <td>{{ $entry->description }}@if ($entry->task) <span class="muted">({{ $entry->task->key() }})</span>@endif</td>
-                        <td class="num">{{ \App\Support\Num::short((float) $entry->hours) }}</td>
                         <td></td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="center muted">Tidak ada catatan pada periode ini.</td></tr>
+                    <tr><td colspan="4" class="center muted">Tidak ada catatan pada periode ini.</td></tr>
                 @endforelse
-                <tr>
-                    <td colspan="3" class="num"><strong>Total jam</strong></td>
-                    <td class="num"><strong>{{ \App\Support\Num::short($report['hours']) }}</strong></td>
-                    <td></td>
-                </tr>
             </tbody>
         </table>
 
         <div class="sign">
             {{ \App\Support\Campus::city() }}, {{ now()->locale('id')->translatedFormat('j F Y') }}<br>
-            {{ $internship->isSeminar() ? 'Dosen Pembimbing' : 'Pembimbing Industri' }}<br>
-            {{ $internship->isSeminar() ? '' : ($internship->supervisor_title ?? '') }}
+            Pembimbing Industri<br>
+            {{ $internship->supervisor_title ?? '' }}
             <div class="space"></div>
-            ({{ $internship->isSeminar() ? ($internship->lecturer?->name ?? '..............................') : ($internship->supervisor?->name ?? $internship->supervisor_name ?? '..............................') }})
+            ({{ $internship->supervisor?->name ?? $internship->supervisor_name ?? '..............................' }})
         </div>
 
+        @if ($report['plans']->isNotEmpty())
+            <h2 class="page-break">Rencana kegiatan</h2>
+            <table class="grid" style="margin-bottom: 16px">
+                <thead>
+                    <tr><th style="width: 7%">No.</th><th>Kegiatan</th><th style="width: 30%">Waktu</th><th style="width: 14%">Task selesai</th></tr>
+                </thead>
+                <tbody>
+                    @foreach ($report['plans'] as $i => $plan)
+                        <tr>
+                            <td class="center">{{ $i + 1 }}.</td>
+                            <td>{{ $plan->title }}</td>
+                            <td>{{ $plan->rangeLabel() }} ({{ $plan->days() }} hari)</td>
+                            <td class="center">{{ $plan->completed_tasks_count }}/{{ $plan->tasks_count }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
         @if ($report['tasks']->isNotEmpty())
-            <h2 class="page-break">Daftar task per proyek</h2>
+            <h2 @class(['page-break' => $report['plans']->isEmpty()])>Daftar task per proyek</h2>
             @foreach ($byProject as $project => $tasks)
                 <p><strong>{{ $project }}</strong> · {{ $tasks->count() }} task, {{ $tasks->where('status', 'completed')->count() }} selesai</p>
                 <table class="grid" style="margin-bottom: 16px">
                     <thead>
-                        <tr><th style="width: 12%">Kode</th><th>Task</th><th style="width: 16%">Status</th><th style="width: 14%">Tenggat</th><th style="width: 9%">Jam</th></tr>
+                        <tr><th style="width: 12%">Kode</th><th>Task</th><th style="width: 16%">Status</th><th style="width: 14%">Tenggat</th></tr>
                     </thead>
                     <tbody>
                         @foreach ($tasks as $task)
@@ -114,7 +127,6 @@
                                 <td>{{ $task->title }}</td>
                                 <td>{{ $task->column?->name ?? $task->statusLabel() }}</td>
                                 <td>{{ $task->due_date?->format('d-m-Y') ?? '–' }}</td>
-                                <td class="num">{{ \App\Support\Num::short((float) ($task->logged_hours ?? 0)) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

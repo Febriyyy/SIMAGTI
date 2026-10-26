@@ -19,6 +19,17 @@ class Company extends Model
         'mandiri_terverifikasi' => ['Terverifikasi', 'green'],
     ];
 
+    /** Pilihan bidang usaha di formulir; "Lainnya" diisi sendiri oleh mahasiswa / TU. */
+    public const INDUSTRIES = [
+        'Pendidikan',
+        'Keuangan',
+        'Teknologi dan IT',
+        'Industri / Manufaktur',
+        'Perdagangan',
+    ];
+
+    public const INDUSTRY_OTHER = 'lainnya';
+
     protected $fillable = [
         'name',
         'industry',

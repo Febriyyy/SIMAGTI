@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-/** Mencatat atau mengubah satu baris timesheet; foto dokumentasi disimpan di disk privat. */
+/** Mencatat atau mengubah satu catatan kegiatan harian; foto dokumentasi disimpan di disk privat. */
 class LogTime
 {
     public const DISK = 'local';
@@ -23,13 +23,12 @@ class LogTime
             $entry = $internship->timeEntries()->create([
                 'weekly_task_id' => $data['weekly_task_id'] ?? null,
                 'work_date' => $data['work_date'],
-                'hours' => $data['hours'],
                 'description' => trim($data['description']),
                 'file_id' => $file?->id,
                 'created_by' => $student->id,
             ]);
 
-            ActivityLog::record('timesheet.catat', 'Mencatat '.rtrim(rtrim(number_format((float) $data['hours'], 2, '.', ''), '0'), '.')." jam pada {$entry->work_date->toDateString()}", $entry);
+            ActivityLog::record('timesheet.catat', 'Mencatat kegiatan '.$entry->work_date->locale('id')->translatedFormat('j M Y').': '.mb_strimwidth($entry->description, 0, 80, '…'), $entry);
 
             return $entry;
         });
@@ -39,7 +38,7 @@ class LogTime
     {
         return $this->withPhoto($student, $entry->internship, $photo, function (?StoredFile $file) use ($entry, $data) {
             $old = $entry->photo;
-            $entry->update(array_intersect_key($data, array_flip(['work_date', 'hours', 'description', 'weekly_task_id'])) + ($file ? ['file_id' => $file->id] : []));
+            $entry->update(array_intersect_key($data, array_flip(['work_date', 'description', 'weekly_task_id'])) + ($file ? ['file_id' => $file->id] : []));
 
             if ($file && $old) {
                 $old->forceDelete();

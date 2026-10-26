@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** Dokumen KP milik mahasiswa: surat pengantar, surat balasan perusahaan, pakta integritas MBKM. */
+/** Dokumen KP milik mahasiswa: surat pengantar dan surat balasan perusahaan. */
 class DocumentController extends Controller
 {
     private function current(Request $request): ?Internship
@@ -50,7 +50,7 @@ class DocumentController extends Controller
     {
         $internship = $this->current($request);
         abort_unless($internship && in_array($internship->status, ['diajukan', 'berjalan'], true), 404);
-        abort_unless(in_array($type, [InternshipDocument::REPLY, InternshipDocument::PACT], true), 404);
+        abort_unless($type === InternshipDocument::REPLY, 404);
 
         $request->validate([
             'berkas' => ['required', 'file', 'max:'.ManageDocuments::MAX_KB, 'extensions:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png'],
@@ -63,7 +63,7 @@ class DocumentController extends Controller
 
         $doc = $docs->upload($request->user(), $internship, $type, $request->file('berkas'));
 
-        return back()->with('status', $doc->label().' terunggah dan menunggu diperiksa biro.');
+        return back()->with('status', $doc->label().' terunggah dan menunggu diperiksa TU.');
     }
 
     /** Berkas unggahan: hanya untuk yang boleh melihat penempatan ini. */

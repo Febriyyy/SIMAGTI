@@ -6,9 +6,7 @@ use App\Models\Assessment;
 use App\Models\Company;
 use App\Models\Internship;
 use App\Models\User;
-use App\Support\Campus;
 use App\Support\Grading;
-use App\Support\Num;
 use App\Support\Relative;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -27,7 +25,7 @@ class BuildMonitoringDashboard
 
     public const ENDING_DAYS = 21;       // KP berakhir dalam 3 minggu tetapi belum dinilai
 
-    public const ACTIVITY_WEEKS = 8;     // panjang grafik jam kegiatan
+    public const ACTIVITY_WEEKS = 8;     // panjang grafik aktivitas mingguan
 
     /** @return array<string, mixed> */
     public function handle(User $user): array
@@ -58,7 +56,7 @@ class BuildMonitoringDashboard
                 'average_score' => $validated->isEmpty() ? null : round((float) $validated->avg('final_score'), 2),
             ],
             'attention' => $this->attention($ongoing),
-            'activity' => $this->weeklyHours($internships->pluck('id')->all()),
+            'activity' => $this->weeklyActivity($internships->pluck('id')->all()),
             'grades' => Grading::distribution($validated->pluck('letter_grade')),
             'assessment' => [
                 'none' => $internships->whereIn('status', ['berjalan', 'selesai'])->filter(fn ($i) => $i->assessment === null)->count(),
@@ -101,10 +99,6 @@ class BuildMonitoringDashboard
 
                 if ($i->tasks_count > 0 && $i->percent() < self::LOW_PROGRESS) {
                     $reasons[] = 'Progres task '.$i->percent().'%';
-                }
-
-                if ($i->isBehindMbkmHours()) {
-                    $reasons[] = 'MBKM: perkiraan '.Num::short($i->projectedHours()).' dari '.Campus::rule('mbkm_min_hours').' jam';
                 }
 
                 if ($i->daysLeft() <= self::ENDING_DAYS && ! $i->assessment?->isValidated()) {
@@ -155,25 +149,32 @@ class BuildMonitoringDashboard
     }
 
     /**
-     * Jam kegiatan yang dicatat per minggu kalender (Senin–Minggu), beberapa minggu terakhir.
+     * Aktivitas per minggu kalender (Senin–Minggu), beberapa minggu terakhir:
+     * jumlah catatan kegiatan harian dan task yang selesai.
      *
      * @param  list<int>  $ids
-     * @return array{labels: list<string>, ranges: list<string>, values: list<float>}
+     * @return array{labels: list<string>, ranges: list<string>, notes: list<int>, done: list<int>}
      */
-    private function weeklyHours(array $ids): array
+    private function weeklyActivity(array $ids): array
     {
         $first = now()->startOfWeek()->subWeeks(self::ACTIVITY_WEEKS - 1)->startOfDay();
+        $bucket = fn ($date) => (int) floor($first->diffInDays(Carbon::parse($date)->startOfDay()) / 7);
 
-        $rows = $ids === [] ? collect() : DB::table('time_entries')
-            ->whereIn('internship_id', $ids)
-            ->where('work_date', '>=', $first->toDateString())
-            ->get(['work_date', 'hours']);
+        $notes = array_fill(0, self::ACTIVITY_WEEKS, 0);
+        $done = array_fill(0, self::ACTIVITY_WEEKS, 0);
 
-        $values = array_fill(0, self::ACTIVITY_WEEKS, 0.0);
-        foreach ($rows as $row) {
-            $index = (int) floor($first->diffInDays(Carbon::parse($row->work_date)->startOfDay()) / 7);
-            if ($index >= 0 && $index < self::ACTIVITY_WEEKS) {
-                $values[$index] += (float) $row->hours;
+        if ($ids !== []) {
+            foreach (DB::table('time_entries')->whereIn('internship_id', $ids)->where('work_date', '>=', $first->toDateString())->pluck('work_date') as $date) {
+                $i = $bucket($date);
+                if ($i >= 0 && $i < self::ACTIVITY_WEEKS) {
+                    $notes[$i]++;
+                }
+            }
+            foreach (DB::table('weekly_tasks')->whereIn('internship_id', $ids)->whereNull('deleted_at')->where('completed_at', '>=', $first)->pluck('completed_at') as $date) {
+                $i = $bucket($date);
+                if ($i >= 0 && $i < self::ACTIVITY_WEEKS) {
+                    $done[$i]++;
+                }
             }
         }
 
@@ -185,7 +186,7 @@ class BuildMonitoringDashboard
             $ranges[] = $start->translatedFormat('j M').' – '.$start->copy()->endOfWeek()->translatedFormat('j M');
         }
 
-        return ['labels' => $labels, 'ranges' => $ranges, 'values' => array_map(fn ($v) => round($v, 1), $values)];
+        return ['labels' => $labels, 'ranges' => $ranges, 'notes' => $notes, 'done' => $done];
     }
 
     /**

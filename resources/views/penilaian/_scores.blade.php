@@ -1,57 +1,44 @@
-{{-- Tabel nilai per aspek (hanya baca). Variabel: $rubric, $assessment --}}
+{{-- Rincian nilai per kategori (hanya baca). Variabel: $rubric, $assessment --}}
 @php($scores = $assessment ? $assessment->scores->keyBy('rubric_aspect_id') : collect())
-<div class="table-wrap">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Aspek</th>
-                <th class="col-num">Bobot</th>
-                <th class="col-num">Nilai</th>
-                <th class="col-num">Kontribusi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($rubric->aspects->where('kind', '!=', 'text') as $aspect)
-                @php($s = $scores->get($aspect->id))
-                <tr>
-                    <td class="cell-wrap">
-                        <div class="cell-title">{{ $aspect->name }}</div>
-                        @if ($s?->note)
-                            <div class="cell-sub">“{{ $s->note }}”</div>
-                        @elseif ($aspect->description)
-                            <div class="cell-sub">{{ $aspect->description }}</div>
+@php($sum = \App\Support\AssessmentStandard::breakdown($rubric, $assessment?->scores ?? collect(), \App\Support\AssessmentStandard::weightsFor($assessment)))
+@foreach (\App\Support\AssessmentStandard::CATEGORIES as $key => [$label, $hint])
+    @php($cat = $sum['categories'][$key])
+    @php($aspects = $rubric->aspects->where('category', $key)->where('kind', '!=', 'text'))
+    <div class="rate-group">
+        <div class="rate-head">
+            <div>
+                <h3 class="rate-title">{{ $label }}</h3>
+                <p class="rate-sub">Bobot {{ \App\Support\Num::short($cat['weight']) }}% · {{ $cat['answered'] }}/{{ $cat['total'] }} dinilai</p>
+            </div>
+            <div class="rate-score">
+                <strong>{{ $cat['average'] !== null ? \App\Support\Num::short($cat['average']) : '–' }}</strong>
+                <small>kontribusi {{ \App\Support\Num::short($cat['contribution']) }}</small>
+            </div>
+        </div>
+        <ul class="rate-list">
+            @foreach ($aspects as $aspect)
+                @php($value = $scores->get($aspect->id)?->score)
+                <li class="rate-row">
+                    <span class="rate-q">{{ $aspect->name }}</span>
+                    <span class="rate-answer">
+                        @if ($value !== null)
+                            {{ \App\Support\AssessmentStandard::scaleLabel((float) $value) ?? 'Nilai' }} <span class="muted">· {{ \App\Support\Num::short((float) $value) }}</span>
+                        @else
+                            <span class="muted">–</span>
                         @endif
-                    </td>
-                    <td class="col-num">{{ \App\Support\Num::short($aspect->weight) }}%</td>
-                    <td class="col-num cell-title">{{ \App\Support\Num::short($s?->score) }}</td>
-                    <td class="col-num muted">{{ $s ? \App\Support\Num::short((float) $s->score * (float) $aspect->weight / 100) : '–' }}</td>
-                </tr>
+                    </span>
+                </li>
             @endforeach
-        </tbody>
-        @if ($assessment?->final_score !== null)
-            <tfoot>
-                <tr>
-                    <td class="cell-title">Nilai akhir</td>
-                    <td class="col-num">100%</td>
-                    <td></td>
-                    <td class="col-num cell-title">{{ \App\Support\Num::short($assessment->final_score) }}</td>
-                </tr>
-            </tfoot>
-        @endif
-    </table>
+        </ul>
+    </div>
+@endforeach
+<div class="rate-total">
+    <span>Nilai akhir</span>
+    <strong>{{ \App\Support\Num::short($assessment?->final_score ?? $sum['final']) }}</strong>
 </div>
-
-@php($questions = $rubric->aspects->where('kind', 'text'))
-@if ($questions->isNotEmpty())
+@if ($assessment?->comment)
     <div class="card-body pt">
-        <h3 class="form-section-title">Jawaban kuesioner</h3>
-        <dl class="answers">
-            @foreach ($questions as $aspect)
-                <div>
-                    <dt>{{ $loop->iteration }}. {{ $aspect->name }}</dt>
-                    <dd class="prewrap">{{ $scores->get($aspect->id)?->note ?? '–' }}</dd>
-                </div>
-            @endforeach
-        </dl>
+        <h3 class="form-section-title">Catatan Company Supervisor</h3>
+        <p class="prewrap">{{ $assessment->comment }}</p>
     </div>
 @endif

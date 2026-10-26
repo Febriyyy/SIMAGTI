@@ -34,8 +34,5 @@ GEMINI.md
 .agents/
 .gemini/
 
-/.git-lama
-
-/kp_monitor
-
+# Berkas SQLite yang tidak sengaja terbuat (DB_DATABASE=kp_monitor tanpa path)
 /kp_monitor

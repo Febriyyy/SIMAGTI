@@ -13,8 +13,8 @@ use Illuminate\Auth\Access\Response;
 class InternshipPolicy
 {
     /**
-     * Mahasiswa menyusun kegiatannya sendiri (proyek, board, task, timesheet) selama KP berjalan.
-     * Sejak v2 perusahaan tidak lagi membuat task.
+     * Mahasiswa menyusun kegiatannya sendiri (rencana di timesheet, goals, proyek, board, task, catatan) selama KP berjalan.
+     * Perusahaan tidak membuat task.
      */
     public function manageActivities(User $user, Internship $internship): Response
     {
@@ -33,46 +33,12 @@ class InternshipPolicy
         return Response::allow();
     }
 
-    /** Silabus disusun mahasiswa; terkunci selama menunggu persetujuan dan setelah disetujui. */
-    public function manageSyllabus(User $user, Internship $internship): Response
-    {
-        $base = $this->manageActivities($user, $internship);
-        if ($base->denied()) {
-            return $base;
-        }
-
-        return in_array($internship->syllabus_status, ['draft', 'revision'], true)
-            ? Response::allow()
-            : Response::deny($internship->syllabus_status === 'approved'
-                ? 'Silabus sudah disetujui. Ajukan perubahan dulu untuk mengubahnya.'
-                : 'Silabus sedang menunggu persetujuan.');
-    }
-
-    /**
-     * Pihak tempat KP yang memantau: Company Supervisor untuk magang, dosen pembimbing untuk seminar.
-     * Dipakai untuk menyetujui silabus, mengatur meeting, dan mengisi penilaian.
-     */
+    /** Pihak perusahaan yang memantau (Company Supervisor): mengatur meeting dan mengisi penilaian akhir. */
     public function review(User $user, Internship $internship): Response
     {
-        if (! $internship->isReviewedBy($user)) {
-            return Response::deny($internship->isSeminar()
-                ? 'Hanya dosen pembimbing mahasiswa ini yang dapat meninjau.'
-                : 'Mahasiswa ini bukan bimbingan Anda.');
-        }
-
-        return Response::allow();
-    }
-
-    public function reviewSyllabus(User $user, Internship $internship): Response
-    {
-        $base = $this->review($user, $internship);
-        if ($base->denied()) {
-            return $base;
-        }
-
-        return $internship->syllabus_status === 'submitted'
+        return $internship->isSupervisedBy($user)
             ? Response::allow()
-            : Response::deny('Tidak ada silabus yang menunggu persetujuan.');
+            : Response::deny('Mahasiswa ini bukan bimbingan Anda.');
     }
 
     /** Company Supervisor dan dosen pembimbing berkomentar pada kegiatan mahasiswa (pemantauan). */
@@ -97,7 +63,7 @@ class InternshipPolicy
     /** Meeting diatur pihak yang memantau, hanya untuk KP yang sedang berjalan. */
     public function scheduleMeeting(User $user, Internship $internship): Response
     {
-        if (! $internship->isReviewedBy($user)) {
+        if (! $internship->isSupervisedBy($user)) {
             return Response::deny('Ada mahasiswa yang bukan bimbingan Anda.');
         }
 
@@ -109,17 +75,21 @@ class InternshipPolicy
     }
 
     /**
-     * Penilaian akhir (sementara, sampai penilaian bulanan v2 selesai): diisi Company Supervisor
-     * (atau dosen pembimbing untuk seminar), lalu divalidasi dosen pembimbing.
+     * Penilaian akhir di akhir periode KP: diisi Company Supervisor dengan skala standar kampus,
+     * dibuka beberapa hari sebelum KP berakhir, lalu divalidasi dosen pembimbing.
      */
     public function assess(User $user, Internship $internship): Response
     {
-        if (! $internship->isReviewedBy($user)) {
+        if (! $internship->isSupervisedBy($user)) {
             return Response::deny('Mahasiswa ini bukan bimbingan Anda.');
         }
 
         if (! in_array($internship->status, ['berjalan', 'selesai'], true)) {
             return Response::deny('Penilaian hanya untuk KP yang sedang berjalan atau sudah selesai.');
+        }
+
+        if (! $internship->assessmentIsOpen()) {
+            return Response::deny('Penilaian akhir dibuka mulai '.$internship->assessmentOpensOn()->locale('id')->translatedFormat('j F Y').', menjelang akhir periode KP.');
         }
 
         $status = $internship->assessment?->status;
@@ -156,8 +126,8 @@ class InternshipPolicy
             return Response::deny('Hanya TU Fakultas yang dapat mengaktifkan Company Supervisor.');
         }
 
-        if ($internship->program !== 'magang' || $internship->status !== 'berjalan') {
-            return Response::deny('Penempatan ini belum disetujui atau bukan jalur magang.');
+        if ($internship->status !== 'berjalan') {
+            return Response::deny('Penempatan ini belum disetujui.');
         }
 
         return Response::allow();
@@ -179,12 +149,12 @@ class InternshipPolicy
             : Response::allow();
     }
 
-    /** Hanya biro kerjasama yang memverifikasi perusahaan KP mandiri. */
-    public function reviewAsBiro(User $user, Internship $internship): Response
+    /** Hanya TU Fakultas yang memverifikasi perusahaan KP mandiri. */
+    public function verifyAsTu(User $user, Internship $internship): Response
     {
-        return $user->role === 'biro'
+        return $user->role === 'tu'
             ? Response::allow()
-            : Response::deny('Hanya Biro Kerjasama yang dapat memverifikasi perusahaan.');
+            : Response::deny('Hanya TU Fakultas yang dapat memverifikasi perusahaan.');
     }
 
     /** Hanya kaprodi yang memberi persetujuan akhir KP mandiri. */
@@ -195,10 +165,10 @@ class InternshipPolicy
             : Response::deny('Hanya Kaprodi yang dapat memberi persetujuan akhir.');
     }
 
-    /** Daftar seluruh penempatan boleh dilihat kaprodi dan biro. */
+    /** Daftar seluruh penempatan boleh dilihat kaprodi dan TU. */
     public function viewAny(User $user): Response
     {
-        return $user->hasRole('kaprodi', 'biro', 'tu')
+        return $user->hasRole('kaprodi', 'tu')
             ? Response::allow()
             : Response::deny('Anda tidak memiliki akses ke daftar penempatan.');
     }

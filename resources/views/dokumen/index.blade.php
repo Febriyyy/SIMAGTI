@@ -12,12 +12,10 @@
 
     @if (! $internship)
         <div class="card"><div class="empty"><strong>Belum ada pengajuan KP</strong> Dokumen muncul setelah Anda mengajukan KP. <a href="{{ route('kp.status') }}">Buka Status KP</a>.</div></div>
-    @elseif ($internship->isSeminar())
-        <div class="card"><div class="empty"><strong>Tidak ada dokumen perusahaan</strong> KP Seminar tidak memerlukan surat pengantar maupun surat balasan.</div></div>
     @else
         @php
             $letter = $internship->document(\App\Models\InternshipDocument::LETTER);
-            $uploads = collect([\App\Models\InternshipDocument::REPLY, \App\Models\InternshipDocument::PACT])
+            $uploads = collect([\App\Models\InternshipDocument::REPLY])
                 ->map(fn ($t) => $internship->document($t))->filter();
         @endphp
 
@@ -72,7 +70,7 @@
                             <input type="file" name="berkas" accept=".pdf,.jpg,.jpeg,.png" required class="input" aria-label="Berkas {{ $doc->label() }}">
                             <button type="submit" class="btn btn-primary"><x-ikon name="upload" :size="18" /> {{ $doc->file ? 'Ganti berkas' : 'Unggah' }}</button>
                         </form>
-                        <p class="hint">PDF, JPG, atau PNG, maksimal 5 MB. Diperiksa biro kerjasama.</p>
+                        <p class="hint">PDF, JPG, atau PNG, maksimal 5 MB. Diperiksa TU Fakultas.</p>
                     @endif
                 </div>
             </section>

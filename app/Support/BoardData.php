@@ -20,9 +20,8 @@ class BoardData
         $sort = in_array($request->query('urut'), ['tenggat', 'prioritas', 'terbaru', 'kode'], true) ? $request->query('urut') : 'tenggat';
 
         $query = $filter->apply($internship->tasks()->getQuery())
-            ->with(['project', 'column', 'syllabusItem'])
-            ->withCount(['evidences', 'comments', 'checklist', 'checklist as checklist_done_count' => fn ($q) => $q->where('is_done', true)])
-            ->withSum('timeEntries as logged_hours', 'hours');
+            ->with(['project', 'column', 'plan', 'goal'])
+            ->withCount(['evidences', 'comments', 'checklist', 'checklist as checklist_done_count' => fn ($q) => $q->where('is_done', true)]);
 
         $tasks = $query->get();
 
@@ -44,13 +43,13 @@ class BoardData
             'view' => $view,
             'sort' => $sort,
             'projects' => $internship->projects()->orderBy('archived_at')->orderBy('name')->get(),
-            'syllabusItems' => $internship->syllabusItems()->get(),
+            'plans' => $internship->activityPlans()->get(),
+            'goals' => $internship->goals()->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])->get(),
             'currentPeriod' => Period::for($internship),
             'summary' => [
                 'total' => $tasks->count(),
                 'done' => $tasks->where('status', 'completed')->count(),
                 'overdue' => $tasks->filter->isOverdue()->count(),
-                'hours' => (float) $tasks->sum('logged_hours'),
             ],
         ];
     }

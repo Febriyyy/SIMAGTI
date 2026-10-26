@@ -20,7 +20,6 @@ class BoardColumn extends Model
     public const DEFAULTS = [
         ['To Do', 'todo'],
         ['In Progress', 'in_progress'],
-        ['Review', 'in_progress'],
         ['Done', 'done'],
     ];
 

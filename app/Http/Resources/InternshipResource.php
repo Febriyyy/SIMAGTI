@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Internship;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Internship */
+/** @mixin Internship */
 class InternshipResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -31,8 +32,6 @@ class InternshipResource extends JsonResource
                 'name' => $this->company->name,
             ] : null),
             'topic' => $this->topic,
-            'program' => $this->program,
-            'program_type' => $this->program_type,
             'position' => $this->position,
             'company_supervisor' => $this->whenLoaded('supervisor', fn () => $this->supervisor?->name),
             'lecturer' => $this->whenLoaded('lecturer', fn () => $this->lecturer?->name),

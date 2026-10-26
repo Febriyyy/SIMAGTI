@@ -1,7 +1,7 @@
 {{--
     Satu baris mahasiswa di daftar pemantauan (halaman Mahasiswa Magang dan dashboard).
     Desktop: sejajar dengan kepala kolom. Kartu sempit / HP: tersusun ke bawah, nama tidak dipotong, tombol tetap di kanan.
-    Variabel: internship, last (tanggal catatan terakhir), week (jam minggu ini, opsional), compact (versi dashboard)
+    Variabel: internship, last (tanggal catatan terakhir), week (catatan kegiatan minggu ini, opsional), compact (versi dashboard)
 --}}
 @props(['internship', 'last' => null, 'week' => null, 'compact' => false])
 @php
@@ -9,10 +9,10 @@
     $student = $i->student;
     $viewer = auth()->user();
     $id = $student->academicIdentity();
-    $hours = (float) ($i->logged_hours ?? $i->loggedHours());
+    $plans = (int) ($i->activity_plans_count ?? $i->activityPlans()->count());
     $needsConfirm = $viewer->role === 'supervisor' && $i->status === 'berjalan' && ! $i->supervisor_confirmation;
-    $syllabus = ['draft' => 'Draf', 'submitted' => 'Menunggu', 'revision' => 'Revisi', 'approved' => 'Disetujui'][$i->syllabus_status] ?? $i->syllabusStatusLabel();
-    $role = $i->isSeminar() ? $i->programTypeLabel() : ($i->position ?? 'Posisi belum diisi');
+    $role = $i->position ?? 'Posisi belum diisi';
+    $assessment = $i->relationLoaded('assessment') ? $i->assessment : null;
 @endphp
 <li {{ $attributes->class(['srow', 'srow-compact' => $compact]) }}>
     <a href="{{ route('pantau.show', $i) }}" class="srow-who">
@@ -30,7 +30,7 @@
         <div class="srow-cell srow-pos">
             <span class="srow-label">Posisi</span>
             <span class="srow-value">{{ $role }}</span>
-            <small>{{ $i->isSeminar() ? 'Seminar' : $i->programTypeLabel() }}</small>
+            <small>{{ $i->division?->name ? 'Divisi '.$i->division->name : 'Divisi belum diisi' }}</small>
         </div>
     @endunless
 
@@ -41,9 +41,9 @@
     </div>
 
     <div class="srow-cell srow-num">
-        <span class="srow-label">Jam</span>
-        <span class="srow-value">{{ \App\Support\Num::short($week !== null ? (float) $week : $hours, 1) }}</span>
-        <small>{{ $week !== null ? 'total '.\App\Support\Num::short($hours, 1) : 'total' }}</small>
+        <span class="srow-label">{{ $week !== null ? 'Catatan' : 'Rencana' }}</span>
+        <span class="srow-value">{{ $week !== null ? (int) $week : $plans }}</span>
+        <small>{{ $week !== null ? 'minggu ini' : 'kegiatan' }}</small>
     </div>
 
     @unless ($compact)
@@ -54,10 +54,15 @@
         </div>
 
         <div class="srow-cell srow-status">
-            <span class="srow-label">Silabus</span>
+            <span class="srow-label">Penilaian</span>
             <span class="srow-chips">
-                <x-chip :tone="$i->syllabusStatusTone()">{{ $syllabus }}</x-chip>
-                @if ($i->result)<x-chip :tone="$i->resultTone()">{{ $i->resultLabel() }}</x-chip>@endif
+                @if ($i->result)
+                    <x-chip :tone="$i->resultTone()">{{ $i->resultLabel() }}</x-chip>
+                @elseif ($assessment)
+                    <x-chip :tone="$assessment->statusTone()">{{ $assessment->status === 'validated' ? 'Nilai '.$assessment->letter() : $assessment->statusLabel() }}</x-chip>
+                @else
+                    <x-chip tone="gray">Belum dinilai</x-chip>
+                @endif
             </span>
         </div>
     @endunless

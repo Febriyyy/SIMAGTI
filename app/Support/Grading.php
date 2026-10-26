@@ -7,14 +7,14 @@ use App\Models\Setting;
 
 class Grading
 {
-    /** Skala awal (batas bawah). Kaprodi bisa menggantinya dari pengaturan. */
+    /** Skala huruf mutu standar kampus (batas bawah). Admin bisa menggantinya di Standar Penilaian. */
     public const DEFAULT_SCALE = [
-        'A' => 88,
-        'B+' => 82,
-        'B' => 70,
-        'C+' => 64,
+        'A' => 80,
+        'B+' => 74,
+        'B' => 68,
+        'C+' => 62,
         'C' => 56,
-        'D' => 40,
+        'D' => 45,
         'E' => 0,
     ];
 
@@ -43,6 +43,16 @@ class Grading
         Setting::put('grade_scale_version', $version, 'Versi skala nilai huruf yang berlaku', $userId);
 
         return $version;
+    }
+
+    /** Skala yang berlaku: huruf => batas bawah, dari tertinggi. @return array<string, float> */
+    public static function scale(?int $version = null): array
+    {
+        $rows = GradeScale::where('version', $version ?? self::currentVersion())->orderByDesc('min_score')->get();
+
+        return $rows->isEmpty()
+            ? array_map('floatval', self::DEFAULT_SCALE)
+            : $rows->mapWithKeys(fn ($r) => [$r->grade => (float) $r->min_score])->all();
     }
 
     /** Huruf-huruf pada skala yang berlaku, dari tertinggi ke terendah. */

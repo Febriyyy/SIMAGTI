@@ -14,7 +14,7 @@ class TaskDetailController extends Controller
     {
         $task->load([
             'internship.student.studentProfile.studyProgram', 'internship.company', 'internship.supervisor', 'internship.lecturer',
-            'project', 'column', 'syllabusItem', 'checklist', 'timeEntries.creator',
+            'project', 'column', 'plan', 'goal', 'checklist', 'timeEntries.creator',
             'evidences.submitter', 'evidences.file', 'comments.author', 'attachments.file',
         ]);
 
@@ -31,8 +31,9 @@ class TaskDetailController extends Controller
         $backUrl = $isStudent ? route('kegiatan.index') : route('pantau.show', $internship);
         $columns = $canEdit ? $internship->ensureBoard() : collect();
         $projects = $canEdit ? $internship->projects()->get() : collect();
-        $syllabusItems = $canEdit ? $internship->syllabusItems()->get() : collect();
+        $plans = $canEdit ? $internship->activityPlans()->get() : collect();
+        $goals = $canEdit ? $internship->goals()->get() : collect();
 
-        return view('tugas.detail', compact('task', 'internship', 'canEdit', 'canComment', 'isStudent', 'isMentor', 'locked', 'backUrl', 'columns', 'projects', 'syllabusItems'));
+        return view('tugas.detail', compact('task', 'internship', 'canEdit', 'canComment', 'isStudent', 'isMentor', 'locked', 'backUrl', 'columns', 'projects', 'plans', 'goals'));
     }
 }

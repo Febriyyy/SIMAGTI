@@ -11,7 +11,6 @@ class AssessmentRubric extends Model
     protected $fillable = [
         'name',
         'is_active',
-        'owner_id',
         'created_by',
     ];
 
@@ -37,26 +36,15 @@ class AssessmentRubric extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'owner_id');
-    }
-
-    /** Rubrik kampus yang berlaku (bukan milik dosen). */
+    /** Standar penilaian kampus yang berlaku. */
     public static function active(): ?self
     {
-        return static::where('is_active', true)->whereNull('owner_id')->latest('id')->first();
+        return static::where('is_active', true)->latest('id')->first();
     }
 
-    /** Aspek bernilai (yang dihitung ke nilai akhir); pertanyaan isian tidak ikut. */
+    /** Pertanyaan bernilai (yang dihitung ke nilai akhir). */
     public function scoreAspects(): HasMany
     {
         return $this->aspects()->where('kind', 'score');
-    }
-
-    /** Total bobot semua aspek; harus 100 agar nilai akhir masuk akal. */
-    public function totalWeight(): float
-    {
-        return (float) $this->scoreAspects()->sum('weight');
     }
 }

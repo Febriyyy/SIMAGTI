@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InternshipApproval extends Model
 {
-    public const STEP_BIRO = 'biro_verification';
+    public const STEP_VERIFY = 'tu_verification';
+
     public const STEP_KAPRODI = 'kaprodi_approval';
 
     /** status => [label, warna chip] */

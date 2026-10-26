@@ -1,6 +1,15 @@
-{{-- Isian task (buat / ubah). Variabel: $task (null = baru), $columns, $projects, $syllabusItems --}}
+{{-- Isian task (buat / ubah). Variabel: $task (null = baru), $columns, $projects, $plans, $goals --}}
 @php($t = $task)
 <div class="form-grid">
+    <div class="span-all">
+        <label class="label" for="tf-plan-{{ $t?->id ?? 'new' }}">Rencana kegiatan</label>
+        <select id="tf-plan-{{ $t?->id ?? 'new' }}" name="activity_plan_id" class="select" required>
+            <option value="" disabled @selected(! old('activity_plan_id', $t?->activity_plan_id))>Pilih rencana dari timesheet…</option>
+            @foreach ($plans as $plan)
+                <option value="{{ $plan->id }}" @selected((int) old('activity_plan_id', $t?->activity_plan_id ?? request('rencana')) === $plan->id)>{{ \Illuminate\Support\Str::limit($plan->title, 60) }} · {{ $plan->rangeLabel() }}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="span-all">
         <label class="label" for="tf-title-{{ $t?->id ?? 'new' }}">Judul task</label>
         <input id="tf-title-{{ $t?->id ?? 'new' }}" type="text" name="title" class="input" maxlength="200" required value="{{ old('title', $t?->title) }}" placeholder="Misalnya Rancang ERD modul pemesanan">
@@ -31,15 +40,11 @@
         </select>
     </div>
     <div>
-        <label class="label" for="tf-syl-{{ $t?->id ?? 'new' }}">Tujuan silabus</label>
-        <select id="tf-syl-{{ $t?->id ?? 'new' }}" name="syllabus_item_id" class="select">
+        <label class="label" for="tf-goal-{{ $t?->id ?? 'new' }}">Goal</label>
+        <select id="tf-goal-{{ $t?->id ?? 'new' }}" name="goal_id" class="select">
             <option value="">Tidak dikaitkan</option>
-            @foreach ($syllabusItems->groupBy('category') as $category => $items)
-                <optgroup label="{{ \App\Models\SyllabusItem::CATEGORIES[$category][0] ?? $category }}">
-                    @foreach ($items as $item)
-                        <option value="{{ $item->id }}" @selected((int) old('syllabus_item_id', $t?->syllabus_item_id) === $item->id)>{{ \Illuminate\Support\Str::limit($item->title, 60) }}</option>
-                    @endforeach
-                </optgroup>
+            @foreach ($goals as $goal)
+                <option value="{{ $goal->id }}" @selected((int) old('goal_id', $t?->goal_id) === $goal->id)>{{ \Illuminate\Support\Str::limit($goal->title, 60) }}</option>
             @endforeach
         </select>
     </div>
@@ -50,10 +55,6 @@
     <div>
         <label class="label" for="tf-due-{{ $t?->id ?? 'new' }}">Tenggat</label>
         <input id="tf-due-{{ $t?->id ?? 'new' }}" type="date" name="due_date" class="input" value="{{ old('due_date', $t?->due_date?->toDateString()) }}">
-    </div>
-    <div>
-        <label class="label" for="tf-est-{{ $t?->id ?? 'new' }}">Estimasi (jam)</label>
-        <input id="tf-est-{{ $t?->id ?? 'new' }}" type="number" name="estimate_hours" class="input" min="0" max="500" step="0.5" value="{{ old('estimate_hours', $t?->estimate_hours !== null ? (float) $t->estimate_hours : '') }}">
     </div>
     <div>
         <label class="label" for="tf-labels-{{ $t?->id ?? 'new' }}">Label</label>

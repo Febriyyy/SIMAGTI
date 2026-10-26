@@ -15,6 +15,19 @@ class SaveCompanyRequest extends FormRequest
         return Gate::forUser($this->user())->authorize('manage', Company::class)->allowed();
     }
 
+    /** Bidang usaha dari pilihan; "Lainnya" diisi sendiri. Website boleh tanpa https://. */
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('industry') === Company::INDUSTRY_OTHER) {
+            $this->merge(['industry' => trim((string) $this->input('industry_other')) ?: null, 'industry_choice' => Company::INDUSTRY_OTHER]);
+        }
+
+        $site = trim((string) $this->input('website'));
+        if ($site !== '' && ! preg_match('#^https?://#i', $site)) {
+            $this->merge(['website' => 'https://'.$site]);
+        }
+    }
+
     public function rules(): array
     {
         /** @var Company|null $company */

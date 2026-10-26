@@ -21,25 +21,11 @@ class Internship extends Model
     /** Status yang membuat penempatan dianggap aktif (satu per mahasiswa). */
     public const ACTIVE_STATUSES = ['diajukan', 'berjalan'];
 
-    /** Jalur dan sub-jenis KP: program => [label, [sub-jenis => label]] */
-    public const PROGRAMS = [
-        'magang' => ['Magang', ['industri' => 'KP Industri', 'mbkm' => 'MBKM Mandiri']],
-        'seminar' => ['Seminar', ['pelaksana' => 'Pelaksana Kegiatan Seminar', 'peserta' => 'Peserta Seminar']],
-    ];
-
     /** Ritme kerja mahasiswa (satu periode = satu sprint). */
     public const CADENCES = [
         'daily' => 'Harian',
         'weekly' => 'Mingguan',
         'monthly' => 'Bulanan',
-    ];
-
-    /** Status silabus => [label, warna chip] */
-    public const SYLLABUS_STATUSES = [
-        'draft' => ['Draf', 'gray'],
-        'submitted' => ['Menunggu persetujuan', 'amber'],
-        'revision' => ['Perlu revisi', 'red'],
-        'approved' => ['Disetujui', 'green'],
     ];
 
     /** status => [label, warna chip] */
@@ -55,7 +41,7 @@ class Internship extends Model
     /** Status akhir yang mengunci penempatan (hanya bisa dibaca). */
     public const CLOSED_STATUSES = ['selesai', 'dibatalkan', 'pindah'];
 
-    /** Hasil akhir KP Industri dan Seminar => [label, warna chip] */
+    /** Hasil akhir KP => [label, warna chip] */
     public const RESULTS = [
         'diterima' => ['Diterima', 'green'],
         'tidak' => ['Tidak diterima', 'red'],
@@ -72,8 +58,6 @@ class Internship extends Model
         'company_id',
         'division_id',
         'position',
-        'topic',
-        'organizer',
         'supervisor_name',
         'supervisor_title',
         'supervisor_email',
@@ -82,23 +66,15 @@ class Internship extends Model
         'supervisor_confirmation_note',
         'supervisor_confirmed_at',
         'lecturer_id',
-        'assessment_rubric_id',
         'result',
         'result_note',
-        'lecturer_score',
         'final_score',
         'final_grade',
         'result_by',
         'result_at',
         'academic_period_id',
         'track',
-        'program',
-        'program_type',
         'cadence',
-        'syllabus_status',
-        'syllabus_note',
-        'syllabus_reviewed_by',
-        'syllabus_reviewed_at',
         'status',
         'start_date',
         'end_date',
@@ -114,9 +90,7 @@ class Internship extends Model
             'locked_at' => 'datetime',
             'supervisor_confirmed_at' => 'datetime',
             'result_at' => 'datetime',
-            'lecturer_score' => 'decimal:2',
             'final_score' => 'decimal:2',
-            'syllabus_reviewed_at' => 'datetime',
         ];
     }
 
@@ -255,11 +229,6 @@ class Internship extends Model
             ->exists();
     }
 
-    public function monthlyReviews(): HasMany
-    {
-        return $this->hasMany(MonthlyReview::class)->orderBy('month_number');
-    }
-
     public function guidanceSessions(): HasMany
     {
         return $this->hasMany(GuidanceSession::class)->orderByDesc('held_on');
@@ -270,19 +239,9 @@ class Internship extends Model
         return $this->hasMany(InternshipDocument::class);
     }
 
-    public function creditRecognition(): HasOne
-    {
-        return $this->hasOne(CreditRecognition::class);
-    }
-
     public function changeRequests(): HasMany
     {
         return $this->hasMany(ChangeRequest::class)->latest('id');
-    }
-
-    public function rubric(): BelongsTo
-    {
-        return $this->belongsTo(AssessmentRubric::class, 'assessment_rubric_id');
     }
 
     public function resultBy(): BelongsTo
@@ -297,28 +256,6 @@ class Internship extends Model
             : $this->documents()->where('type', $type)->first();
     }
 
-    /** Jumlah bulan KP untuk siklus bulanan (bulan terakhir boleh tidak penuh). */
-    public function monthCount(): int
-    {
-        $n = 1;
-        while ($n < 24 && $this->start_date->copy()->addMonthsNoOverflow($n)->lt($this->end_date)) {
-            $n++;
-        }
-
-        return $n;
-    }
-
-    /** Bulan KP ke-n: [mulai, akhir]. Bulan ke-1 dimulai di tanggal mulai KP. */
-    public function monthRange(int $month): array
-    {
-        $start = $this->start_date->copy()->addMonthsNoOverflow($month - 1)->startOfDay();
-        $end = $month >= $this->monthCount()
-            ? $this->end_date->copy()->endOfDay() // bulan terakhir sampai tanggal selesai KP
-            : $this->start_date->copy()->addMonthsNoOverflow($month)->subDay()->endOfDay();
-
-        return [$start, $end];
-    }
-
     /** Jumlah bimbingan yang sudah dikonfirmasi dosen. */
     public function confirmedGuidanceCount(): int
     {
@@ -327,16 +264,12 @@ class Internship extends Model
 
     public function resultLabel(): ?string
     {
-        if ($this->isMbkm()) {
-            return $this->final_grade ? $this->final_grade.' ('.rtrim(rtrim(number_format((float) $this->final_score, 2, ',', ''), '0'), ',').')' : null;
-        }
-
         return self::RESULTS[$this->result][0] ?? null;
     }
 
     public function resultTone(): string
     {
-        return $this->isMbkm() ? 'green' : (self::RESULTS[$this->result][1] ?? 'gray');
+        return self::RESULTS[$this->result][1] ?? 'gray';
     }
 
     public function isClosed(): bool
@@ -359,9 +292,16 @@ class Internship extends Model
         return $this->hasMany(BoardColumn::class)->orderBy('position');
     }
 
-    public function syllabusItems(): HasMany
+    /** Tujuan (goals) yang ingin dicapai mahasiswa selama KP. */
+    public function goals(): HasMany
     {
-        return $this->hasMany(SyllabusItem::class)->orderBy('position');
+        return $this->hasMany(Goal::class)->orderBy('position')->orderBy('id');
+    }
+
+    /** Rencana kegiatan (timesheet / Gantt). Task dibuat di bawah salah satu rencana. */
+    public function activityPlans(): HasMany
+    {
+        return $this->hasMany(ActivityPlan::class)->orderBy('start_date')->orderBy('id');
     }
 
     public function timeEntries(): HasMany
@@ -371,7 +311,7 @@ class Internship extends Model
 
     /**
      * Kolom board mahasiswa. Dibuat otomatis saat pertama dipakai:
-     * To Do, In Progress, Review, Done (mahasiswa boleh menambah, mengganti nama, atau menghapus).
+     * To Do, In Progress, Done (mahasiswa boleh menambah, mengganti nama, atau menghapus).
      *
      * @return Collection<int, BoardColumn>
      */
@@ -413,30 +353,28 @@ class Internship extends Model
             'mahasiswa' => $query->where('student_id', $user->id),
             'supervisor' => $query->supervisedBy($user),
             'dospem' => $query->where('lecturer_id', $user->id),
-            'kaprodi', 'biro', 'tu' => $query, // kaprodi, biro, dan TU fakultas melihat semuanya
+            'kaprodi', 'tu' => $query, // kaprodi dan TU fakultas melihat semuanya
             default => $query->whereRaw('1 = 0'),
         };
     }
 
-    /** KP mandiri yang sudah diverifikasi biro dan menunggu persetujuan akhir kaprodi. */
+    /** KP mandiri yang sudah diverifikasi TU Fakultas dan menunggu persetujuan akhir kaprodi. */
     public function scopeAwaitingKaprodi(Builder $query): Builder
     {
-        // Magang menunggu verifikasi biro dulu; seminar (tanpa perusahaan) langsung ke kaprodi.
         return $query->where('track', 'mandiri')
             ->where('status', 'diajukan')
             ->whereDoesntHave('approvals', fn ($q) => $q
-                ->where('step', InternshipApproval::STEP_BIRO)
+                ->where('step', InternshipApproval::STEP_VERIFY)
                 ->where('status', '!=', 'approved'))
             ->whereHas('approvals', fn ($q) => $q
                 ->where('step', InternshipApproval::STEP_KAPRODI)
                 ->where('status', 'pending'));
     }
 
-    /** Penempatan magang yang sudah disetujui tetapi belum punya Company Supervisor (antrean TU Fakultas). */
+    /** Penempatan yang sudah disetujui tetapi belum punya Company Supervisor (antrean TU Fakultas). */
     public function scopeAwaitingSupervisor(Builder $query): Builder
     {
-        return $query->where('program', 'magang')
-            ->where('status', 'berjalan')
+        return $query->where('status', 'berjalan')
             ->whereNotNull('supervisor_email')
             ->whereDoesntHave('staff', fn ($q) => $q->where('role', InternshipStaff::ROLE_SUPERVISOR));
     }
@@ -497,6 +435,17 @@ class Internship extends Model
         return min($this->totalWeeks(), intdiv($elapsed, 7) + 1);
     }
 
+    /** Penilaian akhir supervisor dibuka N hari sebelum KP berakhir (aturan kampus). */
+    public function assessmentOpensOn(): Carbon
+    {
+        return $this->end_date->copy()->subDays((int) Campus::rule('assessment_open_days'))->startOfDay();
+    }
+
+    public function assessmentIsOpen(): bool
+    {
+        return $this->status === 'selesai' || ! Carbon::today()->lt($this->assessmentOpensOn());
+    }
+
     public function daysLeft(): int
     {
         return max(0, self::daysBetween(Carbon::today(), $this->end_date));
@@ -518,65 +467,25 @@ class Internship extends Model
         return $total > 0 ? (int) round($done / $total * 100) : 0;
     }
 
-    // ---------- Jalur KP ----------
+    // ---------- Tempat KP ----------
 
-    public function isSeminar(): bool
-    {
-        return $this->program === 'seminar';
-    }
-
-    public function isMbkm(): bool
-    {
-        return $this->program === 'magang' && $this->program_type === 'mbkm';
-    }
-
-    /** Hanya jalur magang yang punya perusahaan dan Company Supervisor. */
     public function hasCompany(): bool
     {
-        return ! $this->isSeminar() && $this->company_id !== null;
+        return $this->company_id !== null;
     }
 
-    public function programLabel(): string
-    {
-        return self::PROGRAMS[$this->program][0] ?? ucfirst((string) $this->program);
-    }
-
-    public function programTypeLabel(): string
-    {
-        return self::PROGRAMS[$this->program][1][$this->program_type] ?? ucfirst((string) $this->program_type);
-    }
-
-    /** Nama tempat atau kegiatan KP untuk ditampilkan: perusahaan (magang) atau topik seminar. */
+    /** Nama perusahaan tempat KP. */
     public function placeName(): string
     {
-        if ($this->isSeminar()) {
-            return $this->topic ?: 'Seminar';
-        }
-
         return $this->company?->name ?? '–';
     }
 
-    /** Baris kedua di bawah nama tempat: divisi dan posisi (magang) atau penyelenggara (seminar). */
+    /** Baris kedua di bawah nama perusahaan: divisi dan posisi. */
     public function placeDetail(): ?string
     {
-        if ($this->isSeminar()) {
-            return $this->organizer ? 'Penyelenggara: '.$this->organizer : $this->programTypeLabel();
-        }
-
         $parts = array_filter([$this->division?->name ? 'Divisi '.$this->division->name : null, $this->position]);
 
         return $parts ? implode(' · ', $parts) : null;
-    }
-
-    /**
-     * Siapa yang meninjau silabus, laporan, dan penilaian dari sisi tempat KP:
-     * Company Supervisor untuk magang, dosen pembimbing untuk seminar.
-     */
-    public function isReviewedBy(User $user): bool
-    {
-        return $this->isSeminar()
-            ? (int) $this->lecturer_id === (int) $user->id
-            : $this->isSupervisedBy($user);
     }
 
     /**
@@ -602,45 +511,6 @@ class Internship extends Model
     public function periodLabel(): string
     {
         return $this->start_date->locale('id')->translatedFormat('j M Y').' – '.$this->end_date->locale('id')->translatedFormat('j M Y');
-    }
-
-    public function syllabusStatusLabel(): string
-    {
-        return self::SYLLABUS_STATUSES[$this->syllabus_status][0] ?? $this->syllabus_status;
-    }
-
-    public function syllabusStatusTone(): string
-    {
-        return self::SYLLABUS_STATUSES[$this->syllabus_status][1] ?? 'gray';
-    }
-
-    /**
-     * Perkiraan jam di akhir KP dengan laju pencatatan sejauh ini (null jika KP belum berjalan dua minggu).
-     * Dipakai untuk MBKM yang mensyaratkan logbook minimal sekian jam.
-     */
-    public function projectedHours(): ?float
-    {
-        $total = max(1, self::daysBetween($this->start_date, $this->end_date) + 1);
-        $elapsed = min($total, self::daysBetween($this->start_date, Carbon::today()) + 1);
-        if ($this->status !== 'berjalan' || $elapsed < 14) {
-            return null;
-        }
-
-        return round($this->loggedHours() / $elapsed * $total, 1);
-    }
-
-    /** MBKM: perkiraan jam di akhir KP kurang dari syarat minimal. */
-    public function isBehindMbkmHours(): bool
-    {
-        $projected = $this->isMbkm() ? $this->projectedHours() : null;
-
-        return $projected !== null && $projected < (float) Campus::rule('mbkm_min_hours');
-    }
-
-    /** Total jam yang dicatat di timesheet. */
-    public function loggedHours(): float
-    {
-        return (float) ($this->logged_hours ?? $this->timeEntries()->sum('hours'));
     }
 
     // ---------- Tampilan ----------

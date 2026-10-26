@@ -17,7 +17,7 @@ class InternshipApplicationController extends Controller
     {
         $user = $request->user()->load('studentProfile.studyProgram');
 
-        $internship = Internship::with(['company', 'division', 'lecturer', 'supervisor', 'approvals.reviewer', 'invitations', 'staff', 'creditRecognition'])
+        $internship = Internship::with(['company', 'division', 'lecturer', 'supervisor', 'approvals.reviewer', 'invitations', 'staff', 'documents', 'assessment'])
             ->where('student_id', $user->id)
             ->latest('id')
             ->first();
@@ -34,8 +34,6 @@ class InternshipApplicationController extends Controller
     {
         $internship = $submit->handle($request->user(), $request->validated());
 
-        return redirect()->route('kp.status')->with('status', $internship->isSeminar()
-            ? 'Pengajuan KP terkirim. Menunggu persetujuan Kaprodi.'
-            : 'Pengajuan KP terkirim. Menunggu verifikasi Biro Kerjasama.');
+        return redirect()->route('kp.status')->with('status', 'Pengajuan KP terkirim. Menunggu verifikasi TU Fakultas.');
     }
 }

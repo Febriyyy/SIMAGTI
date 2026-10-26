@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Dashboard\BuildMonitoringDashboard;
+use App\Models\ActivityLog;
 use App\Models\Company;
 use App\Models\Internship;
+use App\Models\InternshipApproval;
+use App\Models\InternshipDocument;
 use App\Models\InternshipStaff;
 use App\Models\Invitation;
+use App\Models\RubricAspect;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
+use App\Support\Gantt;
 use App\Support\KpProgress;
 use App\Support\Period;
 use Illuminate\Http\Request;
@@ -20,9 +25,6 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    /** Jumlah minggu di grafik jam kegiatan mahasiswa. */
-    private const HOUR_WEEKS = 8;
-
     public function __invoke(Request $request): View
     {
         $user = $request->user();
@@ -31,7 +33,7 @@ class DashboardController extends Controller
             'mahasiswa' => $this->mahasiswa($user),
             'supervisor' => $this->supervisor($user),
             'tu' => $this->tu($user),
-            'biro' => $this->biro($user),
+            'admin' => $this->admin($user),
             default => $this->pantau($user), // dospem, kaprodi
         };
     }
@@ -40,20 +42,20 @@ class DashboardController extends Controller
     {
         $internship = Internship::with(['company', 'division', 'supervisor', 'lecturer', 'assessment'])
             ->withProgress()
-            ->withSum('timeEntries as logged_hours', 'hours')
             ->where('student_id', $user->id)
             ->orderByRaw("CASE status WHEN 'berjalan' THEN 0 WHEN 'diajukan' THEN 1 WHEN 'selesai' THEN 2 ELSE 3 END")
             ->latest('start_date')
             ->first();
 
         $data = ['user' => $user, 'internship' => $internship, 'tasks' => collect(), 'meeting' => null,
-            'hours' => null, 'period' => null, 'next' => null, 'periodHours' => 0.0];
+            'period' => null, 'next' => null, 'steps' => [], 'plans' => collect(), 'gantt' => null, 'goals' => collect()];
 
         if (! $internship) {
             return view('dashboard.mahasiswa', $data);
         }
 
-        $data['next'] = KpProgress::current($internship);
+        $data['steps'] = KpProgress::steps($internship);
+        $data['next'] = KpProgress::current($internship, $data['steps']);
 
         if (in_array($internship->status, ['berjalan', 'selesai'], true)) {
             $period = Period::for($internship);
@@ -71,22 +73,23 @@ class DashboardController extends Controller
                 ->get();
 
             $data['period'] = $period;
-            $data['periodHours'] = (float) $internship->timeEntries()
-                ->whereBetween('work_date', [$period->start->toDateString(), $period->end->toDateTimeString()])
-                ->sum('hours');
             $data['meeting'] = $internship->currentMeeting();
-            $data['hours'] = $this->weeklyHours(collect([$internship->id]));
+            $data['plans'] = $internship->activityPlans()
+                ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])
+                ->get();
+            $data['gantt'] = Gantt::build($internship, $data['plans'], withTasks: false);
+            $data['goals'] = $internship->goals()->get();
         }
 
         return view('dashboard.mahasiswa', $data);
     }
 
-    /** Company Supervisor: memantau mahasiswa magang, menyetujui silabus, mengatur meeting. */
+    /** Company Supervisor: memantau mahasiswa magang, mengatur meeting, menilai di akhir periode KP. */
     private function supervisor(User $user): View
     {
         $internships = Internship::with(['student.studentProfile.studyProgram', 'company', 'division', 'assessment'])
             ->withProgress()
-            ->withSum('timeEntries as logged_hours', 'hours')
+            ->withCount('activityPlans')
             ->supervisedBy($user)
             ->where('status', 'berjalan')
             ->orderBy('start_date')
@@ -95,18 +98,17 @@ class DashboardController extends Controller
         $ids = $internships->pluck('id');
         $weekStart = Carbon::today()->startOfWeek();
 
-        $weekHours = TimeEntry::whereIn('internship_id', $ids)
+        // Catatan kegiatan minggu ini per mahasiswa (Senin sampai hari ini)
+        $weekNotes = TimeEntry::whereIn('internship_id', $ids)
             ->where('work_date', '>=', $weekStart->toDateString())
-            ->selectRaw('internship_id, SUM(hours) as total')
+            ->selectRaw('internship_id, COUNT(*) as total')
             ->groupBy('internship_id')
             ->pluck('total', 'internship_id');
 
-        $syllabus = $internships->where('syllabus_status', 'submitted')->values();
-
         $stats = [
             'students' => $internships->count(),
-            'syllabus' => $syllabus->count(),
-            'week_hours' => (float) $weekHours->sum(),
+            'unconfirmed' => $internships->whereNull('supervisor_confirmation')->count(),
+            'week_notes' => (int) $weekNotes->sum(),
             'to_assess' => Internship::supervisedBy($user)
                 ->whereIn('status', ['berjalan', 'selesai'])
                 ->whereDoesntHave('assessment', fn ($q) => $q->whereIn('status', ['submitted', 'validated']))
@@ -127,7 +129,7 @@ class DashboardController extends Controller
 
         [$groups, $withoutMeeting] = $this->meetingGroups($internships);
 
-        return view('dashboard.supervisor', compact('user', 'internships', 'stats', 'syllabus', 'statusCounts', 'recent', 'groups', 'withoutMeeting', 'weekHours'));
+        return view('dashboard.supervisor', compact('user', 'internships', 'stats', 'statusCounts', 'recent', 'groups', 'withoutMeeting', 'weekNotes'));
     }
 
     /** TU Fakultas: antrean aktivasi Company Supervisor. */
@@ -155,7 +157,7 @@ class DashboardController extends Controller
             'students' => $pending->count(),
             'invited' => $groups->where('invited', true)->count(),
             'active' => InternshipStaff::where('role', InternshipStaff::ROLE_SUPERVISOR)->distinct('user_id')->count('user_id'),
-            'running' => Internship::where('program', 'magang')->where('status', 'berjalan')->count(),
+            'running' => Internship::where('status', 'berjalan')->count(),
         ];
 
         $recent = InternshipStaff::with(['user', 'internship.student', 'internship.company'])
@@ -164,7 +166,41 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('dashboard.tu', compact('user', 'groups', 'stats', 'recent'));
+        // Data perusahaan (sebelumnya di Biro Kerjasama): urut dari yang paling banyak mahasiswa magang
+        $companies = Company::withCount([
+            'internships',
+            'internships as active_internships_count' => fn ($q) => $q->where('status', 'berjalan'),
+        ])
+            ->withAvg(['assessments as average_score' => fn ($q) => $q->where('assessments.status', 'validated')], 'final_score')
+            ->orderByDesc('active_internships_count')
+            ->orderBy('name')
+            ->limit(8)
+            ->get();
+
+        $stats['verify'] = Internship::where('status', 'diajukan')
+            ->whereHas('approvals', fn ($q) => $q->where('step', InternshipApproval::STEP_VERIFY)->where('status', 'pending'))
+            ->count();
+        $stats['letters'] = InternshipDocument::where('type', InternshipDocument::LETTER)->where('status', 'diminta')->count();
+        $stats['partners'] = Company::whereIn('status', ['mitra', 'mandiri_terverifikasi'])->count();
+
+        return view('dashboard.tu', compact('user', 'groups', 'stats', 'recent', 'companies'));
+    }
+
+    /** Admin: ringkasan akun dan aktivitas sistem terbaru. */
+    private function admin(User $user): View
+    {
+        $roles = User::selectRaw('role, COUNT(*) as total')->groupBy('role')->pluck('total', 'role');
+
+        $stats = [
+            'users' => (int) $roles->sum(),
+            'inactive' => User::where('is_active', false)->count(),
+            'questions' => RubricAspect::whereHas('rubric', fn ($q) => $q->where('is_active', true)->whereNull('owner_id'))->count(),
+            'logs_today' => ActivityLog::whereDate('created_at', Carbon::today())->count(),
+        ];
+
+        $logs = ActivityLog::with('user')->latest('id')->limit(8)->get();
+
+        return view('dashboard.admin', compact('user', 'roles', 'stats', 'logs'));
     }
 
     /** Dosen pembimbing dan kaprodi: daftar pemantauan. */
@@ -176,28 +212,6 @@ class DashboardController extends Controller
         ][$user->role] ?? '';
 
         return view('dashboard.pantau', ['user' => $user, 'subtitle' => $subtitle] + app(BuildMonitoringDashboard::class)->handle($user));
-    }
-
-    private function biro(User $user): View
-    {
-        $companies = Company::withCount([
-                'internships',
-                'internships as active_internships_count' => fn ($q) => $q->where('status', 'berjalan'),
-            ])
-            ->withAvg(['assessments as average_score' => fn ($q) => $q->where('assessments.status', 'validated')], 'final_score')
-            ->orderByDesc('active_internships_count')
-            ->orderBy('name')
-            ->get();
-
-        $stats = [
-            'partners' => $companies->whereIn('status', ['mitra', 'mandiri_terverifikasi'])->count(),
-            'waiting' => $companies->where('status', 'mandiri_menunggu')->count(),
-            'students' => Internship::where('program', 'magang')->where('status', 'berjalan')->count(),
-        ];
-
-        $waiting = $companies->where('status', 'mandiri_menunggu')->values();
-
-        return view('dashboard.biro', compact('user', 'companies', 'stats', 'waiting'));
     }
 
     /**
@@ -228,36 +242,5 @@ class DashboardController extends Controller
             ->values();
 
         return [$groups, $without];
-    }
-
-    /**
-     * Jam kegiatan per minggu kalender, beberapa minggu terakhir.
-     *
-     * @return array{labels: list<string>, tips: list<string>, values: list<float>}
-     */
-    private function weeklyHours(Collection $ids): array
-    {
-        $first = Carbon::today()->startOfWeek()->subWeeks(self::HOUR_WEEKS - 1);
-        $rows = TimeEntry::whereIn('internship_id', $ids)
-            ->where('work_date', '>=', $first->toDateString())
-            ->get(['work_date', 'hours']);
-
-        $values = array_fill(0, self::HOUR_WEEKS, 0.0);
-        foreach ($rows as $row) {
-            $i = (int) floor($first->diffInDays($row->work_date->copy()->startOfDay()) / 7);
-            if ($i >= 0 && $i < self::HOUR_WEEKS) {
-                $values[$i] += (float) $row->hours;
-            }
-        }
-
-        $labels = [];
-        $tips = [];
-        for ($i = 0; $i < self::HOUR_WEEKS; $i++) {
-            $start = $first->copy()->addWeeks($i)->locale('id');
-            $labels[] = $start->translatedFormat('j M');
-            $tips[] = $start->translatedFormat('j M').' – '.$start->copy()->endOfWeek()->translatedFormat('j M');
-        }
-
-        return ['labels' => $labels, 'tips' => $tips, 'values' => array_map(fn ($v) => round($v, 1), $values)];
     }
 }

@@ -13,8 +13,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Alur pengajuan KP v2: mahasiswa memilih jalur (Magang: KP Industri / MBKM, Seminar) → biro (magang) →
- * kaprodi → TU Fakultas mengaktifkan Company Supervisor → supervisor menerima undangan.
+ * Alur pengajuan KP (satu jenis KP): mahasiswa mengajukan → TU Fakultas memverifikasi perusahaan →
+ * kaprodi menyetujui → TU Fakultas mengaktifkan Company Supervisor → supervisor menerima undangan.
  */
 class ApplicationFlowTest extends TestCase
 {
@@ -54,10 +54,8 @@ class ApplicationFlowTest extends TestCase
     private function magang(array $override = []): array
     {
         return array_merge([
-            'program' => 'magang',
-            'program_type' => 'industri',
             'company_name' => 'PT Contoh Baru',
-            'industry' => 'Fintech',
+            'industry' => 'Keuangan',
             'city' => 'Bandung',
             'address' => 'Jl. Contoh No. 1',
             'division_name' => 'Engineering',
@@ -70,18 +68,6 @@ class ApplicationFlowTest extends TestCase
         ], $override);
     }
 
-    private function seminar(array $override = []): array
-    {
-        return array_merge([
-            'program' => 'seminar',
-            'program_type' => 'pelaksana',
-            'topic' => 'Seminar Keamanan Siber untuk UMKM',
-            'organizer' => 'Himpunan Mahasiswa',
-            'start_date' => now()->addDays(7)->toDateString(),
-            'end_date' => now()->addMonths(3)->toDateString(),
-        ], $override);
-    }
-
     private function submit(User $student, array $payload): Internship
     {
         $this->actingAs($student)->post('/status-kp', $payload)->assertRedirect('/status-kp')->assertSessionHasNoErrors();
@@ -89,12 +75,10 @@ class ApplicationFlowTest extends TestCase
         return Internship::where('student_id', $student->id)->latest('id')->firstOrFail();
     }
 
-    /** Biro memverifikasi lalu kaprodi menyetujui: penempatan berjalan. */
+    /** TU Fakultas memverifikasi lalu kaprodi menyetujui: penempatan berjalan. */
     private function approve(Internship $internship): Internship
     {
-        if (! $internship->isSeminar()) {
-            $this->actingAs($this->user('biro@kp.test'))->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'approve']);
-        }
+        $this->actingAs($this->user('tu@kp.test'))->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'approve']);
         $this->actingAs($this->user('kaprodi@kp.test'))
             ->patch("/kaprodi/persetujuan/{$internship->id}", ['decision' => 'approve', 'lecturer_id' => $this->user('dospem@kp.test')->id])
             ->assertSessionHasNoErrors();
@@ -109,60 +93,48 @@ class ApplicationFlowTest extends TestCase
         $student = $this->newStudent();
         $internship = $this->submit($student, $this->magang());
 
-        $this->assertSame(['mandiri', 'diajukan', 'magang', 'industri'], [$internship->track, $internship->status, $internship->program, $internship->program_type]);
+        $this->assertSame(['mandiri', 'diajukan'], [$internship->track, $internship->status]);
+        $this->assertSame('Keuangan', $internship->company->industry);
         $this->assertSame('Backend Developer Intern', $internship->position);
         $this->assertSame('bima@contoh.test', $internship->supervisor_email, 'Email disimpan huruf kecil');
         $this->assertSame('Engineering', $internship->division->name);
         $this->assertDatabaseHas('companies', ['name' => 'PT Contoh Baru', 'status' => 'mandiri_menunggu', 'created_by' => $student->id]);
-        $this->assertDatabaseHas('internship_approvals', ['internship_id' => $internship->id, 'step' => 'biro_verification', 'status' => 'pending']);
+        $this->assertDatabaseHas('internship_approvals', ['internship_id' => $internship->id, 'step' => 'tu_verification', 'status' => 'pending']);
         $this->assertDatabaseHas('internship_approvals', ['internship_id' => $internship->id, 'step' => 'kaprodi_approval', 'status' => 'pending']);
         // Undangan tidak lagi dibuat otomatis: TU Fakultas yang mengaktifkan supervisor.
         $this->assertSame(0, Invitation::where('internship_id', $internship->id)->count());
     }
 
-    public function test_mahasiswa_mengajukan_seminar_tanpa_perusahaan_dan_langsung_ke_kaprodi(): void
+    public function test_bidang_usaha_lainnya_diisi_sendiri_dan_website_opsional(): void
     {
-        $student = $this->newStudent();
-        $internship = $this->submit($student, $this->seminar());
+        $internship = $this->submit($this->newStudent(), $this->magang([
+            'company_name' => 'PT Sehat Sentosa', 'industry' => 'lainnya', 'industry_other' => 'Kesehatan', 'website' => 'sehatsentosa.co.id',
+        ]));
+        $this->assertSame('Kesehatan', $internship->company->industry);
+        $this->assertSame('https://sehatsentosa.co.id', $internship->company->website);
 
-        $this->assertTrue($internship->isSeminar());
-        $this->assertNull($internship->company_id);
-        $this->assertSame('Seminar Keamanan Siber untuk UMKM', $internship->placeName());
-        $this->assertDatabaseMissing('internship_approvals', ['internship_id' => $internship->id, 'step' => 'biro_verification']);
-        $this->assertTrue(Internship::awaitingKaprodi()->whereKey($internship->id)->exists());
-
-        $this->actingAs($this->user('kaprodi@kp.test'))->get('/kaprodi/persetujuan')->assertOk()->assertSee('Seminar Keamanan Siber untuk UMKM');
-
-        $fresh = $this->approve($internship);
-        $this->assertSame('berjalan', $fresh->status);
-        $this->assertFalse(Internship::awaitingSupervisor()->whereKey($internship->id)->exists(), 'Seminar tidak butuh Company Supervisor');
+        $other = $this->newStudent('2310518888');
+        $this->actingAs($other)->post('/status-kp', $this->magang(['company_name' => 'PT Tanpa Bidang', 'industry' => 'lainnya', 'industry_other' => '']))
+            ->assertSessionHasErrors('industry');
+        $this->submit($other, $this->magang(['company_name' => 'PT Tanpa Web', 'website' => '']));
+        $this->assertDatabaseHas('companies', ['name' => 'PT Tanpa Web', 'website' => null]);
     }
 
-    public function test_data_wajib_menyesuaikan_jalur(): void
+    public function test_data_wajib_diisi(): void
     {
         $student = $this->newStudent();
 
-        $this->actingAs($student)->post('/status-kp', $this->magang(['supervisor_email' => '', 'position' => '', 'company_name' => '']))
-            ->assertSessionHasErrors(['supervisor_email', 'position', 'company_name']);
-
-        $this->actingAs($student)->post('/status-kp', $this->seminar(['topic' => '']))
-            ->assertSessionHasErrors('topic');
-
-        $this->actingAs($student)->post('/status-kp', $this->magang(['program_type' => 'pelaksana']))
-            ->assertSessionHasErrors('program_type');
+        $this->actingAs($student)->post('/status-kp', $this->magang(['supervisor_email' => '', 'position' => '', 'company_name' => '', 'industry' => '']))
+            ->assertSessionHasErrors(['supervisor_email', 'position', 'company_name', 'industry']);
     }
 
-    public function test_syarat_semester_minimal_dan_rentang_mbkm(): void
+    public function test_syarat_semester_minimal(): void
     {
         $this->actingAs($this->newStudent('2310510001', semester: 3))
             ->post('/status-kp', $this->magang())
-            ->assertSessionHasErrors('program');
+            ->assertSessionHasErrors('start_date');
 
-        $this->actingAs($this->newStudent('2310510002', semester: 9))
-            ->post('/status-kp', $this->magang(['program_type' => 'mbkm']))
-            ->assertSessionHasErrors('program_type');
-
-        $this->submit($this->newStudent('2310510003', semester: 6), $this->magang(['program_type' => 'mbkm']));
+        $this->submit($this->newStudent('2310510003', semester: 6), $this->magang());
         $this->assertDatabaseMissing('companies', ['created_by' => $this->user('baru2310510001@kp.test')->id]);
     }
 
@@ -173,7 +145,7 @@ class ApplicationFlowTest extends TestCase
 
         $this->assertSame($nusantara->id, $internship->company_id);
         $this->assertSame(1, Company::whereRaw('LOWER(name) = ?', ['pt nusantara digital'])->count());
-        $this->assertDatabaseHas('internship_approvals', ['internship_id' => $internship->id, 'step' => 'biro_verification', 'status' => 'approved']);
+        $this->assertDatabaseHas('internship_approvals', ['internship_id' => $internship->id, 'step' => 'tu_verification', 'status' => 'approved']);
         $this->assertTrue(Internship::awaitingKaprodi()->whereKey($internship->id)->exists());
     }
 
@@ -193,7 +165,7 @@ class ApplicationFlowTest extends TestCase
     public function test_halaman_status_kp_hanya_untuk_mahasiswa_dan_menampilkan_langkah(): void
     {
         $this->actingAs($this->user('supervisor@kp.test'))->get('/status-kp')->assertForbidden();
-        $this->actingAs($this->newStudent())->get('/status-kp')->assertOk()->assertSee('Ajukan KP')->assertSee('MBKM Mandiri');
+        $this->actingAs($this->newStudent())->get('/status-kp')->assertOk()->assertSee('Ajukan KP')->assertSee('Lainnya…')->assertDontSee('MBKM')->assertDontSee('Seminar');
 
         $this->actingAs($this->user('nadia@kp.test'))->get('/status-kp')->assertOk()
             ->assertSee('Verifikasi perusahaan')
@@ -202,7 +174,7 @@ class ApplicationFlowTest extends TestCase
             ->assertDontSee('Ajukan ulang');
     }
 
-    // ---------- Biro dan kaprodi ----------
+    // ---------- TU Fakultas dan kaprodi ----------
 
     public function test_alur_lengkap_sampai_antrean_tu_fakultas(): void
     {
@@ -216,7 +188,7 @@ class ApplicationFlowTest extends TestCase
         $this->actingAs($this->user('tu@kp.test'))->get('/tu/aktivasi')->assertOk()->assertSee('bima@contoh.test')->assertSee('Bima Saputra');
     }
 
-    public function test_kaprodi_tidak_bisa_menyetujui_magang_sebelum_biro_memverifikasi(): void
+    public function test_kaprodi_tidak_bisa_menyetujui_sebelum_tu_memverifikasi(): void
     {
         $internship = $this->submit($this->newStudent(), $this->magang());
 
@@ -230,11 +202,11 @@ class ApplicationFlowTest extends TestCase
     public function test_pengajuan_yang_sudah_diverifikasi_tidak_bisa_diverifikasi_dua_kali(): void
     {
         $internship = $this->submit($this->newStudent(), $this->magang());
-        $biro = $this->user('biro@kp.test');
+        $tu = $this->user('tu@kp.test');
 
-        $this->actingAs($biro)->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'approve']);
-        $this->actingAs($biro)
-            ->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'reject', 'note' => 'Salah klik'])
+        $this->actingAs($tu)->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'approve']);
+        $this->actingAs($tu)
+            ->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'reject', 'note' => 'Salah klik'])
             ->assertSessionHasErrors('aturan');
 
         $this->assertSame('diajukan', $internship->fresh()->status);
@@ -244,36 +216,36 @@ class ApplicationFlowTest extends TestCase
     {
         $student = $this->newStudent();
         $internship = $this->submit($student, $this->magang());
-        $biro = $this->user('biro@kp.test');
+        $tu = $this->user('tu@kp.test');
 
-        $this->actingAs($biro)->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'reject'])->assertSessionHasErrors('note');
-        $this->actingAs($biro)->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'reject', 'note' => 'Perusahaan tidak ditemukan']);
+        $this->actingAs($tu)->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'reject'])->assertSessionHasErrors('note');
+        $this->actingAs($tu)->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'reject', 'note' => 'Perusahaan tidak ditemukan']);
 
         $fresh = $internship->fresh();
         $this->assertSame('ditolak', $fresh->status);
         $this->assertNull($fresh->active_student_id);
 
         $this->actingAs($student)->get('/status-kp')->assertOk()->assertSee('Ajukan ulang')->assertSee('Perusahaan tidak ditemukan');
-        $this->submit($student, $this->seminar());
+        $this->submit($student, $this->magang(['company_name' => 'PT Pengganti']));
     }
 
     public function test_peran_lain_tidak_bisa_memproses_pengajuan(): void
     {
         $internship = $this->submit($this->newStudent(), $this->magang());
 
-        $this->actingAs($this->user('kaprodi@kp.test'))->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'approve'])->assertForbidden();
-        $this->actingAs($this->user('biro@kp.test'))->patch("/kaprodi/persetujuan/{$internship->id}", ['decision' => 'reject', 'note' => 'x'])->assertForbidden();
-        $this->actingAs($this->user('supervisor@kp.test'))->get('/biro/verifikasi')->assertForbidden();
+        $this->actingAs($this->user('kaprodi@kp.test'))->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'approve'])->assertForbidden();
+        $this->actingAs($this->user('tu@kp.test'))->patch("/kaprodi/persetujuan/{$internship->id}", ['decision' => 'reject', 'note' => 'x'])->assertForbidden();
+        $this->actingAs($this->user('supervisor@kp.test'))->get('/tu/verifikasi')->assertForbidden();
         $this->actingAs($this->user('tu@kp.test'))->get('/kaprodi/persetujuan')->assertForbidden();
     }
 
-    public function test_antrean_kaprodi_hanya_berisi_magang_yang_sudah_diverifikasi_biro(): void
+    public function test_antrean_kaprodi_hanya_berisi_pengajuan_yang_sudah_diverifikasi_tu(): void
     {
         $internship = $this->submit($this->newStudent(), $this->magang(['company_name' => 'PT Antrean Uji']));
         $kaprodi = $this->user('kaprodi@kp.test');
 
         $this->actingAs($kaprodi)->get('/kaprodi/persetujuan')->assertOk()->assertDontSee('PT Antrean Uji');
-        $this->actingAs($this->user('biro@kp.test'))->patch("/biro/verifikasi/{$internship->id}", ['decision' => 'approve']);
+        $this->actingAs($this->user('tu@kp.test'))->patch("/tu/verifikasi/{$internship->id}", ['decision' => 'approve']);
         $this->actingAs($kaprodi)->get('/kaprodi/persetujuan')->assertOk()->assertSee('PT Antrean Uji');
     }
 
@@ -284,7 +256,7 @@ class ApplicationFlowTest extends TestCase
         $tari = Internship::where('student_id', $this->user('tari@kp.test')->id)->firstOrFail();
         $payload = ['company_id' => $tari->company_id, 'email' => $tari->supervisor_email];
 
-        foreach (['kaprodi@kp.test', 'biro@kp.test', 'supervisor@kp.test', 'mahasiswa@kp.test'] as $email) {
+        foreach (['kaprodi@kp.test', 'admin@kp.test', 'supervisor@kp.test', 'mahasiswa@kp.test'] as $email) {
             $this->actingAs($this->user($email))->get('/tu/aktivasi')->assertForbidden();
             $this->actingAs($this->user($email))->post('/tu/aktivasi/undang', $payload)->assertForbidden();
         }

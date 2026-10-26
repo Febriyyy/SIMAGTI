@@ -54,15 +54,6 @@
                 </div>
 
                 <div>
-                    <label for="program_type" class="label">Jenis magang</label>
-                    <select id="program_type" name="program_type" class="select" required>
-                        @foreach (\App\Models\Internship::PROGRAMS['magang'][1] as $key => $label)
-                            <option value="{{ $key }}" @selected(old('program_type', 'industri') === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
                     <label for="position" class="label">Posisi (opsional)</label>
                     <input id="position" name="position" type="text" class="input" value="{{ old('position') }}" maxlength="100" placeholder="Misalnya Backend Developer Intern">
                 </div>

@@ -4,14 +4,12 @@ namespace App\Support;
 
 use App\Models\Assessment;
 use App\Models\ChangeRequest;
-use App\Models\CreditRecognition;
 use App\Models\GuidanceSession;
 use App\Models\Internship;
+use App\Models\InternshipApproval;
 use App\Models\InternshipDocument;
-use App\Models\MonthlyReview;
 use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 
 /**
  * Daftar "perlu tindakan" di lonceng notifikasi. Dihitung langsung dari keadaan data,
@@ -29,7 +27,6 @@ class ActionItems
             'supervisor' => self::supervisor($user),
             'dospem' => self::lecturer($user),
             'kaprodi' => self::kaprodi(),
-            'biro' => self::biro(),
             'tu' => self::tu(),
             default => [],
         };
@@ -56,13 +53,12 @@ class ActionItems
 
         $items = [];
 
-        if ($internship->syllabus_status === 'revision') {
-            $items[] = self::item('Silabus perlu revisi', route('silabus.index'), $internship->syllabus_note, 'syllabus', 'red');
-        } elseif ($internship->syllabus_status === 'draft') {
-            $items[] = self::item('Lengkapi dan kirim silabus', route('silabus.index'), 'Tujuan hard skill, soft skill, dan attitude', 'syllabus');
+        // Rencana kegiatan diisi dulu sebelum membuat task
+        if (! $internship->activityPlans()->exists()) {
+            $items[] = self::item('Isi rencana kegiatan', route('timesheet.index'), 'Task dibuat di bawah rencana', 'calendar');
         }
 
-        // Timesheet: hari kerja terakhir (maks. 3) yang belum diisi
+        // Catatan kegiatan: hari kerja terakhir (maks. 3) yang belum diisi
         $workdays = collect();
         for ($d = Carbon::yesterday(); $workdays->count() < 3 && $d->gte($internship->start_date); $d->subDay()) {
             if (! $d->isWeekend()) {
@@ -74,15 +70,8 @@ class ActionItems
                 ->map(fn ($d) => Carbon::parse($d)->toDateString())->unique();
             $missing = $workdays->diff($filled)->count();
             if ($missing > 0) {
-                $items[] = self::item("Timesheet {$missing} hari kerja terakhir belum diisi", route('timesheet.index'), null, 'clock', $missing >= 3 ? 'red' : 'amber');
+                $items[] = self::item("Catatan kegiatan {$missing} hari kerja terakhir belum diisi", route('timesheet.index'), null, 'clock', $missing >= 3 ? 'red' : 'amber');
             }
-        }
-
-        // Refleksi bulanan
-        foreach (self::dueReflections($internship) as $month) {
-            [, $end] = $internship->monthRange($month);
-            $late = $end->copy()->addDays((int) Campus::rule('reflection_grace_days'))->isPast();
-            $items[] = self::item("Isi refleksi bulan ke-{$month}", route('bulanan.index'), $end->isPast() ? 'Bulan sudah berakhir' : 'Bulan segera berakhir', 'history', $late ? 'red' : 'amber');
         }
 
         // Dokumen
@@ -106,29 +95,11 @@ class ActionItems
         return $items;
     }
 
-    /** Bulan KP yang refleksinya sudah bisa/harus diisi tapi belum. @return list<int> */
-    private static function dueReflections(Internship $internship): array
-    {
-        $done = $internship->monthlyReviews()->whereNotNull('reflected_at')->pluck('month_number')->all();
-        $due = [];
-        for ($m = 1; $m <= $internship->monthCount(); $m++) {
-            [, $end] = $internship->monthRange($m);
-            if (Carbon::today()->lt($end->copy()->subDays(7))) {
-                break;
-            }
-            if (! in_array($m, $done, true)) {
-                $due[] = $m;
-            }
-        }
-
-        return $due;
-    }
-
     // ---------------------------------------------------------------- Company Supervisor
 
     private static function supervisor(User $user): array
     {
-        $internships = Internship::supervisedBy($user)->with('student')->where('status', 'berjalan')->get();
+        $internships = Internship::supervisedBy($user)->with(['student', 'assessment'])->where('status', 'berjalan')->get();
         $items = [];
 
         $unconfirmed = $internships->whereNull('supervisor_confirmation');
@@ -137,48 +108,14 @@ class ActionItems
                 $unconfirmed->pluck('student.name')->join(', '), 'verify');
         }
 
-        return array_merge($items, self::reviewerItems($internships));
-    }
-
-    /** Tugas peninjau (supervisor untuk magang, dosen untuk seminar): silabus, bulanan, perubahan, penilaian. */
-    private static function reviewerItems(Collection $internships): array
-    {
-        $items = [];
-
-        foreach ($internships->where('syllabus_status', 'submitted') as $i) {
-            $items[] = self::item('Silabus '.$i->student->name.' menunggu persetujuan', route('pantau.show', [$i, 'tab' => 'silabus']), null, 'syllabus');
-        }
-
         $ids = $internships->pluck('id');
-        $pending = MonthlyReview::with('internship.student')->whereIn('internship_id', $ids)->whereNull('reviewed_at')
-            ->where(fn ($q) => $q->whereNotNull('reflected_at')->orWhere('period_end', '<', Carbon::today()->toDateString()))
-            ->get();
-        foreach ($pending as $r) {
-            $items[] = self::item('Nilai bulan ke-'.$r->month_number.' '.$r->internship->student->name, route('pantau.show', [$r->internship, 'tab' => 'bulanan']),
-                $r->isReflected() ? 'Refleksi sudah masuk' : 'Bulan sudah berakhir', 'award', $r->period_end->copy()->addDays(14)->isPast() ? 'red' : 'amber');
-        }
-
-        // Bulan yang sudah berakhir tapi barisnya belum ada (mahasiswa belum membuka refleksi)
-        foreach ($internships as $i) {
-            $existing = $pending->where('internship_id', $i->id)->pluck('month_number')
-                ->merge(MonthlyReview::where('internship_id', $i->id)->whereNotNull('reviewed_at')->pluck('month_number'))->all();
-            for ($m = 1; $m <= $i->monthCount(); $m++) {
-                [, $end] = $i->monthRange($m);
-                if (! $end->isPast()) {
-                    break;
-                }
-                if (! in_array($m, $existing, true)) {
-                    $items[] = self::item('Nilai bulan ke-'.$m.' '.$i->student->name, route('pantau.show', [$i, 'tab' => 'bulanan']), 'Mahasiswa belum mengisi refleksi', 'award');
-                }
-            }
-        }
 
         $changes = ChangeRequest::with('internship.student')->whereIn('internship_id', $ids)->where('status', 'pending')->where('step', 'supervisor')->get();
         foreach ($changes as $c) {
             $items[] = self::item($c->typeLabel().' '.$c->internship->student->name, route('perubahan.antrean'), $c->summary(), 'history');
         }
 
-        // Penilaian akhir: KP tinggal 14 hari atau sudah lewat, penilaian belum dikirim
+        // Penilaian akhir di akhir periode KP: tinggal 14 hari atau sudah lewat, penilaian belum dikirim
         foreach ($internships as $i) {
             if ($i->daysLeft() <= 14 && ! in_array($i->assessment?->status, ['submitted', 'validated'], true)) {
                 $items[] = self::item('Penilaian akhir '.$i->student->name, route('penilaian.edit', $i),
@@ -195,7 +132,7 @@ class ActionItems
     {
         $internships = Internship::with(['student', 'assessment'])->where('lecturer_id', $user->id)->where('status', 'berjalan')->get();
         $ids = $internships->pluck('id');
-        $items = self::reviewerItems($internships->where('program', 'seminar'));
+        $items = [];
 
         foreach (Assessment::with('internship.student')->whereIn('internship_id', $ids)->where('status', 'submitted')->get() as $a) {
             $items[] = self::item('Validasi penilaian '.$a->internship->student->name, route('validasi.show', $a->internship), null, 'verify');
@@ -204,13 +141,6 @@ class ActionItems
         $guidance = GuidanceSession::whereIn('internship_id', $ids)->where('status', 'pending')->count();
         if ($guidance > 0) {
             $items[] = self::item("{$guidance} bimbingan menunggu konfirmasi", route('bimbingan.antrean'), null, 'users');
-        }
-
-        $notes = MonthlyReview::with('internship.student')->whereIn('internship_id', $internships->where('program', 'magang')->pluck('id'))
-            ->whereNotNull('reviewed_at')->whereNull('lecturer_noted_at')->get();
-        foreach ($notes as $r) {
-            $items[] = self::item('Catatan bulan ke-'.$r->month_number.' '.$r->internship->student->name, route('pantau.show', [$r->internship, 'tab' => 'bulanan']),
-                'Sudah dinilai supervisor', 'chat', 'amber');
         }
 
         foreach ($internships as $i) {
@@ -235,29 +165,6 @@ class ActionItems
         if ($changes > 0) {
             $items[] = self::item("{$changes} pengajuan perubahan menunggu", route('perubahan.antrean'), null, 'history');
         }
-        $credits = CreditRecognition::where('status', 'diajukan')->count();
-        if ($credits > 0) {
-            $items[] = self::item("{$credits} usulan rekognisi SKS menunggu", route('rekognisi.antrean'), null, 'school');
-        }
-
-        return $items;
-    }
-
-    private static function biro(): array
-    {
-        $items = [];
-        $verify = Internship::where('status', 'diajukan')->whereHas('approvals', fn ($q) => $q->where('step', 'biro_verification')->where('status', 'pending'))->count();
-        if ($verify > 0) {
-            $items[] = self::item("{$verify} perusahaan menunggu verifikasi", route('biro.verifikasi'), null, 'verify');
-        }
-        $uploaded = InternshipDocument::whereIn('type', [InternshipDocument::REPLY, InternshipDocument::PACT])->where('status', 'diunggah')->count();
-        if ($uploaded > 0) {
-            $items[] = self::item("{$uploaded} dokumen perlu diperiksa", route('biro.dokumen'), 'Surat balasan dan pakta integritas', 'file');
-        }
-        $overdue = InternshipDocument::whereIn('status', ['menunggu', 'ditolak'])->whereNotNull('due_on')->where('due_on', '<', Carbon::today()->toDateString())->count();
-        if ($overdue > 0) {
-            $items[] = self::item("{$overdue} dokumen lewat batas waktu", route('biro.dokumen'), null, 'alert', 'red');
-        }
 
         return $items;
     }
@@ -265,6 +172,18 @@ class ActionItems
     private static function tu(): array
     {
         $items = [];
+        $verify = Internship::where('status', 'diajukan')->whereHas('approvals', fn ($q) => $q->where('step', InternshipApproval::STEP_VERIFY)->where('status', 'pending'))->count();
+        if ($verify > 0) {
+            $items[] = self::item("{$verify} KP mandiri menunggu verifikasi", route('tu.verifikasi'), 'Periksa data perusahaan', 'verify');
+        }
+        $uploaded = InternshipDocument::where('type', InternshipDocument::REPLY)->where('status', 'diunggah')->count();
+        if ($uploaded > 0) {
+            $items[] = self::item("{$uploaded} surat balasan perlu diperiksa", route('tu.dokumen'), null, 'file');
+        }
+        $overdue = InternshipDocument::whereIn('status', ['menunggu', 'ditolak'])->whereNotNull('due_on')->where('due_on', '<', Carbon::today()->toDateString())->count();
+        if ($overdue > 0) {
+            $items[] = self::item("{$overdue} dokumen lewat batas waktu", route('tu.dokumen'), null, 'alert', 'red');
+        }
         $groups = Internship::awaitingSupervisor()->get()->groupBy(fn ($i) => $i->company_id.'|'.$i->supervisor_email)->count();
         if ($groups > 0) {
             $items[] = self::item("{$groups} Company Supervisor menunggu aktivasi", route('tu.aktivasi'), null, 'verify');
