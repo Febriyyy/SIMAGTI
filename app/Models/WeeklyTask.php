@@ -99,6 +99,18 @@ class WeeklyTask extends Model
                 $task->completed_at = $task->status === 'completed' ? now() : null;
             }
         });
+
+        // Goal tercapai otomatis saat semua task-nya Done (lihat Goal::syncAchievement).
+        static::saved(function (WeeklyTask $task) {
+            if ($task->wasRecentlyCreated || $task->wasChanged(['status', 'goal_id'])) {
+                Goal::syncAchievement($task->goal_id);
+                if ($task->wasChanged('goal_id')) {
+                    Goal::syncAchievement($task->getOriginal('goal_id'));
+                }
+            }
+        });
+        static::deleted(fn (WeeklyTask $task) => Goal::syncAchievement($task->goal_id));
+        static::restored(fn (WeeklyTask $task) => Goal::syncAchievement($task->goal_id));
     }
 
     public function internship(): BelongsTo

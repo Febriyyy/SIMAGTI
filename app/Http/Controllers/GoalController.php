@@ -39,23 +39,12 @@ class GoalController extends Controller
         $data = $request->validate([
             'title' => ['sometimes', 'string', 'max:160'],
             'description' => ['sometimes', 'nullable', 'string', 'max:2000'],
-            'achieved' => ['sometimes', 'boolean'],
         ], [], ['title' => 'goal']);
 
-        if (array_key_exists('achieved', $data)) {
-            $data['achieved_at'] = $data['achieved'] ? ($goal->achieved_at ?? now()) : null;
-            unset($data['achieved']);
-        }
-
+        // Status tercapai tidak diisi manual: mengikuti task (Goal::syncAchievement).
         $goal->update($data);
 
-        if ($goal->wasChanged('achieved_at')) {
-            ActivityLog::record('goal.capai', ($goal->isAchieved() ? 'Menandai goal tercapai: ' : 'Membuka lagi goal: ').$goal->title, $goal);
-        }
-
-        return back()->with('status', $goal->wasChanged('achieved_at')
-            ? ($goal->isAchieved() ? 'Goal ditandai tercapai.' : 'Goal dibuka lagi.')
-            : 'Goal diperbarui.');
+        return back()->with('status', 'Goal diperbarui.');
     }
 
     public function destroy(Request $request, Goal $goal): RedirectResponse

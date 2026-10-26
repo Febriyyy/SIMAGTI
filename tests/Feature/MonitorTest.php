@@ -37,10 +37,13 @@ class MonitorTest extends TestCase
             ->assertOk()
             ->assertSee('Rina Putri')->assertSee('Fajar Pratama')
             ->assertDontSee('Dimas Aditya')
-            ->assertSee('Teknik Informatika')
-            ->assertSee('Angkatan')
+            ->assertDontSee('Angkatan') // daftar ringkas: nama dan posisi saja
             ->assertSee('Universitas Satya Mandala')
             ->assertSee('Kloter 1')->assertSee('Kloter 2'); // satu divisi, dua periode berbeda
+
+        // Identitas akademik lengkap ada di halaman Buka
+        $this->get('/pantau/'.$this->internshipOf('mahasiswa@kp.test')->id)->assertOk()
+            ->assertSee('Teknik Informatika')->assertSee('Angkatan');
     }
 
     public function test_kloter_dipisah_berdasarkan_periode_dalam_divisi_yang_sama(): void

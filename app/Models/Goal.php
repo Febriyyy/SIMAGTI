@@ -54,4 +54,35 @@ class Goal extends Model
     {
         return $this->achieved_at !== null;
     }
+
+    /** Persen task terkait yang sudah Done (pakai withCount tasks / completed_tasks_count bila tersedia). */
+    public function percent(): int
+    {
+        $total = (int) ($this->tasks_count ?? $this->tasks()->count());
+        $done = (int) ($this->completed_tasks_count ?? $this->tasks()->where('status', 'completed')->count());
+
+        return $total > 0 ? (int) round($done / $total * 100) : 0;
+    }
+
+    /**
+     * Goal tercapai otomatis bila punya task dan semua task-nya sudah Done; terbuka lagi bila ada task yang belum.
+     * Ditulis lewat query agar tidak terhalang kunci penempatan selesai (status goal hanya mengikuti task).
+     */
+    public static function syncAchievement(?int $goalId): void
+    {
+        if (! $goalId) {
+            return;
+        }
+        $tasks = WeeklyTask::query()->where('goal_id', $goalId);
+        $total = (clone $tasks)->count();
+        $open = (clone $tasks)->where('status', '!=', 'completed')->count();
+        $achieved = $total > 0 && $open === 0;
+
+        $current = static::query()->whereKey($goalId)->value('achieved_at');
+        if ($achieved && $current === null) {
+            static::query()->whereKey($goalId)->update(['achieved_at' => (clone $tasks)->max('completed_at') ?? now()]);
+        } elseif (! $achieved && $current !== null) {
+            static::query()->whereKey($goalId)->update(['achieved_at' => null]);
+        }
+    }
 }

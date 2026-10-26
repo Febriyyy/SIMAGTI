@@ -35,8 +35,6 @@
             <div class="alert alert-warning" role="status"><strong>Isi rencana kegiatan dulu.</strong> Task dibuat di bawah rencana pada <a href="{{ route('timesheet.index') }}">Timesheet</a>.</div>
         @endif
 
-        @include('kegiatan._goals')
-
         <div class="toolbar board-toolbar">
             <div class="segmented" role="tablist" aria-label="Tampilan">
                 <a href="{{ route('kegiatan.index', $filter->query(['tampilan' => 'board'])) }}" @class(['seg', 'is-active' => $view === 'board']) role="tab" aria-selected="{{ $view === 'board' ? 'true' : 'false' }}"><x-ikon name="board" :size="16" /> Board</a>
@@ -67,11 +65,16 @@
 
         @include('kegiatan._filters', ['action' => route('kegiatan.index')])
 
-        @if ($view === 'board')
-            @include('kegiatan._board')
-        @else
-            <section class="card">@include('kegiatan._list')</section>
-        @endif
+        <div class="work-split">
+            <aside class="work-aside">@include('kegiatan._goals')</aside>
+            <div class="work-main">
+                @if ($view === 'board')
+                    @include('kegiatan._board')
+                @else
+                    <section class="card">@include('kegiatan._list')</section>
+                @endif
+            </div>
+        </div>
 
         @if ($canEdit)
             {{-- Task baru --}}

@@ -275,15 +275,38 @@ class ActivityBoardTest extends TestCase
         $rina = $this->internshipOf('mahasiswa@kp.test');
         $student = $this->user('mahasiswa@kp.test');
 
-        $this->actingAs($student)->get('/kegiatan')->assertOk()->assertSee('Goals')->assertSee('Membangun REST API dengan Laravel')->assertSee('1 dari 4 tercapai');
+        $this->actingAs($student)->get('/kegiatan')->assertOk()->assertSee('Goals')->assertSee('Membangun REST API dengan Laravel')->assertSee('dari 4 tercapai')->assertSee('Goal tercapai otomatis');
+
+        // Seeder: goal tercapai tepat bila semua task-nya Done
+        foreach ($rina->goals()->withCount(['tasks', 'tasks as open_count' => fn ($q) => $q->where('status', '!=', 'completed')])->get() as $g) {
+            $this->assertSame($g->tasks_count > 0 && $g->open_count === 0, $g->isAchieved(), $g->title);
+        }
 
         $this->post('/kegiatan/goals', ['title' => ''])->assertSessionHasErrors('title');
         $this->post('/kegiatan/goals', ['title' => 'Memahami CI/CD'])->assertSessionHasNoErrors();
         $goal = $rina->goals()->where('title', 'Memahami CI/CD')->firstOrFail();
 
+        // Tercapai tidak bisa dicentang manual: goal tanpa task belum tercapai
         $this->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 1])->assertSessionHasNoErrors();
+        $this->assertFalse($goal->fresh()->isAchieved());
+
+        // Goal penuh dan tercapai otomatis saat semua task-nya Done, terbuka lagi bila ada yang dikembalikan
+        $done = $rina->boardColumns()->where('category', 'done')->firstOrFail();
+        $todo = $rina->boardColumns()->where('category', 'todo')->firstOrFail();
+        $tasks = $rina->tasks()->whereNull('goal_id')->take(2)->get();
+        if ($tasks->count() < 2) {
+            $tasks = $rina->tasks()->take(2)->get();
+        }
+        $tasks->each->update(['goal_id' => $goal->id, 'board_column_id' => $todo->id]);
+        $this->assertFalse($goal->fresh()->isAchieved());
+
+        $this->patchJson("/kegiatan/tugas/{$tasks[0]->id}/pindah", ['board_column_id' => $done->id, 'position' => 0])
+            ->assertOk()->assertJsonPath('goal.percent', 50)->assertJsonPath('goal.achieved', false);
+        $this->patchJson("/kegiatan/tugas/{$tasks[1]->id}/pindah", ['board_column_id' => $done->id, 'position' => 0])
+            ->assertOk()->assertJsonPath('goal.percent', 100)->assertJsonPath('goal.achieved', true);
         $this->assertTrue($goal->fresh()->isAchieved());
-        $this->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 0]);
+
+        $this->patchJson("/kegiatan/tugas/{$tasks[1]->id}/pindah", ['board_column_id' => $todo->id, 'position' => 0])->assertJsonPath('goal.achieved', false);
         $this->assertFalse($goal->fresh()->isAchieved());
 
         // Filter task per goal
@@ -293,7 +316,7 @@ class ActivityBoardTest extends TestCase
         $this->get("/kegiatan?tampilan=list&goal={$first->id}")->assertOk()->assertSee($task->title)->assertDontSee($other->title);
 
         // Goal milik orang lain tidak bisa diubah; supervisor hanya melihat
-        $this->actingAs($this->user('dimas@kp.test'))->patch("/kegiatan/goals/{$goal->id}", ['achieved' => 1])->assertNotFound();
+        $this->actingAs($this->user('dimas@kp.test'))->patch("/kegiatan/goals/{$goal->id}", ['title' => 'x'])->assertNotFound();
         $this->actingAs($this->user('supervisor@kp.test'))->post('/kegiatan/goals', ['title' => 'x'])->assertForbidden();
 
         $this->actingAs($student)->delete("/kegiatan/goals/{$first->id}")->assertSessionHasNoErrors();

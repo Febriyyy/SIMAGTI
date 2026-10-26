@@ -27,11 +27,11 @@
                 </div>
                 @if ($letter)<x-chip :tone="$letter->statusTone()">{{ $letter->statusLabel() }}</x-chip>@endif
             </div>
-            <div class="card-body">
+            <div class="card-body stack">
                 @if (! $letter)
                     <p>Minta surat pengantar bila perusahaan memerlukannya. TU Fakultas menerbitkannya dengan nomor surat otomatis, lalu Anda bisa mencetaknya dari sini.</p>
                     @if ($canEdit)
-                        <form method="POST" action="{{ route('dokumen.minta') }}">
+                        <form method="POST" action="{{ route('dokumen.minta') }}" class="row-actions">
                             @csrf
                             <button type="submit" class="btn btn-primary"><x-ikon name="send" :size="18" /> Minta surat pengantar</button>
                         </form>
@@ -40,7 +40,7 @@
                     <p>Diminta {{ $letter->created_at->locale('id')->translatedFormat('j F Y') }}. TU Fakultas akan menerbitkannya. <x-waiting :since="$letter->created_at" /></p>
                 @else
                     <p>Nomor <strong>{{ $letter->number }}</strong>, terbit {{ $letter->processed_at?->locale('id')->translatedFormat('j F Y') }}.</p>
-                    <a href="{{ route('dokumen.cetak', $letter) }}" target="_blank" rel="noopener" class="btn"><x-ikon name="print" :size="18" /> Cetak / simpan PDF</a>
+                    <div class="row-actions"><a href="{{ route('dokumen.cetak', $letter) }}" target="_blank" rel="noopener" class="btn"><x-ikon name="print" :size="18" /> Cetak / simpan PDF</a></div>
                 @endif
             </div>
         </section>

@@ -163,6 +163,20 @@
         if (after) body.insertBefore(dragged, after); else body.insertBefore(dragged, empty || null);
     });
 
+    // Goal di samping board ikut berubah: penuh dan tercapai saat semua task-nya Done.
+    function updateGoal(g) {
+        if (!g) return;
+        var row = document.querySelector('[data-goal="' + g.id + '"]');
+        if (!row) return;
+        row.classList.toggle('is-done', !!g.achieved);
+        var bar = row.querySelector('[data-goal-bar]');
+        if (bar) { bar.style.width = g.percent + '%'; bar.parentNode.setAttribute('aria-valuenow', g.percent); }
+        var sub = row.querySelector('[data-goal-sub]');
+        if (sub) sub.textContent = g.total > 0 ? g.done + '/' + g.total + ' task Done' : 'Belum ada task';
+        var count = document.querySelector('[data-goals-done]');
+        if (count) count.textContent = document.querySelectorAll('[data-goal].is-done').length;
+    }
+
     board.addEventListener('dragend', function () {
         if (!dragged) return;
         var card = dragged; dragged = null;
@@ -183,6 +197,7 @@
             return res.json();
         }).then(function (data) {
             card.classList.toggle('is-done', data.status === 'completed');
+            updateGoal(data.goal);
         }).catch(function () {
             origin.insertBefore(card, originNext);
             refresh(col); refresh(fromCol);
@@ -275,7 +290,7 @@
         });
 
         Object.keys(collapsed).forEach(function (id) { toggle(id, false); });
-        if (compact) { setZoom('fit', false); }
+        if (compact) { setZoom('week', false); }
         else { setView(load('gt.view', 'gantt'), false); setZoom(load('gt.zoom', 'week'), false); }
 
         // Lebar kartu bisa berubah setelah font/ikon dimuat atau saat layar diputar: hitung ulang mode Penuh.

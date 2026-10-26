@@ -86,7 +86,7 @@ class AssessmentFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Rina Putri')
             ->assertSee('Belum dibuka')
-            ->assertSee('Menunggu validasi'); // Fajar
+            ->assertSee('>Menunggu<', false); // Fajar
 
         $rina = $this->open($this->internshipOf('mahasiswa@kp.test'));
         $this->get('/penilaian')->assertSee('Perlu dinilai');

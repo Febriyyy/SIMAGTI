@@ -51,8 +51,7 @@
                                 <td class="hide-md"><span class="c-main c-plain" title="{{ $company->industry }}">{{ $company->industry ?? '–' }}</span></td>
                                 <td><x-chip :tone="$company->statusTone()">{{ $company->statusLabel() }}</x-chip></td>
                                 <td class="num">
-                                    <span class="c-main">{{ $company->active_internships_count }}</span>
-                                    <span class="c-sub">dari {{ $company->internships_count }}</span>
+                                    <span class="c-main c-of"><b>{{ $company->active_internships_count }}</b> <small>dari {{ $company->internships_count }}</small></span>
                                 </td>
                                 <td class="act">
                                     @if ($canManage)

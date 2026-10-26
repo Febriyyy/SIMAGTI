@@ -13,7 +13,7 @@ class Assessment extends Model
 {
     public const STATUSES = [
         'draft' => ['Draft', 'gray'],
-        'submitted' => ['Menunggu validasi', 'amber'],
+        'submitted' => ['Menunggu', 'amber'],
         'validated' => ['Tervalidasi', 'green'],
     ];
 

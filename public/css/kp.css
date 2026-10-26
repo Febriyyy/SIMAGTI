@@ -312,13 +312,18 @@ details.card > summary {
     font-size: var(--text-lg); font-weight: 700;
 }
 details.card > summary::-webkit-details-marker { display: none; }
+/* Tanda + / – digambar dengan gradien agar selalu tepat di tengah (glyph font tidak simetris) */
 details.card > summary::after {
-    content: '+'; display: grid; place-items: center; width: 28px; height: 28px;
-    border-radius: var(--radius-xs); background: var(--primary-soft); color: var(--primary);
-    font-size: var(--text-xl); font-weight: 600; line-height: 1;
+    content: ''; flex: none; width: 28px; height: 28px; border-radius: var(--radius-xs);
+    background:
+        linear-gradient(var(--primary), var(--primary)) center / 12px 2px no-repeat,
+        linear-gradient(var(--primary), var(--primary)) center / 2px 12px no-repeat,
+        var(--primary-soft);
 }
 details.card[open] > summary { border-bottom: 1px solid var(--line); }
-details.card[open] > summary::after { content: '–'; }
+details.card[open] > summary::after {
+    background: linear-gradient(var(--primary), var(--primary)) center / 12px 2px no-repeat, var(--primary-soft);
+}
 details.card .card-body { padding-top: var(--card-y); }
 
 /* Kartu berdampingan, lebar sama (dipakai di bawah tabel utama) */
@@ -450,7 +455,7 @@ details.card .card-body { padding-top: var(--card-y); }
 .lc-line.is-dashed { stroke-dasharray: 5 5; stroke-width: 2; }
 .lc-area { fill: var(--c); opacity: 0.12; }
 .lc-dot { fill: var(--c); stroke: var(--surface); stroke-width: 2.5; }
-.lc-value { fill: var(--text); font-size: var(--text-sm); font-weight: 700; font-family: var(--font); }
+.lc-value { fill: var(--text); font-size: var(--text-sm); font-weight: 700; font-family: var(--font); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
 .lc-hit rect { fill: transparent; }
 .lc-cross { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
 .lc-mark { fill: var(--c); stroke: var(--surface); stroke-width: 2.5; opacity: 0; }
@@ -519,7 +524,7 @@ details.card .card-body { padding-top: var(--card-y); }
     display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill);
     font-size: var(--text-xs); font-weight: 600; white-space: nowrap; line-height: 1.4;
 }
-.chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.85; }
+.chip::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.85; }
 .chip-gray { background: var(--gray-soft); color: var(--gray); }
 .chip-blue { background: var(--blue-soft); color: var(--blue); }
 .chip-purple { background: var(--primary-soft); color: var(--primary-dark); }
@@ -531,6 +536,10 @@ details.card .card-body { padding-top: var(--card-y); }
 .progress { flex: 1; height: 8px; border-radius: var(--radius-pill); background: var(--gray-soft); overflow: hidden; }
 .progress > span { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--bar-gradient); }
 .progress-label { width: 38px; font-size: var(--text-sm); font-weight: 600; color: var(--gray); text-align: right; }
+.progress-in { display: flex; align-items: center; height: 20px; min-width: 0; border-radius: var(--radius-pill); background: var(--gray-soft); overflow: hidden; }
+.progress-in > span { display: flex; align-items: center; justify-content: flex-end; flex: none; height: 100%; border-radius: var(--radius-pill); background: var(--bar-gradient); }
+.progress-in b { padding: 0 var(--space-2); color: #fff; font-size: var(--text-xs); font-weight: 700; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.progress-in b.is-out { padding-left: var(--space-1); color: var(--gray); }
 
 /* ---------- Tombol ---------- */
 
@@ -1077,7 +1086,8 @@ a.step-link:hover .icon { color: var(--primary); transform: translateX(2px); }
 .kcard-key { color: var(--muted); font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .kcard-title { color: var(--text); font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
 .kcard-title:hover { color: var(--primary); text-decoration: none; }
-.kcard-tags { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.kcard-tags { display: flex; flex-wrap: wrap; gap: var(--space-1); min-width: 0; }
+.kcard-tags .tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kcard-meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); color: var(--muted); font-size: var(--text-xs); }
 .kcard-meta:empty { display: none; }
 .meta { display: inline-flex; align-items: center; gap: var(--space-1); }
@@ -1721,7 +1731,7 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
 .slist { list-style: none; margin: 0; padding: 0; }
 .srow {
     display: grid; align-items: center; gap: var(--space-4);
-    grid-template-columns: minmax(184px, 2fr) minmax(128px, 1.4fr) minmax(128px, 1.3fr) 64px minmax(96px, 1fr) minmax(104px, 1fr) 88px;
+    grid-template-columns: minmax(160px, 1.6fr) minmax(128px, 1.4fr) minmax(120px, 1.3fr) 64px minmax(88px, .9fr) minmax(136px, 1.2fr) 88px;
     padding: var(--space-4) var(--card-x); border-top: 1px solid var(--line);
 }
 .srow.srow-compact { grid-template-columns: minmax(176px, 2fr) minmax(120px, 1.2fr) 88px 88px; }
@@ -1744,7 +1754,8 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
 .srow-value { font-weight: 600; }
 .srow-label { display: none; color: var(--muted); font-size: var(--text-xs); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
 .srow-flag { align-self: flex-start; margin-top: var(--space-1); padding: 0 var(--space-2); border-radius: var(--radius-pill); background: var(--amber-soft); color: var(--amber); font-size: var(--text-xs); font-weight: 700; line-height: 20px; }
-.srow-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.srow-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); min-width: 0; }
+.srow-chips .chip { max-width: 100%; white-space: normal; line-height: var(--leading-snug); }
 .srow-progress .progress-cell { min-width: 0; }
 .srow-actions { display: flex; justify-content: flex-end; }
 
@@ -1883,6 +1894,8 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
 /* Isi sel */
 .dt .c-main, .dt .c-sub { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dt .c-main { color: var(--text); font-weight: 600; line-height: var(--leading-snug); }
+.dt .c-of small { color: var(--muted); font-size: var(--text-sm); font-weight: 500; }
+.dt .c-of b { font-weight: 700; }
 .dt .c-sub { margin-top: 2px; color: var(--muted); font-size: var(--text-sm); line-height: var(--leading-snug); }
 .dt .c-plain { color: var(--gray); font-weight: 400; }
 .dt .ident { display: flex; align-items: center; gap: var(--space-3); min-width: 0; color: inherit; }
@@ -1942,21 +1955,28 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
 .dt .w-role .select { width: 100%; }
 .pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); }
 
-/* ---------- Goals (halaman Kegiatan) ---------- */
+/* ---------- Goals (di samping board Kegiatan) ---------- */
+.work-split { display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.work-aside { position: sticky; top: var(--space-4); min-width: 0; }
+.work-main { min-width: 0; }
+.work-main .board { grid-auto-columns: minmax(208px, 1fr); }
+@media (max-width: 1100px) { .work-split { grid-template-columns: minmax(0, 1fr); } .work-aside { position: static; } }
+.goals-card .card-head { padding-bottom: var(--space-3); }
 .goal-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-.goal { display: grid; grid-template-columns: auto minmax(0, 1fr) 176px auto; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--card-x); }
+.goal { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: var(--space-3); padding: var(--space-3) var(--card-x); }
 .goal + .goal { border-top: 1px solid var(--line); }
+.goal-state { display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border: 1.5px solid var(--line-strong); border-radius: 50%; color: transparent; }
+.goal.is-done .goal-state { border-color: var(--brand-green); background: var(--brand-green); color: #fff; }
 .goal-text { min-width: 0; }
 .goal-title { display: block; color: var(--text); font-weight: 600; line-height: var(--leading-snug); overflow-wrap: anywhere; }
 .goal-title:hover { color: var(--primary); text-decoration: none; }
 .goal-sub { display: block; margin-top: 2px; color: var(--muted); font-size: var(--text-sm); }
-.goal.is-done .goal-title { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--muted-2); }
-.goal.is-done .check-btn { border-color: var(--brand-green); background: var(--brand-green); color: #fff; }
-.goal > form { display: flex; }
-@media (max-width: 600px) {
-    .goal { grid-template-columns: auto minmax(0, 1fr) auto; }
-    .goal-bar { grid-column: 2 / -1; grid-row: 2; }
-}
+.goal-bar { height: 6px; margin-top: var(--space-2); border-radius: var(--radius-pill); background: var(--gray-soft); overflow: hidden; }
+.goal-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--bar-gradient); transition: width .3s; }
+.goal.is-done .goal-title { color: var(--muted); }
+.goal.is-done .goal-sub { color: var(--brand-green); font-weight: 600; }
+.goal > form { display: flex; margin-top: -4px; }
+.goal-note { margin: 0; padding: var(--space-3) var(--card-x); border-top: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); }
 
 /* ---------- Kemajuan KP ringkas (dashboard mahasiswa): setiap langkah bisa diklik ke halamannya ---------- */
 .mini-steps { margin: 0; padding: var(--space-2) var(--card-x) var(--space-4); list-style: none; }

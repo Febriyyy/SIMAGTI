@@ -201,7 +201,7 @@ class DemoSeeder extends Seeder
         $today = Carbon::today();
         // $endInDays: KP berakhir N hari dari hari ini (negatif = sudah lewat, KP selesai)
         $place = function (User $student, Company $company, CompanyDivision $division, User $supervisor, string $position,
-            int $startMonthsAgo, int $endInDays, array $projects, array $goals, int $achieved = 0,
+            int $startMonthsAgo, int $endInDays, array $projects, array $goals,
             int $idleDays = 0) use ($dospem, $period): Internship {
             $start = Carbon::today()->subMonthsNoOverflow($startMonthsAgo);
             $end = Carbon::today()->addDays($endInDays);
@@ -226,7 +226,7 @@ class DemoSeeder extends Seeder
             ]);
 
             $internship->assignSupervisor($supervisor);
-            $this->seedGoals($internship, $goals, $achieved);
+            $this->seedGoals($internship, $goals);
             $this->seedActivities($internship, $projects, $supervisor, diligence: 88, idleDays: $idleDays, until: $finished ? $end : null);
 
             if ($finished) {
@@ -236,10 +236,10 @@ class DemoSeeder extends Seeder
             return $internship;
         };
 
-        $magangRina = $place($rina, $nusantara, $divNusantara, $supA, 'Backend Developer Intern', 3, 60, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE, achieved: 1);
-        $magangFajar = $place($fajar, $nusantara, $divNusantara, $supA, 'Frontend Developer Intern', 4, 10, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE, achieved: 2);
+        $magangRina = $place($rina, $nusantara, $divNusantara, $supA, 'Backend Developer Intern', 3, 60, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE);
+        $magangFajar = $place($fajar, $nusantara, $divNusantara, $supA, 'Frontend Developer Intern', 4, 10, self::PROJECTS_SOFTWARE, self::GOALS_SOFTWARE);
         $magangDimas = $place($dimas, $dataPrima, $divData, $supB, 'Data Analyst Intern', 4, 12, self::PROJECTS_DATA, self::GOALS_DATA, idleDays: 10);
-        $magangSalsa = $place($salsa, $dataPrima, $divData, $supB, 'Data Analyst Intern', 7, -60, self::PROJECTS_DATA, self::GOALS_DATA, achieved: 3);
+        $magangSalsa = $place($salsa, $dataPrima, $divData, $supB, 'Data Analyst Intern', 7, -60, self::PROJECTS_DATA, self::GOALS_DATA);
 
         // Pengajuan KP yang masih menunggu verifikasi TU Fakultas dan persetujuan kaprodi
         $magangNadia = Internship::create([

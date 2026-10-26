@@ -72,14 +72,14 @@
             <path class="lc-line tone-{{ $s['color'] }} {{ $s['dashed'] ? 'is-dashed' : '' }}" d="{{ $line }}" />
         @endforeach
 
-        {{-- Titik terakhir seri utama + angkanya --}}
+        {{-- Titik terakhir seri utama + angkanya tepat di atas titik --}}
         @if ($n > 0 && $series->isNotEmpty())
             @php
                 $main = $series->first();
                 $lv = (float) end($main['values']);
             @endphp
             <circle class="lc-dot tone-{{ $main['color'] }}" cx="{{ $x($n - 1) }}" cy="{{ $y($lv) }}" r="5" />
-            <text class="lc-value" x="{{ $x($n - 1) - 10 }}" y="{{ max($padT + 4, $y($lv) - 12) }}" text-anchor="end">{{ $fmt($lv) }}</text>
+            <text class="lc-value" x="{{ $x($n - 1) }}" y="{{ $y($lv) - 12 }}" text-anchor="middle">{{ $fmt($lv) }}</text>
         @endif
 
         {{-- Area sentuh per titik: garis bantu vertikal + titik + tooltip --}}

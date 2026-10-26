@@ -202,20 +202,20 @@ class DataSeeder extends Seeder
         // [mahasiswa, perusahaan, divisi, supervisor, dospem, posisi, mulai (hari lalu), durasi (bulan), bidang, kerajinan %, goals tercapai]
         // Penilaian akhir dibuka 14 hari sebelum KP berakhir: Rafi, Kevin, dan Fajar sedang dalam masa penilaian.
         $p = fn (...$a) => $this->placement(...$a);
-        $kpNabila = $p($nabila, $cakrawala, $divCakrawala, $andika, $dewi, 'Backend Developer Intern', 95, 5, 'backend', 94, 2);
-        $kpAulia = $p($aulia, $cakrawala, $divCakrawala, $andika, $dewi, 'Backend Developer Intern', 95, 5, 'backend', 52, 0);
-        $kpRafi = $p($rafi, $cakrawala, $divCakrawala, $maya, $dewi, 'Frontend Developer Intern', 140, 5, 'frontend', 88, 2);
-        $kpDimas = $p($dimas, $arunika, $divArunika, $fitri, $bambang, 'Data Analyst Intern', 70, 5, 'data', 80, 0, idleDays: 11);
-        $kpSalsabila = $p($salsabila, $arunika, $divArunika, $fitri, $bambang, 'Data Analyst Intern', 190, 5, 'data', 97, 3, finished: true);
-        $kpFajar = $p($fajar, $arunika, $divArunika, $fitri, $bambang, 'Business Intelligence Intern', 112, 4, 'data', 85, 1);
-        $kpBagas = $p($bagas, $sinergi, $divSinergi, $agus, $rizky, 'Network Engineer Intern', 88, 5, 'network', 78, 1);
-        $kpAnnisa = $p($annisa, $sinergi, $divSinergi, $agus, $rizky, 'DevOps Intern', 33, 5, 'network', 90, 0);
-        $kpRaka = $p($raka, $sinergi, $divSinergi, $agus, $rizky, 'Network Engineer Intern', 215, 5, 'network', 91, 3, finished: true);
-        $kpPutri = $p($putri, $kreasi, $divKreasi, $galih, $dewi, 'UI/UX Designer Intern', 58, 4, 'design', 92, 1);
-        $kpKevin = $p($kevin, $kreasi, $divKreasi, $galih, $dewi, 'UI/UX Designer Intern', 145, 5, 'design', 74, 2);
-        $kpYudha = $p($yudha, $cakrawala, $divCakrawala, $maya, $rizky, 'Frontend Developer Intern', 40, 4, 'frontend', 82, 0);
+        $kpNabila = $p($nabila, $cakrawala, $divCakrawala, $andika, $dewi, 'Backend Developer Intern', 95, 5, 'backend', 94);
+        $kpAulia = $p($aulia, $cakrawala, $divCakrawala, $andika, $dewi, 'Backend Developer Intern', 95, 5, 'backend', 52);
+        $kpRafi = $p($rafi, $cakrawala, $divCakrawala, $maya, $dewi, 'Frontend Developer Intern', 140, 5, 'frontend', 88);
+        $kpDimas = $p($dimas, $arunika, $divArunika, $fitri, $bambang, 'Data Analyst Intern', 70, 5, 'data', 80, idleDays: 11);
+        $kpSalsabila = $p($salsabila, $arunika, $divArunika, $fitri, $bambang, 'Data Analyst Intern', 190, 5, 'data', 97, finished: true);
+        $kpFajar = $p($fajar, $arunika, $divArunika, $fitri, $bambang, 'Business Intelligence Intern', 112, 4, 'data', 85);
+        $kpBagas = $p($bagas, $sinergi, $divSinergi, $agus, $rizky, 'Network Engineer Intern', 88, 5, 'network', 78);
+        $kpAnnisa = $p($annisa, $sinergi, $divSinergi, $agus, $rizky, 'DevOps Intern', 33, 5, 'network', 90);
+        $kpRaka = $p($raka, $sinergi, $divSinergi, $agus, $rizky, 'Network Engineer Intern', 215, 5, 'network', 91, finished: true);
+        $kpPutri = $p($putri, $kreasi, $divKreasi, $galih, $dewi, 'UI/UX Designer Intern', 58, 4, 'design', 92);
+        $kpKevin = $p($kevin, $kreasi, $divKreasi, $galih, $dewi, 'UI/UX Designer Intern', 145, 5, 'design', 74);
+        $kpYudha = $p($yudha, $cakrawala, $divCakrawala, $maya, $rizky, 'Frontend Developer Intern', 40, 4, 'frontend', 82);
         // Laras baru mulai: belum menyusun rencana kegiatan, jadi belum bisa membuat task
-        $kpLaras = $p($laras, $kreasi, $divKreasi, $galih, $bambang, 'Graphic Designer Intern', 5, 4, 'design', 0, 0, activities: false);
+        $kpLaras = $p($laras, $kreasi, $divKreasi, $galih, $bambang, 'Graphic Designer Intern', 5, 4, 'design', 0, activities: false);
 
         // ---------- Pengajuan mandiri ----------
         // Zahra: baru diajukan, menunggu verifikasi TU Fakultas
@@ -398,7 +398,7 @@ class DataSeeder extends Seeder
     }
 
     private function placement(User $student, Company $company, CompanyDivision $division, User $supervisor, User $lecturer, string $position,
-        int $startedDaysAgo, int $months, string $field, int $diligence, int $achieved = 0, int $idleDays = 0, bool $finished = false, bool $activities = true): Internship
+        int $startedDaysAgo, int $months, string $field, int $diligence, int $idleDays = 0, bool $finished = false, bool $activities = true): Internship
     {
         $start = Carbon::today()->subDays($startedDaysAgo);
         $end = $start->copy()->addMonthsNoOverflow($months);
@@ -424,7 +424,7 @@ class DataSeeder extends Seeder
         $internship->forceFill(['created_at' => $start->copy()->subDays(12)])->saveQuietly();
 
         if ($activities) {
-            $this->seedGoals($internship, self::GOALS[$field], $achieved);
+            $this->seedGoals($internship, self::GOALS[$field]);
             $this->seedActivities($internship, self::PROJECTS[$field], $supervisor, $diligence, $idleDays, $finished ? $end : null);
         }
 

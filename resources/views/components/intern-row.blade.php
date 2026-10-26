@@ -1,6 +1,7 @@
 {{--
     Satu baris mahasiswa di daftar pemantauan (halaman Mahasiswa Magang dan dashboard).
     Desktop: sejajar dengan kepala kolom. Kartu sempit / HP: tersusun ke bawah, nama tidak dipotong, tombol tetap di kanan.
+    Ringkas: nama dan posisi saja; NIM, prodi, dan divisi ada di halaman Buka.
     Variabel: internship, last (tanggal catatan terakhir), week (catatan kegiatan minggu ini, opsional), compact (versi dashboard)
 --}}
 @props(['internship', 'last' => null, 'week' => null, 'compact' => false])
@@ -8,7 +9,6 @@
     $i = $internship;
     $student = $i->student;
     $viewer = auth()->user();
-    $id = $student->academicIdentity();
     $plans = (int) ($i->activity_plans_count ?? $i->activityPlans()->count());
     $needsConfirm = $viewer->role === 'supervisor' && $i->status === 'berjalan' && ! $i->supervisor_confirmation;
     $role = $i->position ?? 'Posisi belum diisi';
@@ -19,8 +19,6 @@
         <x-avatar :user="$student" />
         <span class="srow-name">
             <strong title="{{ $student->name }}">{{ $student->listName() }}</strong>
-            <small>{{ $student->nim }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</small>
-            @unless ($compact)<small>{{ $id['program'] ?? 'Prodi belum diisi' }}</small>@endunless
             @if ($compact)<small>{{ $role }}</small>@endif
             @if ($needsConfirm)<span class="srow-flag">Perlu konfirmasi</span>@endif
         </span>
@@ -30,13 +28,12 @@
         <div class="srow-cell srow-pos">
             <span class="srow-label">Posisi</span>
             <span class="srow-value">{{ $role }}</span>
-            <small>{{ $i->division?->name ? 'Divisi '.$i->division->name : 'Divisi belum diisi' }}</small>
         </div>
     @endunless
 
     <div class="srow-cell srow-progress">
         <span class="srow-label">Task</span>
-        <x-progress :value="$i->percent()" />
+        <x-progress :value="$i->percent()" inside />
         <small>{{ $i->completed_tasks_count ?? 0 }}/{{ $i->tasks_count ?? 0 }} selesai</small>
     </div>
 

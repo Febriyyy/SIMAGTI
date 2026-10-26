@@ -38,7 +38,7 @@ Company Supervisor    → AcceptInvitation            (link sekali pakai 14 hari
 
 ```
 Mahasiswa: rencana      → ActivityPlanController (timesheet / Gantt: nama kegiatan + rentang tanggal di dalam periode KP)
-Mahasiswa: goals        → GoalController (di halaman Kegiatan, ditandai tercapai)
+Mahasiswa: goals        → GoalController (di samping board Kegiatan; tercapai otomatis lewat Goal::syncAchievement saat semua task-nya Done)
 Mahasiswa: board        → CreateTask, MoveTask (task wajib di bawah rencana, opsional goal; proyek berkode seperti ORD-12, checklist, bukti)
 Mahasiswa: catatan      → LogTime (catatan kegiatan harian tanpa jam, foto opsional di disk privat)
 Supervisor / dospem     → pantau per kloter, tab Rencana (Gantt + goals), Activity monitor, komentar, koreksi posisi, unduh Excel / cetak PDF

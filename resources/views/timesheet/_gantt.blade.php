@@ -9,7 +9,7 @@
     $compact = $compact ?? false;
     $firstMonday = collect($gantt['days'])->search(fn ($d) => $d['monday']);
 @endphp
-<div @class(['gt', 'gt-compact' => $compact, 'gt-readonly' => ! $canEdit]) data-gantt data-zoom="{{ $compact ? 'fit' : 'week' }}" data-view="gantt"
+<div @class(['gt', 'gt-compact' => $compact, 'gt-readonly' => ! $canEdit]) data-gantt data-zoom="week" data-view="gantt"
      style="--days: {{ $gantt['total'] }}; --mon: {{ $firstMonday === false ? 0 : $firstMonday }}">
     @unless ($compact)
         <div class="gt-toolbar">

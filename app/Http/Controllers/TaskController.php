@@ -6,6 +6,7 @@ use App\Actions\Activities\CreateTask;
 use App\Actions\Activities\MoveTask;
 use App\Http\Requests\Activities\SaveTaskRequest;
 use App\Models\ActivityLog;
+use App\Models\Goal;
 use App\Models\WeeklyTask;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -50,7 +51,11 @@ class TaskController extends Controller
 
         $task = $move->handle($task, (int) $data['board_column_id'], (int) $data['position']);
 
-        return response()->json(['ok' => true, 'status' => $task->status, 'key' => $task->key()]);
+        $goal = $task->goal_id ? Goal::withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])->find($task->goal_id) : null;
+
+        return response()->json(['ok' => true, 'status' => $task->status, 'key' => $task->key(), 'goal' => $goal ? [
+            'id' => $goal->id, 'done' => $goal->completed_tasks_count, 'total' => $goal->tasks_count, 'percent' => $goal->percent(), 'achieved' => $goal->isAchieved(),
+        ] : null]);
     }
 
     public function destroy(Request $request, WeeklyTask $task): RedirectResponse

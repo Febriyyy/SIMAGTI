@@ -29,9 +29,8 @@ trait SeedsActivities
      * Goals mahasiswa di halaman Kegiatan.
      *
      * @param  list<string|array{0: string, 1: string}>  $items  judul goal (atau [judul, keterangan])
-     * @param  int  $achieved  jumlah goal pertama yang sudah tercapai
      */
-    protected function seedGoals(Internship $internship, array $items, int $achieved = 0): void
+    protected function seedGoals(Internship $internship, array $items): void
     {
         foreach (array_values($items) as $i => $item) {
             [$title, $description] = is_array($item) ? $item : [$item, null];
@@ -40,7 +39,6 @@ trait SeedsActivities
                 'title' => $title,
                 'description' => $description,
                 'position' => $i,
-                'achieved_at' => $i < $achieved ? $internship->start_date->copy()->addWeeks(4 + $i * 2)->setTime(16, 0)->min(now()) : null,
                 'created_by' => $internship->student_id,
             ]);
             $at = $internship->start_date->copy()->addDays(2)->setTime(9, 0)->min(now());
@@ -237,6 +235,12 @@ trait SeedsActivities
         }
 
         $this->seedActivityLogs($internship, $tasks, $rows, $lastActive);
+
+        // Goal tercapai bila semua task-nya Done; tanggalnya ikut tanggal selesai task terakhir.
+        foreach ($internship->goals()->pluck('id') as $goalId) {
+            Goal::query()->whereKey($goalId)->update(['achieved_at' => null]);
+            Goal::syncAchievement($goalId);
+        }
     }
 
     /**
