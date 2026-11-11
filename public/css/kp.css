@@ -2081,3 +2081,18 @@ a.mini-step-title:hover { color: var(--primary); }
 .dt .act form { display: inline-block; }
 .dt .act form + form { margin-left: var(--space-2); }
 .dt .w-action-2 { width: 260px; }
+
+/* ---------- Verifikasi sertifikat (halaman publik) ---------- */
+.verify-body { min-height: 100vh; background: var(--bg); }
+.verify-page { display: flex; flex-direction: column; align-items: center; gap: var(--space-5); max-width: 560px; margin: 0 auto; padding: var(--space-7) var(--space-4); }
+.verify-logo { height: 44px; width: auto; }
+.verify-card { width: 100%; padding: var(--space-5); }
+.verify-status { display: flex; align-items: flex-start; gap: var(--space-4); }
+.verify-badge { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--green-soft); color: var(--green); }
+.verify-invalid .verify-badge, .verify-missing .verify-badge { background: var(--red-soft); color: var(--red); }
+.verify-valid { border-top: 4px solid var(--brand-green); }
+.verify-invalid, .verify-missing { border-top: 4px solid var(--red); }
+.verify-title { margin: 0; font-size: var(--text-xl); font-weight: 700; color: var(--text); }
+.verify-sub { margin: var(--space-1) 0 0; color: var(--muted); font-size: var(--text-sm); }
+.verify-kv { margin-top: var(--space-5); }
+.verify-foot { margin: 0; color: var(--muted); font-size: var(--text-xs); text-align: center; }

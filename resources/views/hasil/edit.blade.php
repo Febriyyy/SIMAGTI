@@ -64,6 +64,9 @@
                             @if ($internship->result_note)<div><dt>Catatan</dt><dd>{{ $internship->result_note }}</dd></div>@endif
                             <div><dt>Diputuskan</dt><dd>{{ $internship->result_at?->locale('id')->translatedFormat('j F Y') }}</dd></div>
                         </dl>
+                        @if ($internship->result === 'diterima')
+                            <div class="row-actions"><a href="{{ route('sertifikat.cetak', $internship) }}" target="_blank" rel="noopener" class="btn"><x-ikon name="award" :size="18" /> Lihat sertifikat</a></div>
+                        @endif
                     @elseif ($blockers)
                         <div class="alert alert-info" role="status">{{ implode(' ', $blockers) }}</div>
                     @elseif ($internship->status !== 'berjalan')

@@ -94,6 +94,9 @@
                             <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>{{ $internship->durationMonths() }} bulan</small></dd></div>
                             @if ($internship->result)
                                 <div><dt>Hasil KP</dt><dd><x-chip :tone="$internship->resultTone()">{{ $internship->resultLabel() }}</x-chip>@if ($internship->result_note)<small>{{ $internship->result_note }}</small>@endif</dd></div>
+                                @if ($internship->result === 'diterima')
+                                    <div><dt>Sertifikat</dt><dd><a href="{{ route('sertifikat.cetak', $internship) }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="award" :size="16" /> Lihat sertifikat</a></dd></div>
+                                @endif
                             @endif
                         </dl>
                     </div>

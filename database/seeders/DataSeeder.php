@@ -491,6 +491,16 @@ class DataSeeder extends Seeder
             'entered_by' => $kaprodi->id,
         ]);
 
+        // Hasil KP sudah diputuskan dosen pembimbing: diterima, nilai dari penilaian yang divalidasi.
+        $assessment = $internship->assessment()->first();
+        $internship->forceFill([
+            'result' => 'diterima',
+            'final_score' => $assessment?->final_score,
+            'final_grade' => $assessment?->letter_grade,
+            'result_by' => $lecturer->id,
+            'result_at' => $internship->end_date->copy()->addDays(12),
+        ])->saveQuietly();
+
         $template = CertificateTemplate::firstOrCreate(
             ['scope' => 'kampus', 'name' => 'Sertifikat KP kampus'],
             ['signer_name' => $kaprodi->name, 'signer_title' => 'Ketua Program Studi', 'created_by' => $kaprodi->id]

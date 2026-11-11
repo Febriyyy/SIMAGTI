@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 /**
  * Dosen pembimbing memutuskan hasil akhir KP (Diterima / Tidak diterima), lalu KP ditutup dan dikunci.
  * Nilai angka dan huruf mutu diambil dari penilaian akhir Company Supervisor yang sudah divalidasi.
+ * KP yang diterima langsung mendapat sertifikat ber-QR.
  * Syarat: penilaian akhir sudah divalidasi dan bimbingan terkonfirmasi sudah memenuhi minimal.
  */
 class FinalizeResult
@@ -55,6 +56,7 @@ class FinalizeResult
             ];
 
             $internship->update($fields + ['status' => 'selesai']);
+            app(IssueCertificate::class)->handle($internship, $lecturer);
             $label = $internship->resultLabel();
 
             ActivityLog::record('kp.hasil', "Memutuskan hasil KP {$internship->student->name}: {$label}", $internship);

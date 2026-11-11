@@ -10,6 +10,7 @@ use App\Http\Controllers\AssessmentStandardController;
 use App\Http\Controllers\AssessmentWeightController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BoardColumnController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\CompanyController;
@@ -56,6 +57,10 @@ Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'logi
 Route::get('/undangan/{token}', [InvitationController::class, 'show'])->name('undangan.show');
 Route::post('/undangan/{token}', [InvitationController::class, 'store'])->middleware('throttle:10,1')->name('undangan.store');
 
+// Verifikasi sertifikat KP lewat QR: publik, tidak menampilkan NIM.
+Route::get('/sertifikat/verifikasi/{token}', [CertificateController::class, 'verify'])
+    ->where('token', '[A-Za-z0-9]{20,64}')->middleware('throttle:60,1')->name('sertifikat.verifikasi');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
@@ -86,6 +91,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     // Berkas dokumen KP (dicek InternshipPolicy view)
     Route::get('/dokumen/{document}/berkas', [DocumentController::class, 'file'])->whereNumber('document')->name('dokumen.berkas');
     Route::get('/dokumen/{document}/cetak', [DocumentController::class, 'letter'])->whereNumber('document')->name('dokumen.cetak');
+
+    // Sertifikat KP yang diterima (dicek InternshipPolicy view)
+    Route::get('/sertifikat/{internship}', [CertificateController::class, 'show'])->whereNumber('internship')->name('sertifikat.cetak');
 
     Route::get('/timesheet/{entry}/foto', [TimesheetController::class, 'photo'])->whereNumber('entry')->name('timesheet.foto');
 
