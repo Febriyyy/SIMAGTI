@@ -177,7 +177,7 @@
                         </div>
                     </section>
                 @else
-                    @include('dashboard._week', ['plans' => $plans, 'week' => $week])
+                    @include('dashboard._week', ['week' => $week])
                 @endif
             </div>
 

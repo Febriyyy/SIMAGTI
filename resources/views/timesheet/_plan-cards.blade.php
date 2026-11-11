@@ -1,7 +1,8 @@
 {{--
-    Kartu per rencana kegiatan (dashboard). Kartu terang dengan titik warna rencana, status yang jelas
-    (Berjalan / Selesai / Akan datang / Terlambat), tanggal, dan progres task. Rencana yang sedang berjalan disorot.
-    Variabel: $plans (withCount tasks, completed_tasks_count)
+    Kartu per rencana kegiatan (tab Rencana di Timesheet, di atas Gantt; sekaligus keterangan warna Gantt).
+    Kartu terang dengan titik warna rencana, status yang jelas (Berjalan / Selesai / Akan datang / Terlambat),
+    tanggal, dan progres task. Rencana yang sedang berjalan disorot. Pemilik bisa klik kartu untuk mengubah rencana.
+    Variabel: $plans (withCount tasks, completed_tasks_count), $canEdit (opsional)
 --}}
 <ul class="plan-cards">
     @foreach ($plans as $k => $plan)
@@ -21,7 +22,11 @@
                 <span class="plan-card-dot" aria-hidden="true"></span>
                 <span class="plan-card-state">{{ $state[1] }}</span>
             </span>
-            <span class="plan-card-title" title="{{ $plan->title }}">{{ $plan->title }}</span>
+            @if ($canEdit ?? false)
+                <button type="button" class="plan-card-title plan-card-open" data-open="dlg-plan-{{ $plan->id }}" title="Ubah rencana {{ $plan->title }}">{{ $plan->title }}</button>
+            @else
+                <span class="plan-card-title" title="{{ $plan->title }}">{{ $plan->title }}</span>
+            @endif
             <span class="plan-card-sub">{{ $plan->rangeLabel() }}</span>
             <span class="plan-card-foot">
                 @if ($plan->tasks_count > 0)

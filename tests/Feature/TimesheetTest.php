@@ -66,6 +66,8 @@ class TimesheetTest extends TestCase
         $this->actingAs($student)->get('/timesheet')->assertOk()
             ->assertSee('data-gt-toggle="'.$plan->id.'"', false)
             ->assertSee('data-gt-parent="'.$plan->id.'"', false)
+            ->assertSee('class="plan-card"', false) // kartu rencana di atas Gantt
+            ->assertSee('class="plan-card-title plan-card-open" data-open="dlg-plan-'.$plan->id.'"', false)
             ->assertSee($task->title)
             ->assertSee('name="color"', false);
 

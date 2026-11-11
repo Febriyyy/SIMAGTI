@@ -4,10 +4,6 @@
     Variabel: $week (App\Support\WeekPlanner::build)
 --}}
 <div class="week-cal" style="--lanes: {{ $week['lanes'] }}">
-    <p class="week-cal-head">
-        <b>Task {{ $week['offset'] === 0 ? 'minggu ini' : $week['label'] }}</b>
-        <span class="week-cal-count">{{ count($week['items']) }}</span>
-    </p>
     <div class="week-days" aria-hidden="true">
         @foreach ($week['days'] as $d)
             <span @class(['week-day', 'is-today' => $d['today'], 'is-weekend' => $d['weekend']])>

@@ -201,7 +201,7 @@ class DashboardDataTest extends TestCase
             ->assertSee('Backend Developer Intern')
             ->assertSee('Rencana kegiatan')
             ->assertSee('class="week-cal"', false)   // kalender minggu ini (pengganti Gantt ringkas)
-            ->assertSee('class="plan-card"', false)  // kartu berwarna per rencana kegiatan
+            ->assertDontSee('class="plan-cards"', false)  // kartu rencana dipindah ke tab Rencana Timesheet
             ->assertSee('Minggu ini')
             ->assertSee('Kemajuan KP')
             ->assertSee('href="'.route('timesheet.index').'" class="mini-step-title"', false)
