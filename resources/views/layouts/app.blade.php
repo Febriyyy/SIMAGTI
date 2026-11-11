@@ -28,11 +28,13 @@
 </head>
 <body>
 @php($user = auth()->user())
+<a href="#konten" class="skip-link">Lewati ke konten</a>
 <div class="shell">
-    <aside class="sidebar">
-        <a href="{{ route('dashboard') }}" class="brand">
-            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="brand-logo" width="168" height="51">
-        </a>
+    <aside class="sidebar" id="sidebar" aria-label="Menu">
+        <div class="brand">
+            <a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="brand-logo" width="168" height="51"></a>
+            <button type="button" class="drawer-close" data-drawer-close aria-label="Tutup menu"><x-ikon name="close" :size="20" /></button>
+        </div>
 
         <span class="nav-label">Menu</span>
         <nav class="nav" aria-label="Menu utama">
@@ -62,8 +64,12 @@
         </div>
     </aside>
 
+    <div class="drawer-backdrop" data-drawer-close></div>
+
     <main class="main">
         <header class="topbar">
+            <button type="button" class="menu-btn" data-drawer-open aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu"><x-ikon name="menu" :size="22" /></button>
+            <a href="{{ route('dashboard') }}" class="topbar-brand"><img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="112" height="34"></a>
             <span class="topbar-date"><x-ikon name="calendar" :size="16" /> {{ now()->locale('id')->translatedFormat('l, j F Y') }}</span>
             <div class="topbar-right">
             <x-bell />
@@ -77,7 +83,7 @@
             </div>
         </header>
 
-        <div class="container">
+        <div class="container" id="konten" tabindex="-1">
             @if (session('status'))
                 <div class="alert alert-success" role="status">{{ session('status') }}</div>
             @endif

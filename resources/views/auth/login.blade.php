@@ -17,7 +17,7 @@
         <div class="signin-form-box">
             <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="signin-logo" width="150" height="46">
 
-            <h1 class="signin-title">Masuk ke akun Anda.</h1>
+            <h1 class="signin-title">Selamat datang kembali</h1>
             <p class="signin-sub">Masukkan email dan kata sandi untuk melanjutkan.</p>
 
             <form method="POST" action="{{ route('login') }}" class="signin-form" novalidate>
@@ -61,42 +61,41 @@
                 <button type="submit" class="signin-submit">Masuk</button>
             </form>
         </div>
+        <p class="signin-foot"><strong>Semua kegiatan KP dalam satu tempat.</strong> Rencana kegiatan, task, catatan harian, bimbingan, dan penilaian.</p>
     </section>
 
-    {{-- Kanan: latar gradasi hijau-teal dengan awan dan cuplikan aplikasi --}}
+    {{-- Kanan: panel merek dengan cuplikan aplikasi yang digambar dengan HTML (tajam di semua layar, ikut token warna) --}}
     <section class="signin-showcase" aria-hidden="true">
-        <span class="login-cloud login-cloud-1"></span>
-        <span class="login-cloud login-cloud-2"></span>
-        <span class="login-cloud login-cloud-3"></span>
-        <span class="login-cloud login-cloud-4"></span>
-
-        <div class="signin-visual">
-            <span class="signin-badge"><img src="{{ asset('images/logo-simagti-mark.svg') }}" alt="" width="54" height="54"></span>
-
-            <figure class="signin-shot">
-                <img src="{{ asset('images/login-preview.jpg') }}" alt="" width="1600" height="950">
-            </figure>
-
-            <div class="signin-float">
-                <div class="signin-float-head">
-                    <span class="signin-float-icon">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-                    </span>
-                    <div>
-                        <div class="signin-float-title">Catatan kegiatan</div>
-                        <div class="signin-float-sub">8 minggu terakhir</div>
-                    </div>
-                </div>
-                <svg class="signin-spark" viewBox="0 0 120 40" preserveAspectRatio="none">
-                    <path d="M2 30 C14 28 18 18 30 20 S48 32 60 24 S80 8 92 14 S110 10 118 6" fill="none" stroke="#0e9b6b" stroke-width="2.4" stroke-linecap="round"/>
-                </svg>
-                <div class="signin-float-value">12 <small>catatan minggu ini</small> <span class="signin-float-up">Timesheet terisi setiap hari</span></div>
-            </div>
-        </div>
+        <div class="showcase-grid"></div>
 
         <div class="signin-tagline">
+            <span class="signin-kicker">Sistem Monitoring Kerja Praktik</span>
             <h2>Semua kegiatan KP dalam satu tempat.</h2>
-            <p>Rencana kegiatan, task, timesheet, dan penilaian, untuk mahasiswa, perusahaan, dan kampus.</p>
+            <p>Rencana kegiatan, task, catatan harian, bimbingan, dan penilaian untuk mahasiswa, perusahaan, dan kampus.</p>
+        </div>
+
+        <div class="showcase">
+            <div class="sc-card sc-progress">
+                <div class="sc-row"><strong>Kemajuan KP</strong><span class="sc-muted">Minggu 14 dari 22</span></div>
+                <div class="sc-steps"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+                <div class="sc-row sc-small"><span>Pengajuan</span><span class="sc-now">Pelaksanaan</span><span>Hasil</span></div>
+            </div>
+
+            <div class="sc-card sc-gantt">
+                <div class="sc-row"><strong>Rencana kegiatan</strong><span class="sc-chip">4 rencana</span></div>
+                <div class="sc-lanes">
+                    <span class="sc-today"></span>
+                    <div class="sc-lane"><span class="sc-name">Orientasi</span><span class="sc-bar c1" style="--x: 0%; --w: 22%"><b>100%</b></span></div>
+                    <div class="sc-lane"><span class="sc-name">Modul Pemesanan</span><span class="sc-bar c2" style="--x: 14%; --w: 46%"><b>60%</b></span></div>
+                    <div class="sc-lane"><span class="sc-name">Integrasi API</span><span class="sc-bar c3" style="--x: 42%; --w: 36%"><b>25%</b></span></div>
+                    <div class="sc-lane"><span class="sc-name">Laporan akhir</span><span class="sc-bar c4" style="--x: 70%; --w: 30%"></span></div>
+                </div>
+            </div>
+
+            <div class="sc-card sc-float">
+                <span class="sc-float-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                <div><strong>Penilaian divalidasi</strong><span class="sc-muted">Nilai akhir A</span></div>
+            </div>
         </div>
     </section>
 </main>

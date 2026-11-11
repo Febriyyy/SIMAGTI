@@ -51,14 +51,68 @@
             </x-slot:meta>
         </x-hero>
 
+        {{-- Kartu Kemajuan KP: elemen khas dashboard mahasiswa (minggu berjalan, task, dan langkah KP dalam satu kartu) --}}
+        @php($visibleSteps = collect($steps)->reject(fn ($st) => $st['state'] === 'later')->values())
+        @php($doneSteps = $visibleSteps->where('state', 'done')->count())
+        @php($nowStep = $visibleSteps->first(fn ($st) => in_array($st['state'], ['current', 'waiting', 'attention'], true)))
+        @php($taskPct = $internship->percent())
+        <section class="kpp" aria-labelledby="kpp-title">
+            <div class="kpp-top">
+                <div class="kpp-main">
+                    <span class="kpp-eyebrow">Kemajuan KP</span>
+                    <h2 id="kpp-title" class="kpp-title">
+                        @if ($internship->status === 'selesai')
+                            KP selesai
+                        @else
+                            Minggu ke-{{ $internship->currentWeek() }} <span>dari {{ $internship->totalWeeks() }}</span>
+                        @endif
+                    </h2>
+                    <p class="kpp-sub">
+                        @if ($internship->status !== 'selesai')Sisa {{ $internship->daysLeft() }} hari · selesai {{ $internship->end_date->locale('id')->translatedFormat('j M Y') }} · @endif
+                        {{ $doneSteps }} dari {{ $visibleSteps->count() }} langkah selesai
+                    </p>
+                </div>
+                <div class="kpp-figures">
+                    <a href="{{ route('kegiatan.index') }}" class="kpp-ring" style="--p: {{ $taskPct }}" aria-label="Task selesai {{ $taskPct }} persen, buka Kegiatan">
+                        <strong>{{ $taskPct }}%</strong>
+                        <span>task selesai</span>
+                    </a>
+                    <div class="kpp-fig">
+                        <strong>{{ $internship->completed_tasks_count }}<small>/{{ $internship->tasks_count }}</small></strong>
+                        <span>Task selesai</span>
+                    </div>
+                </div>
+            </div>
+
+            <ol class="mini-steps kpp-steps" style="--n: {{ max(1, $visibleSteps->count()) }}">
+                @foreach ($visibleSteps as $step)
+                    @php($link = $step['url'] && $step['state'] !== 'upcoming')
+                    <li @class(['mini-step', 'is-'.$step['state']]) @if ($step === $nowStep) aria-current="step" @endif>
+                        <span class="mini-step-dot" aria-hidden="true">@if ($step['state'] === 'done')<x-ikon name="tick" :size="12" />@endif</span>
+                        @if ($link)
+                            <a href="{{ $step['url'] }}" class="mini-step-title">{{ $step['title'] }}</a>
+                        @else
+                            <span class="mini-step-title">{{ $step['title'] }}</span>
+                        @endif
+                        <span class="mini-step-state">{{ ['done' => 'Selesai', 'current' => 'Berjalan', 'waiting' => 'Menunggu', 'attention' => 'Perlu cek', 'upcoming' => 'Belum'][$step['state']] ?? '' }}</span>
+                    </li>
+                @endforeach
+            </ol>
+
+            <div class="kpp-foot">
+                @if ($nowStep)
+                    <span class="kpp-now">Sekarang: <strong>{{ $nowStep['title'] }}</strong></span>
+                @else
+                    <span class="kpp-now">Semua langkah yang berjalan sudah selesai.</span>
+                @endif
+                <a href="{{ route('kp.status') }}" class="kpp-link">Detail langkah <x-ikon name="arrow" :size="16" /></a>
+            </div>
+        </section>
+
         <div class="stat-grid">
-            <x-stat label="Minggu berjalan" :value="$internship->currentWeek()" :unit="'dari '.$internship->totalWeeks()"
-                    :hint="'Sisa '.$internship->daysLeft().' hari · s.d. '.$internship->end_date->locale('id')->translatedFormat('j M')" />
             @php($activePlans = $plans->filter(fn ($p) => $p->phase() === 'active')->count())
             <x-stat label="Rencana kegiatan" :value="$plans->count()" unit="kegiatan" :href="route('timesheet.index')"
                     :tone="$plans->isEmpty() ? 'amber' : 'blue'" :hint="$plans->isEmpty() ? 'Isi rencana dulu di timesheet' : $activePlans.' sedang berjalan'" />
-            <x-stat label="Task selesai" :value="$internship->completed_tasks_count" :unit="'dari '.$internship->tasks_count" :href="route('kegiatan.index')"
-                    :percent="$internship->percent()" />
             @if ($internship->status === 'selesai' || $a?->isValidated())
                 <x-stat label="Nilai akhir" :value="$a?->isValidated() ? $a->letter_grade : null" :unit="$a?->isValidated() ? \App\Support\Num::short($a->final_score) : null"
                         :tone="$a?->isValidated() ? 'green' : 'gray'" empty="Belum dinilai"
@@ -67,6 +121,9 @@
                 <x-stat label="Goals tercapai" :value="$goals->whereNotNull('achieved_at')->count()" :unit="'dari '.$goals->count()" :href="route('kegiatan.index')"
                         tone="gray" :hint="$goals->isEmpty() ? 'Tulis goals di halaman Kegiatan' : 'Tandai di halaman Kegiatan'" />
             @endif
+            <x-stat label="Sisa waktu KP" :value="$internship->status === 'selesai' ? null : $internship->daysLeft()" unit="hari" empty="Selesai"
+                    :tone="$internship->status !== 'selesai' && $internship->daysLeft() <= 21 ? 'amber' : 'gray'"
+                    :hint="'s.d. '.$internship->end_date->locale('id')->translatedFormat('j M Y')" />
         </div>
 
         @if ($next && in_array($next['state'], ['current', 'waiting', 'attention'], true) && $next['key'] !== 'activities')
@@ -133,31 +190,6 @@
             </div>
 
             <div class="col">
-                <section class="card">
-                    <div class="card-head">
-                        <div>
-                            <h2 class="card-title">Kemajuan KP</h2>
-                            <p class="card-sub">{{ collect($steps)->where('state', 'done')->count() }} dari {{ count($steps) }} langkah selesai</p>
-                        </div>
-                        <a href="{{ route('kp.status') }}" class="btn btn-sm">Detail</a>
-                    </div>
-                    <ul class="mini-steps">
-                        @foreach ($steps as $step)
-                            @continue($step['state'] === 'later')
-                            @php($link = $step['url'] && $step['state'] !== 'upcoming')
-                            <li @class(['mini-step', 'is-'.$step['state']])>
-                                <span class="mini-step-dot" aria-hidden="true">@if ($step['state'] === 'done')<x-ikon name="check" :size="12" />@endif</span>
-                                @if ($link)
-                                    <a href="{{ $step['url'] }}" class="mini-step-title">{{ $step['title'] }}</a>
-                                @else
-                                    <span class="mini-step-title">{{ $step['title'] }}</span>
-                                @endif
-                                <span class="mini-step-state">{{ ['done' => 'Selesai', 'current' => 'Berjalan', 'waiting' => 'Menunggu', 'attention' => 'Perlu cek', 'upcoming' => 'Belum'][$step['state']] ?? '' }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                </section>
-
                 <section class="card">
                     <div class="card-head">
                         <h2 class="card-title">Meeting minggu ini</h2>

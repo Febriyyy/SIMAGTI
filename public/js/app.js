@@ -6,9 +6,37 @@
  * - filter: form [data-autosubmit] terkirim saat pilihan berubah
  * - select [data-other-toggle]: pilihan "Lainnya" menampilkan isian bebas
  * - board: drag-and-drop kartu antar kolom (PATCH ke server, kembali ke posisi semula bila gagal)
+ * - menu HP: tombol [data-drawer-open] membuka sidebar sebagai drawer, [data-drawer-close] / Esc menutupnya
  */
 (function () {
     var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content;
+
+    // Menu HP (drawer). Fokus pindah ke menu saat dibuka dan kembali ke tombol ☰ saat ditutup.
+    var drawerBtn = document.querySelector('[data-drawer-open]');
+    var drawer = document.getElementById('sidebar');
+    function setDrawer(open) {
+        if (!drawerBtn || !drawer) return;
+        document.body.classList.toggle('drawer-open', open);
+        drawerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            var first = drawer.querySelector('.nav-item.is-active') || drawer.querySelector('a, button');
+            if (first) setTimeout(function () { first.focus(); }, 30);
+        } else {
+            drawerBtn.focus();
+        }
+    }
+    if (drawerBtn && drawer) {
+        drawerBtn.addEventListener('click', function () { setDrawer(true); });
+        document.querySelectorAll('[data-drawer-close]').forEach(function (el) {
+            el.addEventListener('click', function () { setDrawer(false); });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) setDrawer(false);
+        });
+        window.matchMedia('(min-width: 901px)').addEventListener('change', function (m) {
+            if (m.matches) document.body.classList.remove('drawer-open');
+        });
+    }
 
     document.addEventListener('click', function (e) {
         var open = e.target.closest('[data-open]');
