@@ -13,6 +13,7 @@
      style="--days: {{ $gantt['total'] }}; --mon: {{ $firstMonday === false ? 0 : $firstMonday }}">
     @unless ($compact)
         <div class="gt-toolbar">
+            @includeWhen($viewSwitch ?? false, 'timesheet._view-switch')
             <div class="segmented" role="group" aria-label="Tampilan">
                 <button type="button" class="seg is-active" data-gt-view="gantt" aria-pressed="true"><x-ikon name="calendar" :size="16" /> Gantt</button>
                 <button type="button" class="seg" data-gt-view="list" aria-pressed="false"><x-ikon name="list" :size="16" /> Daftar</button>

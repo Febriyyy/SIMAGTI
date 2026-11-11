@@ -164,7 +164,7 @@
             @if ($plans->isEmpty())
                 <div class="empty"><strong>Belum ada rencana</strong> Mahasiswa menyusun rencana kegiatan di timesheet sebelum membuat task.</div>
             @else
-                @include('timesheet._gantt', ['canEdit' => false])
+                @include('timesheet._plan-views', ['gantt' => $gantt, 'canEdit' => false])
             @endif
         </section>
         @include('kegiatan._goals', ['canEdit' => false])
