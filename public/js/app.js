@@ -16,6 +16,46 @@
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (window.CSS && CSS.registerProperty) document.documentElement.classList.add('ring-anim');
 
+    // ---------- Tab di dalam halaman ([data-tabs] + [data-tab-panel]); #catatan / ?p / ?periode membuka tab Catatan ----------
+    document.querySelectorAll('[data-tabs]').forEach(function (list) {
+        var buttons = list.querySelectorAll('[data-tab]');
+        function show(name, focus) {
+            buttons.forEach(function (b) {
+                var on = b.getAttribute('data-tab') === name;
+                b.classList.toggle('is-active', on);
+                b.setAttribute('aria-selected', on ? 'true' : 'false');
+                b.tabIndex = on ? 0 : -1;
+                if (on && focus) b.focus();
+            });
+            document.querySelectorAll('[data-tab-panel]').forEach(function (p) {
+                p.hidden = p.getAttribute('data-tab-panel') !== name;
+            });
+            // Gantt menghitung lebar saat terlihat
+            if (name === 'rencana') window.dispatchEvent(new Event('resize'));
+        }
+        buttons.forEach(function (b, i) {
+            b.addEventListener('click', function () {
+                var name = b.getAttribute('data-tab');
+                show(name, false);
+                try { history.replaceState(null, '', name === 'catatan' ? '#catatan' : location.pathname + location.search); } catch (e) {}
+            });
+            b.addEventListener('keydown', function (e) {
+                if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                var next = buttons[(i + (e.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length];
+                show(next.getAttribute('data-tab'), true);
+            });
+        });
+        var wantNotes = list.getAttribute('data-tab-default') === 'catatan' || location.hash === '#catatan' || /[?&](p|periode)=/.test(location.search)
+            || document.querySelector('[data-tab-panel="catatan"] .alert, [data-tab-panel="catatan"] .is-invalid');
+        show(wantNotes ? 'catatan' : buttons[0].getAttribute('data-tab'), false);
+    });
+    document.querySelectorAll('[data-photo-input]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            var label = document.querySelector('label[for="' + input.id + '"] [data-photo-name]');
+            if (label) label.textContent = input.files.length ? input.files[0].name : 'Foto';
+        });
+    });
+
     // ---------- Sedikit kata: teks penjelasan panjang menjadi ikon info di samping judul ----------
     var tipId = 0;
     function closeTips(except) {

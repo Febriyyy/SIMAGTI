@@ -3001,3 +3001,86 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .week-col { grid-row: 1 / span var(--lanes); min-height: 120px; }
 .plan-cards { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
 .plan-card-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+
+/* =====================================================================
+   Halaman Timesheet: dua tab, Gantt gaya roadmap berwarna, jurnal kartu per hari.
+   ===================================================================== */
+.tabs .tab { border: 0; border-bottom: 2px solid transparent; background: none; font: inherit; cursor: pointer; }
+.tab-count { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--muted); font-size: var(--text-2xs); font-weight: 700; }
+.tab.is-active .tab-count { background: var(--primary-soft); box-shadow: none; color: var(--primary-dark); }
+.tab:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; border-radius: var(--radius-xs) var(--radius-xs) 0 0; }
+
+/* ---------- Gantt gaya roadmap (hanya di Timesheet, pembungkus .ts-roadmap) ---------- */
+.ts-roadmap .gt { --side: 280px; --row: 60px; --row-task: 44px; }
+.ts-roadmap .gt:not([data-view="list"]) .gt-side { grid-template-columns: 24px minmax(0, 1fr) 32px; }
+.ts-roadmap .gt:not([data-view="list"]) .gt-c-dur,
+.ts-roadmap .gt:not([data-view="list"]) .gt-c-status { display: none; }
+.ts-roadmap .gt-head, .ts-roadmap .gt-head .gt-side { background: var(--surface); }
+.ts-roadmap .gt-months b { color: var(--text); font-size: var(--text-sm); font-weight: 650; }
+/* Baris rencana: pita warna lembut sepanjang timeline */
+.ts-roadmap .gt-plan .gt-track { background: color-mix(in srgb, var(--c) 6%, transparent); }
+.ts-roadmap .gt-plan .gt-side { box-shadow: inset 4px 0 0 var(--c); background: color-mix(in srgb, var(--c) 6%, var(--surface)); }
+.ts-roadmap .gt-plan .gt-title { color: color-mix(in srgb, var(--c) 80%, #000); font-size: var(--text-md); }
+.ts-roadmap .gt-row + .gt-row { border-top-color: transparent; }
+.ts-roadmap .gt-plan + .gt-row, .ts-roadmap .gt-task + .gt-plan { border-top-color: var(--line); }
+/* Batang rencana besar dengan sudut membulat dan bayangan lembut */
+.ts-roadmap .gt-plan .gt-bar { height: 38px; padding: 0 var(--space-3); border-radius: 12px; font-size: var(--text-sm); box-shadow: 0 4px 12px color-mix(in srgb, var(--c) 30%, transparent); }
+.ts-roadmap .gt-plan .gt-bar.is-empty { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 45%, transparent); }
+.ts-roadmap .gt-fill { background: rgba(255, 255, 255, 0.18); }
+.ts-roadmap .gt-frac { background: rgba(255, 255, 255, 0.3); }
+/* Batang task: kapsul lembut berwarna rencana */
+.ts-roadmap .gt-bar-task { height: 28px; border-radius: 9px; font-weight: 600; }
+.ts-roadmap .gt-bar-task.is-done { box-shadow: none; }
+.ts-roadmap .gt-task .gt-title { font-size: var(--text-sm); }
+.ts-roadmap .gt-now { width: 2px; background: var(--acc-blue); }
+.ts-roadmap .gt-now span { background: var(--acc-blue); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35); }
+.ts-roadmap .gt-day.is-today b { background: var(--acc-blue); }
+.ts-roadmap .gt-legend { justify-content: flex-start; }
+
+/* ---------- Jurnal catatan harian ---------- */
+.journal { display: flex; flex-direction: column; gap: var(--space-4); }
+.jquick { padding: var(--space-4) var(--card-x); background: linear-gradient(115deg, var(--surface) 60%, var(--acc-teal-soft)); }
+.jquick form { display: flex; flex-direction: column; gap: var(--space-3); }
+.jquick-title { font-size: var(--text-md); font-weight: 650; color: var(--text); }
+.jquick-text { min-height: 64px; background: var(--surface); }
+.jquick-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.jquick-date { width: 160px; }
+.jquick-task { flex: 1 1 240px; max-width: 420px; }
+.jquick-photo { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.jquick-photo:focus-within, input[data-photo-input]:focus-visible + .jquick-save { outline: 2px solid var(--primary); }
+.jquick-save { margin-left: auto; }
+
+.jdays { margin: 0; padding: var(--space-2) var(--card-x) var(--card-y); list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.jday { --d: var(--acc-teal); --d-soft: var(--acc-teal-soft); --d-ink: var(--acc-teal-ink); display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.jday-1 { --d: var(--acc-blue); --d-soft: var(--acc-blue-soft); --d-ink: var(--acc-blue-ink); }
+.jday-2 { --d: var(--acc-violet); --d-soft: var(--acc-violet-soft); --d-ink: var(--acc-violet-ink); }
+.jday-3 { --d: var(--acc-teal); --d-soft: var(--acc-teal-soft); --d-ink: var(--acc-teal-ink); }
+.jday-4 { --d: var(--acc-yellow); --d-soft: var(--acc-yellow-soft); --d-ink: var(--acc-yellow-ink); }
+.jday-5 { --d: var(--acc-coral); --d-soft: var(--acc-coral-soft); --d-ink: var(--acc-coral-ink); }
+.jday-6, .jday-7 { --d: var(--muted); --d-soft: var(--pastel-gray); --d-ink: var(--gray); }
+.jday-badge {
+    display: flex; flex-direction: column; align-items: center; gap: 0; padding: var(--space-2) 0;
+    border-radius: var(--radius); background: var(--d-soft); color: var(--d-ink); text-align: center; line-height: 1.15;
+}
+.jday-badge b { font-size: var(--text-3xl); font-weight: 750; letter-spacing: -0.03em; }
+.jday-badge span { font-size: var(--text-xs); font-weight: 700; }
+.jday-badge small { font-size: var(--text-2xs); opacity: 0.85; }
+.jday.is-today .jday-badge { background: var(--d); color: #fff; box-shadow: 0 6px 14px color-mix(in srgb, var(--d) 35%, transparent); }
+.jentries { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.jentry {
+    display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--line); border-left: 3px solid var(--d); border-radius: var(--radius-sm); background: var(--surface);
+}
+.jentry-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.jentry-desc { margin: 0; color: var(--text); line-height: var(--leading-normal); overflow-wrap: anywhere; }
+.jentry-task { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 2px var(--space-2); border-radius: var(--radius-pill); background: var(--d-soft); color: var(--d-ink); font-size: var(--text-xs); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jentry-task:hover { text-decoration: none; filter: brightness(0.97); }
+.jentry-photo img { display: block; width: 56px; height: 56px; object-fit: cover; border-radius: var(--radius-sm); }
+
+@media (max-width: 700px) {
+    .ts-roadmap .gt { --side: 150px; }
+    .jday { grid-template-columns: 48px minmax(0, 1fr); gap: var(--space-3); }
+    .jday-badge b { font-size: var(--text-xl); }
+    .jquick-date, .jquick-task { flex: 1 1 100%; max-width: none; width: 100%; }
+    .jquick-save { margin-left: auto; }
+}

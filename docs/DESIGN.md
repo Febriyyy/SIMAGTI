@@ -409,3 +409,10 @@ Gantt ringkas di dashboard (terlalu lebar, harus digeser) diganti tampilan mingg
 - **Kartu rencana berwarna** (`.plan-card`): satu kartu per rencana kegiatan dengan warna rencananya, judul (maks. 2 baris), rentang tanggal, bar progres putih, dan jumlah task selesai.
 - **Kalender minggu** (`App\Support\WeekPlanner`, `dashboard/_week`, `.week-cal`): kolom Senin–Minggu tanpa jam (SIMAGTI tidak mencatat jam). Task tampil sebagai blok berwarna rencananya, membentang dari tanggal mulai sampai tenggat dan disusun ke lajur agar tidak bertumpuk. Hari ini disorot, akhir pekan diarsir, task selesai berwarna lembut dan dicoret, task lewat tenggat bercincin merah, ujung blok datar bila task berlanjut ke minggu lain.
 - Navigasi minggu sebelumnya/berikutnya lewat `?minggu=-1` / `?minggu=1`; tombol Timesheet membuka Gantt lengkap (tidak berubah).
+
+### Halaman Timesheet (November 2026)
+
+- **Banner** (`.pbanner`) berisi judul, pil ringkas (periode KP, jumlah rencana dan yang berjalan, task selesai, hari tercatat), Unduh, dan Rencana baru. Strip angka dihapus.
+- **Dua tab** (`[data-tabs]` / `[data-tab-panel]` di `app.js`): Rencana dan Catatan harian, masing-masing dengan jumlahnya. Kedua isi tetap ada di HTML (tanpa JavaScript tampil bertumpuk). Tab Catatan terbuka otomatis bila alamat berisi `#catatan`, `?p=` atau `?periode=`, atau setelah catatan gagal disimpan. Panah kiri/kanan berpindah tab.
+- **Gantt gaya roadmap** (pembungkus `.ts-roadmap`, khusus Timesheet): kolom kiri cukup nama rencana/task (Durasi dan Status hanya di tampilan Daftar), baris rencana berpita warna lembut sepanjang timeline, batang rencana lebih besar dan membulat dengan pil progres, batang task berbentuk kapsul, garis dan pil "Hari ini" biru.
+- **Jurnal catatan harian**: kotak cepat di atas ("apa yang kamu kerjakan hari ini?", tanggal, task, tombol Foto, Simpan), lalu kartu per hari (`.jday`) dengan lencana tanggal berwarna per hari dalam minggu (hari ini warna penuh), setiap catatan berpinggir warna hari itu, label task, dan foto kecil.
