@@ -37,6 +37,7 @@ class WeekPlanner
         }
 
         $colors = $plans->values()->mapWithKeys(fn (ActivityPlan $p, int $k) => [$p->id => $p->colorKey($k)]);
+        $titles = $plans->mapWithKeys(fn (ActivityPlan $p) => [$p->id => $p->title]);
 
         $tasks = $internship->tasks()
             ->with('column')
@@ -46,7 +47,7 @@ class WeekPlanner
                 ->whereRaw('COALESCE(due_date, start_date) >= ?', [$start->toDateString()]))
             ->get();
 
-        $items = $tasks->map(function ($task) use ($start, $colors) {
+        $items = $tasks->map(function ($task) use ($start, $colors, $titles) {
             $from = CarbonImmutable::parse($task->start_date ?? $task->due_date);
             $to = CarbonImmutable::parse($task->due_date ?? $task->start_date);
             if ($to->lt($from)) {
@@ -59,6 +60,11 @@ class WeekPlanner
                 'span' => 0,
                 'to' => min(6, (int) $start->diffInDays($to, false)),
                 'color' => $colors[$task->activity_plan_id] ?? 'teal',
+                'plan' => $titles[$task->activity_plan_id] ?? null,
+                'due' => $task->due_date ? CarbonImmutable::parse($task->due_date)->locale('id')->translatedFormat('D, j M') : null,
+                'range' => $from->isSameDay($to)
+                    ? $from->locale('id')->translatedFormat('j M')
+                    : $from->locale('id')->translatedFormat('j M').' – '.$to->locale('id')->translatedFormat('j M'),
                 'done' => $task->isDone(),
                 'late' => $task->isOverdue(),
                 'continues' => $to->gt($start->addDays(6)),

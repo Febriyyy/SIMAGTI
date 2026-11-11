@@ -426,3 +426,7 @@ Timeline lajur melayang sempat dicoba lalu dihapus atas permintaan pemilik proye
 ### Gantt rapi (November 2026)
 
 Gantt rencana kegiatan memakai baris ringkas (rencana 44px, task 34px). Batang rencana berbentuk pil warna muda yang terisi warna lebih pekat sesuai persentase task selesai; judul dan angka x/y berada di dalam pil. Pil penuh pekat berarti semua task selesai, putus-putus berarti belum ada task, dan bingkai merah berarti terlambat. Batang task berupa garis pastel tipis. Kolom kiri hanya menampilkan judul satu baris; tanggal dan kode task tetap ada di tampilan Daftar. Task terlipat secara bawaan, dan rencana yang dibuka pengguna diingat di localStorage (`gt.expanded`). Warna toska, hijau, dan kuning dibuat lebih berjauhan agar rencana yang berdampingan tidak terlihat sama.
+
+### Rencana kegiatan di dashboard, lebih mudah dibaca (November 2026)
+
+Kartu rencana kini terang dengan titik warna rencana dan label status: Berjalan (disorot warna rencana), Selesai, Terlambat, Sudah lewat, atau Akan datang; rencana yang sudah lewat atau selesai diredam. Progres ditulis "x/y task", atau "Belum ada task". Kalender minggu diberi judul "Task minggu ini" dengan jumlahnya; tiap blok task menyebut nama rencananya, judul task, dan keadaannya (Selesai, Terlambat, atau tanggal tenggat), dengan garis warna rencana di kiri.
