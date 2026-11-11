@@ -1,5 +1,8 @@
-{{-- Board kanban. Variabel: $columns, $grouped, $canEdit --}}
-<div class="board" data-board>
+{{-- Board kanban. Variabel: $columns, $grouped, $canEdit, $showGoals (kolom Goals di kiri, opsional; perlu $goals) --}}
+<div @class(['board', 'has-goals' => $showGoals ?? false]) data-board>
+    @if ($showGoals ?? false)
+        @include('kegiatan._goals-col')
+    @endif
     @foreach ($columns as $column)
         @php($items = $grouped[$column->id] ?? collect())
         <section class="kcol" data-column="{{ $column->id }}">

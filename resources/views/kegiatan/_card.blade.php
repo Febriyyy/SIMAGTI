@@ -17,6 +17,18 @@
 
     <a href="{{ route('tugas.show', $task) }}" class="kcard-title">{{ $task->title }}</a>
 
+    @if ($checkTotal > 0 && $task->relationLoaded('checklist'))
+        <ul class="kcard-checks" aria-label="Checklist">
+            @foreach ($task->checklist->take(4) as $item)
+                <li @class(['is-done' => $item->is_done])>
+                    <span class="kcheck" aria-hidden="true">@if ($item->is_done)<x-ikon name="tick" :size="10" />@endif</span>
+                    <span>{{ $item->text }}</span><span class="sr-only">{{ $item->is_done ? ' (selesai)' : ' (belum)' }}</span>
+                </li>
+            @endforeach
+            @if ($checkTotal > 4)<li class="kcard-checks-more">+{{ $checkTotal - 4 }} lainnya</li>@endif
+        </ul>
+    @endif
+
     @if ($checkTotal > 0)
         @php($dots = min($checkTotal, 10))
         @php($filled = $checkTotal > 10 ? (int) round($checkDone / $checkTotal * 10) : $checkDone)

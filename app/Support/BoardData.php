@@ -20,7 +20,7 @@ class BoardData
         $sort = in_array($request->query('urut'), ['tenggat', 'prioritas', 'terbaru', 'kode'], true) ? $request->query('urut') : 'tenggat';
 
         $query = $filter->apply($internship->tasks()->getQuery())
-            ->with(['project', 'column', 'plan', 'goal'])
+            ->with(['project', 'column', 'plan', 'goal', 'checklist'])
             ->withCount(['evidences', 'comments', 'checklist', 'checklist as checklist_done_count' => fn ($q) => $q->where('is_done', true)]);
 
         $tasks = $query->get();

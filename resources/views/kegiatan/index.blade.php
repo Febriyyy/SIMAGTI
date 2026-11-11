@@ -71,16 +71,20 @@
 
         @include('kegiatan._filters', ['action' => route('kegiatan.index')])
 
+        @if ($view === 'board')
+            {{-- Board selebar halaman: kolom Goals di kiri To Do --}}
+            @include('kegiatan._board', ['showGoals' => true])
+            @if ($canEdit)
+                @include('kegiatan._goal-dialog')
+            @endif
+        @else
         <div class="work-split">
             <aside class="work-aside">@include('kegiatan._goals')</aside>
             <div class="work-main">
-                @if ($view === 'board')
-                    @include('kegiatan._board')
-                @else
-                    <section class="card">@include('kegiatan._list')</section>
-                @endif
+                <section class="card">@include('kegiatan._list')</section>
             </div>
         </div>
+        @endif
 
         @if ($canEdit)
             {{-- Task baru --}}

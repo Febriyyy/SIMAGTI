@@ -2874,3 +2874,57 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 }
 .tabs { overflow-y: hidden; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
+
+/* ---------- Board Kegiatan selebar halaman, kolom Goals di kiri To Do ---------- */
+.container:has(.board.has-goals) { max-width: none; }
+.board.has-goals { grid-template-columns: minmax(260px, 300px); grid-auto-columns: minmax(280px, 1fr); gap: var(--space-4); }
+.kcol { max-height: calc(100vh - 200px); }
+.kcol-head { display: flex; align-items: center; gap: var(--space-2); }
+.kcol-head .kcol-title { flex: 1; }
+.kcol-body { padding: 0 var(--space-3) var(--space-3); gap: var(--space-3); }
+
+.kcol-goals { background: linear-gradient(180deg, var(--acc-yellow-soft), var(--surface-2) 140px); border-color: var(--pastel-amber-line); }
+.kcol-goal-icon { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: var(--acc-yellow); color: #fff; }
+.kcol-add-btn { width: 28px; height: 28px; min-height: 28px; padding: 0; border-radius: 8px; }
+
+.gcard {
+    display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4);
+    border: 1px solid var(--pastel-amber-line); border-radius: var(--radius); background: var(--surface);
+    transition: transform 180ms var(--ease-out), box-shadow 180ms, border-color 150ms;
+}
+.gcard:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 27, 25, 0.08); }
+.gcard.is-done { background: var(--pastel-green); border-color: var(--pastel-green-line); }
+.gcard-top { display: flex; align-items: center; gap: var(--space-2); }
+.gcard-top form { margin-left: auto; }
+.gcard-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 var(--space-2); border-radius: var(--radius-pill); background: var(--acc-yellow-soft); color: var(--acc-yellow-ink); font-size: var(--text-xs); font-weight: 700; }
+.gcard .goal-badge { margin-top: 0; align-self: center; background: var(--acc-teal-soft); color: var(--acc-teal-ink); }
+.gcard-title { color: var(--text); font-size: var(--text-md); font-weight: 650; line-height: var(--leading-snug); overflow-wrap: anywhere; }
+.gcard-title:hover { color: var(--primary); text-decoration: none; }
+.gcard.is-done .gcard-title { color: var(--pastel-green-ink); }
+.gcard-progress { display: flex; flex-direction: column; gap: 6px; }
+.gcard-progress .kcard-progress-top b { color: var(--acc-yellow-ink); font-weight: 600; }
+.gcard.is-done .gcard-progress .kcard-progress-top b { color: var(--pastel-green-ink); }
+.gcard .goal-bar { height: 8px; border-radius: var(--radius-pill); background: rgba(15, 27, 25, 0.08); overflow: hidden; }
+.gcard .goal-bar > span { display: block; height: 100%; border-radius: inherit; background: var(--acc-yellow); }
+.gcard.is-done .goal-bar > span { background: var(--primary); }
+
+/* ---------- Checklist di kartu task (maks. 4 item, hanya baca) ---------- */
+.kcard-checks { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: var(--text-sm); }
+.kcard-checks li { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--gray); line-height: 1.35; }
+.kcard-checks li.is-done > span:nth-child(2) { color: var(--muted); text-decoration: line-through; }
+.kcheck {
+    display: grid; place-items: center; flex: none; width: 16px; height: 16px; margin-top: 1px;
+    border: 1.5px solid var(--k-ink); border-radius: 5px; background: var(--surface); color: #fff;
+}
+.kcard-checks li.is-done .kcheck { background: var(--k-ink); }
+.kcard-checks-more { padding-left: 24px; color: var(--muted); font-size: var(--text-xs); }
+
+@media (max-width: 900px) {
+    .board.has-goals { grid-template-columns: minmax(240px, 82vw); grid-auto-columns: minmax(240px, 82vw); }
+}
+.board.has-goals { grid-template-columns: minmax(240px, 280px); grid-auto-columns: minmax(240px, 1fr); }
+.kcol-count-wide { width: auto; padding: 0 var(--space-2); white-space: nowrap; }
+.gcard .goal-badge { display: none; }
+.gcard.is-done .goal-badge { display: inline-flex; animation: pop-in 420ms var(--ease-out) both; }
+.kcol-count-wide { display: inline-flex; align-items: center; }
+.kcol-note { margin: 0; padding: 0 var(--space-1); color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-normal); }

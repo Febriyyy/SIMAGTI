@@ -393,3 +393,10 @@ Acuan: tiga referensi papan proyek dan roadmap dari pemilik proyek.
 - **Kepala halaman**: `.page-head` dan `.pbanner` menjadi banner gradasi pastel (teal → biru → ungu muda). Kegiatan memakai `.pbanner` berisi judul, pil ringkas (tempat, periode, ritme, task selesai, lewat tenggat), dan tombol Task baru.
 - **Tab**: `.tabs` bergaris bawah tipis, tab aktif bergaris teal dan tebal; Kegiatan punya tab Board, List, dan Timeline (menuju Timesheet), aksi Proyek/Kolom/Unduh di kanan (`.ptabs`). Halaman pantau mahasiswa memakai gaya tab yang sama.
 - **Gantt**: pil progres `selesai/total` di ujung batang rencana (`.gt-frac`), pil merah "Hari ini" di garis hari ini.
+
+### Board Kegiatan selebar halaman (November 2026)
+
+- Tampilan Board tidak lagi memakai panel Goals di samping. **Goals menjadi kolom pertama board** (`kegiatan/_goals-col`, `.kcol-goals`), di kiri To Do, dengan kepala yang sama seperti kolom lain (judul, jumlah tercapai, tombol +). Setiap goal berupa kartu (`.gcard`): label Goal, lencana Tercapai, judul (klik untuk menyaring task goal itu), progres. Atribut `data-goal*` tetap, jadi bar dan lencana ikut berubah saat task digeser.
+- Board memenuhi lebar halaman (`.container:has(.board.has-goals)` tanpa batas lebar): kolom Goals 240–280px, kolom task berbagi sisa ruang (min. 240px).
+- Kartu task menampilkan maksimal 4 item checklist dengan kotak centang (hanya baca) dan "+n lainnya"; item dimuat bersama data board (`BoardData`, relasi `checklist`).
+- Tampilan List tetap memakai kartu Goals di samping. Dialog Goal baru dipisah ke `kegiatan/_goal-dialog`.
