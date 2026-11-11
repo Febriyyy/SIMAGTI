@@ -11,6 +11,16 @@
 (function () {
     var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content;
 
+    // Filter di HP: tombol "Filter" membuka/menutup panel pilihan filter
+    document.querySelectorAll('[data-filter-toggle]').forEach(function (btn) {
+        var form = btn.closest('[data-filters]');
+        btn.addEventListener('click', function () {
+            var open = !form.classList.contains('is-open');
+            form.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    });
+
     // Menu HP (drawer). Fokus pindah ke menu saat dibuka dan kembali ke tombol ☰ saat ditutup.
     var drawerBtn = document.querySelector('[data-drawer-open]');
     var drawer = document.getElementById('sidebar');

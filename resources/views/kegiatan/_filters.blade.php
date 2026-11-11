@@ -1,11 +1,17 @@
 {{-- Baris filter board/list. Variabel: $filter, $projects, $plans, $goals, $view, $sort, $currentPeriod, $action (url) --}}
 @php($v = $filter->values)
-<form method="GET" action="{{ $action }}" class="filters" data-autosubmit>
+@php($activeFilters = collect(['proyek', 'status', 'prioritas', 'rencana', 'goal'])->filter(fn ($k) => filled($v[$k] ?? null))->count() + (($v['periode'] ?? 'semua') !== 'semua' ? 1 : 0))
+<form method="GET" action="{{ $action }}" class="filters" data-autosubmit data-filters>
     <input type="hidden" name="tampilan" value="{{ $view }}">
     <div class="filter-search">
         <x-ikon name="search" :size="16" />
         <input type="search" name="cari" value="{{ $v['cari'] ?? '' }}" placeholder="Cari task…" aria-label="Cari task" class="input input-sm">
     </div>
+    {{-- HP: pilihan filter dilipat di balik tombol ini (diatur app.js); di layar lebar tombol ini tidak tampil --}}
+    <button type="button" class="btn btn-sm filter-toggle" data-filter-toggle aria-expanded="false" aria-controls="filter-panel">
+        <x-ikon name="filter" :size="16" /> Filter @if ($activeFilters > 0)<span class="filter-count">{{ $activeFilters }}</span>@endif
+    </button>
+    <div class="filter-panel" id="filter-panel">
     <select name="periode" class="select select-sm" aria-label="Periode">
         <option value="semua" @selected($v['periode'] === 'semua')>Semua periode</option>
         <option value="ini" @selected($v['periode'] === 'ini')>Periode ini · {{ $currentPeriod->short }}</option>
@@ -57,6 +63,7 @@
             @endforeach
         </select>
     @endif
+    </div>
     <noscript><button type="submit" class="btn btn-sm">Terapkan</button></noscript>
     @if ($filter->isActive())
         <a href="{{ $action }}?tampilan={{ $view }}" class="btn btn-sm btn-ghost">Reset</a>

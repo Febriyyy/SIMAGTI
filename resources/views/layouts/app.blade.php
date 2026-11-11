@@ -14,6 +14,7 @@
         // Tampilkan Material Symbols hanya setelah fontnya benar-benar siap; sebelum itu pakai ikon cadangan.
         (function () {
             var root = document.documentElement;
+            root.classList.add('js');
             try { if (sessionStorage.getItem('ms-ready') === '1') root.classList.add('ms-ready'); } catch (e) {}
             if (!document.fonts || !document.fonts.load) return;
             document.fonts.load('24px "Material Symbols Rounded"', 'task_alt').then(function (fonts) {
