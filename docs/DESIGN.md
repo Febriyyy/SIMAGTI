@@ -351,13 +351,13 @@ Arah: dasar tenang ala alat produktivitas (acuan referensi Dribbble di brief), h
 **Kerangka.**
 - Desktop: sidebar abu terang, menu aktif berupa kotak putih kecil berbingkai dengan ikon hijau. Akun (Ganti kata sandi, Keluar) di bawah, dipisah garis.
 - HP (≤900px): bar atas menempel berisi tombol ☰ (`.menu-btn`), logo, lonceng, dan avatar. ☰ membuka sidebar sebagai drawer dari kiri (`body.drawer-open`); tutup lewat tombol ×, klik latar gelap, atau Esc, lalu fokus kembali ke ☰ (`public/js/app.js`). Tautan "Lewati ke konten" (`.skip-link`) muncul saat ditekan Tab.
-- Sapaan dashboard (`<x-hero>`) kini teks biasa tanpa gradasi; label divisi/posisi (`.hero-tag`) berupa pil putih.
+- Sapaan dashboard (`<x-hero>`): banner gradasi hijau merek dengan bintang hiasan, label pil transparan (`.hero-tag`), dan tombol kapsul gelap berikon panah (pilihan pemilik proyek, November 2026).
 - Tombol berbentuk kotak membulat (10px), bukan kapsul. `btn-dark` lama tampil sebagai tombol utama.
 - Kepala tabel tidak lagi huruf kapital semua.
 
 **Tiga elemen khas.**
 1. **Halaman masuk**: panel kanan hijau tua merek dengan kisi halus dan cuplikan aplikasi yang digambar dengan HTML (kartu Kemajuan KP, Gantt mini, kartu "Penilaian divalidasi"), bukan gambar. Di HP formulir berada di kartu putih di atas pita hijau tua, dengan tagline di bawahnya.
-2. **Kartu Kemajuan KP** (`.kpp`, dashboard mahasiswa): satu-satunya kartu hijau tua di dashboard. Isinya minggu berjalan, sisa hari, cincin persen task (`.kpp-ring`, tautan ke Kegiatan), dan langkah KP mendatar (`.mini-steps.kpp-steps`, setiap langkah tetap bisa diklik). Di HP hanya titik langkah yang tampil; nama langkah yang sedang berjalan ada di baris bawah. Menggantikan kartu "Minggu berjalan" dan kartu langkah di kolom kanan.
+2. **Kartu Kemajuan KP** (`.kpp`, dashboard mahasiswa): kartu putih tepat di bawah banner hijau (supaya tidak ada dua blok hijau bertumpuk). Isinya minggu berjalan, sisa hari, cincin persen task (`.kpp-ring`, tautan ke Kegiatan), dan langkah KP mendatar (`.mini-steps.kpp-steps`, setiap langkah tetap bisa diklik). Di HP hanya titik langkah yang tampil; nama langkah yang sedang berjalan ada di baris bawah. Menggantikan kartu "Minggu berjalan" dan kartu langkah di kolom kanan.
 3. **Gantt**: batang membulat 8px (task 6px), garis warna rencana di tepi kiri kolom nama, titik merah di ujung garis hari ini. Di HP kolom nama 140px agar timeline tetap terlihat.
 
 **Pola baru.**

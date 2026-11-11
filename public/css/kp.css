@@ -2535,3 +2535,80 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 @media (max-width: 600px) {
     .filters.is-open .filter-panel { padding: var(--space-4); border: 1px solid var(--line); }
 }
+
+/* ---------- Banner sapaan dashboard (pilihan pemilik proyek): gradasi hijau merek, bintang hiasan, label pil ---------- */
+.hero {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+    padding: var(--space-6) var(--space-6); border-radius: var(--radius-lg);
+    background:
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.16) 0, rgba(255, 255, 255, 0) 38%),
+        var(--hero-gradient);
+    color: #fff;
+}
+.hero-text { position: relative; z-index: 1; max-width: 640px; }
+.hero-eyebrow { color: rgba(255, 255, 255, 0.82); font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.hero-title { margin-top: var(--space-2); color: #fff; font-size: 32px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.15; }
+.hero-sub { margin-top: var(--space-2); max-width: 560px; color: rgba(255, 255, 255, 0.88); font-size: var(--text-base); }
+.hero-action { position: relative; z-index: 1; flex: none; }
+.hero-art { display: block; position: absolute; right: 22%; top: 50%; transform: translateY(-50%); width: 120px; height: 120px; color: rgba(255, 255, 255, 0.2); pointer-events: none; }
+.hero-art-2 { right: 6%; top: 16%; width: 48px; height: 48px; transform: none; color: rgba(255, 255, 255, 0.28); }
+.hero-meta { gap: var(--space-2); margin-top: var(--space-4); }
+.hero-tag {
+    padding: var(--space-1) var(--space-3); border: 0; border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    color: #fff; font-size: var(--text-sm); font-weight: 600;
+}
+.hero-tag .ikon { color: #fff; }
+/* Tombol di banner: kapsul gelap dengan ikon panah dalam lingkaran putih */
+.hero .btn-dark {
+    min-height: 44px; padding: var(--space-1) var(--space-1) var(--space-1) var(--space-5); border-radius: var(--radius-pill);
+    background: var(--text); border-color: var(--text); color: #fff;
+}
+.hero .btn-dark:hover { background: #000; border-color: #000; }
+.hero .btn-dark .btn-dark-icon { width: 32px; height: 32px; border-radius: 50%; background: #fff; color: var(--text); }
+.hero .btn-dark:focus-visible { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6); }
+
+/* ---------- Kartu Kemajuan KP versi putih (banner hijau sudah ada di atasnya) ---------- */
+.kpp { background: var(--surface); color: var(--text); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.kpp-eyebrow { color: var(--primary); font-weight: 600; }
+.kpp-title { color: var(--text); font-size: 28px; }
+.kpp-title span { color: var(--muted); }
+.kpp-sub { color: var(--muted); }
+.kpp-ring {
+    color: var(--text);
+    background:
+        radial-gradient(closest-side, var(--surface) 78%, transparent 79% 100%),
+        conic-gradient(var(--primary) calc(var(--p) * 1%), var(--gray-soft) 0);
+}
+.kpp-ring:focus-visible { outline-color: var(--primary); }
+.kpp-ring span, .kpp-fig span { color: var(--muted); }
+.kpp-fig small { color: var(--muted); }
+.kpp-steps .mini-step::after { background: var(--line); }
+.kpp-steps .mini-step.is-done::after { background: var(--primary); }
+.kpp-steps .mini-step-dot { border-color: var(--line-strong); background: var(--surface); }
+.kpp-steps .mini-step.is-done .mini-step-dot { border-color: var(--primary); background: var(--primary); color: #fff; }
+.kpp-steps .mini-step.is-current .mini-step-dot { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 5px var(--primary-soft); }
+.kpp-steps .mini-step.is-waiting .mini-step-dot { border-color: var(--amber); box-shadow: 0 0 0 5px var(--amber-soft); }
+.kpp-steps .mini-step.is-attention .mini-step-dot { border-color: var(--red); background: var(--red); }
+.kpp-steps .mini-step-title { color: var(--text); }
+.kpp-steps a.mini-step-title:hover { color: var(--primary); }
+.kpp-steps .mini-step.is-upcoming .mini-step-title { color: var(--muted); }
+.kpp-steps .mini-step-state { color: var(--muted); }
+.kpp-steps .mini-step.is-current .mini-step-state { color: var(--primary); font-weight: 600; }
+.kpp-steps .mini-step.is-waiting .mini-step-state { color: var(--amber); }
+.kpp-steps .mini-step.is-attention .mini-step-state { color: var(--red); }
+.kpp-foot { border-top-color: var(--line); }
+.kpp-now { color: var(--muted); }
+.kpp-now strong { color: var(--text); }
+.kpp-link { color: var(--primary); }
+.kpp-link:hover { color: var(--primary-dark); }
+
+@media (max-width: 900px) {
+    .hero { flex-direction: column; align-items: flex-start; padding: var(--space-5); }
+    .hero-title { font-size: var(--text-3xl); }
+    .hero-art { right: -20px; width: 100px; height: 100px; }
+    .hero-art-2 { display: none; }
+    .hero-action { align-self: stretch; }
+    .hero-action .btn { width: 100%; justify-content: space-between; }
+}
