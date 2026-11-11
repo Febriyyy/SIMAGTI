@@ -417,12 +417,6 @@ Gantt ringkas di dashboard (terlalu lebar, harus digeser) diganti tampilan mingg
 - **Gantt gaya roadmap** (pembungkus `.ts-roadmap`, khusus Timesheet): kolom kiri cukup nama rencana/task (Durasi dan Status hanya di tampilan Daftar), baris rencana berpita warna lembut sepanjang timeline, batang rencana lebih besar dan membulat dengan pil progres, batang task berbentuk kapsul, garis dan pil "Hari ini" biru.
 - **Jurnal catatan harian**: kotak cepat di atas ("apa yang kamu kerjakan hari ini?", tanggal, task, tombol Foto, Simpan), lalu kartu per hari (`.jday`) dengan lencana tanggal berwarna per hari dalam minggu (hari ini warna penuh), setiap catatan berpinggir warna hari itu, label task, dan foto kecil.
 
-### Timeline rencana (lajur melayang), November 2026
+### Rencana kegiatan: satu Gantt (November 2026)
 
-Rencana kegiatan di Timesheet dan halaman pantau mahasiswa kini punya dua tampilan (`timesheet/_plan-views`, pilihan diingat per perangkat):
-
-- **Timeline** (bawaan, `timesheet/_timeline`, `.tl`): tanpa tabel di kiri. Setiap rencana = lajur berwarna lembut; label lajur (titik warna, judul, rentang) menempel di kiri saat digeser. Batang rencana melayang membulat dengan cincin progres dan pil `selesai/total`; task berupa pil di bawahnya. Bulan tampil sebagai pil, garis "Hari ini" biru menyala. Ringkas: batang 28px, pil task 22px, lajur tanpa task tidak menyisakan ruang.
-  - Skala **Bulan** (bawaan, 5px/hari) memuat seluruh periode KP tanpa digeser; task jadi penanda kecil (judul di tooltip). Skala **Minggu** (14px/hari) menampilkan kode dan judul task. Susunan baris task dihitung di server terpisah per skala agar tidak bertumpuk.
-  - Geser dengan seret mouse atau panah kiri/kanan; tombol Hari ini; klik batang rencana membuka form ubah (pemilik).
-- **Tabel**: Gantt klasik (kolom Durasi/Status, zoom Hari/Minggu/Penuh) tetap tersedia sesuai revisi dosen.
-- Kartu rencana dan kalender minggu di dashboard dipisah ke partial bersama `timesheet/_plan-cards` dan `timesheet/_week-cal`.
+Timeline lajur melayang sempat dicoba lalu dihapus atas permintaan pemilik proyek; rencana kegiatan di Timesheet dan halaman pantau kembali memakai satu Gantt tabel (`timesheet/_gantt`, gaya roadmap di Timesheet lewat `.ts-roadmap`). Kartu rencana dan kalender minggu di dashboard memakai partial bersama `timesheet/_plan-cards` dan `timesheet/_week-cal`.

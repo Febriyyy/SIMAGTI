@@ -70,7 +70,7 @@
                     @endif
                 </div>
             @else
-                @include('timesheet._plan-views', ['gantt' => $gantt, 'canEdit' => $canEdit])
+                @include('timesheet._gantt', ['canEdit' => $canEdit])
             @endif
         </section>
 
