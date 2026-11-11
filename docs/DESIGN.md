@@ -196,7 +196,7 @@ Disepakati 25 Oktober 2026. Halaman baru harus memakai aturan dan komponen di ba
 | Kontrol | `--control-h`, `--control-h-sm`, `--btn-x`, `--btn-x-sm` | 40 / 32px (40px di layar sentuh), padding tombol 20 / 16px |
 | Teks | `--text-2xs` … `--text-6xl` | 11, 12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 40px |
 | Tinggi baris | `--leading-tight`, `--leading-snug`, `--leading-normal` | 1.2 / 1.4 / 1.5 |
-| Radius | `--radius-xs`, `--radius-sm`, `--radius-md`, `--radius`, `--radius-lg`, `--radius-pill` | 8, 12, 16, 20, 28, 999px |
+| Radius | `--radius-xs`, `--radius-sm`, `--radius-md`, `--radius`, `--radius-lg`, `--radius-pill` | 8, 10, 16, 16, 24, 999px (sejak redesign November 2026) |
 
 Hierarki teks: judul halaman `--text-4xl` (HP `--text-3xl`), judul banner `--text-5xl`, judul kartu `--text-lg`, isi `--text-base`, teks sekunder `--text-sm`, metadata `--text-xs`, overline kapital `--text-2xs`. Pengecualian yang disengaja: halaman masuk (`.signin-*`) dan ikon di dalam isian (padding 36/44/52px) memakai ukuran khusus.
 
@@ -270,8 +270,8 @@ Hierarki teks: judul halaman `--text-4xl` (HP `--text-3xl`), judul banner `--tex
 
 ## Kartu angka, menu kiri, dan grafik
 
-- **Kartu angka**: kartu pertama di setiap baris berwarna hijau tua. Saat kursor diarahkan ke kartu lain, hijau pindah ke kartu itu (transisi halus), lalu kembali ke kartu pertama saat kursor keluar.
-- **Menu kiri** tetap di tempat saat halaman di-scroll (`position: sticky`). Di HP menu kembali berada di atas halaman seperti biasa.
+- **Kartu angka** (sejak redesign November 2026): semua kartu putih dan kecil; label abu, angka besar, keterangan berupa pil berwarna sesuai makna. Tidak ada lagi kartu pertama berwarna hijau tua.
+- **Menu kiri** tetap di tempat saat halaman di-scroll (`position: sticky`). Di layar ≤900px menjadi drawer (lihat bagian redesign di bawah).
 - **Grafik** dibuat sendiri dengan SVG dari server, tanpa library dan tanpa CDN. Tooltip ada di `public/js/charts.js`.
   - `<x-donut>`: diagram lingkaran untuk bagian dari keseluruhan (status penilaian, status task minggu ini, status perusahaan). Legenda selalu tampil dengan angka dan persen.
   - `<x-line-chart>`: grafik garis untuk perubahan dari waktu ke waktu (bukti per minggu, progres task kumulatif mahasiswa). Satu sumbu Y saja. Atur `width` mendekati lebar kartu supaya ukuran hurufnya pas.
@@ -327,3 +327,45 @@ Bagian KP v2 di atas menjelaskan riwayat; yang berlaku sekarang:
 - **Timesheet**: kartu "Rencana kegiatan" berupa Gantt sepanjang periode KP, mengikuti pola aplikasi manajemen proyek. Kiri tabel Kegiatan / Durasi / Status (bar progres + %), menempel saat sumbu digeser; rencana bisa dilipat untuk menyembunyikan task-nya. Kanan sumbu bulan + hari (hari ini = pil merah dan garis merah, akhir pekan diarsir). Batang rencana berbentuk pil dengan warna pilihan mahasiswa (7 warna, dipilih di form rencana); bagian gelap = persen task selesai, pil muda = belum ada task, cincin merah = lewat waktu dengan task belum selesai. Task tampil sebagai pil kecil di bawah rencananya (muda = belum selesai, penuh + centang = selesai). Kontrol: Gantt / Daftar, zoom Hari (40px/hari) / Minggu (16px) / Penuh (muat selebar kartu), geser seminggu, Hari ini; pilihan disimpan di localStorage. Klik batang rencana membuka form ubah; klik task membuka detail task. Dashboard memakai versi ringkas (skala Minggu, bisa digeser ke kiri-kanan, dibuka di sekitar hari ini, tanpa toolbar dan task). Di HP kolom Durasi/Status disembunyikan pada tampilan Gantt, tetap ada di tampilan Daftar. Di bawahnya "Catatan kegiatan" harian tanpa jam.
 - **Kegiatan**: kartu Goals di samping kiri board (di bawah 1100px pindah ke atas). Goal tercapai otomatis saat semua task-nya Done, bar ikut berubah saat task digeser; tombol "Task baru" diganti "Isi rencana" bila belum ada rencana. Board bawaan To Do, In Progress, Done.
 - **Penilaian akhir**: satu kartu per kategori dengan rata-rata langsung terhitung (JS), setiap pertanyaan memakai pilihan skala; di kartu sempit pilihan turun ke bawah pertanyaan dalam grid sama lebar. Perkiraan nilai akhir baru tampil setelah semua pertanyaan dinilai.
+
+## Redesign UI (November 2026)
+
+Arah: dasar tenang ala alat produktivitas (acuan referensi Dribbble di brief), hijau-teal SIMAGTI dipakai hemat untuk aksi dan tiga elemen khas. Tanpa build step, tanpa CDN baru; markup komponen lama (`.card`, `.btn`, `.table.dt`, `.segmented`, `<x-chip>`, `<x-progress>`, `<x-stat>`, `<x-ikon>`) tetap, tampilannya diubah lewat CSS.
+
+**Token yang berubah** (`:root` di `public/css/kp.css`):
+
+| Token | Nilai | Catatan kontras (WCAG 2.1) |
+|---|---|---|
+| `--page`, `--bg` | `#f4f6f5` | latar halaman netral sangat terang |
+| `--surface`, `--surface-2`, `--sidebar-bg` | `#ffffff`, `#f8faf9`, `#fafbfb` | kartu, isian, sidebar |
+| `--line`, `--line-strong` | `#e6eae8`, `#d6dedb` | bingkai tipis kartu dan isian |
+| `--text` | `#12201e` | 15,5:1 di atas latar |
+| `--muted` | `#5b6b68` | 5,2:1 di atas latar, 5,6:1 di atas putih |
+| `--muted-2` | `#647471` | placeholder, ≥ 4,5:1 di atas isian |
+| `--primary` | `#037a68` (tetap) | teks putih di atasnya 5,3:1 |
+| `--radius`, `--radius-sm`, `--radius-lg` | 16, 10, 24px | kartu, tombol/isian, kartu khas |
+| `--shadow`, `--shadow-hover`, `--shadow-pop` | bayangan sangat tipis; `pop` untuk drawer | |
+| `--focus-ring` | cincin hijau 3px | fokus keyboard pada tombol |
+| `--sidebar-w`, `--appbar-h` | 240px, 56px | |
+
+**Kerangka.**
+- Desktop: sidebar abu terang, menu aktif berupa kotak putih kecil berbingkai dengan ikon hijau. Akun (Ganti kata sandi, Keluar) di bawah, dipisah garis.
+- HP (≤900px): bar atas menempel berisi tombol ☰ (`.menu-btn`), logo, lonceng, dan avatar. ☰ membuka sidebar sebagai drawer dari kiri (`body.drawer-open`); tutup lewat tombol ×, klik latar gelap, atau Esc, lalu fokus kembali ke ☰ (`public/js/app.js`). Tautan "Lewati ke konten" (`.skip-link`) muncul saat ditekan Tab.
+- Sapaan dashboard (`<x-hero>`) kini teks biasa tanpa gradasi; label divisi/posisi (`.hero-tag`) berupa pil putih.
+- Tombol berbentuk kotak membulat (10px), bukan kapsul. `btn-dark` lama tampil sebagai tombol utama.
+- Kepala tabel tidak lagi huruf kapital semua.
+
+**Tiga elemen khas.**
+1. **Halaman masuk**: panel kanan hijau tua merek dengan kisi halus dan cuplikan aplikasi yang digambar dengan HTML (kartu Kemajuan KP, Gantt mini, kartu "Penilaian divalidasi"), bukan gambar. Di HP formulir berada di kartu putih di atas pita hijau tua, dengan tagline di bawahnya.
+2. **Kartu Kemajuan KP** (`.kpp`, dashboard mahasiswa): satu-satunya kartu hijau tua di dashboard. Isinya minggu berjalan, sisa hari, cincin persen task (`.kpp-ring`, tautan ke Kegiatan), dan langkah KP mendatar (`.mini-steps.kpp-steps`, setiap langkah tetap bisa diklik). Di HP hanya titik langkah yang tampil; nama langkah yang sedang berjalan ada di baris bawah. Menggantikan kartu "Minggu berjalan" dan kartu langkah di kolom kanan.
+3. **Gantt**: batang membulat 8px (task 6px), garis warna rencana di tepi kiri kolom nama, titik merah di ujung garis hari ini. Di HP kolom nama 140px agar timeline tetap terlihat.
+
+**Pola baru.**
+- **Filter dilipat di HP** (`kegiatan/_filters`): di ≤600px hanya kotak cari dan tombol **Filter** (dengan jumlah filter aktif) yang tampil; pilihan lain ada di `.filter-panel` yang dibuka tombol itu. Tanpa JavaScript semua pilihan tetap tampil (kelas `.js` di `<html>`).
+- **Kegiatan di layar ≤1100px**: board tampil dulu, Goals sesudahnya.
+- **Perlu perhatian** (dashboard dosen dan kaprodi, `.attention-card`): pindah ke atas daftar mahasiswa, berupa kisi kartu kecil dengan alasan berwarna kuning; seluruh kartu bisa diklik ke halaman pantau mahasiswa.
+- **Kartu angka ganjil di HP**: kartu terakhir melebar penuh agar tidak ada celah.
+- **Tombol aksi halaman di HP** (`.page-head`): tetap rata kanan di bawah judul.
+- **Isian di HP** berukuran huruf 16px supaya Safari iOS tidak memperbesar halaman.
+
+**Pengecekan.** Login, dashboard mahasiswa, Timesheet, Kegiatan, dashboard dosen, dan dashboard supervisor dicek di 1280px dan 390px. Halaman menu semua peran (56 halaman, 6 peran) dipindai di 390px: tidak ada geser horizontal dan tidak ada galat.

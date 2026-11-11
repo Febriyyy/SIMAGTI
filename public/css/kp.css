@@ -20,7 +20,7 @@
     /* Teks (muted 5,3:1 di atas latar halaman) */
     --text: #12201e;
     --muted: #5b6b68;
-    --muted-2: #8a9a97;
+    --muted-2: #647471;   /* placeholder, >= 4,5:1 di atas isian dan latar */
     --gray: #44514f;
 
     /* Aksen utama: perpaduan teal dan hijau logo, kontras teks putih 5,3:1 */
@@ -1518,7 +1518,7 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
     .page-head { flex-direction: column; align-items: flex-start; }
     .page-head > .chip { align-self: flex-start; }
     /* Tombol aksi halaman tetap di kanan (standar UI), di bawah judul */
-    .page-head > .btn, .page-head > .row-actions, .page-head > form { align-self: flex-end; }
+    .page-head > .btn, .page-head > .row-actions, .page-head > form, .page-head > .menu { align-self: flex-end; }
     .split { grid-template-columns: minmax(0, 1fr); }
     .table td.col-fluid { max-width: none; }
     .table td.col-fluid .truncate { max-width: 180px; }
@@ -2228,4 +2228,16 @@ a.mini-step-title:hover { color: var(--primary); }
 @media (max-width: 600px) {
     .attention-card .watch-list { grid-template-columns: minmax(0, 1fr); }
     .watch-meta { white-space: normal; }
+}
+
+/* HP: isian minimal 16px supaya Safari iOS tidak memperbesar halaman saat mengetik */
+@media (max-width: 600px) {
+    .input, .select, .textarea, .signin-field input { font-size: 16px; }
+}
+
+/* Tabel Akun admin di lebar tablet: dua tombol aksi ditumpuk supaya kolom nama tidak terjepit */
+@media (max-width: 1100px) and (min-width: 601px) {
+    .dt .w-action-2 { width: 168px; }
+    .dt .act form { display: block; }
+    .dt .act form + form { margin: var(--space-1) 0 0; }
 }
