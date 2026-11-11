@@ -40,6 +40,52 @@
 
     </div>
 
+        <section @class(['card', 'attention-card', 'is-alert' => $attention->isNotEmpty()]) id="perlu-perhatian">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Perlu perhatian</h2>
+                    <p class="card-sub">Mahasiswa yang sebaiknya Anda hubungi minggu ini</p>
+                </div>
+                @if ($attention->isEmpty())
+                    <x-chip tone="green">Aman</x-chip>
+                @else
+                    <x-chip tone="amber">{{ $attention->count() }} mahasiswa</x-chip>
+                @endif
+            </div>
+
+            @if ($attention->isEmpty())
+                <div class="calm">
+                    <span class="calm-icon"><x-ikon name="check" :size="20" /></span>
+                    <p>Semua mahasiswa aktif mencatat kegiatan dan progresnya baik.</p>
+                </div>
+            @else
+                <ul class="watch-list">
+                    @foreach ($attention->take(5) as $row)
+                        @php($i = $row['internship'])
+                        <li class="watch">
+                            <a href="{{ route('pantau.show', $i) }}" class="watch-link" aria-label="Buka {{ $i->student->listName() }}"></a>
+                            <x-avatar :user="$i->student" small />
+                            <div class="watch-body">
+                                <div class="watch-name" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
+                                <div class="watch-meta">{{ $i->student->nim }} · {{ $i->placeName() }}</div>
+                                <div class="watch-flags">
+                                    @foreach ($row['reasons'] as $reason)
+                                        <span class="watch-flag"><x-ikon name="alert" :size="12" /> {{ $reason }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <p class="card-foot">
+                Ditandai otomatis jika tidak ada kegiatan {{ $rules::IDLE_DAYS }} hari, progres di bawah {{ $rules::LOW_PROGRESS }}%,
+                atau KP tinggal {{ $rules::ENDING_DAYS }} hari tapi nilai belum divalidasi.
+            </p>
+        </section>
+
+
             <section class="card">
                 <div class="card-head">
                     <div>
@@ -136,47 +182,6 @@
                         @endif
                     </section>
                 @endif
-
-                <section class="card" id="perlu-perhatian">
-                    <div class="card-head">
-                        <h2 class="card-title">Perlu perhatian</h2>
-                        @if ($attention->isEmpty())
-                            <x-chip tone="green">Aman</x-chip>
-                        @else
-                            <x-chip tone="amber">{{ $attention->count() }} mahasiswa</x-chip>
-                        @endif
-                    </div>
-
-                    @if ($attention->isEmpty())
-                        <div class="calm">
-                            <span class="calm-icon"><x-ikon name="check" :size="20" /></span>
-                            <p>Semua mahasiswa aktif mencatat kegiatan dan progresnya baik.</p>
-                        </div>
-                    @else
-                        <ul class="watch-list">
-                            @foreach ($attention->take(5) as $row)
-                                @php($i = $row['internship'])
-                                <li class="watch">
-                                    <x-avatar :user="$i->student" small />
-                                    <div class="watch-body">
-                                        <div class="watch-name" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
-                                        <div class="watch-meta">{{ $i->student->nim }} · {{ $i->placeName() }}</div>
-                                        <div class="watch-flags">
-                                            @foreach ($row['reasons'] as $reason)
-                                                <span class="watch-flag"><x-ikon name="alert" :size="12" /> {{ $reason }}</span>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-
-                    <p class="card-foot">
-                        Ditandai otomatis jika tidak ada kegiatan {{ $rules::IDLE_DAYS }} hari, progres di bawah {{ $rules::LOW_PROGRESS }}%,
-                        atau KP tinggal {{ $rules::ENDING_DAYS }} hari tapi nilai belum divalidasi.
-                    </p>
-                </section>
 
                 @include('dashboard._activity')
             </div>

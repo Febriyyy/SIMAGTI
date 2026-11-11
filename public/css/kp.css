@@ -2210,3 +2210,22 @@ a.mini-step-title:hover { color: var(--primary); }
     .kpp-steps .mini-step-dot { margin-bottom: 0; }
     .kpp-foot { flex-direction: column; align-items: flex-start; }
 }
+
+
+/* ---------- Dashboard pemantauan (dosen, kaprodi): "Perlu perhatian" di atas daftar mahasiswa ---------- */
+.attention-card.is-alert { border-color: color-mix(in srgb, var(--amber) 35%, var(--line)); box-shadow: inset 4px 0 0 var(--amber), var(--shadow); }
+.attention-card .watch-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-3); padding: 0 var(--card-x) var(--card-y); border-top: 0; }
+.attention-card .watch {
+    position: relative; padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2);
+    transition: border-color 150ms, background-color 150ms;
+}
+.attention-card .watch:hover { border-color: var(--amber); background: var(--surface); }
+.attention-card .watch:first-child { border-top: 1px solid var(--line); }
+.attention-card .watch:hover:first-child { border-top-color: var(--amber); }
+.watch-link { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.watch-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.attention-card .card-foot { margin-top: 0; }
+@media (max-width: 600px) {
+    .attention-card .watch-list { grid-template-columns: minmax(0, 1fr); }
+    .watch-meta { white-space: normal; }
+}
