@@ -383,3 +383,13 @@ Arah: dasar tenang ala alat produktivitas (acuan referensi Dribbble di brief), h
 - **Gerak halus**: bar progres terisi saat halaman dibuka, cincin Kemajuan KP berputar mengisi (bila browser mendukung `@property`), kartu sedikit terangkat saat diarahkan. Semua mati bila pengguna memilih kurangi gerak.
 - **Perayaan**: lencana kuning "Tercapai" pada goal yang selesai; konfeti sekali saat goal tercapai di board dan saat syarat bimbingan terpenuhi (`[data-celebrate]`, diingat per perangkat lewat localStorage).
 - **Keadaan kosong**: ilustrasi vektor kecil di atas setiap `.empty` (sementara, sebelum maskot final).
+
+### Gaya papan proyek pastel (November 2026)
+
+Acuan: tiga referensi papan proyek dan roadmap dari pemilik proyek.
+
+- **Kartu task** (`kegiatan/_card`): latar pastel mengikuti warna proyek (`projects.color`: green, blue, amber, pink, purple, gray; tanpa proyek = putih), judul berwarna tinta proyek, pil prioritas berteks (Urgent, Tinggi, Sedang, Rendah), progres checklist berupa deretan titik (maks. 10), label proyek putih, meta di bawah garis putus-putus. Token `--pastel-*` (latar, garis, tinta; tinta ≥ 5,8:1 di atas latarnya).
+- **Kolom board**: latar lembut bersudut 18px, judul kolom huruf biasa, jumlah dalam bulatan.
+- **Kepala halaman**: `.page-head` dan `.pbanner` menjadi banner gradasi pastel (teal → biru → ungu muda). Kegiatan memakai `.pbanner` berisi judul, pil ringkas (tempat, periode, ritme, task selesai, lewat tenggat), dan tombol Task baru.
+- **Tab**: `.tabs` bergaris bawah tipis, tab aktif bergaris teal dan tebal; Kegiatan punya tab Board, List, dan Timeline (menuju Timesheet), aksi Proyek/Kolom/Unduh di kanan (`.ptabs`). Halaman pantau mahasiswa memakai gaya tab yang sama.
+- **Gantt**: pil progres `selesai/total` di ujung batang rencana (`.gt-frac`), pil merah "Hari ini" di garis hari ini.

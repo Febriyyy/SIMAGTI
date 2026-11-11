@@ -105,6 +105,7 @@
                                 title="{{ $plan->title }} · {{ $plan->rangeLabel() }}{{ $plan->tasks_count > 0 ? ' · '.$row['percent'].'% task selesai' : '' }}{{ $canEdit ? ' · klik untuk mengubah' : '' }}">
                                 <span class="gt-fill" style="width: {{ $row['percent'] }}%"></span>
                                 <span class="gt-label">{{ $plan->title }}</span>
+                                @if ($plan->tasks_count > 0)<b class="gt-frac">{{ (int) ($plan->completed_tasks_count ?? 0) }}/{{ $plan->tasks_count }}</b>@endif
                             </{{ $tag }}>
                         </div>
                     </div>

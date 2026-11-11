@@ -2762,3 +2762,115 @@ h1, h2, h3 { letter-spacing: -0.02em; }
     .stat-grid > .stat { padding: var(--space-4); }
     .stat-icon { width: 32px; height: 32px; }
 }
+
+/* =====================================================================
+   Gaya papan proyek pastel (referensi Pinterest, November 2026):
+   kartu task berwarna per proyek, pil prioritas, progres titik, banner halaman pastel, tab bergaris bawah,
+   batang Gantt dengan pil progres dan pil "Hari ini".
+   ===================================================================== */
+:root {
+    --pastel-green: #e6f6f1;  --pastel-green-line: #bfe8db;  --pastel-green-ink: #03634f;
+    --pastel-blue: #e9f0ff;   --pastel-blue-line: #cddcff;   --pastel-blue-ink: #1d4fb8;
+    --pastel-amber: #fff4dc;  --pastel-amber-line: #ffe0a3;  --pastel-amber-ink: #8a5300;
+    --pastel-pink: #ffedf4;   --pastel-pink-line: #ffcfe0;   --pastel-pink-ink: #a3255e;
+    --pastel-purple: #f2ecff; --pastel-purple-line: #dccdff; --pastel-purple-ink: #5b2fc9;
+    --pastel-gray: #f3f5f5;   --pastel-gray-line: #e0e5e4;   --pastel-gray-ink: #44514f;
+    --banner-gradient: linear-gradient(115deg, #dcf5ee 0%, #e3eeff 55%, #efe8ff 100%);
+}
+
+/* ---------- Kartu task pastel ---------- */
+.kcard { --k-bg: var(--surface); --k-line: var(--line); --k-ink: var(--primary); gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius); background: var(--k-bg); border-color: var(--k-line); box-shadow: none; }
+.kcard.proj-green  { --k-bg: var(--pastel-green);  --k-line: var(--pastel-green-line);  --k-ink: var(--pastel-green-ink); }
+.kcard.proj-blue   { --k-bg: var(--pastel-blue);   --k-line: var(--pastel-blue-line);   --k-ink: var(--pastel-blue-ink); }
+.kcard.proj-amber  { --k-bg: var(--pastel-amber);  --k-line: var(--pastel-amber-line);  --k-ink: var(--pastel-amber-ink); }
+.kcard.proj-pink   { --k-bg: var(--pastel-pink);   --k-line: var(--pastel-pink-line);   --k-ink: var(--pastel-pink-ink); }
+.kcard.proj-purple { --k-bg: var(--pastel-purple); --k-line: var(--pastel-purple-line); --k-ink: var(--pastel-purple-ink); }
+.kcard.proj-gray   { --k-bg: var(--pastel-gray);   --k-line: var(--pastel-gray-line);   --k-ink: var(--pastel-gray-ink); }
+.kcard:hover { border-color: var(--k-ink); box-shadow: 0 6px 16px rgba(15, 27, 25, 0.08); transform: translateY(-2px); }
+.kcard.is-overdue { box-shadow: inset 3px 0 0 var(--red); }
+.kcard-title { color: var(--k-ink); font-size: var(--text-md); font-weight: 650; letter-spacing: -0.01em; }
+.kcard.proj-none .kcard-title { color: var(--text); }
+.kcard-key { color: var(--muted); font-weight: 600; }
+.kcard.is-done { opacity: 0.85; }
+
+.prio-pill {
+    display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 var(--space-2);
+    border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line);
+    font-size: var(--text-xs); font-weight: 600; white-space: nowrap;
+}
+.prio-pill.prio-urgent { background: var(--red-soft); box-shadow: none; color: var(--red); }
+.prio-pill.prio-high { background: var(--acc-coral-soft); box-shadow: none; color: var(--acc-coral-ink); }
+.prio-pill.prio-medium { color: var(--acc-blue-ink); }
+.prio-pill.prio-low { color: var(--muted); }
+
+.kcard-progress { display: flex; flex-direction: column; gap: 6px; }
+.kcard-progress-top { display: flex; justify-content: space-between; color: var(--muted); font-size: var(--text-xs); }
+.kcard-progress-top b { color: var(--k-ink); font-weight: 700; }
+.kcard-dots { display: flex; gap: 4px; }
+.kcard-dots i { flex: 1; max-width: 18px; height: 8px; border-radius: var(--radius-pill); background: rgba(15, 27, 25, 0.08); }
+.kcard-dots i.is-on { background: var(--k-ink); }
+.tag-proj { background: var(--surface); color: var(--k-ink); font-weight: 600; }
+.kcard.proj-none .tag-proj { background: var(--primary-soft); }
+.kcard-meta { padding-top: var(--space-2); border-top: 1px dashed var(--k-line); }
+
+/* Kolom board: latar lembut, judul tanpa kapital */
+.kcol { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.kcol-head { padding: var(--space-3) var(--space-4); }
+.kcol-title { font-size: var(--text-md); font-weight: 650; color: var(--text); }
+.kcol-count { min-width: 24px; height: 24px; display: inline-grid; place-items: center; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); font-size: var(--text-xs); font-weight: 700; }
+
+/* ---------- Banner halaman pastel (Kegiatan dan semua kepala halaman) ---------- */
+.pbanner, .page-head {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    padding: var(--space-5) var(--space-6); border-radius: var(--radius-lg);
+    background: var(--banner-gradient);
+}
+.pbanner::after, .page-head::after {
+    content: ''; position: absolute; right: -40px; top: -60px; width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 70%); pointer-events: none;
+}
+.pbanner > *, .page-head > * { position: relative; z-index: 1; }
+.pbanner .page-title, .page-head .page-title { font-size: 28px; }
+.pbanner-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.pill {
+    display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--space-3);
+    border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.85); box-shadow: inset 0 0 0 1px rgba(15, 27, 25, 0.06);
+    color: var(--gray); font-size: var(--text-sm); font-weight: 500; white-space: nowrap;
+}
+.pill .ikon { color: var(--primary); }
+.pill-strong b { color: var(--primary-dark); }
+.pill-late { background: var(--acc-coral-soft); color: var(--acc-coral-ink); }
+.pill-late .ikon { color: var(--acc-coral-ink); }
+.pbanner-action { flex: none; }
+.page-head .back { color: var(--gray); }
+
+/* ---------- Tab bergaris bawah (Kegiatan, pantau mahasiswa, dan tab lain) ---------- */
+.ptabs { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line-strong); }
+.ptabs .tabs { border-bottom: 0; }
+.ptabs .toolbar-actions { padding-bottom: var(--space-2); }
+.tabs { gap: var(--space-2); }
+.tab { padding: var(--space-3) var(--space-3); border-bottom-width: 2px; color: var(--muted); font-weight: 500; }
+.tab .ikon { color: var(--muted); }
+.tab:hover { color: var(--text); }
+.tab.is-active { border-bottom-color: var(--primary); color: var(--text); font-weight: 650; }
+.tab.is-active .ikon { color: var(--primary); }
+
+/* ---------- Gantt: pil progres dalam batang dan pil "Hari ini" ---------- */
+.gt-frac {
+    flex: none; margin-left: auto; padding: 1px var(--space-2); border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.28); color: inherit; font-size: var(--text-2xs); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.gt-bar.is-empty .gt-frac, .gt-bar-task .gt-frac { background: rgba(15, 27, 25, 0.06); }
+.gt-now span { display: block; top: 6px; z-index: 3; background: var(--red); box-shadow: 0 2px 6px rgba(191, 51, 40, 0.3); }
+.gt-now::before { display: none; }
+.gt[data-zoom="fit"] .gt-frac { display: none; }
+
+@media (max-width: 900px) {
+    .pbanner, .page-head { flex-direction: column; align-items: flex-start; padding: var(--space-5); }
+    .pbanner-action, .page-head > .btn, .page-head > .row-actions { align-self: flex-end; }
+    .ptabs { flex-direction: column; align-items: stretch; }
+    .ptabs .toolbar-actions { justify-content: flex-end; }
+}
+.tabs { overflow-y: hidden; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }

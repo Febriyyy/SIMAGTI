@@ -17,40 +17,46 @@
             </div>
         </div>
     @else
-        <div class="page-head">
-            <div>
+        {{-- Banner halaman (gaya referensi papan proyek): judul, pil ringkas, tombol utama --}}
+        <section class="pbanner">
+            <div class="pbanner-text">
                 <h1 class="page-title">Kegiatan</h1>
-                <p class="page-sub">{{ $internship->placeName() }} · ritme {{ mb_strtolower(\App\Models\Internship::CADENCES[$internship->cadence]) }} · {{ $currentPeriod->label }}</p>
+                <div class="pbanner-pills">
+                    <span class="pill"><x-ikon name="building" :size="14" /> {{ $internship->placeName() }}</span>
+                    <span class="pill"><x-ikon name="calendar" :size="14" /> {{ $currentPeriod->label }}</span>
+                    <span class="pill"><x-ikon name="timer" :size="14" /> {{ \App\Models\Internship::CADENCES[$internship->cadence] }}</span>
+                    <span class="pill pill-strong"><span><b>{{ $summary['done'] }}</b>/{{ $summary['total'] }} selesai</span></span>
+                    @if ($summary['overdue'] > 0)
+                        <span class="pill pill-late"><x-ikon name="alert" :size="14" /> {{ $summary['overdue'] }} lewat tenggat</span>
+                    @endif
+                </div>
             </div>
             @if ($canEdit)
-                @if ($plans->isEmpty())
-                    <a href="{{ route('timesheet.index') }}" class="btn btn-primary"><x-ikon name="calendar" :size="18" /> Isi rencana</a>
-                @else
-                    <button type="button" class="btn btn-primary" data-open="dlg-task"><x-ikon name="plus" :size="18" /> Task baru</button>
-                @endif
+                <div class="pbanner-action">
+                    @if ($plans->isEmpty())
+                        <a href="{{ route('timesheet.index') }}" class="btn btn-primary"><x-ikon name="calendar" :size="18" /> Isi rencana</a>
+                    @else
+                        <button type="button" class="btn btn-primary" data-open="dlg-task"><x-ikon name="plus" :size="18" /> Task baru</button>
+                    @endif
+                </div>
             @endif
-        </div>
+        </section>
 
         @if ($canEdit && $plans->isEmpty())
             <div class="alert alert-warning" role="status"><strong>Isi rencana kegiatan dulu.</strong> Task dibuat di bawah rencana pada <a href="{{ route('timesheet.index') }}">Timesheet</a>.</div>
         @endif
 
-        <div class="toolbar board-toolbar">
-            <div class="segmented" role="tablist" aria-label="Tampilan">
-                <a href="{{ route('kegiatan.index', $filter->query(['tampilan' => 'board'])) }}" @class(['seg', 'is-active' => $view === 'board']) role="tab" aria-selected="{{ $view === 'board' ? 'true' : 'false' }}"><x-ikon name="board" :size="16" /> Board</a>
-                <a href="{{ route('kegiatan.index', $filter->query(['tampilan' => 'list'])) }}" @class(['seg', 'is-active' => $view === 'list']) role="tab" aria-selected="{{ $view === 'list' ? 'true' : 'false' }}"><x-ikon name="list" :size="16" /> List</a>
-            </div>
-            <div class="toolbar-stats">
-                <span><strong>{{ $summary['total'] }}</strong> task</span>
-                <span><strong>{{ $summary['done'] }}</strong> selesai</span>
-                @if ($summary['overdue'] > 0)
-                    <span class="is-late"><strong>{{ $summary['overdue'] }}</strong> lewat tenggat</span>
-                @endif
-            </div>
+        {{-- Tab tampilan + aksi --}}
+        <div class="ptabs">
+            <nav class="tabs" aria-label="Tampilan">
+                <a href="{{ route('kegiatan.index', $filter->query(['tampilan' => 'board'])) }}" @class(['tab', 'is-active' => $view === 'board']) @if ($view === 'board') aria-current="page" @endif><x-ikon name="board" :size="16" /> Board</a>
+                <a href="{{ route('kegiatan.index', $filter->query(['tampilan' => 'list'])) }}" @class(['tab', 'is-active' => $view === 'list']) @if ($view === 'list') aria-current="page" @endif><x-ikon name="list" :size="16" /> List</a>
+                <a href="{{ route('timesheet.index') }}" class="tab"><x-ikon name="calendar" :size="16" /> Timeline</a>
+            </nav>
             <div class="toolbar-actions">
                 @if ($canEdit)
                     <button type="button" class="btn btn-sm" data-open="dlg-projects"><x-ikon name="project" :size="16" /> Proyek</button>
-                    <button type="button" class="btn btn-sm" data-open="dlg-columns"><x-ikon name="board" :size="16" /> Atur kolom</button>
+                    <button type="button" class="btn btn-sm" data-open="dlg-columns"><x-ikon name="board" :size="16" /> Kolom</button>
                 @endif
                 <details class="menu">
                     <summary class="btn btn-sm"><x-ikon name="download" :size="16" /> Unduh</summary>
