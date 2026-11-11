@@ -1026,8 +1026,6 @@ a.step-link:hover .icon { color: var(--primary); transform: translateX(2px); }
 .toolbar-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-left: auto; }
 
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.filter-panel { display: contents; }
-.filter-toggle { display: none; }
 .filter-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 var(--space-1); border-radius: var(--radius-pill); background: var(--primary); color: #fff; font-size: var(--text-2xs); font-weight: 700; }
 .filters .select-sm { width: auto; max-width: 220px; }
 .filters .input-sm[type="date"] { width: auto; }
@@ -1576,10 +1574,6 @@ button.seg-chip { cursor: pointer; font: inherit; font-size: var(--text-sm); fon
 
     .filters > .select-sm, .filters > .input-sm, .filter-panel > .select-sm, .filter-panel > .input-sm { flex: 1 1 calc(50% - 4px); max-width: none; }
     .filter-search { flex: 1 1 0; max-width: none; }
-    /* Pilihan filter dilipat di balik tombol "Filter" (hanya bila JavaScript aktif) */
-    .js .filter-toggle { display: inline-flex; min-height: var(--control-h); }
-    .js .filter-panel { display: none; }
-    .js .filters.is-open .filter-panel { display: flex; flex-wrap: wrap; gap: var(--space-2); flex: 1 1 100%; padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
     .filter-search .input { min-height: var(--control-h); }
     .task-mini-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: var(--space-2); padding: var(--space-3) var(--space-4); }
     .task-mini-row .kcard-key { grid-column: 1 / -1; }
@@ -2507,4 +2501,37 @@ h1, h2, h3 { letter-spacing: -0.02em; }
     .container { padding: var(--space-4) var(--page-x) var(--space-6); }
     .page-title, .hero-title { font-size: var(--text-3xl); }
     .account-menu { position: static; margin-top: var(--space-2); box-shadow: none; }
+}
+
+
+/* ---------- Filter sebagai pop-up (Kegiatan, pantau mahasiswa) ----------
+   Kotak cari + satu tombol "Filter" (dengan jumlah filter aktif). Pop-up berisi pilihan berlabel dalam dua kolom. */
+.filters[data-filters] { flex-wrap: nowrap; }
+.filters[data-filters] .filter-search { flex: 0 1 320px; }
+.filter-pop { position: relative; }
+.filter-toggle, .js .filter-toggle { display: inline-flex; min-height: var(--control-h); }
+.filter-toggle.is-active { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-tint); }
+.filter-panel, .js .filter-panel { display: none; }
+.filters.is-open .filter-panel, .js .filters.is-open .filter-panel {
+    position: absolute; left: 0; top: calc(100% + var(--space-2)); z-index: 40;
+    display: flex; flex-direction: column; gap: var(--space-4); width: 520px; max-width: calc(100vw - 32px);
+    padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-pop);
+    flex-wrap: nowrap; flex: none;
+}
+.filter-panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.filter-panel-head strong { font-size: var(--text-md); font-weight: 600; }
+.filter-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); }
+.filter-fields .select-sm, .filter-fields .input-sm { width: 100%; max-width: none; }
+.filter-range { grid-column: 1 / -1; }
+.filter-range-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.filter-panel-foot { display: flex; justify-content: flex-end; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+@media (max-width: 600px) {
+    .filters[data-filters] { flex-wrap: wrap; }
+    .filters[data-filters] .filter-search { flex: 1 1 0; }
+    .filters.is-open .filter-panel, .js .filters.is-open .filter-panel { position: fixed; left: var(--space-4); right: var(--space-4); top: auto; bottom: var(--space-4); width: auto; max-height: 80dvh; overflow-y: auto; }
+    .filter-fields { grid-template-columns: minmax(0, 1fr); }
+    .filter-reset { display: none; }
+}
+@media (max-width: 600px) {
+    .filters.is-open .filter-panel { padding: var(--space-4); border: 1px solid var(--line); }
 }

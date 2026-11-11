@@ -3,7 +3,7 @@
  * - dialog: tombol [data-open="id"] membuka <dialog>, [data-close] menutup, <dialog data-autoopen> terbuka saat halaman dimuat
  * - rencana kegiatan: tombol [data-span="7"] mengisi tanggal selesai = tanggal mulai + N hari
  * - penilaian akhir: form [data-rating-form] menghitung rata-rata tiap kategori dan perkiraan nilai akhir
- * - filter: form [data-autosubmit] terkirim saat pilihan berubah
+ * - filter: form [data-autosubmit] terkirim saat pilihan berubah; pilihan di pop-up filter menunggu tombol Terapkan
  * - select [data-other-toggle]: pilihan "Lainnya" menampilkan isian bebas
  * - board: drag-and-drop kartu antar kolom (PATCH ke server, kembali ke posisi semula bila gagal)
  * - menu HP: tombol [data-drawer-open] membuka sidebar sebagai drawer, [data-drawer-close] / Esc menutupnya
@@ -11,14 +11,40 @@
 (function () {
     var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content;
 
-    // Filter di HP: tombol "Filter" membuka/menutup panel pilihan filter
+    // Filter: tombol "Filter" membuka pop-up pilihan; klik di luar atau Esc menutupnya
     document.querySelectorAll('[data-filter-toggle]').forEach(function (btn) {
         var form = btn.closest('[data-filters]');
-        btn.addEventListener('click', function () {
-            var open = !form.classList.contains('is-open');
+        var pop = btn.closest('.filter-pop');
+        function setOpen(open, focusBack) {
             form.classList.toggle('is-open', open);
             btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) {
+                var first = form.querySelector('.filter-panel select, .filter-panel input');
+                if (first) first.focus();
+            } else if (focusBack) {
+                btn.focus();
+            }
+        }
+        btn.addEventListener('click', function () { setOpen(!form.classList.contains('is-open'), false); });
+        form.querySelectorAll('[data-filter-close]').forEach(function (c) {
+            c.addEventListener('click', function () { setOpen(false, true); });
         });
+        document.addEventListener('click', function (e) {
+            if (form.classList.contains('is-open') && !pop.contains(e.target)) setOpen(false, false);
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && form.classList.contains('is-open')) setOpen(false, true);
+        });
+        // Rentang tanggal hanya tampil saat periode "Rentang tanggal" dipilih
+        var periode = form.querySelector('[data-range-toggle]');
+        var range = form.querySelector('.filter-range');
+        if (periode && range) {
+            periode.addEventListener('change', function () {
+                var on = periode.value === 'rentang';
+                range.hidden = !on;
+                range.querySelectorAll('input').forEach(function (i) { i.disabled = !on; });
+            });
+        }
     });
 
     // Menu HP (drawer). Fokus pindah ke menu saat dibuka dan kembali ke tombol ☰ saat ditutup.
@@ -146,7 +172,11 @@
 
     document.querySelectorAll('form[data-autosubmit]').forEach(function (form) {
         var timer;
-        form.addEventListener('change', function () { form.submit(); });
+        form.addEventListener('change', function (e) {
+            // Pilihan di pop-up filter menunggu tombol Terapkan
+            if (e.target.closest('.filter-panel')) return;
+            form.submit();
+        });
         form.querySelectorAll('input[type=search]').forEach(function (input) {
             input.addEventListener('input', function () {
                 clearTimeout(timer);
