@@ -86,7 +86,11 @@
                     @if ($days->isEmpty())
                         <div class="empty">
                             <strong>Belum ada catatan</strong>
-                            Catat kegiatan harian Anda di formulir samping.
+                            @if ($canEdit)
+                                Catat kegiatan harian Anda di formulir samping.
+                            @else
+                                Tidak ada catatan pada periode ini. Pilih <a href="{{ route('timesheet.index', ['periode' => 'semua']) }}">Semua</a> untuk melihat seluruh catatan.
+                            @endif
                         </div>
                     @else
                         <div class="days">
