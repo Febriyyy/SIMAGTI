@@ -39,8 +39,13 @@
             <header class="cohort-head">
                 <div class="min0">
                     <h2 class="cohort-title" id="place-{{ $loop->index }}">
-                        {{ $first->placeName() }}
-                        @if ($first->division)<span class="cohort-div">Divisi {{ $first->division->name }}</span>@endif
+                        {{-- Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi --}}
+                        @if ($user->role === 'supervisor')
+                            {{ $first->division ? 'Divisi '.$first->division->name : 'Divisi belum diisi' }}
+                        @else
+                            {{ $first->placeName() }}
+                            @if ($first->division)<span class="cohort-div">Divisi {{ $first->division->name }}</span>@endif
+                        @endif
                     </h2>
                 </div>
                 <span class="cohort-count">{{ $placeCohorts->sum(fn ($c) => $c['items']->count()) }} mahasiswa</span>
