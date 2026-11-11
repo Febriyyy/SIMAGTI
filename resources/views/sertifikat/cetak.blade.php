@@ -12,7 +12,7 @@
     <title>Sertifikat KP {{ $student->name }} · {{ config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <style>
         /* Halaman cetak berdiri sendiri (A4 mendatar). Warna mengikuti token merek di public/css/kp.css. */
@@ -24,7 +24,7 @@
         @page { size: A4 landscape; margin: 0; }
         * { box-sizing: border-box; }
         html, body { margin: 0; }
-        body { background: var(--page); color: var(--text); font-family: "Plus Jakarta Sans", system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { background: var(--page); color: var(--text); font-family: "Geist", system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
         .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; max-width: 297mm; margin: 0 auto; padding: 16px; }
         .toolbar p { flex: 1 1 240px; margin: 0; color: var(--muted); font-size: 14px; }

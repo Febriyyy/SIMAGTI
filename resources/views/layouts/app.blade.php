@@ -7,7 +7,7 @@
     <title>@yield('title', 'Dashboard') · {{ config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     {{-- Ikon Google Material Symbols; hanya ikon yang dipakai aplikasi (lihat app/Support/Icons.php) --}}
     <link href="{{ \App\Support\Icons::fontUrl() }}" rel="stylesheet">
     <script>
@@ -48,39 +48,59 @@
             @endforeach
         </nav>
 
+        {{-- Profil di bawah sidebar: menu akun (ganti kata sandi, keluar) terbuka ke atas --}}
         <div class="sidebar-foot">
-            <span class="nav-label">Akun</span>
-            @php($pwActive = request()->routeIs('akun.sandi'))
-            <a href="{{ route('akun.sandi') }}" class="nav-item {{ $pwActive ? 'is-active' : '' }}" @if ($pwActive) aria-current="page" @endif>
-                <x-ikon name="lock" :fill="$pwActive" :size="20" />
-                <span>Ganti kata sandi</span>
-            </a>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="nav-item is-danger">
-                    <x-ikon name="logout" />
-                    <span>Keluar</span>
-                </button>
-            </form>
+            <details class="account" @if (request()->routeIs('akun.sandi')) open @endif>
+                <summary class="account-btn">
+                    <x-avatar :user="$user" />
+                    <span class="account-text">
+                        <span class="account-name" title="{{ $user->name }}">{{ $user->listName() }}</span>
+                        <span class="account-role">{{ $user->roleLabel() }}</span>
+                    </span>
+                    <x-ikon name="expand" :size="18" class="account-caret" />
+                </summary>
+                <div class="account-menu">
+                    @php($pwActive = request()->routeIs('akun.sandi'))
+                    <a href="{{ route('akun.sandi') }}" class="nav-item {{ $pwActive ? 'is-active' : '' }}" @if ($pwActive) aria-current="page" @endif>
+                        <x-ikon name="lock" :size="18" />
+                        <span>Ganti kata sandi</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="nav-item is-danger">
+                            <x-ikon name="logout" :size="18" />
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                </div>
+            </details>
         </div>
     </aside>
 
     <div class="drawer-backdrop" data-drawer-close></div>
 
     <main class="main">
+        @php($menuNow = collect(\App\Support\Menu::for($user))->first(fn ($m) => request()->routeIs(...(array) $m['active'])))
+        @php($pageTitle = trim($__env->yieldContent('title', 'Dashboard')))
         <header class="topbar">
             <button type="button" class="menu-btn" data-drawer-open aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu"><x-ikon name="menu" :size="22" /></button>
             <a href="{{ route('dashboard') }}" class="topbar-brand"><img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="112" height="34"></a>
-            <span class="topbar-date"><x-ikon name="calendar" :size="16" /> {{ now()->locale('id')->translatedFormat('l, j F Y') }}</span>
+            {{-- Letak halaman: menu yang sedang dibuka, lalu judul halaman bila berbeda --}}
+            <nav class="crumbs" aria-label="Letak halaman">
+                @if ($menuNow)
+                    <a href="{{ route($menuNow['route']) }}" class="crumb-root"><x-ikon :name="$menuNow['icon']" :size="18" /> {{ $menuNow['label'] }}</a>
+                    @if ($pageTitle !== $menuNow['label'] && ! str_starts_with($pageTitle, 'Dashboard'))
+                        <x-ikon name="next" :size="16" class="crumb-sep" />
+                        <span class="crumb-now" aria-current="page">{{ $pageTitle }}</span>
+                    @endif
+                @else
+                    <span class="crumb-now" aria-current="page">{{ $pageTitle }}</span>
+                @endif
+            </nav>
             <div class="topbar-right">
-            <x-bell />
-            <div class="profile">
-                <div class="profile-text">
-                    <span class="profile-name" title="{{ $user->name }}">{{ $user->listName() }}</span>
-                    <span class="profile-sub">{{ $user->roleLabel() }}@if ($user->nim) · {{ $user->nim }}@endif</span>
-                </div>
-                <x-avatar :user="$user" />
-            </div>
+                <span class="topbar-date">{{ now()->locale('id')->translatedFormat('l, j F Y') }}</span>
+                <x-bell />
+                <x-avatar :user="$user" class="topbar-avatar" />
             </div>
         </header>
 
