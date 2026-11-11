@@ -369,3 +369,8 @@ Arah: dasar tenang ala alat produktivitas (acuan referensi Dribbble di brief), h
 - **Isian di HP** berukuran huruf 16px supaya Safari iOS tidak memperbesar halaman.
 
 **Pengecekan.** Login, dashboard mahasiswa, Timesheet, Kegiatan, dashboard dosen, dan dashboard supervisor dicek di 1280px dan 390px. Halaman menu semua peran (56 halaman, 6 peran) dipindai di 390px: tidak ada geser horizontal dan tidak ada galat.
+
+### Halaman Pemantauan dan Bimbingan (November 2026)
+
+- **/pantau** (dosen, supervisor, kaprodi): mahasiswa dikelompokkan per perusahaan + divisi (judul kelompok di luar kartu, garis tipis di bawahnya). Setiap mahasiswa satu kartu `<x-intern-card>` dalam grid (`.icard-grid`, 3 per baris di 1280px, 1 di HP): nama ringkas, posisi, label kloter + periode, progres task, kotak fakta Minggu / Rencana / Aktif (kuning bila tidak aktif lebih dari 7 hari), status penilaian, tombol Buka. Seluruh kartu bisa diklik. `<x-intern-row>` tetap dipakai dashboard supervisor.
+- **/bimbingan** (mahasiswa): pelacak syarat di atas (`.gtrack`, satu kotak per sesi yang dibutuhkan: hijau = dikonfirmasi, kuning = menunggu, garis putus = belum) dengan kalimat "n sesi lagi untuk syarat hasil KP". Riwayat berupa linimasa (`bimbingan/_timeline`, `.gtl`): tanggal besar di kiri, titik status di garis, topik dan status di kanan, catatan dosen tampil langsung, catatan mahasiswa di Detail. Formulir catat (`bimbingan/_form`) di kolom kanan pada desktop; di ≤1100px dibuka lewat tombol **Catat bimbingan** sebagai dialog. Antrean dosen (`bimbingan/_list`) tidak berubah.

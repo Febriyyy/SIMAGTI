@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <form method="GET" class="filters" data-autosubmit>
+    <form method="GET" class="filters pantau-filters" data-autosubmit>
         <div class="filter-search">
             <x-ikon name="search" :size="16" />
             <input type="search" name="cari" value="{{ $term }}" placeholder="Cari nama atau NIM…" aria-label="Cari mahasiswa" class="input input-sm">
@@ -31,26 +31,28 @@
         </div>
     @endif
 
-    @foreach ($cohorts as $cohort)
-        @php($first = $cohort['first'])
-        <section class="card">
-            <div class="card-head">
+    {{-- Kelompok per perusahaan + divisi; kloter (periode) tampil di setiap kartu supaya kartu bisa berjejer --}}
+    @php($places = $cohorts->groupBy(fn ($c) => $c['first']->company_id.'-'.$c['first']->division_id.'-'.$c['first']->placeName()))
+    @foreach ($places as $placeCohorts)
+        @php($first = $placeCohorts->first()['first'])
+        <section class="cohort" aria-labelledby="place-{{ $loop->index }}">
+            <header class="cohort-head">
                 <div class="min0">
-                    <h2 class="card-title">
+                    <h2 class="cohort-title" id="place-{{ $loop->index }}">
                         {{ $first->placeName() }}
-                        @if ($first->division) <span class="muted">· Divisi {{ $first->division->name }}</span> @endif
+                        @if ($first->division)<span class="cohort-div">Divisi {{ $first->division->name }}</span>@endif
                     </h2>
-                    <p class="card-sub">
-                        <span class="cohort-badge">{{ $first->cohortLabel() }}@if ($cohort['many']) · Kloter {{ $cohort['number'] }}@endif</span>
-                        {{ $first->periodLabel() }} · {{ $first->durationMonths() }} bulan · {{ $cohort['items']->count() }} mahasiswa
-                    </p>
                 </div>
-            </div>
-            <x-intern-list>
-                @foreach ($cohort['items'] as $internship)
-                    <x-intern-row :internship="$internship" :last="$lastActivity[$internship->id] ?? null" />
+                <span class="cohort-count">{{ $placeCohorts->sum(fn ($c) => $c['items']->count()) }} mahasiswa</span>
+            </header>
+            <ul class="icard-grid">
+                @foreach ($placeCohorts as $cohort)
+                    @foreach ($cohort['items'] as $internship)
+                        <x-intern-card :internship="$internship" :last="$lastActivity[$internship->id] ?? null"
+                                       :cohort="$internship->cohortLabel().($cohort['many'] ? ' · Kloter '.$cohort['number'] : '')" />
+                    @endforeach
                 @endforeach
-            </x-intern-list>
+            </ul>
         </section>
     @endforeach
 @endsection
