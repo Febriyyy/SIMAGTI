@@ -24,6 +24,7 @@
                     <div class="goal-text">
                         <a href="{{ request()->fullUrlWithQuery(['goal' => $goal->id]) }}" class="goal-title" title="Tampilkan task goal ini">{{ $goal->title }}</a>
                         <span class="goal-sub" data-goal-sub>{{ $goal->tasks_count > 0 ? $goal->completed_tasks_count.'/'.$goal->tasks_count.' task Done' : 'Belum ada task' }}</span>
+                        <span class="goal-badge">Tercapai</span>
                         <div class="goal-bar" role="progressbar" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="Task Done"><span data-goal-bar style="width: {{ $pct }}%"></span></div>
                     </div>
                     @if ($canEdit)

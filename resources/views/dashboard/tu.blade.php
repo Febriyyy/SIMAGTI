@@ -6,11 +6,11 @@
     <x-hero eyebrow="TU Fakultas"
             :title="\App\Support\Greeting::now().', '.$user->firstName()"
             :sub="$stats['verify'] > 0
-                ? $stats['verify'].' KP mandiri menunggu verifikasi perusahaan.'
+                ? $stats['verify'].' KP mandiri perlu verifikasi.'
                 : ($stats['pending'] > 0
-                    ? $stats['pending'].' Company Supervisor ('.$stats['students'].' mahasiswa) menunggu diaktifkan.'
-                    : 'Tidak ada antrean verifikasi maupun aktivasi supervisor.')"
-            :action="$stats['verify'] > 0 ? 'Buka verifikasi' : 'Buka aktivasi'" :href="$stats['verify'] > 0 ? route('tu.verifikasi') : route('tu.aktivasi')" />
+                    ? $stats['pending'].' supervisor menunggu aktivasi.'
+                    : 'Tidak ada antrean.')"
+            :action="$stats['verify'] > 0 ? 'Verifikasi' : 'Aktivasi'" :href="$stats['verify'] > 0 ? route('tu.verifikasi') : route('tu.aktivasi')" />
 
     <div class="stat-grid">
         <x-stat label="Perlu verifikasi" :value="$stats['verify']" unit="KP" :tone="$stats['verify'] > 0 ? 'amber' : 'gray'" :href="route('tu.verifikasi')"

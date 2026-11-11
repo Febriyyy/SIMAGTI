@@ -6,9 +6,9 @@
     <x-hero eyebrow="Company Supervisor"
             :title="\App\Support\Greeting::now().', '.$user->firstName()"
             :sub="$stats['unconfirmed'] > 0
-                ? $stats['unconfirmed'].' penempatan mahasiswa menunggu konfirmasi Anda.'
-                : ($stats['students'] > 0 ? 'Pantau rencana, task, dan catatan kegiatan mahasiswa magang Anda.' : 'Belum ada mahasiswa magang yang aktif.')"
-            action="Pantau mahasiswa" :href="route('pantau.index')" />
+                ? $stats['unconfirmed'].' penempatan menunggu konfirmasi.'
+                : ($stats['students'] > 0 ? 'Mahasiswa magang Anda aktif.' : 'Belum ada mahasiswa aktif.')"
+            action="Mahasiswa" :href="route('pantau.index')" />
 
     <div class="stat-grid">
         <x-stat label="Mahasiswa magang" :value="$stats['students']" unit="orang" :href="route('pantau.index')" hint="Yang sedang berjalan" />

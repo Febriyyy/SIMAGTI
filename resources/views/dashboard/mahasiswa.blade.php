@@ -10,14 +10,13 @@
 
     @if (! $internship)
         <x-hero eyebrow="Mahasiswa" :title="$greeting"
-                sub="Anda belum punya KP. Ajukan KP bila sudah mendapat tempat, atau tunggu penempatan dari kampus."
+                sub="Belum ada KP."
                 action="Ajukan KP" :href="route('kp.status')" />
 
         <div class="card">
             <div class="empty">
                 <strong>Belum ada KP</strong>
-                Setelah pengajuan Anda disetujui, timesheet, kegiatan, dan goals muncul di sini.
-                <a href="{{ route('kp.status') }}">Buka Status KP</a> untuk mengajukan.
+                <a href="{{ route('kp.status') }}">Ajukan KP</a> untuk mulai.
             </div>
         </div>
     @elseif (! $running)
@@ -41,9 +40,9 @@
         @php($a = $internship->assessment)
         <x-hero :eyebrow="'Mahasiswa · '.$internship->placeName()" :title="$greeting"
                 :sub="$internship->status === 'selesai'
-                    ? 'KP Anda sudah selesai. Data kegiatan dan timesheet tetap bisa dibuka.'
-                    : $period->label.'. Kerjakan task sesuai rencana dan catat kegiatan harian Anda.'"
-                action="Buka kegiatan" :href="route('kegiatan.index')">
+                    ? 'KP Anda sudah selesai.'
+                    : $period->label"
+                action="Kegiatan" :href="route('kegiatan.index')">
             <x-slot:meta>
                 <span class="hero-tag"><x-ikon name="building" :size="15" /> {{ $internship->division?->name ? 'Divisi '.$internship->division->name : 'Divisi belum diisi' }}</span>
                 <span class="hero-tag"><x-ikon name="person" :size="15" /> {{ $internship->position ?? 'Posisi belum diisi' }}</span>
@@ -68,8 +67,7 @@
                         @endif
                     </h2>
                     <p class="kpp-sub">
-                        @if ($internship->status !== 'selesai')Sisa {{ $internship->daysLeft() }} hari · selesai {{ $internship->end_date->locale('id')->translatedFormat('j M Y') }} · @endif
-                        {{ $doneSteps }} dari {{ $visibleSteps->count() }} langkah selesai
+                        @if ($internship->status !== 'selesai')Sisa {{ $internship->daysLeft() }} hari @else{{ $doneSteps }}/{{ $visibleSteps->count() }} langkah @endif
                     </p>
                 </div>
                 <div class="kpp-figures">

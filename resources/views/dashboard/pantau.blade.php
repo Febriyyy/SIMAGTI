@@ -6,15 +6,15 @@
     @php
         [$heroAction, $heroHref] = match (true) {
             $user->hasRole('kaprodi') => ['Persetujuan KP', route('kaprodi.persetujuan')],
-            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => ['Buka validasi', route('validasi.index')],
-            $attention->isNotEmpty() => ['Lihat yang perlu perhatian', '#perlu-perhatian'],
-            default => ['Pantau kegiatan', route('pantau.index')],
+            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => ['Validasi', route('validasi.index')],
+            $attention->isNotEmpty() => ['Perhatian', '#perlu-perhatian'],
+            default => ['Pantau', route('pantau.index')],
         };
         $heroSub = match (true) {
-            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => $subtitle.' '.$waitingValidation->count().' penilaian akhir menunggu validasi Anda.',
-            $user->hasRole('kaprodi') && $waitingApproval > 0 => $waitingApproval.' pengajuan KP menunggu persetujuan Anda.',
-            $attention->isNotEmpty() => $subtitle.' '.$attention->count().' mahasiswa perlu perhatian.',
-            default => $subtitle.' Semua mahasiswa aktif dalam kondisi baik.',
+            $user->hasRole('dospem') && $waitingValidation->isNotEmpty() => $waitingValidation->count().' penilaian menunggu validasi.',
+            $user->hasRole('kaprodi') && $waitingApproval > 0 => $waitingApproval.' pengajuan menunggu persetujuan.',
+            $attention->isNotEmpty() => $attention->count().' mahasiswa perlu perhatian.',
+            default => 'Semua mahasiswa aman.',
         };
     @endphp
     <x-hero :eyebrow="$user->roleLabel()" :title="\App\Support\Greeting::now().', '.$user->firstName()"
@@ -31,7 +31,7 @@
             <x-stat label="Perlu perhatian" value="0" icon="check" tone="green" hint="Semua mahasiswa aman" />
         @else
             <x-stat label="Perlu perhatian" :value="$attention->count()" unit="mahasiswa" icon="alert" tone="amber"
-                    href="#perlu-perhatian" hint="Alasannya ada di daftar bawah" />
+                    href="#perlu-perhatian" hint="Lihat daftar" />
         @endif
 
         <x-stat label="Nilai rata-rata" :value="$stats['average_score'] !== null ? \App\Support\Num::short($stats['average_score']) : null"

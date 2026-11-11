@@ -6,9 +6,9 @@
     <x-hero eyebrow="Admin"
             :title="\App\Support\Greeting::now().', '.$user->firstName()"
             :sub="$stats['inactive'] > 0
-                ? $stats['inactive'].' akun sedang nonaktif. Kelola peran dan status akun dari menu Akun.'
-                : 'Semua akun aktif. Kelola peran, standar penilaian, dan log aktivitas dari sini.'"
-            action="Kelola akun" :href="route('admin.akun')" />
+                ? $stats['inactive'].' akun nonaktif.'
+                : 'Semua akun aktif.'"
+            action="Akun" :href="route('admin.akun')" />
 
     <div class="stat-grid">
         <x-stat label="Total akun" :value="$stats['users']" unit="akun" :href="route('admin.akun')" hint="Semua peran" />

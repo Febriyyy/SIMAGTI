@@ -21,7 +21,7 @@
     @else
         {{-- Pelacak syarat: satu kotak per sesi yang dibutuhkan --}}
         @php($slots = max($min, $confirmed))
-        <section class="gtrack" aria-labelledby="gtrack-title">
+        <section @class(['gtrack', 'is-complete' => $confirmed >= $min]) aria-labelledby="gtrack-title" @if ($confirmed >= $min) data-celebrate="bimbingan-{{ $internship->id }}" @endif>
             <div class="gtrack-text">
                 <h2 id="gtrack-title" class="gtrack-title">
                     @if ($confirmed >= $min)

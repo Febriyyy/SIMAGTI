@@ -7,9 +7,87 @@
  * - select [data-other-toggle]: pilihan "Lainnya" menampilkan isian bebas
  * - board: drag-and-drop kartu antar kolom (PATCH ke server, kembali ke posisi semula bila gagal)
  * - menu HP: tombol [data-drawer-open] membuka sidebar sebagai drawer, [data-drawer-close] / Esc menutupnya
+ * - sedikit kata: subjudul dan penjelasan panjang dipindah ke ikon info (tooltip)
+ * - perayaan: konfeti sekali untuk [data-celebrate] dan saat goal tercapai
  */
 (function () {
     var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content;
+
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (window.CSS && CSS.registerProperty) document.documentElement.classList.add('ring-anim');
+
+    // ---------- Sedikit kata: teks penjelasan panjang menjadi ikon info di samping judul ----------
+    var tipId = 0;
+    function closeTips(except) {
+        document.querySelectorAll('.info-tip.is-open').forEach(function (t) {
+            if (t !== except) { t.classList.remove('is-open'); t.querySelector('button').setAttribute('aria-expanded', 'false'); }
+        });
+    }
+    function makeTip(el, title) {
+        if (!title) return;
+        var existing = title.querySelector('.info-tip-text');
+        if (existing) { existing.insertAdjacentHTML('beforeend', '<br><br>' + el.innerHTML); el.remove(); return; }
+        var id = 'tip-' + (++tipId);
+        var wrap = document.createElement('span');
+        wrap.className = 'info-tip';
+        wrap.innerHTML = '<button type="button" class="info-tip-btn" aria-label="Keterangan" aria-expanded="false" aria-describedby="' + id + '">'
+            + '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg></button>'
+            + '<span class="info-tip-text" role="tooltip" id="' + id + '"></span>';
+        wrap.lastChild.innerHTML = el.innerHTML;
+        title.appendChild(wrap);
+        el.remove();
+        var btn = wrap.firstChild;
+        btn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            var open = !wrap.classList.contains('is-open');
+            closeTips(wrap);
+            wrap.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+    document.querySelectorAll('.page-sub, .card-sub, p.card-foot, .goal-note').forEach(function (el) {
+        var text = el.textContent.trim();
+        // keterangan sangat singkat, atau data singkat (berisi angka), tetap tampil
+        if (el.matches('.page-sub, .card-sub') && (text.length <= 20 || (/\d/.test(text) && text.length <= 40))) return;
+        if (el.querySelector('a, button, form, input, select')) return;     // ada kontrol di dalamnya: biarkan
+        var title = null;
+        if (el.matches('.page-sub')) title = el.parentNode.querySelector('.page-title');
+        else if (el.matches('.card-sub')) title = el.parentNode.querySelector('.card-title');
+        else { var card = el.closest('.card'); title = card && card.querySelector('.card-title'); }
+        makeTip(el, title);
+    });
+    document.addEventListener('click', function () { closeTips(null); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTips(null); });
+
+    // ---------- Perayaan: konfeti sekali ----------
+    function confetti() {
+        if (reduceMotion) return;
+        var colors = ['#0e9b7f', '#ffb020', '#3b82f6', '#ff7a59', '#8b5cf6'];
+        var box = document.createElement('div');
+        box.className = 'confetti';
+        box.setAttribute('aria-hidden', 'true');
+        for (var i = 0; i < 70; i++) {
+            var p = document.createElement('i');
+            p.style.left = (Math.random() * 100) + '%';
+            p.style.background = colors[i % colors.length];
+            p.style.setProperty('--x', ((Math.random() - 0.5) * 240) + 'px');
+            p.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg');
+            p.style.setProperty('--delay', Math.round(Math.random() * 300) + 'ms');
+            p.style.setProperty('--d', (1100 + Math.round(Math.random() * 700)) + 'ms');
+            box.appendChild(p);
+        }
+        document.body.appendChild(box);
+        setTimeout(function () { box.remove(); }, 2400);
+    }
+    window.simagtiConfetti = confetti;
+    document.querySelectorAll('[data-celebrate]').forEach(function (el) {
+        var key = 'simagti-rayakan-' + el.getAttribute('data-celebrate');
+        try {
+            if (localStorage.getItem(key)) return;
+            localStorage.setItem(key, '1');
+        } catch (e) { return; }
+        setTimeout(confetti, 400);
+    });
 
     // Filter: tombol "Filter" membuka pop-up pilihan; klik di luar atau Esc menutupnya
     document.querySelectorAll('[data-filter-toggle]').forEach(function (btn) {
@@ -236,7 +314,9 @@
         if (!g) return;
         var row = document.querySelector('[data-goal="' + g.id + '"]');
         if (!row) return;
+        var wasDone = row.classList.contains('is-done');
         row.classList.toggle('is-done', !!g.achieved);
+        if (g.achieved && !wasDone) confetti();
         var bar = row.querySelector('[data-goal-bar]');
         if (bar) { bar.style.width = g.percent + '%'; bar.parentNode.setAttribute('aria-valuenow', g.percent); }
         var sub = row.querySelector('[data-goal-sub]');
