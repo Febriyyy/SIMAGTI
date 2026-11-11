@@ -128,6 +128,10 @@ Prinsipnya: pihak perusahaan sesedikit mungkin direpotkan. Supervisor hanya konf
 - **Rekognisi SKS** MBKM (maksimal 20 SKS) diusulkan mahasiswa, diputuskan kaprodi.
 - **Proyeksi jam MBKM** di dashboard mahasiswa dan alasan "perlu perhatian", serta penanda tujuan silabus yang belum punya task.
 
+### Tambahan November 2026
+- **Kata sandi**: ganti kata sandi sendiri untuk semua peran, atur ulang oleh admin dengan kata sandi sementara yang tampil sekali, dan wajib ganti kata sandi sementara sebelum memakai aplikasi (`users.must_change_password`, middleware `EnsurePasswordChanged`).
+- **Sertifikat KP dengan QR**: halaman cetak A4 (simpan PDF lewat browser) untuk KP yang Diterima, terbit otomatis saat hasil diputuskan, dan halaman verifikasi publik tanpa NIM. QR dibuat di server dengan pustaka gratis `chillerlan/php-qrcode`.
+
 ## 6. Belum dikerjakan
 
 Catatan v8: kuesioner milik dosen diganti standar penilaian kampus yang diatur admin.
@@ -139,7 +143,6 @@ Dari rencana awal:
 
 - Input nilai sidang
 - UI konversi jadi karyawan
-- Sertifikat PDF + QR
 - Dokumen dan template, surat pengantar
 - Lowongan magang, skill, template task (UI)
 - Ekspor Excel/PDF

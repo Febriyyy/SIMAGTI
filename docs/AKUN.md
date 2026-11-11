@@ -7,6 +7,8 @@ Data ini dimuat oleh `php artisan migrate:fresh --seed` (berkas `database/seeder
 
 > Daftar ini sengaja tidak ditampilkan di halaman login. Simpan berkas ini untuk keperluan demo saja.
 
+Setiap akun bisa mengganti kata sandinya lewat menu **Ganti kata sandi**. Jika lupa, admin memakai tombol **Atur ulang sandi** di menu Akun; pemilik akun menerima kata sandi sementara dan wajib menggantinya saat pertama masuk.
+
 Sejak KP v2 (Oktober 2026) peran mentor dan ketua divisi digabung menjadi **Company Supervisor**, dan ada peran **TU Fakultas**.
 Sejak v3 (revisi 27 Oktober 2026) peran **Biro Kerjasama dihapus** (tugasnya pindah ke TU Fakultas) dan ada peran **Admin**.
 Hanya ada satu jenis KP (tidak ada lagi MBKM dan Seminar); silabus, evaluasi bulanan, kuesioner dosen, dan rekognisi SKS dihapus.
