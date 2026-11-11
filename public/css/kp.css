@@ -2928,3 +2928,13 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .gcard.is-done .goal-badge { display: inline-flex; animation: pop-in 420ms var(--ease-out) both; }
 .kcol-count-wide { display: inline-flex; align-items: center; }
 .kcol-note { margin: 0; padding: 0 var(--space-1); color: var(--muted); font-size: var(--text-xs); line-height: var(--leading-normal); }
+
+/* ---------- Warna kolom board per kategori (seperti kolom Goals): To Do biru, In Progress ungu, Done hijau-teal ---------- */
+.kcol { --col: var(--muted); --col-soft: var(--surface-2); --col-line: var(--line); }
+.kcol-cat-todo { --col: var(--acc-blue); --col-soft: var(--pastel-blue); --col-line: var(--pastel-blue-line); }
+.kcol-cat-in_progress { --col: var(--acc-violet); --col-soft: var(--pastel-purple); --col-line: var(--pastel-purple-line); }
+.kcol-cat-done { --col: var(--acc-teal); --col-soft: var(--pastel-green); --col-line: var(--pastel-green-line); }
+.kcol[class*="kcol-cat-"] { background: linear-gradient(180deg, var(--col-soft), var(--surface-2) 140px); border-color: var(--col-line); }
+.kcol-icon, .kcol-goal-icon { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 8px; background: var(--col); color: #fff; }
+.kcol-goals .kcol-goal-icon { background: var(--acc-yellow); }
+.kcol.is-over { border-color: var(--col); box-shadow: inset 0 0 0 1px var(--col); }

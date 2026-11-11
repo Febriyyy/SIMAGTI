@@ -400,3 +400,4 @@ Acuan: tiga referensi papan proyek dan roadmap dari pemilik proyek.
 - Board memenuhi lebar halaman (`.container:has(.board.has-goals)` tanpa batas lebar): kolom Goals 240–280px, kolom task berbagi sisa ruang (min. 240px).
 - Kartu task menampilkan maksimal 4 item checklist dengan kotak centang (hanya baca) dan "+n lainnya"; item dimuat bersama data board (`BoardData`, relasi `checklist`).
 - Tampilan List tetap memakai kartu Goals di samping. Dialog Goal baru dipisah ke `kegiatan/_goal-dialog`.
+- Kolom task berwarna per kategori seperti kolom Goals (gradasi lembut di atas, bingkai, ikon dalam kotak): To Do biru (`.kcol-cat-todo`), In Progress ungu (`.kcol-cat-in_progress`), Done hijau-teal (`.kcol-cat-done`). Kolom buatan mahasiswa ikut warna kategorinya.

@@ -5,9 +5,9 @@
     @endif
     @foreach ($columns as $column)
         @php($items = $grouped[$column->id] ?? collect())
-        <section class="kcol" data-column="{{ $column->id }}">
+        <section class="kcol kcol-cat-{{ $column->category }}" data-column="{{ $column->id }}">
             <header class="kcol-head">
-                <span class="kcol-dot tone-bg-{{ $column->tone() }}"></span>
+                <span class="kcol-icon" aria-hidden="true"><x-ikon :name="['todo' => 'list', 'in_progress' => 'timer', 'done' => 'tick'][$column->category] ?? 'board'" :size="14" /></span>
                 <h3 class="kcol-title">{{ $column->name }}</h3>
                 <span class="kcol-count" data-count>{{ $items->count() }}</span>
             </header>
