@@ -146,7 +146,7 @@
     <div class="gt-legend">
         <span><i class="gt-lg-now"></i> Hari ini</span>
         <span><i class="gt-lg-wk"></i> Akhir pekan</span>
-        <span><i class="gt-lg-fill"></i> Bagian gelap = task selesai</span>
+        <span><i class="gt-lg-fill"></i> Garis bawah = task selesai</span>
         @unless ($compact)<span><i class="gt-lg-late"></i> Lewat waktu, task belum selesai</span>@endunless
     </div>
 </div>

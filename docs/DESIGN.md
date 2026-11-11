@@ -420,3 +420,5 @@ Gantt ringkas di dashboard (terlalu lebar, harus digeser) diganti tampilan mingg
 ### Rencana kegiatan: satu Gantt (November 2026)
 
 Timeline lajur melayang sempat dicoba lalu dihapus atas permintaan pemilik proyek; rencana kegiatan di Timesheet dan halaman pantau kembali memakai satu Gantt tabel (`timesheet/_gantt`, gaya roadmap di Timesheet lewat `.ts-roadmap`). Kartu rencana dan kalender minggu di dashboard memakai partial bersama `timesheet/_plan-cards` dan `timesheet/_week-cal`.
+
+- **Gaya Gantt** (referensi timeline proyek): batang rencana berupa kartu putih dengan garis warna di kiri, progres berupa garis tipis di bawah, dan pil "✓ selesai/total" di luar batang. Batang task berupa blok pastel (selesai = warna penuh bercentang, terlambat = merah muda berbingkai merah). Hari ini = pil biru di kepala tanggal dan garis biru putus-putus. Kolom kiri polos dengan titik warna rencana. Hanya CSS; struktur dan fitur Gantt tetap.
