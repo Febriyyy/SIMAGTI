@@ -168,23 +168,17 @@
                     @endif
                 </section>
 
-                <section class="card">
-                    <div class="card-head">
-                        <div>
-                            <h2 class="card-title">Rencana kegiatan</h2>
-                            <p class="card-sub">Dari timesheet · garis merah hari ini</p>
-                        </div>
-                        <a href="{{ route('timesheet.index') }}" class="btn btn-sm">Timesheet</a>
-                    </div>
-                    @if ($plans->isEmpty())
+                @if ($plans->isEmpty())
+                    <section class="card">
+                        <div class="card-head"><h2 class="card-title">Rencana kegiatan</h2></div>
                         <div class="empty">
                             <strong>Belum ada rencana</strong>
-                            Susun rencana kegiatan per minggu atau per bulan di <a href="{{ route('timesheet.index') }}">Timesheet</a>, lalu buat task di bawahnya.
+                            <a href="{{ route('timesheet.index') }}">Susun rencana</a> dulu, lalu buat task di bawahnya.
                         </div>
-                    @else
-                        @include('timesheet._gantt', ['canEdit' => false, 'compact' => true])
-                    @endif
-                </section>
+                    </section>
+                @else
+                    @include('dashboard._week', ['plans' => $plans, 'week' => $week])
+                @endif
             </div>
 
             <div class="col">

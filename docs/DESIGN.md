@@ -401,3 +401,11 @@ Acuan: tiga referensi papan proyek dan roadmap dari pemilik proyek.
 - Kartu task menampilkan maksimal 4 item checklist dengan kotak centang (hanya baca) dan "+n lainnya"; item dimuat bersama data board (`BoardData`, relasi `checklist`).
 - Tampilan List tetap memakai kartu Goals di samping. Dialog Goal baru dipisah ke `kegiatan/_goal-dialog`.
 - Kolom task berwarna per kategori seperti kolom Goals (gradasi lembut di atas, bingkai, ikon dalam kotak): To Do biru (`.kcol-cat-todo`), In Progress ungu (`.kcol-cat-in_progress`), Done hijau-teal (`.kcol-cat-done`). Kolom buatan mahasiswa ikut warna kategorinya.
+
+### Rencana kegiatan di dashboard mahasiswa: kalender minggu (November 2026)
+
+Gantt ringkas di dashboard (terlalu lebar, harus digeser) diganti tampilan mingguan (acuan: kalender mingguan berwarna):
+
+- **Kartu rencana berwarna** (`.plan-card`): satu kartu per rencana kegiatan dengan warna rencananya, judul (maks. 2 baris), rentang tanggal, bar progres putih, dan jumlah task selesai.
+- **Kalender minggu** (`App\Support\WeekPlanner`, `dashboard/_week`, `.week-cal`): kolom Senin–Minggu tanpa jam (SIMAGTI tidak mencatat jam). Task tampil sebagai blok berwarna rencananya, membentang dari tanggal mulai sampai tenggat dan disusun ke lajur agar tidak bertumpuk. Hari ini disorot, akhir pekan diarsir, task selesai berwarna lembut dan dicoret, task lewat tenggat bercincin merah, ujung blok datar bila task berlanjut ke minggu lain.
+- Navigasi minggu sebelumnya/berikutnya lewat `?minggu=-1` / `?minggu=1`; tombol Timesheet membuka Gantt lengkap (tidak berubah).
