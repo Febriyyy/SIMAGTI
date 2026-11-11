@@ -74,6 +74,8 @@ class Icons
         'swap' => 'swap_horiz',
         'star' => 'star',
         'grade' => 'grading',
+        'lock' => 'lock',
+        'copy' => 'content_copy',
     ];
 
     /** nama di aplikasi => nama Heroicons (outline), cadangan pertama */
@@ -91,6 +93,7 @@ class Icons
         'edit' => 'pencil-square', 'filter' => 'funnel', 'search' => 'magnifying-glass', 'excel' => 'table-cells', 'print' => 'printer',
         'person' => 'user', 'mail' => 'envelope', 'more' => 'ellipsis-horizontal', 'drag' => 'bars-3', 'timer' => 'clock', 'school' => 'academic-cap',
         'bell' => 'bell', 'swap' => 'arrows-right-left', 'star' => 'star', 'grade' => 'clipboard-document-check',
+        'lock' => 'lock-closed', 'copy' => 'clipboard-document',
     ];
 
     /** Cadangan terakhir: garis sederhana (viewBox 24). */
@@ -154,6 +157,8 @@ class Icons
         'swap' => '<path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/>',
         'star' => '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
         'grade' => '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 13l2 2 4-4"/>',
+        'lock' => '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
+        'copy' => '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
     ];
 
     public static function material(string $name): ?string

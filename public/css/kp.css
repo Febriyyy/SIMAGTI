@@ -2074,3 +2074,10 @@ a.mini-step-title:hover { color: var(--primary); }
     .card-head:has(> .period-nav) { flex-wrap: wrap; }
     .card-head > .period-nav { flex: 1 1 100%; }
 }
+
+/* ---------- Ganti kata sandi dan kata sandi sementara ---------- */
+.narrow-card { max-width: 560px; }
+.temp-password { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: var(--text-lg); letter-spacing: .06em; }
+.dt .act form { display: inline-block; }
+.dt .act form + form { margin-left: var(--space-2); }
+.dt .w-action-2 { width: 260px; }

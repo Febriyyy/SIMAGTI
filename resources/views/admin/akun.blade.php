@@ -6,9 +6,23 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Akun</h1>
-            <p class="page-sub">Ubah peran dan aktifkan atau nonaktifkan akun.</p>
+            <p class="page-sub">Ubah peran, aktifkan atau nonaktifkan akun, dan atur ulang kata sandi.</p>
         </div>
     </div>
+
+    @if (session('temporary_password'))
+        @php($temp = session('temporary_password'))
+        <section class="card callout" aria-live="polite">
+            <div class="card-body pt">
+                <label for="temp-password" class="label">Kata sandi sementara untuk {{ $temp['name'] }}</label>
+                <div class="inline-form">
+                    <input id="temp-password" type="text" class="input temp-password" readonly value="{{ $temp['password'] }}" onclick="this.select()">
+                    <button type="button" class="btn" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('temp-password').value); this.textContent='Tersalin'"><x-ikon name="copy" :size="18" /> Salin</button>
+                </div>
+                <p class="hint">Hanya tampil sekali. Berikan kepada pemilik akun ({{ $temp['email'] }}); kata sandi ini wajib diganti saat masuk.</p>
+            </div>
+        </section>
+    @endif
 
     <div class="chip-filters">
         <a href="{{ route('admin.akun', array_filter(['status' => $status, 'cari' => $term ?: null])) }}" @class(['seg-chip', 'is-active' => ! $role])>Semua <span>{{ $counts->sum() }}</span></a>
@@ -41,7 +55,7 @@
                             <th>Nama</th>
                             <th class="w-role">Peran</th>
                             <th class="w-status">Status</th>
-                            <th class="w-action" aria-label="Aksi"></th>
+                            <th class="w-action-2" aria-label="Aksi"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,6 +95,11 @@
                                             @method('PATCH')
                                             <input type="hidden" name="is_active" value="{{ $account->is_active ? 0 : 1 }}">
                                             <button type="submit" class="btn btn-quiet">{{ $account->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.akun.sandi', $account) }}"
+                                              onsubmit="return confirm('Atur ulang kata sandi {{ $account->listName() }}? Akun ini akan keluar dari semua perangkat.')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-quiet">Atur ulang sandi</button>
                                         </form>
                                     @endunless
                                 </td>

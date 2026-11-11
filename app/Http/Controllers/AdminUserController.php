@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\ResetPassword;
 use App\Models\ActivityLog;
 use App\Models\Internship;
 use App\Models\InternshipStaff;
@@ -12,7 +13,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-/** Admin: daftar akun, ubah peran, aktifkan / nonaktifkan akun. */
+/** Admin: daftar akun, ubah peran, aktifkan / nonaktifkan akun, atur ulang kata sandi. */
 class AdminUserController extends Controller
 {
     public function index(Request $request): View
@@ -73,6 +74,16 @@ class AdminUserController extends Controller
         }
 
         return back()->with('status', $messages ? implode(' ', $messages) : 'Tidak ada perubahan.');
+    }
+
+    /** Kata sandi sementara tampil sekali di kartu halaman Akun (lewat flash session), tidak disimpan dalam bentuk asli. */
+    public function resetPassword(Request $request, User $account, ResetPassword $action): RedirectResponse
+    {
+        $temporary = $action->handle($request->user(), $account);
+
+        return back()
+            ->with('status', "Kata sandi {$account->listName()} sudah diatur ulang.")
+            ->with('temporary_password', ['name' => $account->listName(), 'email' => $account->email, 'password' => $temporary]);
     }
 
     /** Peran tidak bisa diubah selama akun masih terhubung dengan data KP sesuai perannya. */

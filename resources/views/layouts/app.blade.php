@@ -47,6 +47,11 @@
 
         <div class="sidebar-foot">
             <span class="nav-label">Akun</span>
+            @php($pwActive = request()->routeIs('akun.sandi'))
+            <a href="{{ route('akun.sandi') }}" class="nav-item {{ $pwActive ? 'is-active' : '' }}" @if ($pwActive) aria-current="page" @endif>
+                <x-ikon name="lock" :fill="$pwActive" :size="20" />
+                <span>Ganti kata sandi</span>
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="nav-item is-danger">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\CompanyController;
 use App\Http\Controllers\Api\V1\InternshipController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Middleware\EnsureActiveAccount;
+use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +23,7 @@ Route::prefix('v1')->middleware(ForceJsonResponse::class)->group(function () {
     Route::get('/certificates/{token}', CertificateVerificationController::class)->middleware('throttle:60,1');
 
     // Perlu token (Authorization: Bearer ...)
-    Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
+    Route::middleware(['auth:sanctum', EnsureActiveAccount::class, EnsurePasswordChanged::class])->group(function () {
         Route::delete('/auth/token', [AuthTokenController::class, 'destroy']);
         Route::get('/me', MeController::class);
 

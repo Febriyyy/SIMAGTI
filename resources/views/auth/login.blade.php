@@ -55,7 +55,7 @@
                     <button type="button" class="signin-link" data-toggle-help aria-expanded="false" aria-controls="signin-help">Lupa kata sandi?</button>
                 </div>
                 <p id="signin-help" class="signin-help" hidden>
-                    Hubungi TU Fakultas atau kaprodi untuk mengatur ulang kata sandi akun Anda.
+                    Hubungi admin SIMAGTI untuk mengatur ulang kata sandi. Anda akan menerima kata sandi sementara yang wajib diganti saat masuk.
                 </p>
 
                 <button type="submit" class="signin-submit">Masuk</button>

@@ -25,6 +25,7 @@ use App\Http\Controllers\KaprodiApprovalController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ResultController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\TaskEvidenceController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Middleware\EnsureActiveAccount;
+use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Support\Facades\Route;
 
@@ -59,8 +61,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
 });
 
-Route::middleware(['auth', EnsureActiveAccount::class])->group(function () {
+Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::class])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    // Ganti kata sandi (semua peran). Akun dengan kata sandi sementara diarahkan ke sini terus.
+    Route::get('/akun/sandi', [PasswordController::class, 'edit'])->name('akun.sandi');
+    Route::put('/akun/sandi', [PasswordController::class, 'update'])->middleware('throttle:10,1')->name('akun.sandi.update');
+
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // ---------- Task (dilihat mahasiswa, Company Supervisor, dosen pembimbing; dicek WeeklyTaskPolicy) ----------
@@ -237,6 +244,8 @@ Route::middleware(['auth', EnsureActiveAccount::class])->group(function () {
     Route::middleware(EnsureRole::class.':admin')->prefix('admin')->group(function () {
         Route::get('/akun', [AdminUserController::class, 'index'])->name('admin.akun');
         Route::patch('/akun/{account}', [AdminUserController::class, 'update'])->whereNumber('account')->name('admin.akun.update');
+        Route::post('/akun/{account}/sandi', [AdminUserController::class, 'resetPassword'])
+            ->whereNumber('account')->middleware('throttle:20,1')->name('admin.akun.sandi');
         Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
 
         // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
