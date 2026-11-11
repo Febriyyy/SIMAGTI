@@ -432,3 +432,5 @@ Gantt rencana kegiatan memakai baris ringkas (rencana 44px, task 34px). Batang r
 Kartu rencana kini terang dengan titik warna rencana dan label status: Berjalan (disorot warna rencana), Selesai, Terlambat, Sudah lewat, atau Akan datang; rencana yang sudah lewat atau selesai diredam. Progres ditulis "x/y task", atau "Belum ada task". Kalender minggu diberi judul "Task minggu ini" dengan jumlahnya; tiap blok task menyebut nama rencananya, judul task, dan keadaannya (Selesai, Terlambat, atau tanggal tenggat), dengan garis warna rencana di kiri.
 
 Kartu rencana kemudian dipindah dari dashboard ke tab Rencana di Timesheet, di atas Gantt (sekaligus keterangan warna batang Gantt; pemilik bisa klik kartu untuk mengubah rencana). Dashboard tinggal menampilkan kalender "Jadwal task" dengan jumlah task minggu yang dipilih.
+
+Atas permintaan pemilik proyek, kartu rencana di Timesheet kembali ke gaya awal (blok warna pekat, teks putih, lingkaran dekoratif); label status tetap ada sebagai pil putih transparan (putih pekat untuk Berjalan dan Terlambat).
