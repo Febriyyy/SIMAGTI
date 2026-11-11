@@ -3086,62 +3086,93 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 }
 
 /* =====================================================================
-   Gaya Gantt (referensi timeline proyek, November 2026) — hanya tampilan, struktur tetap.
-   Batang rencana = kartu putih dengan garis warna di kiri dan progres di luar batang;
-   batang task = blok pastel, bagian pekat = selesai; hari ini = pil biru + garis putus-putus.
+   Gantt rapi (November 2026) — hanya tampilan, struktur tetap.
+   Baris ringkas; batang rencana = pil warna muda yang terisi warna pekat sesuai task selesai,
+   judul + angka di dalam pil; task = garis pastel tipis; kolom kiri satu baris, sejajar.
    Berlaku di Timesheet dan halaman pantau.
    ===================================================================== */
-.gt { --row: 56px; --row-task: 42px; }
+/* Warna rencana dibuat lebih berjauhan: toska dan hijau sebelumnya hampir sama */
+:root { --gc-teal: #0d9488; --gc-green: #65a30d; --gc-amber: #d97706; }
 
-/* Kolom kiri polos */
-.gt .gt-side { background: var(--surface); }
-.gt .gt-plan .gt-side { box-shadow: none; background: var(--surface); }
-.gt .gt-plan .gt-title { color: var(--text); font-size: var(--text-sm); font-weight: 700; }
-.gt .gt-task .gt-title { color: var(--gray); font-weight: 500; }
-.gt .gt-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 20%, transparent); }
-.gt .gt-row:hover .gt-side, .gt .gt-row:hover .gt-track { background: var(--surface-2); }
-.gt .gt-plan .gt-track { background: none; }
-.gt .gt-row + .gt-row { border-top: 1px solid var(--line); }
+.gt[data-gantt] { --row: 44px; --row-task: 34px; }
+.ts-roadmap .gt[data-gantt] { --side: 300px; }
 
-/* Kepala: tanggal kecil, hari ini = pil biru */
-.gt .gt-head, .gt .gt-head .gt-side { background: var(--surface); }
-.gt .gt-day b { font-size: var(--text-xs); font-weight: 600; color: var(--gray); }
-.gt .gt-day.is-today b { min-width: 26px; padding: 3px 6px; border-radius: 7px; background: var(--acc-blue); color: #fff; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35); }
-.gt .gt-months b { color: var(--text); font-weight: 650; }
+/* Garis: hanya pemisah antar rencana, task tanpa garis */
+.gt[data-gantt] .gt-row + .gt-row { border-top: 0; }
+.gt[data-gantt] .gt-plan:not(:first-child) { border-top: 1px solid var(--line); }
+.gt[data-gantt] .gt-plan .gt-track, .gt[data-gantt] .gt-track { background: none; }
+.gt[data-gantt] .gt-row:hover .gt-side, .gt[data-gantt] .gt-row:hover .gt-track { background: var(--surface-2); }
 
-/* Garis hari ini: biru putus-putus, tanpa label (pil ada di kepala) */
-.gt .gt-now { width: 2px; background: repeating-linear-gradient(to bottom, var(--acc-blue) 0 5px, transparent 5px 10px); box-shadow: none; }
-.gt .gt-now span, .gt .gt-now::before { display: none; }
+/* Kolom kiri: satu baris judul, ikon dan teks lurus di tengah baris */
+.gt[data-gantt] .gt-side { padding-top: 0; padding-bottom: 0; align-items: center; column-gap: var(--space-2); background: var(--surface); box-shadow: none; }
+.gt[data-gantt]:not([data-view="list"]) .gt-side .gt-title { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gt[data-gantt]:not([data-view="list"]) .gt-sub { display: none; }
+.gt[data-gantt] .gt-c-lead { display: grid; place-items: center; width: 24px; height: 24px; }
+.gt[data-gantt] .gt-plan .gt-title { color: var(--text); font-size: var(--text-sm); font-weight: 650; }
+.gt[data-gantt] .gt-task .gt-c-name { padding-left: 0; }
+.gt[data-gantt] .gt-task .gt-title { color: var(--gray); font-size: var(--text-sm); font-weight: 500; }
+.gt[data-gantt] .gt-task.is-done .gt-title { color: var(--muted); }
+.gt[data-gantt] .gt-dot { width: 10px; height: 10px; margin: 0; border-radius: 50%; background: var(--c); box-shadow: none; }
+.gt[data-gantt] .gt-caret { width: 24px; height: 24px; color: var(--c); }
+.gt[data-gantt] .gt-check { width: 14px; height: 14px; margin: 0; }
+.gt[data-gantt] .gt-c-act .btn { width: 28px; height: 28px; min-height: 28px; }
+/* Task menjorok sedikit dengan garis panduan warna rencana */
+.gt[data-gantt] .gt-task .gt-c-lead { position: relative; }
+.gt[data-gantt] .gt-task .gt-c-lead::before { content: ''; position: absolute; top: -6px; bottom: -6px; left: 50%; width: 1.5px; background: color-mix(in srgb, var(--c) 30%, transparent); transform: translateX(-50%); }
+.gt[data-gantt] .gt-task .gt-check { position: relative; background: var(--surface); }
+.gt[data-gantt] .gt-task .gt-check.is-done { background: var(--c); }
 
-/* Batang rencana: kartu putih, garis warna kiri, progres tipis di bawah, angka di luar batang */
-.gt .gt-plan .gt-bar {
-    height: 34px; padding: 0 var(--space-3) 0 var(--space-4); overflow: visible;
-    border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text);
-    font-size: var(--text-sm); font-weight: 600;
-    box-shadow: inset 4px 0 0 var(--c), 0 1px 2px rgba(15, 27, 25, 0.05), 0 6px 14px rgba(15, 27, 25, 0.06);
+/* Kepala */
+.gt[data-gantt] .gt-head, .gt[data-gantt] .gt-head .gt-side { background: var(--surface); }
+.gt[data-gantt] .gt-day.is-today b { min-width: 24px; padding: 3px 6px; border-radius: var(--radius-pill); background: var(--acc-blue); color: #fff; box-shadow: none; }
+
+/* Garis hari ini: tipis, biru, utuh */
+.gt[data-gantt] .gt-now { width: 1.5px; background: var(--acc-blue); opacity: .7; box-shadow: none; }
+.gt[data-gantt] .gt-now span, .gt[data-gantt] .gt-now::before { display: none; }
+
+/* Batang rencana: pil progres */
+.gt[data-gantt] .gt-plan .gt-bar {
+    height: 26px; padding: 0 var(--space-3); gap: var(--space-2); overflow: hidden;
+    border: 0; border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--c) 16%, var(--surface));
+    color: color-mix(in srgb, var(--c) 72%, #000);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 28%, transparent);
+    font-size: var(--text-xs); font-weight: 650;
 }
-.gt .gt-plan .gt-bar:hover { filter: none; border-color: color-mix(in srgb, var(--c) 45%, var(--line)); box-shadow: inset 4px 0 0 var(--c), 0 8px 20px rgba(15, 27, 25, 0.1); }
-.gt .gt-plan .gt-label { overflow: hidden; text-overflow: ellipsis; }
-.gt .gt-plan .gt-fill { inset: auto auto 0 4px; height: 3px; max-width: calc(100% - 4px); border-radius: 0 0 0 2px; background: var(--c); opacity: 0.7; }
-.gt .gt-plan .gt-bar.is-empty { border-style: dashed; border-color: color-mix(in srgb, var(--c) 45%, var(--line)); background: var(--surface); color: var(--gray); box-shadow: inset 4px 0 0 color-mix(in srgb, var(--c) 45%, transparent); background-image: none; }
-.gt .gt-plan .gt-bar.is-late { border-color: var(--red); box-shadow: inset 4px 0 0 var(--red), 0 0 0 3px var(--red-soft); }
-.gt .gt-plan .gt-frac {
-    position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); margin: 0;
-    display: inline-flex; align-items: center; gap: 4px; padding: 2px var(--space-2); border-radius: var(--radius-pill);
-    background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: var(--text-2xs); font-weight: 700; white-space: nowrap;
+.gt[data-gantt] .gt-plan .gt-bar:hover { filter: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent), 0 2px 8px color-mix(in srgb, var(--c) 22%, transparent); }
+.gt[data-gantt] .gt-plan .gt-fill { inset: 0 auto 0 0; height: auto; max-width: 100%; border-radius: inherit; background: color-mix(in srgb, var(--c) 42%, var(--surface)); opacity: 1; }
+.gt[data-gantt] .gt-plan .gt-label { position: sticky; z-index: 1; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.gt[data-gantt] .gt-plan .gt-frac {
+    position: relative; z-index: 1; left: auto; top: auto; transform: none; flex: none; margin: 0 0 0 auto;
+    padding: 0; background: none; box-shadow: none; color: inherit; font-size: var(--text-2xs); font-weight: 700; font-variant-numeric: tabular-nums; opacity: .85;
 }
-.gt .gt-plan .gt-frac::before { content: '\2713'; color: var(--c); font-weight: 800; }
+.gt[data-gantt] .gt-plan .gt-frac::before { content: none; }
+.gt[data-gantt][data-zoom="fit"] .gt-plan .gt-frac { display: inline; }
+/* Semua task selesai: pil penuh warna pekat */
+.gt[data-gantt] .gt-plan .gt-bar.is-done { background: var(--c); color: #fff; box-shadow: none; }
+.gt[data-gantt] .gt-plan .gt-bar.is-done .gt-fill { display: none; }
+/* Belum ada task: garis putus-putus */
+.gt[data-gantt] .gt-plan .gt-bar.is-empty { background: var(--surface); background-image: none; color: var(--gray); box-shadow: none; outline: 1.5px dashed color-mix(in srgb, var(--c) 50%, var(--line)); outline-offset: -1.5px; }
+/* Terlambat: hanya bingkai merah, warna rencana tetap */
+.gt[data-gantt] .gt-plan .gt-bar.is-late { box-shadow: inset 0 0 0 1.5px var(--red); }
+.gt[data-gantt] .gt-plan .gt-bar.is-late .gt-frac { color: var(--red); opacity: 1; }
 
-/* Batang task: blok pastel, selesai = warna penuh */
-.gt .gt-bar-task {
-    height: 26px; padding: 0 var(--space-2); border-radius: 7px;
-    background: color-mix(in srgb, var(--c) 16%, var(--surface)); color: color-mix(in srgb, var(--c) 78%, #000);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent); font-size: var(--text-xs); font-weight: 600;
+/* Batang task: garis pastel tipis */
+.gt[data-gantt] .gt-bar-task {
+    height: 18px; padding: 0 var(--space-2); gap: 4px; border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--c) 14%, var(--surface)); color: color-mix(in srgb, var(--c) 70%, #000);
+    box-shadow: none; font-size: var(--text-2xs); font-weight: 600;
 }
-.gt .gt-bar-task.is-done { background: var(--c); color: #fff; box-shadow: none; }
-.gt .gt-bar-task.is-late { background: var(--red-soft); color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
-.gt .gt-bar-task:hover { filter: brightness(0.98); transform: translateY(-50%) scale(1.02); }
+.gt[data-gantt] .gt-bar-task.is-done { background: color-mix(in srgb, var(--c) 38%, var(--surface)); color: color-mix(in srgb, var(--c) 80%, #000); }
+.gt[data-gantt] .gt-bar-task.is-late { background: var(--red-soft); color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+.gt[data-gantt] .gt-bar-task:hover { filter: none; transform: translateY(-50%); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 50%, transparent); }
 
-/* Legenda menyesuaikan gaya baru */
-.gt .gt-lg-now { background: repeating-linear-gradient(to bottom, var(--acc-blue) 0 3px, transparent 3px 6px) !important; }
-.gt .gt-lg-fill { background: linear-gradient(to right, var(--surface), var(--surface)); box-shadow: inset 3px 0 0 var(--gc-blue), inset 0 -2px 0 var(--gc-blue), inset 0 0 0 1px var(--line); }
+/* Legenda */
+.gt[data-gantt] .gt-lg-now { width: 2px !important; background: var(--acc-blue) !important; }
+.gt[data-gantt] .gt-lg-fill { width: 22px !important; border-radius: var(--radius-pill); background: linear-gradient(to right, color-mix(in srgb, var(--gc-blue) 42%, #fff) 60%, color-mix(in srgb, var(--gc-blue) 16%, #fff) 60%); box-shadow: none; }
+.gt[data-gantt] .gt-lg-late { border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1.5px var(--red); }
+
+@media (max-width: 700px) {
+    .gt[data-gantt], .ts-roadmap .gt[data-gantt] { --side: 150px; --row: 44px; --row-task: 34px; }
+    .gt[data-gantt] .gt-plan .gt-frac { display: none; }
+}

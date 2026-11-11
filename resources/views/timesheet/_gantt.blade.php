@@ -73,7 +73,7 @@
                         <div class="gt-side">
                             <span class="gt-c-lead">
                                 @if ($hasTasks)
-                                    <button type="button" class="gt-caret" data-gt-toggle="{{ $plan->id }}" aria-expanded="true" aria-label="Lipat task {{ $plan->title }}"><x-ikon name="expand" :size="16" /></button>
+                                    <button type="button" class="gt-caret" data-gt-toggle="{{ $plan->id }}" aria-expanded="false" aria-label="Buka task {{ $plan->title }}"><x-ikon name="expand" :size="16" /></button>
                                 @else
                                     <span class="gt-dot" aria-hidden="true"></span>
                                 @endif
@@ -112,7 +112,7 @@
 
                     @foreach ($row['tasks'] as $t)
                         @php($task = $t['task'])
-                        <div @class(['gt-row', 'gt-task', 'is-done' => $t['done']]) data-gt-parent="{{ $plan->id }}" style="--c: var(--gc-{{ $row['color'] }})">
+                        <div @class(['gt-row', 'gt-task', 'is-hidden', 'is-done' => $t['done']]) data-gt-parent="{{ $plan->id }}" style="--c: var(--gc-{{ $row['color'] }})">
                             <div class="gt-side">
                                 <span class="gt-c-lead">
                                     <span @class(['gt-check', 'is-done' => $t['done']]) aria-label="{{ $t['done'] ? 'Selesai' : 'Belum selesai' }}">@if ($t['done'])<x-ikon name="tick" :size="12" />@endif</span>
@@ -146,7 +146,7 @@
     <div class="gt-legend">
         <span><i class="gt-lg-now"></i> Hari ini</span>
         <span><i class="gt-lg-wk"></i> Akhir pekan</span>
-        <span><i class="gt-lg-fill"></i> Garis bawah = task selesai</span>
+        <span><i class="gt-lg-fill"></i> Bagian pekat = task selesai</span>
         @unless ($compact)<span><i class="gt-lg-late"></i> Lewat waktu, task belum selesai</span>@endunless
     </div>
 </div>

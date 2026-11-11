@@ -404,8 +404,9 @@
         var scroll = gt.querySelector('[data-gt-scroll]');
         var compact = gt.classList.contains('gt-compact');
         var days = parseInt(getComputedStyle(gt).getPropertyValue('--days'), 10) || 1;
-        var collapsed = {};
-        try { collapsed = JSON.parse(load('gt.collapsed', '{}')) || {}; } catch (e) { collapsed = {}; }
+        // Task terlipat bawaan; yang diingat adalah rencana yang dibuka pengguna.
+        var expanded = {};
+        try { expanded = JSON.parse(load('gt.expanded', '{}')) || {}; } catch (e) { expanded = {}; }
 
         function sideWidth() {
             var side = gt.querySelector('.gt-head .gt-side');
@@ -472,12 +473,12 @@
                 var id = t.getAttribute('data-gt-toggle');
                 var open = t.getAttribute('aria-expanded') !== 'true';
                 toggle(id, open);
-                if (open) delete collapsed[id]; else collapsed[id] = 1;
-                save('gt.collapsed', JSON.stringify(collapsed));
+                if (open) expanded[id] = 1; else delete expanded[id];
+                save('gt.expanded', JSON.stringify(expanded));
             }
         });
 
-        Object.keys(collapsed).forEach(function (id) { toggle(id, false); });
+        Object.keys(expanded).forEach(function (id) { if (gt.querySelector('[data-gt-toggle="' + id + '"]')) toggle(id, true); });
         if (compact) { setZoom('week', false); }
         else { setView(load('gt.view', 'gantt'), false); setZoom(load('gt.zoom', 'week'), false); }
 
