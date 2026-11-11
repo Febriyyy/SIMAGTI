@@ -8,7 +8,8 @@
         <div class="min0">
             <a href="{{ route('pantau.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke daftar mahasiswa</a>
             <h1 class="page-title">{{ $student->name }}</h1>
-            <p class="page-sub">{{ $student->nim }} · {{ $internship->placeName() }}@if ($internship->placeDetail()) · {{ $internship->placeDetail() }}@endif</p>
+            {{-- Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi dan posisi --}}
+            <p class="page-sub">{{ collect([$student->nim, auth()->user()->role !== 'supervisor' ? $internship->placeName() : null, $internship->placeDetail()])->filter()->implode(' · ') }}</p>
         </div>
         <details class="menu">
             <summary class="btn"><x-ikon name="download" :size="18" /> Unduh</summary>

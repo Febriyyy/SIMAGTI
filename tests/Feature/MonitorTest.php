@@ -43,12 +43,14 @@ class MonitorTest extends TestCase
             ->assertSee('Divisi Engineering')
             ->assertDontSee('PT Nusantara Digital'); // supervisor sudah tahu perusahaannya sendiri: cukup divisi
 
-        // Identitas akademik lengkap ada di halaman Buka
+        // Identitas akademik lengkap ada di halaman Buka; supervisor tetap tidak melihat nama perusahaannya sendiri
         $this->get('/pantau/'.$this->internshipOf('mahasiswa@kp.test')->id)->assertOk()
-            ->assertSee('Teknik Informatika')->assertSee('Angkatan');
+            ->assertSee('Teknik Informatika')->assertSee('Angkatan')
+            ->assertSee('Divisi Engineering')->assertDontSee('PT Nusantara Digital');
 
         // Dosen pembimbing tetap melihat nama perusahaan
         $this->actingAs($this->user('dospem@kp.test'))->get('/pantau')->assertOk()->assertSee('PT Nusantara Digital');
+        $this->get('/pantau/'.$this->internshipOf('mahasiswa@kp.test')->id)->assertOk()->assertSee('PT Nusantara Digital');
     }
 
     public function test_kloter_dipisah_berdasarkan_periode_dalam_divisi_yang_sama(): void
