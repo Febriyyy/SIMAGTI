@@ -3350,3 +3350,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .page-head .info-tip-text { left: 0; top: calc(100% + 8px); transform: none; max-width: min(320px, 100%); }
 .page-head-main .info-tip-text { left: 68px; max-width: min(320px, calc(100% - 68px)); }
 @media (max-width: 700px) { .page-head-main .info-tip-text { left: 0; max-width: 100%; } }
+/* Isian tidak boleh melewati kolomnya (isian tanggal punya lebar bawaan ±150px) */
+.field > .input, .field > .select, .field > input, .field > select { min-width: 0; max-width: 100%; }
+/* Catat bimbingan di kolom samping: kolom Tanggal lebih lebar dari Cara agar tanggal + ikon kalender muat */
+.gform-aside .gform-row { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); column-gap: var(--space-3); }

@@ -447,3 +447,5 @@ Acuan: referensi Dribbble di brief (kartu angka terpisah, kisi kartu rapi). Jadw
 - **Kartu rencana** di dashboard mahasiswa bisa diklik: membuka Kegiatan yang tersaring ke rencana itu, dengan panah di pojok kartu.
 - **Halaman galat** 403, 404, 419, 429, 500, 503 (`errors/_page`): logo, kode besar di kartu banner, kalimat singkat, tombol Ke dashboard dan Kembali.
 - Kolom aksi tabel Akun dilebarkan agar tombol tidak menempel ke tepi kartu; riwayat Pengajuan Perubahan yang kosong memakai keadaan kosong bergambar.
+
+- Isian di dalam `.field` tidak boleh melewati kolomnya (`min-width: 0; max-width: 100%`). Di formulir Catat bimbingan (kolom samping) kolom Tanggal dibuat lebih lebar dari kolom Cara agar tanggal dan ikon kalender muat tanpa menempel.
