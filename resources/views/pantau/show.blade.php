@@ -4,45 +4,46 @@
 
 @section('content')
     @php($student = $internship->student)
-    <div class="page-head">
-        <div class="min0">
-            <a href="{{ route('pantau.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke daftar mahasiswa</a>
-            <h1 class="page-title">{{ $student->name }}</h1>
-            {{-- Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi dan posisi --}}
-            <p class="page-sub">{{ collect([$student->nim, auth()->user()->role !== 'supervisor' ? $internship->placeName() : null, $internship->placeDetail()])->filter()->implode(' · ') }}</p>
-        </div>
-        <details class="menu">
-            <summary class="btn"><x-ikon name="download" :size="18" /> Unduh</summary>
-            <div class="menu-panel">
-                <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
-                <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
-                <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
-            </div>
-        </details>
-    </div>
-
-    {{-- Profil ringkas (acuan kartu FlowMail di brief), sedikit kata: sampul gradasi, avatar menimpa tepi sampul,
-         nama + satu baris identitas, pil info berikon, empat kotak angka berikon. Kampus, fakultas, semester di tooltip. --}}
+    {{-- Kepala halaman + profil dalam satu kartu (acuan kartu FlowMail di brief), sedikit kata:
+         sampul gradasi berisi tautan kembali, status, dan Unduh; avatar menimpa tepi sampul; nama sebagai judul halaman;
+         pil info berikon; empat kotak angka berikon. Kampus, fakultas, semester di tooltip nama. --}}
     <?php
         $id = $student->academicIdentity();
         $taskPct = $stats['tasks'] > 0 ? (int) round($stats['done'] / $stats['tasks'] * 100) : 0;
+        // Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi
+        $division = $internship->division?->name ? 'Divisi '.$internship->division->name : null;
+        $place = auth()->user()->role === 'supervisor' ? $division : collect([$internship->placeName(), $division])->filter()->implode(' · ');
     ?>
     <div class="profile-strip card pcard">
-        <div class="pcard-cover" aria-hidden="true"></div>
-        <x-chip :tone="$internship->statusTone()" class="pcard-status">{{ $internship->statusLabel() }}</x-chip>
+        <div class="pcard-cover">
+            <a href="{{ route('pantau.index') }}" class="pcard-back"><x-ikon name="back" :size="16" /> Kembali ke daftar mahasiswa</a>
+            <div class="pcard-actions">
+                <x-chip :tone="$internship->statusTone()" class="pcard-status">{{ $internship->statusLabel() }}</x-chip>
+                <details class="menu">
+                    <summary class="btn btn-sm pcard-glass"><x-ikon name="download" :size="16" /> Unduh</summary>
+                    <div class="menu-panel">
+                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
+                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
+                        <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
+                    </div>
+                </details>
+            </div>
+        </div>
         <div class="pcard-head">
             <x-avatar :user="$student" class="pcard-avatar" />
             <div class="min0" title="{{ $id['university'] }} · {{ $id['faculty'] }}{{ $id['semester'] ? ' · Semester '.$id['semester'] : '' }}">
-                <div class="pcard-name">{{ $student->name }}</div>
+                <h1 class="pcard-name">{{ $student->name }}</h1>
                 <div class="pcard-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</div>
             </div>
+            {{-- Info tempat, posisi, periode, dosen: kisi 2x2 berikon (tanpa pil), label di tooltip --}}
+            <ul class="pcard-meta">
+                @if ($place)<li title="Tempat magang"><span class="pm-icon"><x-ikon name="building" :size="15" /></span><span class="pm-text">{{ $place }}</span></li>@endif
+                <li title="Posisi"><span class="pm-icon"><x-ikon name="person" :size="15" /></span><span class="pm-text">{{ $internship->position ?? 'Posisi belum diisi' }}</span></li>
+                <li title="Periode KP"><span class="pm-icon"><x-ikon name="calendar" :size="15" /></span><span class="pm-text">{{ $internship->periodLabel() }}</span></li>
+                <li title="{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}"><span class="pm-icon"><x-ikon name="school" :size="15" /></span><span class="pm-text">{{ $internship->lecturer?->listName() ?? 'Dosen belum ditunjuk' }}</span></li>
+            </ul>
         </div>
 
-        <ul class="pcard-meta">
-            <li title="Posisi"><x-ikon name="person" :size="15" /> {{ $internship->position ?? 'Posisi belum diisi' }}</li>
-            <li title="Periode KP"><x-ikon name="calendar" :size="15" /> {{ $internship->periodLabel() }}</li>
-            <li title="{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}"><x-ikon name="school" :size="15" /> {{ $internship->lecturer?->listName() ?? 'Dosen belum ditunjuk' }}</li>
-        </ul>
 
         <dl class="pcard-wells">
             <div class="pw-teal">

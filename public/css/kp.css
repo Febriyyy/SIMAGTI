@@ -3694,3 +3694,64 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 @media (prefers-reduced-motion: reduce) { .pcard-wells > div:hover { transform: none; } }
 @media (max-width: 700px) { .pcard-meta { flex-direction: row; flex-wrap: wrap; } }
 @media (max-width: 700px) { .pcard-head { flex-direction: column; align-items: flex-start; gap: var(--space-3); } .pcard-head > .min0 { padding-bottom: 0; } }
+
+/* Kepala halaman detail pantau digabung ke kartu profil: sampul = banner berisi tautan kembali, status, Unduh.
+   Kartu tidak memotong isi (menu Unduh), sudut atas sampul ikut membulat. */
+.profile-strip.pcard { overflow: visible; }
+.pcard-cover {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3);
+    height: 116px; padding: var(--space-4) var(--card-x); border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+}
+.pcard-back { display: inline-flex; align-items: center; gap: 6px; padding: 6px var(--space-3) 6px var(--space-2); border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.6); color: var(--gray); font-size: var(--text-sm); font-weight: 550; backdrop-filter: blur(6px); }
+.pcard-back:hover { background: rgba(255, 255, 255, 0.9); color: var(--text); text-decoration: none; }
+.pcard-actions { display: flex; align-items: center; gap: var(--space-2); }
+.pcard-actions .pcard-status.chip { position: static; }
+.pcard-glass.btn { background: rgba(255, 255, 255, 0.78); border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 2px 8px rgba(15, 27, 25, 0.06); backdrop-filter: blur(6px); }
+.pcard-glass.btn:hover { background: #fff; }
+.pcard-head { margin-top: -48px; }
+h1.pcard-name { margin: 0; font-size: 26px; line-height: 1.2; letter-spacing: -0.025em; }
+
+@media (max-width: 700px) {
+    .pcard-cover { height: 104px; padding: var(--space-3) var(--space-4); }
+    .pcard-back { font-size: 0; gap: 0; padding: 8px; }
+    .pcard-back .ikon { --ikon: 18px; }
+    .pcard-head { margin-top: -36px; }
+    h1.pcard-name { font-size: var(--text-xl); }
+}
+
+/* Kepala kartu profil: kiri avatar + nama + identitas, kanan kisi info 2x2 berikon (tanpa pil) dipisah garis tipis */
+.pcard-head { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.15fr); align-items: end; column-gap: var(--space-5); row-gap: var(--space-3); }
+.pcard-head > .min0 { align-self: end; padding-bottom: 6px; }
+h1.pcard-name { font-size: 28px; }
+.pcard-sub { margin-top: 6px; }
+.pcard-head .pcard-meta {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-5); align-self: end;
+    margin: 0; padding: 0 0 4px var(--space-5); border: 0; border-left: 1px solid var(--line); list-style: none;
+}
+.pcard-head .pcard-meta li { display: flex; align-items: center; gap: var(--space-2); min-width: 0; padding: 0; border-radius: 0; background: none; box-shadow: none; color: var(--text); font-size: var(--text-sm); font-weight: 550; }
+.pm-icon { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 9px; background: var(--primary-tint); box-shadow: inset 0 0 0 1px var(--primary-soft); color: var(--primary); }
+.pm-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 1100px) {
+    .pcard-head { grid-template-columns: auto minmax(0, 1fr); }
+    .pcard-head .pcard-meta { grid-column: 1 / -1; padding: var(--space-4) 0 0; border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (max-width: 700px) {
+    .pcard-head { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: -36px; }
+    .pcard-head > .min0 { padding-bottom: 0; }
+    h1.pcard-name { font-size: var(--text-xl); }
+    .pcard-head .pcard-meta { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+    .pm-text { white-space: normal; }
+}
+/* Hanya avatar yang menimpa sampul; nama dan info mulai tepat di bawah sampul */
+.pcard-head { margin-top: 0; padding-top: var(--space-4); align-items: start; }
+.pcard-head > .min0 { align-self: start; padding-bottom: 0; }
+.pcard-head .pcard-meta { align-self: start; padding-top: 2px; }
+.pcard-head .pcard-avatar.avatar { margin-top: calc(-48px - var(--space-4)); }
+@media (max-width: 1100px) { .pcard-head .pcard-meta { padding-top: var(--space-4); } }
+@media (max-width: 700px) { .pcard-head { padding-top: 0; } .pcard-head .pcard-avatar.avatar { margin-top: -36px; } }
+.pcard-head { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.6fr); }
+.pm-text { white-space: normal; overflow: visible; line-height: 1.3; }
+.pcard-head .pcard-meta li { align-items: center; }
+@media (max-width: 1100px) { .pcard-head { grid-template-columns: auto minmax(0, 1fr); } }
+@media (max-width: 700px) { .pcard-head { grid-template-columns: minmax(0, 1fr); } }
