@@ -4,65 +4,64 @@
 
 @section('content')
     @php($student = $internship->student)
-    {{-- Kepala halaman + profil dalam satu kartu (acuan kartu FlowMail di brief), sedikit kata:
-         sampul gradasi berisi tautan kembali, status, dan Unduh; avatar menimpa tepi sampul; nama sebagai judul halaman;
-         pil info berikon; empat kotak angka berikon. Kampus, fakultas, semester di tooltip nama. --}}
+    {{-- Kepala halaman + profil dalam satu kartu tiga lapis (dipilih pemilik proyek):
+         1) avatar, nama (judul halaman), status, Unduh; 2) empat kolom info berlabel; 3) empat kotak angka.
+         Kampus, fakultas, semester ada di tooltip nama. --}}
     <?php
         $id = $student->academicIdentity();
         $taskPct = $stats['tasks'] > 0 ? (int) round($stats['done'] / $stats['tasks'] * 100) : 0;
-        // Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi
         $division = $internship->division?->name ? 'Divisi '.$internship->division->name : null;
-        $place = auth()->user()->role === 'supervisor' ? $division : collect([$internship->placeName(), $division])->filter()->implode(' · ');
+        // Company Supervisor sudah tahu perusahaannya sendiri: cukup divisi
+        $isSupervisor = auth()->user()->role === 'supervisor';
     ?>
-    <div class="profile-strip card pcard">
-        <div class="pcard-cover">
-            <a href="{{ route('pantau.index') }}" class="pcard-back"><x-ikon name="back" :size="16" /> Kembali ke daftar mahasiswa</a>
-            <div class="pcard-actions">
-                <x-chip :tone="$internship->statusTone()" class="pcard-status">{{ $internship->statusLabel() }}</x-chip>
-                <details class="menu">
-                    <summary class="btn btn-sm pcard-glass"><x-ikon name="download" :size="16" /> Unduh</summary>
-                    <div class="menu-panel">
-                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
-                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
-                        <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
-                    </div>
-                </details>
+    <a href="{{ route('pantau.index') }}" class="prof-back"><x-ikon name="back" :size="16" /> Kembali ke daftar mahasiswa</a>
+    <div class="card prof">
+        {{-- Bagian atas bergradasi hijau merek (gaya banner dashboard) berisi nama dan info --}}
+        <div class="prof-top">
+        <svg class="prof-art" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
+        <svg class="prof-art prof-art-2" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><path d="M50 0C53 34 66 47 100 50 66 53 53 66 50 100 47 66 34 53 0 50 34 47 47 34 50 0z"/></svg>
+        <div class="prof-head">
+            <x-avatar :user="$student" class="prof-avatar" />
+            <div class="prof-who" title="{{ $id['university'] }} · {{ $id['faculty'] }}{{ $id['semester'] ? ' · Semester '.$id['semester'] : '' }}">
+                <div class="prof-title">
+                    <h1 class="prof-name">{{ $student->name }}</h1>
+                    <x-chip :tone="$internship->statusTone()">{{ $internship->statusLabel() }}</x-chip>
+                </div>
+                <div class="prof-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</div>
             </div>
-        </div>
-        <div class="pcard-head">
-            <x-avatar :user="$student" class="pcard-avatar" />
-            <div class="min0" title="{{ $id['university'] }} · {{ $id['faculty'] }}{{ $id['semester'] ? ' · Semester '.$id['semester'] : '' }}">
-                <h1 class="pcard-name">{{ $student->name }}</h1>
-                <div class="pcard-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</div>
-            </div>
-            {{-- Info tempat, posisi, periode, dosen: kisi 2x2 berikon (tanpa pil), label di tooltip --}}
-            <ul class="pcard-meta">
-                @if ($place)<li title="Tempat magang"><span class="pm-icon"><x-ikon name="building" :size="15" /></span><span class="pm-text">{{ $place }}</span></li>@endif
-                <li title="Posisi"><span class="pm-icon"><x-ikon name="person" :size="15" /></span><span class="pm-text">{{ $internship->position ?? 'Posisi belum diisi' }}</span></li>
-                <li title="Periode KP"><span class="pm-icon"><x-ikon name="calendar" :size="15" /></span><span class="pm-text">{{ $internship->periodLabel() }}</span></li>
-                <li title="{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}"><span class="pm-icon"><x-ikon name="school" :size="15" /></span><span class="pm-text">{{ $internship->lecturer?->listName() ?? 'Dosen belum ditunjuk' }}</span></li>
-            </ul>
+            <details class="menu prof-menu">
+                <summary class="btn prof-glass"><x-ikon name="download" :size="18" /> Unduh</summary>
+                <div class="menu-panel">
+                    <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
+                    <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
+                    <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
+                </div>
+            </details>
         </div>
 
+        <dl class="prof-info">
+            <div>
+                <dt>{{ $isSupervisor ? 'Divisi' : 'Tempat' }}</dt>
+                <dd>@if ($isSupervisor){{ $division ?? '–' }}@else{{ $internship->placeName() }}@if ($division)<small>{{ $division }}</small>@endif @endif</dd>
+            </div>
+            <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
+            <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}</dd></div>
+            <div><dt>{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
+        </dl>
+        </div>
 
-        <dl class="pcard-wells">
-            <div class="pw-teal">
-                <dt><span class="pw-icon"><x-ikon name="tasks" :size="16" /></span>Task selesai</dt>
+        <dl class="prof-stats">
+            <div>
+                <dt>Task selesai</dt>
                 <dd>{{ $stats['done'] }}<small>/{{ $stats['tasks'] }}</small></dd>
-                <span class="pw-bar" aria-hidden="true"><span style="width: {{ $taskPct }}%"></span></span>
+                <span class="prof-bar" aria-hidden="true"><span style="width: {{ $taskPct }}%"></span></span>
             </div>
-            <div class="pw-yellow">
-                <dt><span class="pw-icon"><x-ikon name="timer" :size="16" /></span>{{ $internship->status === 'berjalan' ? 'Minggu' : 'Durasi (minggu)' }}</dt>
+            <div>
+                <dt>{{ $internship->status === 'berjalan' ? 'Minggu' : 'Durasi (minggu)' }}</dt>
                 <dd>@if ($internship->status === 'berjalan'){{ $internship->currentWeek() }}<small>/{{ $internship->totalWeeks() }}</small>@else{{ $internship->totalWeeks() }}@endif</dd>
             </div>
-            <div class="pw-blue">
-                <dt><span class="pw-icon"><x-ikon name="calendar" :size="16" /></span>Rencana</dt>
-                <dd>{{ $stats['plans'] }}</dd>
-            </div>
-            <div class="pw-violet">
-                <dt><span class="pw-icon"><x-ikon name="edit" :size="16" /></span>Hari tercatat</dt>
-                <dd>{{ $stats['days'] }}</dd>
-            </div>
+            <div><dt>Rencana</dt><dd>{{ $stats['plans'] }}</dd></div>
+            <div><dt>Hari tercatat</dt><dd>{{ $stats['days'] }}</dd></div>
         </dl>
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
         @if ($canCorrect || $canReplace)
