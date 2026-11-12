@@ -500,3 +500,7 @@ Tampilan potret untuk HP (lebar maks. 480px di desktop), acuan dua referensi ser
 ### KP Wrapped (November 2026)
 
 `/wrapped` (mahasiswa, hanya setelah KP selesai; ajakan berupa kartu ungu di dashboard): cerita layar penuh ala Spotify Wrapped (`App\Support\Wrapped`, `wrapped/show`). Slide: sapaan, hari tercatat, task selesai (cincin), minggu paling produktif, hari paling rajin + rentetan terpanjang, goal tercapai, bimbingan, nilai akhir, rangkuman. Tiap slide bergradasi sendiri, angka berhitung naik, batang progres di atas, ganti otomatis tiap 6 detik (berhenti bila kurangi gerak atau tab disembunyikan), bisa diketuk kiri/kanan, panah keyboard, Spasi (jeda), Esc (tutup). Slide rangkuman: tombol Simpan gambar (PNG 1080x1350 digambar di canvas, tanpa pustaka) dan Putar ulang.
+
+### Portofolio KP publik (November 2026)
+
+Pengaturan di menu **Portofolio** (mahasiswa, `/portofolio`): sakelar tautan publik dan tampilkan nilai (bawaan mati), judul singkat, tentang, keahlian (dipisah koma), pilih maks. 6 hasil kerja dari task selesai. Bila publik: tautan, tombol Salin, dan kode QR. Halaman publik `/p/{token}` (tanpa login, tanpa NIM, noindex): kepala bergradasi hijau merek dengan pil "Terverifikasi SIMAGTI", avatar inisial, nama, judul, prodi/kampus, posisi/tempat/periode/status; kartu angka (minggu, hari tercatat, task selesai, nilai akhir bila diizinkan); Tentang; Keahlian; Hasil kerja pilihan; Goal tercapai; peta kontribusi; tautan verifikasi sertifikat bila ada.

@@ -205,3 +205,20 @@ Dihapus di v3: `syllabus_items`, `monthly_reviews`, `credit_recognitions`, kuesi
 - `Concerns/SeedsActivities`: pengisi goals, rencana kegiatan, proyek, task, catatan kegiatan, bukti, komentar, dan log aktivitas 30 hari terakhir yang dipakai kedua seeder (hasilnya tetap, tidak acak).
 
 Migrasi v3: `2026_10_27_100000_kp_v3_revisi.php`. Setelah menarik versi ini jalankan `php artisan migrate:fresh --seed` (data lama tidak dipertahankan karena struktur berubah besar).
+
+### portfolios (November 2026)
+
+Portofolio KP publik pilihan mahasiswa, satu per KP.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| id | bigint | |
+| internship_id | FK internships, unik | hapus berantai |
+| token | string(40), unik | tautan publik `/p/{token}` |
+| is_public | boolean, bawaan false | tautan hanya aktif bila dinyalakan mahasiswa |
+| show_grade | boolean, bawaan false | huruf mutu dan nilai akhir ikut tampil |
+| headline | string(120), null | judul singkat |
+| about | text, null | cerita singkat KP |
+| skills | json, null | maks. 10 keahlian |
+| task_ids | json, null | maks. 6 task selesai milik KP ini |
+| timestamps | | |

@@ -24,6 +24,7 @@ class Menu
                 ['label' => 'Kegiatan', 'route' => 'kegiatan.index', 'icon' => 'board', 'active' => ['kegiatan.*', 'tugas.show']],
                 ['label' => 'Bimbingan', 'route' => 'bimbingan.index', 'icon' => 'chat', 'active' => 'bimbingan.*'],
                 ['label' => 'Dokumen', 'route' => 'dokumen.index', 'icon' => 'file', 'active' => 'dokumen.*'],
+                ['label' => 'Portofolio', 'route' => 'portofolio.edit', 'icon' => 'star', 'active' => 'portofolio.*'],
                 ['label' => 'Perubahan', 'route' => 'perubahan.index', 'icon' => 'swap', 'active' => 'perubahan.*'],
             ],
             'supervisor' => [

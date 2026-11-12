@@ -28,6 +28,7 @@ use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
+use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
@@ -56,6 +57,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'));
 
 // Undangan Company Supervisor: halaman publik, keabsahan dicek lewat token.
+// Portofolio KP publik (tanpa login, hanya bila mahasiswa menyalakannya)
+Route::get('/p/{token}', [PortfolioController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{20,64}')->name('portofolio.publik');
 Route::get('/undangan/{token}', [InvitationController::class, 'show'])->name('undangan.show');
 Route::post('/undangan/{token}', [InvitationController::class, 'store'])->middleware('throttle:10,1')->name('undangan.store');
 
@@ -137,6 +140,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::get('/laporan', [ReportDraftController::class, 'show'])->name('laporan.draf');
         // KP Wrapped: rangkuman animasi setelah KP selesai
         Route::get('/wrapped', [WrappedController::class, 'show'])->name('wrapped');
+        // Portofolio KP publik pilihan mahasiswa (pengaturan)
+        Route::get('/portofolio', [PortfolioController::class, 'edit'])->name('portofolio.edit');
+        Route::patch('/portofolio', [PortfolioController::class, 'update'])->name('portofolio.update');
         Route::post('/timesheet/rencana', [ActivityPlanController::class, 'store'])->middleware('throttle:60,1')->name('rencana.store');
         Route::patch('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'update'])->whereNumber('plan')->name('rencana.update');
         Route::delete('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'destroy'])->whereNumber('plan')->name('rencana.destroy');
