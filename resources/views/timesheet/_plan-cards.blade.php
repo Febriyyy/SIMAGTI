@@ -1,8 +1,7 @@
 {{--
-    Kartu per rencana kegiatan (dashboard mahasiswa).
-    Kartu terang dengan titik warna rencana, status yang jelas (Berjalan / Selesai / Akan datang / Terlambat),
-    tanggal, dan progres task. Rencana yang sedang berjalan disorot. Pemilik bisa klik kartu untuk mengubah rencana.
-    Variabel: $plans (withCount tasks, completed_tasks_count), $canEdit (opsional)
+    Kartu berwarna per rencana kegiatan (dashboard mahasiswa): label status, judul, tanggal, progres task.
+    Seluruh kartu bisa diklik dan membuka Kegiatan yang tersaring ke rencana itu (?rencana=).
+    Variabel: $plans (withCount tasks, completed_tasks_count)
 --}}
 <ul class="plan-cards">
     @foreach ($plans as $k => $plan)
@@ -21,12 +20,9 @@
             <span class="plan-card-top">
                 <span class="plan-card-dot" aria-hidden="true"></span>
                 <span class="plan-card-state">{{ $state[1] }}</span>
+                <span class="plan-card-go" aria-hidden="true"><x-ikon name="arrow-up-right" :size="16" /></span>
             </span>
-            @if ($canEdit ?? false)
-                <button type="button" class="plan-card-title plan-card-open" data-open="dlg-plan-{{ $plan->id }}" title="Ubah rencana {{ $plan->title }}">{{ $plan->title }}</button>
-            @else
-                <span class="plan-card-title" title="{{ $plan->title }}">{{ $plan->title }}</span>
-            @endif
+            <a href="{{ route('kegiatan.index', ['rencana' => $plan->id]) }}" class="plan-card-title plan-card-open" title="Lihat task {{ $plan->title }}">{{ $plan->title }}</a>
             <span class="plan-card-sub">{{ $plan->rangeLabel() }}</span>
             <span class="plan-card-foot">
                 @if ($plan->tasks_count > 0)

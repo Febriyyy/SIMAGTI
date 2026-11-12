@@ -56,6 +56,22 @@
         });
     });
 
+    // ---------- Kepala halaman: ikon menu yang sedang dibuka di samping judul ----------
+    var menuIcon = document.querySelector('.crumb-root > .ikon, .crumb-root > svg, .crumb-root > span');
+    if (menuIcon) {
+        document.querySelectorAll('.page-head').forEach(function (head) {
+            var title = head.querySelector(':scope > div > .page-title');
+            if (!title || head.querySelector('.page-icon')) return;
+            var box = title.parentElement;
+            var icon = document.createElement('span');
+            icon.className = 'page-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.appendChild(menuIcon.cloneNode(true));
+            box.classList.add('page-head-main');
+            box.insertBefore(icon, box.firstChild);
+        });
+    }
+
     // ---------- Sedikit kata: teks penjelasan panjang menjadi ikon info di samping judul ----------
     var tipId = 0;
     function closeTips(except) {

@@ -202,6 +202,7 @@ class DashboardDataTest extends TestCase
             ->assertSee('Rencana kegiatan')
             ->assertDontSee('class="week-cal"', false)  // jadwal task mingguan ditiadakan
             ->assertSee('class="plan-card"', false)      // kartu berwarna per rencana kegiatan
+            ->assertSee('href="'.route('kegiatan.index', ['rencana' => $this->user('mahasiswa@kp.test')->internships()->latest('id')->first()->activityPlans()->first()->id]).'" class="plan-card-title plan-card-open"', false) // kartu bisa diklik
             ->assertSee('class="dash-row"', false)       // baris bento dashboard
             ->assertSee('Kemajuan KP')
             ->assertSee('href="'.route('timesheet.index').'" class="mini-step-title"', false)

@@ -438,3 +438,12 @@ Atas permintaan pemilik proyek, kartu rencana di Timesheet kembali ke gaya awal 
 ### Dashboard mahasiswa bento (November 2026)
 
 Acuan: referensi Dribbble di brief (kartu angka terpisah, kisi kartu rapi). Jadwal task mingguan (`WeekPlanner`, `dashboard/_week`, `timesheet/_week-cal`) ditiadakan. Urutan: banner sapaan, kartu Kemajuan KP, tiga kartu angka terpisah (`.stat-grid.dash-stats`: ikon + judul, angka dan keterangan berbentuk pil dalam satu kotak dalam abu), lalu dua baris bento (`.dash-row`, kiri 2/3 dan kanan 1/3, kartu satu baris sama tinggi): **Rencana kegiatan** (kartu berwarna per rencana, dipindah dari Timesheet, tautan Timesheet di kepala) + **Tempat magang**, lalu **Perlu dikerjakan** + **Meeting minggu ini** (kotak waktu dan tombol Gabung selebar kartu). Di ≤1100px baris bento menjadi satu kolom. Timesheet kembali langsung menampilkan Gantt.
+
+### Gaya bento untuk semua halaman (November 2026)
+
+- **Kartu angka** (`.stat-grid` / `<x-stat>`) di semua halaman memakai gaya dashboard mahasiswa: kartu terpisah, ikon + judul, angka dan keterangan berbentuk pil dalam kotak dalam abu. Bila satu baris berisi 4 kartu atau lebih, angka dan keterangan bertumpuk agar tidak terpotong.
+- **Dua kolom** (`.layout`): kolom sama tinggi dan kartu terakhir tiap kolom mengisi sisa ruang, jadi tepi bawah sejajar (kecuali kolom formulir yang menempel saat digulir).
+- **Kepala halaman** (`.page-head`): kotak ikon menu yang sedang dibuka di samping judul (ditambahkan `app.js` dari ikon remah roti).
+- **Kartu rencana** di dashboard mahasiswa bisa diklik: membuka Kegiatan yang tersaring ke rencana itu, dengan panah di pojok kartu.
+- **Halaman galat** 403, 404, 419, 429, 500, 503 (`errors/_page`): logo, kode besar di kartu banner, kalimat singkat, tombol Ke dashboard dan Kembali.
+- Kolom aksi tabel Akun dilebarkan agar tombol tidak menempel ke tepi kartu; riwayat Pengajuan Perubahan yang kosong memakai keadaan kosong bergambar.

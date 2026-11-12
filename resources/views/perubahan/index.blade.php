@@ -18,7 +18,7 @@
                 <section class="card">
                     <div class="card-head"><h2 class="card-title">Riwayat pengajuan</h2></div>
                     @if ($history->isEmpty())
-                        <p class="meeting-empty">Belum ada pengajuan perubahan.</p>
+                        <div class="empty"><strong>Belum ada pengajuan</strong> Ajukan perpanjangan, pindah, mundur, atau ganti supervisor lewat formulir di samping.</div>
                     @else
                         <ul class="item-list">
                             @foreach ($history as $c)
