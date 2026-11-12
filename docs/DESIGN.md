@@ -492,3 +492,7 @@ Tampilan potret untuk HP (lebar maks. 480px di desktop), acuan dua referensi ser
 ### Peta kontribusi (November 2026)
 
 `<x-contrib>` dari `App\Support\Contribution`: kotak per hari ala GitHub sepanjang periode KP (kolom = minggu, baris = Senin-Minggu), warna 5 tingkat dari catatan + task selesai per hari, kotak hari mendatang bergaris tipis. Kepala kartu berisi pil hari aktif, rentetan terpanjang, dan rentetan sekarang (akhir pekan tidak memutus rentetan). Tampil di dashboard mahasiswa (di bawah kartu angka) dan tab Aktivitas halaman pantau. Kisi bisa digeser mendatar di layar sempit.
+
+### Draf laporan KP otomatis (November 2026)
+
+`/laporan` (mahasiswa, menu Unduh di Timesheet → Draf laporan KP): halaman A4 tegak berdiri sendiri (`laporan/draf`), disusun dari data KP. Sampul (posisi, perusahaan, periode, nama, NIM, kampus), Bab I Pendahuluan (tujuan dari goals, tabel waktu dan tempat), Bab II Profil tempat KP, Bab III Rencana dan pelaksanaan (angka ringkas + tabel task per rencana), Bab IV Uraian kegiatan mingguan (catatan harian dikelompokkan per minggu KP), Bab V Bimbingan (sesi yang dikonfirmasi), Bab VI Penutup. Bagian yang harus ditulis sendiri berupa kotak bergaris putus. Tombol Salin teks (menyalin seluruh isi untuk ditempel ke Word) dan Cetak / Simpan PDF; tanpa pustaka tambahan.

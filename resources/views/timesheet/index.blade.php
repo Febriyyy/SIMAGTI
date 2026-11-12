@@ -27,6 +27,7 @@
                         <a href="{{ route('kegiatan.unduh', ['format' => 'xlsx', 'periode' => $all ? 'semua' : 'rentang', 'dari' => $period->start->toDateString(), 'sampai' => $period->end->toDateString()]) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
                         <a href="{{ route('kegiatan.unduh', ['format' => 'pdf', 'periode' => $all ? 'semua' : 'rentang', 'dari' => $period->start->toDateString(), 'sampai' => $period->end->toDateString()]) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
                         <p class="menu-note">{{ $all ? 'Seluruh periode KP.' : $period->label }}</p>
+                        <a href="{{ route('laporan.draf') }}" target="_blank" rel="noopener" class="menu-item menu-item-sep"><x-ikon name="file" :size="16" /> Draf laporan KP</a>
                     </div>
                 </details>
                 @if ($canEdit)

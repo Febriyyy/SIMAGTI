@@ -29,6 +29,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTaskController;
@@ -131,6 +132,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
         // Timesheet: rencana kegiatan (Gantt) diisi dulu, lalu catatan kegiatan harian
         Route::get('/timesheet', [TimesheetController::class, 'index'])->name('timesheet.index');
+        // Draf laporan KP otomatis (cetak / salin teks)
+        Route::get('/laporan', [ReportDraftController::class, 'show'])->name('laporan.draf');
         Route::post('/timesheet/rencana', [ActivityPlanController::class, 'store'])->middleware('throttle:60,1')->name('rencana.store');
         Route::patch('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'update'])->whereNumber('plan')->name('rencana.update');
         Route::delete('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'destroy'])->whereNumber('plan')->name('rencana.destroy');
