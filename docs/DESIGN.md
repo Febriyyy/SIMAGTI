@@ -488,3 +488,7 @@ Satu ritme untuk semua halaman: kurva `--ease-premium` (cubic-bezier(.22,1,.36,1
 ### Halaman verifikasi sertifikat (hasil pindai QR), November 2026
 
 Tampilan potret untuk HP (lebar maks. 480px di desktop), acuan dua referensi sertifikat potret dari pemilik proyek: pita status (sah / tidak berlaku / tidak ditemukan), dua tombol lompat (Sertifikat, Keterangan nilai), lalu **sertifikat potret** (`.vx-sheet`, ukuran memakai satuan container agar proporsinya sama di semua layar): pita motif seperempat lingkaran hijau-teal dengan tahun tegak, logo dan kampus, tanggal terbit, judul "Sertifikat Kerja Praktik", nama bergaris bawah, keterangan posisi/tempat/periode, penanda tangan, stempel bulat "Terverifikasi", nomor. Di bawahnya **kartu keterangan nilai** terpisah: huruf mutu dalam lingkaran, nilai akhir /100, tanggal validasi, rata-rata Hard skill / Soft skill / Attitude dengan bobot dan batang. Nilai hanya tampil untuk sertifikat yang sah dan penilaian yang sudah divalidasi; NIM tetap tidak ditampilkan.
+
+### Peta kontribusi (November 2026)
+
+`<x-contrib>` dari `App\Support\Contribution`: kotak per hari ala GitHub sepanjang periode KP (kolom = minggu, baris = Senin-Minggu), warna 5 tingkat dari catatan + task selesai per hari, kotak hari mendatang bergaris tipis. Kepala kartu berisi pil hari aktif, rentetan terpanjang, dan rentetan sekarang (akhir pekan tidak memutus rentetan). Tampil di dashboard mahasiswa (di bawah kartu angka) dan tab Aktivitas halaman pantau. Kisi bisa digeser mendatar di layar sempit.

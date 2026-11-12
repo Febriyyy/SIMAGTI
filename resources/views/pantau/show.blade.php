@@ -194,6 +194,7 @@
         </section>
         @include('kegiatan._goals', ['canEdit' => false])
     @elseif ($tab === 'aktivitas')
+        <x-contrib :data="$contrib" />
         <section class="card">
             <div class="card-head">
                 <div>

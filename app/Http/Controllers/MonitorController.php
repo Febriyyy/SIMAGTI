@@ -8,6 +8,7 @@ use App\Models\TimeEntry;
 use App\Support\ActivityFeed;
 use App\Support\BoardData;
 use App\Support\Campus;
+use App\Support\Contribution;
 use App\Support\Gantt;
 use App\Support\Period;
 use Illuminate\Http\RedirectResponse;
@@ -100,7 +101,7 @@ class MonitorController extends Controller
                 'goals' => $internship->goals()->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])->get(),
             ];
         } elseif ($tab === 'aktivitas') {
-            $data += ['feed' => ActivityFeed::for(collect([$internship]), 60)];
+            $data += ['feed' => ActivityFeed::for(collect([$internship]), 60), 'contrib' => Contribution::build($internship)];
         } elseif ($tab === 'bimbingan') {
             $data += [
                 'sessions' => $internship->guidanceSessions()->get(),

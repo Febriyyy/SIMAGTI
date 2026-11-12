@@ -125,6 +125,10 @@
                     :hint="'s.d. '.$internship->end_date->locale('id')->translatedFormat('j M Y')" />
         </div>
 
+        @if ($contrib)
+            <x-contrib :data="$contrib" />
+        @endif
+
         @if ($next && in_array($next['state'], ['current', 'waiting', 'attention'], true) && $next['key'] !== 'activities')
             <div class="next-step next-{{ $next['state'] }}">
                 <x-ikon :name="$next['state'] === 'attention' ? 'alert' : ($next['state'] === 'waiting' ? 'clock' : 'arrow')" :size="20" />

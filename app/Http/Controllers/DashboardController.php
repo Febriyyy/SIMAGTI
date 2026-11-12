@@ -15,6 +15,7 @@ use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
+use App\Support\Contribution;
 use App\Support\KpProgress;
 use App\Support\Period;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class DashboardController extends Controller
             ->first();
 
         $data = ['user' => $user, 'internship' => $internship, 'tasks' => collect(), 'meeting' => null,
-            'period' => null, 'next' => null, 'steps' => [], 'plans' => collect(), 'gantt' => null, 'goals' => collect()];
+            'period' => null, 'next' => null, 'steps' => [], 'plans' => collect(), 'gantt' => null, 'goals' => collect(), 'contrib' => null];
 
         if (! $internship) {
             return view('dashboard.mahasiswa', $data);
@@ -77,6 +78,7 @@ class DashboardController extends Controller
                 ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])
                 ->get();
             $data['goals'] = $internship->goals()->get();
+            $data['contrib'] = Contribution::build($internship);
         }
 
         return view('dashboard.mahasiswa', $data);
