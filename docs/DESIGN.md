@@ -469,3 +469,14 @@ Semua halaman menu dan halaman detail untuk enam peran (ditambah mahasiswa tanpa
 ### Kartu kolom samping di semua halaman (November 2026)
 
 Kartu di kolom kanan `.layout` / `.split` memakai pola kartu Tempat magang. Daftar label-nilai (`.kv`, kecuali `.kv-tight` huruf mutu) menjadi kotak dalam abu: label kecil di atas nilainya dan pemisah putus-putus, jadi nilai panjang tidak lagi rata kanan dan terpecah. Daftar baris (`.item-list`) berada dalam kotak dalam yang sama, dan jumlahnya berbentuk pil. Langkah "Cara aktivasi" (`.howto`) bernomor dalam lingkaran. Berlaku di antaranya untuk Ringkasan (Status KP), Detail dan Mahasiswa (task), Informasi dan Nilai akhir (penilaian), Contoh perhitungan dan Skala nilai (bobot), Ringkasan aktivitas, Rekap bimbingan, Baru diaktifkan (TU), dan Akun per peran (admin).
+
+### Gerak halus (November 2026)
+
+Satu ritme untuk semua halaman: kurva `--ease-premium` (cubic-bezier(.22,1,.36,1)), durasi 160 / 260 / 560 ms, hanya transform dan opacity.
+
+- **Perpindahan halaman**: View Transitions bawaan browser; isi memudar 220 ms, sidebar dan bar atas tetap di tempat.
+- **Masuk halaman**: blok isi `.container` naik 8 px bergiliran (50 ms, maks. 7 blok); kartu angka, kartu rencana, dan kartu mahasiswa ikut bergiliran tipis (45 ms). Hanya bila halaman terlihat saat dimuat (kelas `.motion` di `<html>`); animasi yang tertahan dituntaskan setelah 1,2 detik.
+- **Dialog** muncul dengan skala 0,97 ke 1 dan latar memudar; **menu dan lonceng** turun pelan; **tooltip** sedikit bergeser saat muncul; **tab** memudar masuk.
+- **Angka kartu angka** berhitung naik sekali (±700 ms); teks akhir sama dengan dari server.
+- **Tombol** mengecil 2 persen saat ditekan; warna, bingkai, dan bayangan berganti lembut.
+- Semua mati bila pengguna memilih kurangi gerak, dan saat dicetak.

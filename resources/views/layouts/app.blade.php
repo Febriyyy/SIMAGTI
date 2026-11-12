@@ -15,6 +15,8 @@
         (function () {
             var root = document.documentElement;
             root.classList.add('js');
+            // Animasi masuk halaman hanya bila halaman terlihat saat dimuat (tab latar belakang langsung tampil penuh).
+            if (document.visibilityState === 'visible') root.classList.add('motion');
             try { if (sessionStorage.getItem('ms-ready') === '1') root.classList.add('ms-ready'); } catch (e) {}
             if (!document.fonts || !document.fonts.load) return;
             document.fonts.load('24px "Material Symbols Rounded"', 'task_alt').then(function (fonts) {

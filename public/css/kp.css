@@ -3531,3 +3531,69 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .howto > li + li { border-top: 1px dashed var(--line-strong); }
 .howto > li::before { content: counter(howto); position: absolute; left: 0; top: var(--space-3); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--primary-soft); color: var(--primary-dark); font-size: var(--text-xs); font-weight: 700; }
 .howto > li strong { color: var(--text); }
+
+/* =====================================================================
+   Gerak halus (November 2026): satu ritme untuk semua halaman, tenang dan singkat.
+   Hanya transform + opacity; isi akhir tidak menyisakan transform (fill: backwards) agar sticky/fixed tetap normal.
+   Semua mati bila pengguna memilih "kurangi gerak" (aturan prefers-reduced-motion di atas).
+   ===================================================================== */
+:root {
+    --ease-premium: cubic-bezier(.22, 1, .36, 1);
+    --dur-fast: 160ms;
+    --dur-mid: 260ms;
+    --dur-slow: 560ms;
+}
+@keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* 1. Perpindahan halaman: isi utama memudar, sidebar dan bar atas tetap di tempat */
+@view-transition { navigation: auto; }
+.sidebar { view-transition-name: sidebar; }
+.topbar { view-transition-name: topbar; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; animation-timing-function: var(--ease-premium); }
+
+/* 2. Masuk halaman: blok isi naik pelan bergiliran (maks. 7 blok pertama).
+   Hanya dengan kelas .motion di <html> (dipasang bila halaman terlihat saat dimuat). */
+.motion .container > * { animation: rise-in var(--dur-slow) var(--ease-premium) backwards; }
+.motion .container > :nth-child(2) { animation-delay: 50ms; }
+.motion .container > :nth-child(3) { animation-delay: 100ms; }
+.motion .container > :nth-child(4) { animation-delay: 150ms; }
+.motion .container > :nth-child(5) { animation-delay: 200ms; }
+.motion .container > :nth-child(6) { animation-delay: 250ms; }
+.motion .container > :nth-child(n+7) { animation-delay: 300ms; }
+/* Kartu dalam kisi ikut bergiliran sangat tipis */
+.motion :is(.stat-grid > .stat, .plan-cards > li, .icard-grid > li) { animation: rise-in var(--dur-slow) var(--ease-premium) backwards; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
+:is(.stat-grid, .plan-cards, .icard-grid) > :nth-child(2) { --i: 1; }
+:is(.stat-grid, .plan-cards, .icard-grid) > :nth-child(3) { --i: 2; }
+:is(.stat-grid, .plan-cards, .icard-grid) > :nth-child(4) { --i: 3; }
+:is(.stat-grid, .plan-cards, .icard-grid) > :nth-child(5) { --i: 4; }
+:is(.stat-grid, .plan-cards, .icard-grid) > :nth-child(n+6) { --i: 5; }
+
+/* 3. Dialog, menu, lonceng, tooltip */
+.dialog[open] { animation: dialog-in var(--dur-mid) var(--ease-premium); }
+.dialog[open]::backdrop { animation: fade-in var(--dur-mid) var(--ease-premium); }
+details[open] > .menu-panel { animation: drop-in 200ms var(--ease-premium); transform-origin: top right; }
+.info-tip-text { transform: translateY(-3px); transition: opacity 160ms var(--ease-premium), transform 160ms var(--ease-premium), visibility 0s linear 160ms; }
+.info-tip:hover .info-tip-text, .info-tip.is-open .info-tip-text, .info-tip-btn:focus-visible + .info-tip-text { transform: none; transition: opacity 160ms var(--ease-premium), transform 160ms var(--ease-premium); }
+.page-head .info-tip-text, .card-head .info-tip-text { transform: translateY(-3px); }
+.page-head .info-tip.is-open .info-tip-text, .page-head .info-tip:hover .info-tip-text, .card-head .info-tip.is-open .info-tip-text, .card-head .info-tip:hover .info-tip-text { transform: none; }
+
+/* 4. Tab: isi yang baru tampil memudar masuk */
+[data-tab-panel]:not([hidden]) { animation: fade-in var(--dur-mid) var(--ease-premium); }
+
+/* 5. Interaksi: warna dan bayangan berganti lembut, tombol sedikit mengecil saat ditekan */
+a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(--dur-fast) var(--ease-premium), background-color var(--dur-fast) var(--ease-premium), border-color var(--dur-fast) var(--ease-premium), box-shadow var(--dur-mid) var(--ease-premium), transform var(--dur-fast) var(--ease-premium); }
+.btn:active:not(:disabled), .seg:active, .icard-go:active { transform: scale(.98); }
+.input, .select, textarea { transition: border-color var(--dur-fast) var(--ease-premium), box-shadow var(--dur-mid) var(--ease-premium), background-color var(--dur-fast) var(--ease-premium); }
+.card { transition: box-shadow var(--dur-mid) var(--ease-premium), border-color var(--dur-mid) var(--ease-premium); }
+:is(.stat-link, .icard, .kcard, .plan-card, .attention-card .watch) { transition: transform var(--dur-mid) var(--ease-premium), box-shadow var(--dur-mid) var(--ease-premium), border-color var(--dur-mid) var(--ease-premium), background-color var(--dur-mid) var(--ease-premium); }
+
+@media (prefers-reduced-motion: reduce) {
+    .container > *, :is(.stat-grid > .stat, .plan-cards > li, .icard-grid > li), .dialog[open], .dialog[open]::backdrop, [data-tab-panel] { animation: none !important; }
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+    .info-tip-text { transform: none !important; }
+}
+/* Cetak: tanpa animasi supaya semua isi langsung tampil */
+@media print { *, *::before, *::after { animation: none !important; transition: none !important; } }

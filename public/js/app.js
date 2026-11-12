@@ -506,3 +506,40 @@
         window.addEventListener('load', function () { fit(); scrollToToday(false); });
     });
 })();
+
+/* Pengaman animasi masuk: bila browser menahan animasi (tab tidak sedang digambar), tuntaskan setelah 1,2 detik
+   supaya isi halaman tidak pernah tertinggal tak terlihat. */
+setTimeout(function () {
+    if (!document.getAnimations) return;
+    document.getAnimations().forEach(function (a) {
+        if (a.animationName === 'rise-in' && a.playState !== 'finished') { try { a.finish(); } catch (e) { /* abaikan */ } }
+    });
+}, 1200);
+
+/* Angka kartu angka berhitung naik sekali saat halaman dibuka (hanya bilangan bulat, ±700 ms).
+   Teks akhir sama persis dengan isi dari server; dilewati bila pengguna memilih kurangi gerak. */
+(function () {
+    if (!window.requestAnimationFrame) return;
+    try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
+    if (document.visibilityState !== 'visible') return;
+    var ease = function (t) { return 1 - Math.pow(1 - t, 4); };
+    document.querySelectorAll('.stat-value, .kpp-fig strong').forEach(function (el) {
+        var node = el.firstChild;
+        if (!node || node.nodeType !== 3) return;
+        var text = node.textContent.trim();
+        if (!/^\d{1,4}$/.test(text)) return;
+        var target = parseInt(text, 10);
+        if (target < 2) return;
+        var start = null, dur = 700;
+        node.textContent = '0';
+        function step(ts) {
+            if (start === null) start = ts;
+            var t = Math.min(1, (ts - start) / dur);
+            node.textContent = String(Math.round(target * ease(t)));
+            if (t < 1) requestAnimationFrame(step); else node.textContent = text;
+        }
+        setTimeout(function () { requestAnimationFrame(step); }, 150);
+        // Cadangan: tab di latar belakang menahan requestAnimationFrame; angka akhir tetap dipasang.
+        setTimeout(function () { node.textContent = text; }, dur + 400);
+    });
+})();
