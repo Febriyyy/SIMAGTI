@@ -482,3 +482,5 @@ Satu ritme untuk semua halaman: kurva `--ease-premium` (cubic-bezier(.22,1,.36,1
 - Semua mati bila pengguna memilih kurangi gerak, dan saat dicetak.
 
 - **Rekap per mahasiswa** (antrean Bimbingan dosen): cukup nama satu baris + deret sesi (kotak terisi = sesi terkonfirmasi) dan jumlah "4/5" di kanan (centang hijau bila syarat terpenuhi). Tempat dan tanggal selesai dipindah ke tooltip baris; detailnya ada di halaman pantau.
+
+- **Strip profil mahasiswa** (halaman detail pantau): kepala bergradasi lembut, avatar 76px bercincin progres task, nama besar, identitas akademik, pil NIM; lima fakta (Posisi, Periode, Task selesai, Rencana, Dosen) dalam kotak dalam dengan ikon kecil berwarna dan pemisah tipis, batang tipis untuk waktu berjalan dan task selesai. 3 kolom di tablet, 2 kolom di HP.

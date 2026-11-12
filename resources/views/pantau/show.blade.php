@@ -21,22 +21,45 @@
         </details>
     </div>
 
+    {{-- Profil ringkas: avatar bercincin progres task, identitas akademik, lalu deretan fakta dalam kotak dalam --}}
+    <?php
+        $id = $student->academicIdentity();
+        $taskPct = $stats['tasks'] > 0 ? (int) round($stats['done'] / $stats['tasks'] * 100) : 0;
+        $timePct = $internship->status === 'berjalan' ? (int) min(100, round($internship->currentWeek() / max(1, $internship->totalWeeks()) * 100)) : 100;
+    ?>
     <div class="profile-strip card">
         <div class="profile-strip-main">
-            <x-avatar :user="$student" />
+            <span class="icard-ring profile-ring" style="--p: {{ $taskPct }}" aria-hidden="true"><x-avatar :user="$student" /></span>
             <div class="min0">
-                <div class="cell-title">{{ $student->name }}</div>
-                @php($id = $student->academicIdentity())
-                <div class="cell-sub">{{ $id['university'] }} · {{ $id['faculty'] }}</div>
-                <div class="cell-sub">{{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif @if ($id['semester']) · Semester {{ $id['semester'] }}@endif</div>
+                <div class="profile-name">{{ $student->name }}</div>
+                <div class="profile-meta">{{ $id['university'] }} · {{ $id['faculty'] }}</div>
+                <div class="profile-meta">{{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif @if ($id['semester']) · Semester {{ $id['semester'] }}@endif</div>
             </div>
+            <span class="profile-badge">{{ $student->nim }}</span>
         </div>
         <dl class="profile-strip-facts">
-            <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
-            <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>{{ $internship->durationMonths() }} bulan · {{ $internship->status === 'berjalan' ? 'sisa '.$internship->daysLeft().' hari' : $internship->statusLabel() }}</small></dd></div>
-            <div><dt>Task selesai</dt><dd>{{ $stats['done'] }} / {{ $stats['tasks'] }}</dd></div>
-            <div><dt>Rencana</dt><dd>{{ $stats['plans'] }} kegiatan<small>{{ $stats['days'] }} hari tercatat</small></dd></div>
-            <div><dt>{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
+            <div>
+                <dt><span class="pf-icon"><x-ikon name="person" :size="14" /></span>Posisi</dt>
+                <dd>{{ $internship->position ?? '–' }}</dd>
+            </div>
+            <div>
+                <dt><span class="pf-icon"><x-ikon name="calendar" :size="14" /></span>Periode</dt>
+                <dd>{{ $internship->periodLabel() }}<small>{{ $internship->durationMonths() }} bulan · {{ $internship->status === 'berjalan' ? 'sisa '.$internship->daysLeft().' hari' : $internship->statusLabel() }}</small></dd>
+                <span class="pf-bar" aria-hidden="true"><span style="width: {{ $timePct }}%"></span></span>
+            </div>
+            <div>
+                <dt><span class="pf-icon"><x-ikon name="tasks" :size="14" /></span>Task selesai</dt>
+                <dd>{{ $stats['done'] }} / {{ $stats['tasks'] }}<small>{{ $taskPct }}% selesai</small></dd>
+                <span class="pf-bar" aria-hidden="true"><span style="width: {{ $taskPct }}%"></span></span>
+            </div>
+            <div>
+                <dt><span class="pf-icon"><x-ikon name="board" :size="14" /></span>Rencana</dt>
+                <dd>{{ $stats['plans'] }} kegiatan<small>{{ $stats['days'] }} hari tercatat</small></dd>
+            </div>
+            <div>
+                <dt><span class="pf-icon"><x-ikon name="school" :size="14" /></span>{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}</dt>
+                <dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd>
+            </div>
         </dl>
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
         @if ($canCorrect || $canReplace)
