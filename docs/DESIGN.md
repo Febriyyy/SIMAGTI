@@ -465,3 +465,7 @@ Semua halaman menu dan halaman detail untuk enam peran (ditambah mahasiswa tanpa
 
 - **Kartu mahasiswa** (`<x-intern-card>`): avatar dilingkari cincin progres task (`.icard-ring`, kuning bila tidak aktif lebih dari 7 hari), nama dan posisi, label kloter + periode, kotak dalam abu berisi task selesai (angka, persen, batang tipis) dan fakta Minggu / Rencana / Aktif dipisah garis putus-putus, lalu kaki kartu dengan status penilaian dan tautan Buka berpanah. Latar atas bergradasi hijau lembut (kuning untuk yang perlu konfirmasi).
 - **Tempat magang** (dashboard mahasiswa, `.place`): tanda inisial perusahaan + nama + kota, pil Divisi dan Posisi, kotak dalam berisi Company Supervisor dan Dosen pembimbing dengan avatar, lalu periode dengan batang bulan berjalan.
+
+### Kartu kolom samping di semua halaman (November 2026)
+
+Kartu di kolom kanan `.layout` / `.split` memakai pola kartu Tempat magang. Daftar label-nilai (`.kv`, kecuali `.kv-tight` huruf mutu) menjadi kotak dalam abu: label kecil di atas nilainya dan pemisah putus-putus, jadi nilai panjang tidak lagi rata kanan dan terpecah. Daftar baris (`.item-list`) berada dalam kotak dalam yang sama, dan jumlahnya berbentuk pil. Langkah "Cara aktivasi" (`.howto`) bernomor dalam lingkaran. Berlaku di antaranya untuk Ringkasan (Status KP), Detail dan Mahasiswa (task), Informasi dan Nilai akhir (penilaian), Contoh perhitungan dan Skala nilai (bobot), Ringkasan aktivitas, Rekap bimbingan, Baru diaktifkan (TU), dan Akun per peran (admin).
