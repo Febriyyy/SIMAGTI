@@ -3597,3 +3597,12 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 }
 /* Cetak: tanpa animasi supaya semua isi langsung tampil */
 @media print { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Rekap bimbingan per mahasiswa (kolom samping antrean Bimbingan): nama satu baris + deret sesi, jumlah di kanan */
+.recap-row { gap: var(--space-3); }
+.recap-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recap-dots { display: flex; gap: 4px; margin-top: 6px; }
+.recap-dots i { flex: 1; max-width: 22px; height: 6px; border-radius: var(--radius-pill); background: var(--line-strong); }
+.recap-dots i.is-on { background: var(--primary); }
+.recap-count { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px var(--space-2); border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: var(--text-xs); font-weight: 700; font-variant-numeric: tabular-nums; }
+.recap-count.is-done { background: var(--primary-soft); box-shadow: none; color: var(--primary-dark); }

@@ -30,14 +30,19 @@
                 @else
                     <ul class="item-list">
                         @foreach ($internships as $i)
+                            {{-- Ringkas: nama + deret sesi (terisi = terkonfirmasi). Tempat dan tanggal selesai ada di tooltip dan halaman pantau. --}}
+                            @php($done = $i->confirmed_count >= $min)
                             <li>
-                                <a href="{{ route('pantau.show', [$i, 'tab' => 'bimbingan']) }}" class="item-row row-link">
+                                <a href="{{ route('pantau.show', [$i, 'tab' => 'bimbingan']) }}" class="item-row row-link recap-row"
+                                   title="{{ $i->student->name }} · {{ $i->placeName() }} · s.d. {{ $i->end_date->locale('id')->translatedFormat('j M Y') }}">
                                     <x-avatar :user="$i->student" />
                                     <div class="grow min0">
-                                        <div class="cell-title" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
-                                        <div class="cell-sub">{{ $i->placeName() }} · s.d. {{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</div>
+                                        <div class="cell-title recap-name">{{ $i->student->listName() }}</div>
+                                        <span class="recap-dots" aria-hidden="true">
+                                            @for ($n = 1; $n <= $min; $n++)<i @class(['is-on' => $n <= $i->confirmed_count])></i>@endfor
+                                        </span>
                                     </div>
-                                    <x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip>
+                                    <span @class(['recap-count', 'is-done' => $done]) aria-label="{{ $i->confirmed_count }} dari {{ $min }} sesi terkonfirmasi">@if ($done)<x-ikon name="tick" :size="12" />@endif{{ $i->confirmed_count }}/{{ $min }}</span>
                                 </a>
                             </li>
                         @endforeach

@@ -480,3 +480,5 @@ Satu ritme untuk semua halaman: kurva `--ease-premium` (cubic-bezier(.22,1,.36,1
 - **Angka kartu angka** berhitung naik sekali (±700 ms); teks akhir sama dengan dari server.
 - **Tombol** mengecil 2 persen saat ditekan; warna, bingkai, dan bayangan berganti lembut.
 - Semua mati bila pengguna memilih kurangi gerak, dan saat dicetak.
+
+- **Rekap per mahasiswa** (antrean Bimbingan dosen): cukup nama satu baris + deret sesi (kotak terisi = sesi terkonfirmasi) dan jumlah "4/5" di kanan (centang hijau bila syarat terpenuhi). Tempat dan tanggal selesai dipindah ke tooltip baris; detailnya ada di halaman pantau.
