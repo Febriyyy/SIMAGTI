@@ -449,3 +449,14 @@ Acuan: referensi Dribbble di brief (kartu angka terpisah, kisi kartu rapi). Jadw
 - Kolom aksi tabel Akun dilebarkan agar tombol tidak menempel ke tepi kartu; riwayat Pengajuan Perubahan yang kosong memakai keadaan kosong bergambar.
 
 - Isian di dalam `.field` tidak boleh melewati kolomnya (`min-width: 0; max-width: 100%`). Di formulir Catat bimbingan (kolom samping) kolom Tanggal dibuat lebih lebar dari kolom Cara agar tanggal dan ikon kalender muat tanpa menempel.
+
+### Pemeriksaan jarak menyeluruh (November 2026)
+
+Semua halaman menu dan halaman detail untuk enam peran (ditambah mahasiswa tanpa KP, menunggu verifikasi, dan sudah selesai, halaman masuk, serta halaman galat) dipindai otomatis di 1280px, 768px, dan 390px, termasuk isi dialog dan bagian lipat yang dibuka. Yang diperiksa: kotak yang bersebelahan dengan celah kurang dari 6px, kotak yang menempel ke teks, teks yang menempel ke teks, teks yang terlalu dekat dengan tepi kotaknya, label yang menempel ke isian, isi yang terpotong atau keluar dari kartu, geser horizontal, dan tooltip ⓘ yang terpotong. Perbaikan (gaya tidak berubah):
+
+- Baris huruf mutu yang berlaku (`.kv-tight > div.is-current`): ruang dalam sama di semua sisi, juga saat menjadi baris pertama.
+- Kartu angka: satuan selalu berjarak dari angkanya (di HP sempat menempel, mis. "13mahasiswa"); keterangan berbentuk pil boleh dua baris, tidak dipotong "…"; "Belum ada nilai" tidak terpotong di HP.
+- Lencana jumlah notifikasi: angka tepat di tengah.
+- Pilihan nilai di formulir penilaian (`.rate-options`) dan tombol ubah/hapus pertanyaan di Standar Penilaian berjarak 8px.
+- Tooltip ⓘ di judul kartu dan judul halaman ditambatkan ke kiri judul agar tidak terpotong tepi kartu atau layar.
+- HP: pilihan Peran di tabel Akun tidak melewati kartu; judul kepala halaman 22px dan kotak ikon 38px agar ikon ⓘ tetap sebaris dengan judul.
