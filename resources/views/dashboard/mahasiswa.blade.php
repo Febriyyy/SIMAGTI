@@ -108,6 +108,18 @@
         </section>
 
         {{-- Kartu angka terpisah (acuan referensi: ikon + judul, angka di kotak dalam) --}}
+        @if ($internship->status === 'selesai')
+            {{-- KP Wrapped: ajakan melihat rangkuman animasi akhir KP --}}
+            <a href="{{ route('wrapped') }}" class="wrapped-cta">
+                <span class="wrapped-cta-badge" aria-hidden="true">{{ $internship->end_date->format('Y') }}</span>
+                <span class="min0">
+                    <strong>KP Wrapped kamu sudah siap</strong>
+                    <span>Lihat rangkuman perjalanan KP: hari tercatat, task, minggu terbaik, sampai nilai akhir.</span>
+                </span>
+                <span class="wrapped-cta-go">Putar <x-ikon name="arrow" :size="16" /></span>
+            </a>
+        @endif
+
         <div class="stat-grid dash-stats">
             @php($activePlans = $plans->filter(fn ($p) => $p->phase() === 'active')->count())
             <x-stat label="Rencana kegiatan" :value="$plans->count()" unit="kegiatan" :href="route('timesheet.index')"

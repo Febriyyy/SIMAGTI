@@ -42,6 +42,7 @@ use App\Http\Controllers\TaskDetailController;
 use App\Http\Controllers\TaskEvidenceController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\WrappedController;
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\EnsureRole;
@@ -134,6 +135,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::get('/timesheet', [TimesheetController::class, 'index'])->name('timesheet.index');
         // Draf laporan KP otomatis (cetak / salin teks)
         Route::get('/laporan', [ReportDraftController::class, 'show'])->name('laporan.draf');
+        // KP Wrapped: rangkuman animasi setelah KP selesai
+        Route::get('/wrapped', [WrappedController::class, 'show'])->name('wrapped');
         Route::post('/timesheet/rencana', [ActivityPlanController::class, 'store'])->middleware('throttle:60,1')->name('rencana.store');
         Route::patch('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'update'])->whereNumber('plan')->name('rencana.update');
         Route::delete('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'destroy'])->whereNumber('plan')->name('rencana.destroy');

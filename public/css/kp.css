@@ -3842,3 +3842,92 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 
 /* Pemisah item menu (mis. Draf laporan KP di menu Unduh Timesheet) */
 .menu-item-sep { margin-top: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--line); border-radius: 0 0 var(--radius-xs) var(--radius-xs); }
+
+/* =====================================================================
+   KP Wrapped (November 2026): cerita layar penuh ala Spotify Wrapped, setelah KP selesai.
+   Setiap slide punya gradasi sendiri; angka besar berhitung naik; batang progres di atas.
+   ===================================================================== */
+.wr-body { margin: 0; min-height: 100vh; background: #021f1d; color: #fff; overflow: hidden; }
+.wr { position: relative; display: flex; flex-direction: column; height: 100dvh; max-width: 560px; margin: 0 auto; overflow: hidden; }
+@media (min-width: 700px) { .wr { height: min(100dvh, 920px); margin-top: max(0px, calc((100dvh - 920px) / 2)); border-radius: 28px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); } }
+
+.wr-progress { position: absolute; z-index: 4; top: 14px; left: 16px; right: 16px; display: flex; gap: 5px; }
+.wr-progress span { flex: 1; height: 3px; border-radius: 99px; background: rgba(255, 255, 255, 0.28); overflow: hidden; }
+.wr-progress i { display: block; height: 100%; background: #fff; transform: scaleX(0); transform-origin: left center; }
+@keyframes wr-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.wr-top { position: absolute; z-index: 4; top: 28px; left: 16px; right: 12px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+.wr-top img { border-radius: 8px; background: #fff; padding: 3px; }
+.wr-top span { flex: 1; }
+.wr-icon-btn { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer; }
+.wr-icon-btn:hover { background: rgba(255, 255, 255, 0.24); }
+.wr-icon-btn:focus-visible, .wr-btn:focus-visible, .wr-nav:focus-visible { outline: 3px solid #a7f3d0; outline-offset: 2px; }
+
+.wr-stage { position: relative; z-index: 2; flex: 1; pointer-events: none; }
+.wr-slide { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 96px 32px 56px; }
+.wr-slide[hidden] { display: none; }
+.wr-slide > * { animation: wr-in 700ms cubic-bezier(.22, 1, .36, 1) backwards; }
+.wr-slide > :nth-child(2) { animation-delay: 120ms; }
+.wr-slide > :nth-child(3) { animation-delay: 240ms; }
+.wr-slide > :nth-child(4) { animation-delay: 360ms; }
+@keyframes wr-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.wr-slide .wr-actions, .wr-slide .wr-card { pointer-events: auto; }
+
+/* Tema per slide */
+.wr-intro { background: radial-gradient(circle at 80% 10%, rgba(167, 243, 208, 0.35), transparent 45%), linear-gradient(160deg, #03423e, #037a68 60%, #02a86f); }
+.wr-days { background: radial-gradient(circle at 20% 90%, rgba(255, 255, 255, 0.18), transparent 45%), linear-gradient(160deg, #3b1d8f, #6d3fe0); }
+.wr-tasks { background: radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.16), transparent 45%), linear-gradient(160deg, #0b3a7a, #2f6fde); }
+.wr-week { background: radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.2), transparent 40%), linear-gradient(160deg, #9a2b1d, #ef6a4c); }
+.wr-day { background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.2), transparent 40%), linear-gradient(160deg, #7a4b00, #e8a317); }
+.wr-goals { background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.16), transparent 45%), linear-gradient(160deg, #6b1846, #d6457f); }
+.wr-guidance { background: radial-gradient(circle at 80% 85%, rgba(255, 255, 255, 0.16), transparent 45%), linear-gradient(160deg, #0f4c5c, #11999e); }
+.wr-grade { background: radial-gradient(circle at 50% 30%, rgba(167, 243, 208, 0.35), transparent 50%), linear-gradient(160deg, #021f1d, #03423e 50%, #037a68); }
+.wr-outro { background: linear-gradient(160deg, #03423e, #037a68 55%, #02a86f); }
+
+.wr-kicker { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.wr-huge { margin: 0; font-size: clamp(44px, 12vw, 68px); font-weight: 900; line-height: 1; letter-spacing: -0.04em; }
+.wr-number { margin: 0; font-size: clamp(56px, 18vw, 112px); font-weight: 900; line-height: 0.95; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.wr-number small { font-size: 0.45em; color: rgba(255, 255, 255, 0.7); letter-spacing: -0.02em; }
+.wr-label { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.25; }
+.wr-lead { margin: 0; max-width: 34ch; color: rgba(255, 255, 255, 0.86); font-size: 17px; line-height: 1.5; }
+.wr-lead b { color: #fff; }
+.wr-list { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+.wr-list li { padding: 10px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.14); font-size: 15px; font-weight: 600; }
+.wr-ring { display: grid; place-items: center; width: 168px; height: 168px; border-radius: 50%; background: conic-gradient(#fff calc(var(--p) * 1%), rgba(255, 255, 255, 0.2) 0); }
+.wr-ring span { display: grid; place-items: center; width: 136px; height: 136px; border-radius: 50%; background: #1a4fa8; font-size: 56px; font-weight: 900; }
+.wr-grade-badge { display: grid; place-items: center; width: 168px; height: 168px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 4px #a7f3d0, 0 0 60px rgba(167, 243, 208, 0.35); color: #fff; font-size: 84px; font-weight: 900; }
+
+.wr-card { padding: 22px; border-radius: 22px; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); }
+.wr-card-head { display: flex; flex-direction: column; gap: 2px; }
+.wr-card-head b { color: #a7f3d0; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.wr-card-head span { font-size: 26px; font-weight: 800; line-height: 1.2; }
+.wr-card-place { margin-top: 4px; color: rgba(255, 255, 255, 0.8); font-size: 14px; }
+.wr-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 0; }
+.wr-card-grid div { padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
+.wr-card-grid dt { color: rgba(255, 255, 255, 0.75); font-size: 12px; }
+.wr-card-grid dd { margin: 2px 0 0; font-size: 28px; font-weight: 800; }
+.wr-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.wr-btn { min-height: 46px; padding: 0 20px; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 99px; background: transparent; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.wr-btn-main { border-color: #fff; background: #fff; color: #03423e; }
+.wr-btn:hover { background: rgba(255, 255, 255, 0.16); }
+.wr-btn-main:hover { background: #e9fbf4; }
+
+.wr-nav { position: absolute; z-index: 1; top: 0; bottom: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.wr-prev { left: 0; width: 32%; }
+.wr-next { right: 0; width: 68%; }
+
+@media (prefers-reduced-motion: reduce) { .wr-slide > * { animation: none; } }
+
+/* Ajakan di dashboard mahasiswa (KP selesai) */
+.wrapped-cta {
+    position: relative; overflow: hidden; display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg); color: #fff; text-decoration: none;
+    background: radial-gradient(circle at 90% 0%, rgba(255, 255, 255, 0.22), transparent 40%), linear-gradient(120deg, #3b1d8f, #6d3fe0 45%, #2f6fde);
+    box-shadow: 0 10px 28px rgba(59, 29, 143, 0.25);
+}
+.wrapped-cta:hover { color: #fff; text-decoration: none; filter: brightness(1.05); }
+.wrapped-cta strong { display: block; font-size: var(--text-md); }
+.wrapped-cta .min0 > span { display: block; margin-top: 2px; color: rgba(255, 255, 255, 0.85); font-size: var(--text-sm); }
+.wrapped-cta-badge { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, 0.16); font-weight: 900; font-size: var(--text-sm); }
+.wrapped-cta-go { display: inline-flex; align-items: center; gap: 6px; flex: none; margin-left: auto; padding: 8px 16px; border-radius: 99px; background: #fff; color: #3b1d8f; font-size: var(--text-sm); font-weight: 700; }
+@media (max-width: 700px) { .wrapped-cta { flex-wrap: wrap; } .wrapped-cta-go { margin-left: 68px; } }

@@ -496,3 +496,7 @@ Tampilan potret untuk HP (lebar maks. 480px di desktop), acuan dua referensi ser
 ### Draf laporan KP otomatis (November 2026)
 
 `/laporan` (mahasiswa, menu Unduh di Timesheet → Draf laporan KP): halaman A4 tegak berdiri sendiri (`laporan/draf`), disusun dari data KP. Sampul (posisi, perusahaan, periode, nama, NIM, kampus), Bab I Pendahuluan (tujuan dari goals, tabel waktu dan tempat), Bab II Profil tempat KP, Bab III Rencana dan pelaksanaan (angka ringkas + tabel task per rencana), Bab IV Uraian kegiatan mingguan (catatan harian dikelompokkan per minggu KP), Bab V Bimbingan (sesi yang dikonfirmasi), Bab VI Penutup. Bagian yang harus ditulis sendiri berupa kotak bergaris putus. Tombol Salin teks (menyalin seluruh isi untuk ditempel ke Word) dan Cetak / Simpan PDF; tanpa pustaka tambahan.
+
+### KP Wrapped (November 2026)
+
+`/wrapped` (mahasiswa, hanya setelah KP selesai; ajakan berupa kartu ungu di dashboard): cerita layar penuh ala Spotify Wrapped (`App\Support\Wrapped`, `wrapped/show`). Slide: sapaan, hari tercatat, task selesai (cincin), minggu paling produktif, hari paling rajin + rentetan terpanjang, goal tercapai, bimbingan, nilai akhir, rangkuman. Tiap slide bergradasi sendiri, angka berhitung naik, batang progres di atas, ganti otomatis tiap 6 detik (berhenti bila kurangi gerak atau tab disembunyikan), bisa diketuk kiri/kanan, panah keyboard, Spasi (jeda), Esc (tutup). Slide rangkuman: tombol Simpan gambar (PNG 1080x1350 digambar di canvas, tanpa pustaka) dan Putar ulang.
