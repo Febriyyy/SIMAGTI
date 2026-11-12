@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Results\IssueCertificate;
 use App\Models\Certificate;
 use App\Models\Internship;
+use App\Support\AssessmentStandard;
 use App\Support\Campus;
 use App\Support\Qr;
 use Illuminate\Http\Request;
@@ -42,15 +43,30 @@ class CertificateController extends Controller
 
     public function verify(string $token): Response
     {
-        $certificate = Certificate::with('internship.student', 'internship.company')
+        $certificate = Certificate::with('internship.student', 'internship.company', 'internship.division', 'template')
             ->where('verification_token', $token)
             ->first();
+
+        // Keterangan nilai hanya untuk sertifikat yang sah dan penilaian yang sudah divalidasi dosen pembimbing.
+        $grade = null;
+        $assessment = $certificate?->isValid() ? $certificate->internship->assessment()->with('scores', 'rubric.aspects', 'validator')->first() : null;
+        if ($assessment?->isValidated()) {
+            $grade = [
+                'assessment' => $assessment,
+                'letter' => $certificate->internship->final_grade ?? $assessment->letter_grade,
+                'score' => (float) ($certificate->internship->final_score ?? $assessment->final_score),
+                'breakdown' => AssessmentStandard::breakdown($assessment->rubric, $assessment->scores, AssessmentStandard::weightsFor($assessment)),
+            ];
+        }
 
         return response()
             ->view('sertifikat.verifikasi', [
                 'certificate' => $certificate,
+                'grade' => $grade,
                 'university' => Campus::university(),
+                'faculty' => Campus::faculty(),
                 'program' => (string) Campus::get('campus.program'),
+                'city' => Campus::city(),
             ], $certificate ? 200 : 404)
             ->header('X-Robots-Tag', 'noindex');
     }

@@ -3707,3 +3707,104 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .prof-art { right: -16px; top: 12px; width: 80px; height: 80px; }
     .prof-art-2 { display: none; }
 }
+
+/* =====================================================================
+   Verifikasi sertifikat (hasil pindai QR), November 2026: tampilan potret.
+   Pita status, sertifikat potret (pita motif geometris, tahun, judul, nama bergaris, stempel), kartu nilai terpisah.
+   Ukuran sertifikat memakai satuan container (cqw) agar proporsinya sama di HP dan desktop.
+   ===================================================================== */
+.vx-body {
+    min-height: 100vh; margin: 0; color: var(--text);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(2, 168, 111, 0.12), rgba(2, 168, 111, 0) 40%),
+        radial-gradient(circle at 100% 30%, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0) 40%),
+        var(--page);
+}
+.vx { container-type: inline-size; display: flex; flex-direction: column; gap: var(--space-4); width: 100%; max-width: 460px; margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-7); }
+.vx-top { display: flex; justify-content: center; padding: var(--space-2) 0; }
+
+/* Status */
+.vx-status { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-lg); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); }
+.vx-status-icon { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; box-shadow: 0 0 0 5px var(--primary-soft); }
+.vx-invalid .vx-status-icon, .vx-missing .vx-status-icon { background: var(--red); box-shadow: 0 0 0 5px var(--red-soft); }
+.vx-status-title { margin: 0; color: var(--text); font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.01em; }
+.vx-status-sub { margin: 4px 0 0; color: var(--gray); font-size: var(--text-sm); line-height: 1.5; overflow-wrap: anywhere; }
+
+.vx-jump { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); padding: 4px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.vx-jump a { display: grid; place-items: center; min-height: 40px; border-radius: var(--radius-pill); color: var(--gray); font-size: var(--text-sm); font-weight: 600; }
+.vx-jump a:hover { background: var(--primary-tint); color: var(--primary-dark); text-decoration: none; }
+.vx-jump a:first-child { background: var(--primary); color: #fff; }
+
+/* Sertifikat potret */
+.vx-sheet {
+    container-type: inline-size; position: relative; display: flex; flex-direction: column; overflow: hidden;
+    min-height: 141.4cqw; border-radius: 6px; background: #fdfdfb;
+    box-shadow: 0 0 0 1px rgba(3, 66, 62, 0.08), 0 2px 4px rgba(3, 66, 62, 0.04), 0 24px 48px -12px rgba(3, 66, 62, 0.22);
+    scroll-margin-top: var(--space-4);
+}
+.vx-sheet::after { content: ''; position: absolute; inset: 3cqw; border: 0.3cqw solid rgba(3, 122, 104, 0.18); border-radius: 2px; pointer-events: none; }
+.vx-band { display: grid; grid-template-columns: 18cqw 1fr; height: 27cqw; flex: none; }
+.vx-year { display: grid; place-items: center; background: var(--brand-ink, #03423e); }
+.vx-year span { color: #fff; font-size: 4.6cqw; font-weight: 800; line-height: 1; letter-spacing: 0.04em; writing-mode: vertical-rl; transform: rotate(180deg); }
+.vx-tiles { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, 1fr); background: #e7f6f0; }
+.vx-tile { display: block; }
+.vx-tile.a { background: #02a86f; }
+.vx-tile.b { background: #037a68; }
+.vx-tile.c { background: #a7e6cf; }
+.vx-tile.tl { border-radius: 100% 0 0 0; }
+.vx-tile.tr { border-radius: 0 100% 0 0; }
+.vx-tile.bl { border-radius: 0 0 0 100%; }
+.vx-tile.br { border-radius: 0 0 100% 0; }
+
+.vx-sheet-body { position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; padding: 6cqw 8cqw 7cqw; }
+.vx-org { display: flex; align-items: center; gap: 2.4cqw; }
+.vx-org img { width: 7cqw; height: 7cqw; flex: none; }
+.vx-org strong, .vx-org span { display: block; }
+.vx-org strong { color: var(--text); font-size: 2.9cqw; font-weight: 700; line-height: 1.25; }
+.vx-org span { color: var(--muted); font-size: 2.5cqw; line-height: 1.3; }
+.vx-date { flex: none; margin-left: auto; padding: 0.8cqw 2.4cqw; border-radius: 99px; background: #e7f6f0; color: var(--primary-dark); font-size: 2.4cqw !important; font-weight: 600; white-space: nowrap; }
+
+.vx-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 3cqw; margin-top: 8cqw; }
+.vx-heading h2 { margin: 0; color: var(--brand-ink, #03423e); font-size: 7.4cqw; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; text-transform: uppercase; }
+.vx-spark { flex: none; width: 8cqw; height: 8cqw; margin-top: 1cqw; color: #02a86f; }
+
+.vx-given { margin: 7cqw 0 0; color: var(--muted); font-size: 2.8cqw; }
+.vx-name { margin: 1.5cqw 0 0; padding-bottom: 2cqw; border-bottom: 0.5cqw solid #02a86f; color: var(--text); font-size: 7.2cqw; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.vx-desc { margin: 4cqw 0 0; color: var(--gray); font-size: 3.1cqw; line-height: 1.6; }
+.vx-desc strong { color: var(--text); font-weight: 650; }
+
+.vx-sheet-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 4cqw; margin-top: auto; padding-top: 6cqw; }
+.vx-sign { min-width: 0; }
+.vx-sign-line { display: block; width: 34cqw; max-width: 100%; margin-bottom: 1.6cqw; border-top: 0.3cqw solid var(--text); }
+.vx-sign strong, .vx-sign small { display: block; }
+.vx-sign strong { color: var(--text); font-size: 2.9cqw; font-weight: 700; }
+.vx-sign small { color: var(--muted); font-size: 2.5cqw; }
+.vx-seal { flex: none; width: 22cqw; height: 22cqw; color: var(--primary); }
+.vx-seal svg { display: block; width: 100%; height: 100%; }
+.vx-seal-out { fill: #e7f6f0; stroke: var(--primary); stroke-width: 2; stroke-dasharray: 3 3; }
+.vx-seal-in { fill: var(--primary); }
+.vx-seal-text { fill: var(--primary-dark); font-size: 8.5px; font-weight: 700; }
+.vx-seal-check { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.vx-number { margin: 3cqw 0 0; color: var(--muted); font-size: 2.4cqw; letter-spacing: 0.02em; }
+
+/* Kartu nilai */
+.vx-card { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); scroll-margin-top: var(--space-4); }
+.vx-card-title { margin: 0; color: var(--text); font-size: var(--text-md); font-weight: 700; }
+.vx-grade { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4); border-radius: var(--radius); background: linear-gradient(135deg, var(--primary-tint), #eef4ff); }
+.vx-grade-letter { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 50%; background: var(--surface); box-shadow: inset 0 0 0 3px var(--primary), 0 6px 16px rgba(3, 122, 104, 0.18); color: var(--primary-dark); font-size: 28px; font-weight: 800; }
+.vx-grade-score { color: var(--text); font-size: 30px; font-weight: 750; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.vx-grade-score small { margin-left: 2px; color: var(--muted); font-size: var(--text-sm); font-weight: 500; letter-spacing: 0; }
+.vx-grade-sub { margin-top: 6px; color: var(--gray); font-size: var(--text-xs); }
+.vx-cats { display: flex; flex-direction: column; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+.vx-cat-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); color: var(--text); font-size: var(--text-sm); font-weight: 600; }
+.vx-cat-top small { margin-left: 4px; color: var(--muted); font-size: var(--text-xs); font-weight: 400; }
+.vx-cat-top b { font-variant-numeric: tabular-nums; }
+.vx-bar { display: block; height: 6px; margin-top: var(--space-2); border-radius: 99px; background: var(--primary-soft); overflow: hidden; }
+.vx-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--primary), #02a86f); transform-origin: left center; animation: grow-x 900ms var(--ease-out) both; }
+.vx-note { margin: 0; padding-top: var(--space-3); border-top: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); }
+.vx-empty { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+
+.vx-foot { margin: var(--space-2) 0 0; color: var(--muted); font-size: var(--text-xs); line-height: 1.5; text-align: center; }
+
+@media (min-width: 900px) { .vx { max-width: 480px; padding-top: var(--space-6); } }
+@media print { .vx-jump, .vx-foot { display: none; } }

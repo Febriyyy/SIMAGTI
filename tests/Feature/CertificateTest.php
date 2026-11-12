@@ -92,12 +92,15 @@ class CertificateTest extends TestCase
             ->assertSee('Sertifikat sah')
             ->assertSee('Salsa Nabila')
             ->assertSee($certificate->number)
+            ->assertSee('class="vx-sheet"', false)   // sertifikat tampilan potret
+            ->assertSee('Keterangan nilai')
             ->assertDontSee('2310511045')
             ->assertHeader('X-Robots-Tag', 'noindex');
 
         $certificate->update(['status' => 'dicabut', 'revoked_at' => now(), 'revoked_reason' => 'Salah data']);
         $this->get("/sertifikat/verifikasi/{$certificate->verification_token}")->assertOk()
-            ->assertSee('Sertifikat tidak berlaku')->assertSee('Salah data');
+            ->assertSee('Sertifikat tidak berlaku')->assertSee('Salah data')
+            ->assertDontSee('Keterangan nilai'); // nilai hanya untuk sertifikat yang sah
 
         $this->get('/sertifikat/verifikasi/'.str_repeat('x', 48))->assertNotFound()->assertSee('Sertifikat tidak ditemukan');
     }
