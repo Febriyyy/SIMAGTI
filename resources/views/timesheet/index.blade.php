@@ -70,7 +70,6 @@
                     @endif
                 </div>
             @else
-                @include('timesheet._plan-cards', ['plans' => $plans, 'canEdit' => $canEdit])
                 @include('timesheet._gantt', ['canEdit' => $canEdit])
             @endif
         </section>

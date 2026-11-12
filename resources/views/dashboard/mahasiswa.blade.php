@@ -107,7 +107,8 @@
             </div>
         </section>
 
-        <div class="stat-grid">
+        {{-- Kartu angka terpisah (acuan referensi: ikon + judul, angka di kotak dalam) --}}
+        <div class="stat-grid dash-stats">
             @php($activePlans = $plans->filter(fn ($p) => $p->phase() === 'active')->count())
             <x-stat label="Rencana kegiatan" :value="$plans->count()" unit="kegiatan" :href="route('timesheet.index')"
                     :tone="$plans->isEmpty() ? 'amber' : 'blue'" :hint="$plans->isEmpty() ? 'Isi rencana dulu di timesheet' : $activePlans.' sedang berjalan'" />
@@ -117,7 +118,7 @@
                         :hint="$a?->isValidated() ? 'Sudah divalidasi' : 'Muncul setelah divalidasi dosen pembimbing'" />
             @else
                 <x-stat label="Goals tercapai" :value="$goals->whereNotNull('achieved_at')->count()" :unit="'dari '.$goals->count()" :href="route('kegiatan.index')"
-                        tone="gray" :hint="$goals->isEmpty() ? 'Tulis goals di halaman Kegiatan' : 'Tandai di halaman Kegiatan'" />
+                        tone="gray" :hint="$goals->isEmpty() ? 'Tulis di Kegiatan' : 'Tandai di Kegiatan'" />
             @endif
             <x-stat label="Sisa waktu KP" :value="$internship->status === 'selesai' ? null : $internship->daysLeft()" unit="hari" empty="Selesai"
                     :tone="$internship->status !== 'selesai' && $internship->daysLeft() <= 21 ? 'amber' : 'gray'"
@@ -135,87 +136,94 @@
             </div>
         @endif
 
-        <div class="layout">
-            <div class="col">
-                <section class="card">
-                    <div class="card-head">
-                        <div>
-                            <h2 class="card-title">Perlu dikerjakan</h2>
-                            <p class="card-sub">Belum selesai, tenggat sampai akhir {{ mb_strtolower($period->short) }}</p>
-                        </div>
-                        <a href="{{ route('kegiatan.index') }}" class="btn btn-sm">Board</a>
-                    </div>
-
-                    @if ($tasks->isEmpty())
-                        <div class="empty">
-                            <strong>Tidak ada task yang mendesak</strong>
-                            Tambahkan task baru di halaman <a href="{{ route('kegiatan.index') }}">Kegiatan</a>.
-                        </div>
-                    @else
-                        <ul class="task-mini">
-                            @foreach ($tasks as $task)
-                                <li>
-                                    <a href="{{ route('tugas.show', $task) }}" class="task-mini-row">
-                                        <span class="kcard-key">{{ $task->key() }}</span>
-                                        <span class="task-mini-title truncate" title="{{ $task->title }}">{{ $task->title }}</span>
-                                        <span class="prio prio-{{ $task->priority }}" title="Prioritas {{ $task->priorityLabel() }}"><x-ikon name="flag" :size="14" :fill="in_array($task->priority, ['urgent', 'high'], true)" /></span>
-                                        <x-chip :tone="$task->column?->tone() ?? $task->statusTone()">{{ $task->column?->name ?? $task->statusLabel() }}</x-chip>
-                                        <span @class(['task-mini-due', 'is-late' => $task->isOverdue()])>{{ $task->due_date?->locale('id')->translatedFormat('j M') ?? '–' }}</span>
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </section>
-
+        {{-- Baris bento: kiri lebar, kanan sempit; kartu dalam satu baris sama tinggi --}}
+        <div class="dash-row">
+            <section class="card dash-plans" aria-labelledby="plans-title">
+                <div class="card-head">
+                    <h2 class="card-title" id="plans-title">Rencana kegiatan <span class="dash-count">{{ $plans->count() }}</span></h2>
+                    <a href="{{ route('timesheet.index') }}" class="dash-more">Timesheet <x-ikon name="arrow-up-right" :size="16" /></a>
+                </div>
                 @if ($plans->isEmpty())
-                    <section class="card">
-                        <div class="card-head"><h2 class="card-title">Rencana kegiatan</h2></div>
-                        <div class="empty">
-                            <strong>Belum ada rencana</strong>
-                            <a href="{{ route('timesheet.index') }}">Susun rencana</a> dulu, lalu buat task di bawahnya.
-                        </div>
-                    </section>
+                    <div class="empty">
+                        <strong>Belum ada rencana</strong>
+                        <a href="{{ route('timesheet.index') }}">Susun rencana</a> dulu, lalu buat task di bawahnya.
+                    </div>
                 @else
-                    @include('dashboard._week', ['week' => $week])
+                    @include('timesheet._plan-cards', ['plans' => $plans])
                 @endif
-            </div>
+            </section>
 
-            <div class="col">
-                <section class="card">
-                    <div class="card-head">
-                        <h2 class="card-title">Meeting minggu ini</h2>
+            <section class="card" aria-labelledby="place-title">
+                <div class="card-head">
+                    <h2 class="card-title" id="place-title">Tempat magang</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="kv">
+                        <div><dt>Perusahaan</dt><dd>{{ $internship->company?->name }}@if ($internship->company?->city)<small>{{ $internship->company->city }}</small>@endif</dd></div>
+                        <div><dt>Divisi</dt><dd>{{ $internship->division?->name ?? '–' }}</dd></div>
+                        <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
+                        <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}@if ($internship->supervisor_title)<small>{{ $internship->supervisor_title }}</small>@endif</dd></div>
+                        <div><dt>Dosen pembimbing</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
+                        <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>Bulan ke-{{ $internship->currentMonth() }} dari {{ $internship->durationMonths() }}</small></dd></div>
+                    </dl>
+                </div>
+            </section>
+        </div>
+
+        <div class="dash-row">
+            <section class="card" aria-labelledby="todo-title">
+                <div class="card-head">
+                    <div>
+                        <h2 class="card-title" id="todo-title">Perlu dikerjakan</h2>
+                        <p class="card-sub">Belum selesai, tenggat sampai akhir {{ mb_strtolower($period->short) }}</p>
                     </div>
-                    @php($host = $internship->supervisor?->listName() ?? 'Company Supervisor')
-                    @if ($meeting)
-                        <div class="meeting">
-                            <div class="meeting-when">{{ $meeting->dayLabel() }}, {{ $meeting->timeLabel() }}</div>
-                            <div class="meeting-who">Bersama {{ $host }}</div>
-                            <a href="{{ $meeting->url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-                                <x-ikon name="video" :size="16" /> Gabung meeting
-                            </a>
+                    <a href="{{ route('kegiatan.index') }}" class="dash-more">Board <x-ikon name="arrow-up-right" :size="16" /></a>
+                </div>
+
+                @if ($tasks->isEmpty())
+                    <div class="empty">
+                        <strong>Tidak ada task yang mendesak</strong>
+                        Tambahkan task baru di halaman <a href="{{ route('kegiatan.index') }}">Kegiatan</a>.
+                    </div>
+                @else
+                    <ul class="task-mini">
+                        @foreach ($tasks as $task)
+                            <li>
+                                <a href="{{ route('tugas.show', $task) }}" class="task-mini-row">
+                                    <span class="kcard-key">{{ $task->key() }}</span>
+                                    <span class="task-mini-title truncate" title="{{ $task->title }}">{{ $task->title }}</span>
+                                    <span class="prio prio-{{ $task->priority }}" title="Prioritas {{ $task->priorityLabel() }}"><x-ikon name="flag" :size="14" :fill="in_array($task->priority, ['urgent', 'high'], true)" /></span>
+                                    <x-chip :tone="$task->column?->tone() ?? $task->statusTone()">{{ $task->column?->name ?? $task->statusLabel() }}</x-chip>
+                                    <span @class(['task-mini-due', 'is-late' => $task->isOverdue()])>{{ $task->due_date?->locale('id')->translatedFormat('j M') ?? '–' }}</span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </section>
+
+            <section class="card dash-meet" aria-labelledby="meet-title">
+                <div class="card-head">
+                    <h2 class="card-title" id="meet-title">Meeting minggu ini</h2>
+                </div>
+                @php($host = $internship->supervisor?->listName() ?? 'Company Supervisor')
+                @if ($meeting)
+                    <div class="dash-meet-body">
+                        <div class="dash-meet-when">
+                            <span class="dash-meet-icon" aria-hidden="true"><x-ikon name="video" :size="20" /></span>
+                            <div>
+                                <div class="meeting-when">{{ $meeting->dayLabel() }}, {{ $meeting->timeLabel() }}</div>
+                                <div class="meeting-who">Bersama {{ $host }}</div>
+                            </div>
                         </div>
-                    @else
-                        <p class="meeting-empty">Belum ada jadwal meeting minggu ini. {{ $host }} akan mengaturnya.</p>
-                    @endif
-                </section>
-
-                <section class="card">
-                    <div class="card-head">
-                        <h2 class="card-title">Tempat magang</h2>
+                        <a href="{{ $meeting->url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            <x-ikon name="video" :size="16" /> Gabung meeting
+                        </a>
                     </div>
-                    <div class="card-body">
-                        <dl class="kv">
-                            <div><dt>Perusahaan</dt><dd>{{ $internship->company?->name }}@if ($internship->company?->city)<small>{{ $internship->company->city }}</small>@endif</dd></div>
-                            <div><dt>Divisi</dt><dd>{{ $internship->division?->name ?? '–' }}</dd></div>
-                            <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
-                            <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}@if ($internship->supervisor_title)<small>{{ $internship->supervisor_title }}</small>@endif</dd></div>
-                            <div><dt>Dosen pembimbing</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
-                            <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>Bulan ke-{{ $internship->currentMonth() }} dari {{ $internship->durationMonths() }}</small></dd></div>
-                        </dl>
-                    </div>
-                </section>
-            </div>
+                @else
+                    <p class="meeting-empty">Belum ada jadwal meeting minggu ini. {{ $host }} akan mengaturnya.</p>
+                @endif
+            </section>
         </div>
     @endif
 @endsection

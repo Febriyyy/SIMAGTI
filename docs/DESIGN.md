@@ -434,3 +434,7 @@ Kartu rencana kini terang dengan titik warna rencana dan label status: Berjalan 
 Kartu rencana kemudian dipindah dari dashboard ke tab Rencana di Timesheet, di atas Gantt (sekaligus keterangan warna batang Gantt; pemilik bisa klik kartu untuk mengubah rencana). Dashboard tinggal menampilkan kalender "Jadwal task" dengan jumlah task minggu yang dipilih.
 
 Atas permintaan pemilik proyek, kartu rencana di Timesheet kembali ke gaya awal (blok warna pekat, teks putih, lingkaran dekoratif); label status tetap ada sebagai pil putih transparan (putih pekat untuk Berjalan dan Terlambat).
+
+### Dashboard mahasiswa bento (November 2026)
+
+Acuan: referensi Dribbble di brief (kartu angka terpisah, kisi kartu rapi). Jadwal task mingguan (`WeekPlanner`, `dashboard/_week`, `timesheet/_week-cal`) ditiadakan. Urutan: banner sapaan, kartu Kemajuan KP, tiga kartu angka terpisah (`.stat-grid.dash-stats`: ikon + judul, angka dan keterangan berbentuk pil dalam satu kotak dalam abu), lalu dua baris bento (`.dash-row`, kiri 2/3 dan kanan 1/3, kartu satu baris sama tinggi): **Rencana kegiatan** (kartu berwarna per rencana, dipindah dari Timesheet, tautan Timesheet di kepala) + **Tempat magang**, lalu **Perlu dikerjakan** + **Meeting minggu ini** (kotak waktu dan tombol Gabung selebar kartu). Di ≤1100px baris bento menjadi satu kolom. Timesheet kembali langsung menampilkan Gantt.

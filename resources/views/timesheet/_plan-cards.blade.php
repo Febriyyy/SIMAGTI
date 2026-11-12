@@ -1,5 +1,5 @@
 {{--
-    Kartu per rencana kegiatan (tab Rencana di Timesheet, di atas Gantt; sekaligus keterangan warna Gantt).
+    Kartu per rencana kegiatan (dashboard mahasiswa).
     Kartu terang dengan titik warna rencana, status yang jelas (Berjalan / Selesai / Akan datang / Terlambat),
     tanggal, dan progres task. Rencana yang sedang berjalan disorot. Pemilik bisa klik kartu untuk mengubah rencana.
     Variabel: $plans (withCount tasks, completed_tasks_count), $canEdit (opsional)

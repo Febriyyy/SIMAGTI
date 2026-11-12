@@ -17,7 +17,6 @@ use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
 use App\Support\KpProgress;
 use App\Support\Period;
-use App\Support\WeekPlanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -48,7 +47,7 @@ class DashboardController extends Controller
             ->first();
 
         $data = ['user' => $user, 'internship' => $internship, 'tasks' => collect(), 'meeting' => null,
-            'period' => null, 'next' => null, 'steps' => [], 'plans' => collect(), 'gantt' => null, 'week' => null, 'goals' => collect()];
+            'period' => null, 'next' => null, 'steps' => [], 'plans' => collect(), 'gantt' => null, 'goals' => collect()];
 
         if (! $internship) {
             return view('dashboard.mahasiswa', $data);
@@ -77,8 +76,6 @@ class DashboardController extends Controller
             $data['plans'] = $internship->activityPlans()
                 ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'completed')])
                 ->get();
-            // Kalender minggu di dashboard: ?minggu=-1 untuk minggu lalu, 1 untuk minggu depan
-            $data['week'] = WeekPlanner::build($internship, $data['plans'], max(-60, min(60, request()->integer('minggu'))));
             $data['goals'] = $internship->goals()->get();
         }
 

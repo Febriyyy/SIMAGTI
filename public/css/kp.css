@@ -3234,3 +3234,52 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .plan-card-open:focus-visible { outline: none; }
 .plan-card-open:focus-visible::after { outline: 2px solid var(--text); outline-offset: 2px; }
 .card-title .week-cal-count { margin-left: var(--space-1); vertical-align: 2px; }
+
+/* =====================================================================
+   Dashboard mahasiswa bento (November 2026; acuan referensi Dribbble di brief):
+   kartu angka terpisah dengan angka di kotak dalam, baris kiri lebar / kanan sempit yang sama tinggi.
+   ===================================================================== */
+/* Kartu angka terpisah */
+.stat-grid.dash-stats { gap: var(--space-4); overflow: visible; background: none; border: 0; box-shadow: none; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.dash-stats > .stat {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head head" "value foot";
+    row-gap: var(--space-3); column-gap: 0; padding: var(--space-4);
+    border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+}
+.dash-stats > .stat-link:hover { background: var(--surface); border-color: var(--line-strong); box-shadow: var(--shadow-hover); }
+.dash-stats .stat-head { grid-area: head; }
+.dash-stats .stat-value, .dash-stats .stat-foot { align-self: stretch; background: var(--surface-2); }
+.dash-stats .stat-value { grid-area: value; display: flex; align-items: baseline; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: 26px; }
+.dash-stats .stat-value.is-empty { align-items: center; font-size: var(--text-lg); line-height: 1.3; }
+.dash-stats .stat-foot { grid-area: foot; display: flex; align-items: center; justify-content: flex-end; min-height: 0; margin: 0; padding: 0 var(--space-3) 0 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.dash-stats .stat-blue .stat-hint, .dash-stats .stat-gray .stat-hint { display: inline-block; }
+.dash-stats .stat-hint { max-width: 150px; padding: 3px var(--space-2); border-radius: var(--radius-pill); background: var(--acc-soft); color: var(--acc-ink); font-size: var(--text-2xs); font-weight: 600; }
+.dash-stats .stat-gray .stat-hint { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); }
+
+/* Baris bento */
+.dash-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap: var(--space-5); align-items: stretch; }
+.dash-row > .card { display: flex; flex-direction: column; min-width: 0; margin: 0; }
+.dash-count { display: inline-grid; place-items: center; min-width: 22px; height: 20px; margin-left: var(--space-1); padding: 0 6px; border-radius: var(--radius-pill); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: var(--text-2xs); font-weight: 700; vertical-align: 2px; }
+.dash-more { display: inline-flex; align-items: center; gap: 4px; flex: none; color: var(--primary); font-size: var(--text-sm); font-weight: 600; }
+.dash-more:hover { color: var(--primary-dark); text-decoration: none; }
+.dash-plans .plan-cards { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); padding: var(--space-4) var(--card-x) var(--card-y); }
+
+/* Meeting: kotak dalam + tombol penuh di bawah */
+.dash-meet-body { display: flex; flex: 1; flex-direction: column; justify-content: flex-start; gap: var(--space-3); padding: var(--space-4) var(--card-x) var(--card-y); }
+.dash-meet-when { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-sm); background: var(--primary-tint); }
+.dash-meet-icon { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--surface); color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary-soft); }
+.dash-meet-when .meeting-when { font-size: var(--text-md); }
+.dash-meet .btn { justify-content: center; }
+.dash-meet .meeting-empty { flex: 1; display: grid; place-items: center; padding: var(--space-5) var(--card-x); text-align: center; }
+
+@media (max-width: 1100px) {
+    .dash-row { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+    .stat-grid.dash-stats { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
+    .dash-stats > .stat:last-child:nth-child(odd) { grid-column: auto; }
+    .dash-plans .plan-cards { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: var(--space-3); gap: var(--space-2); }
+}
+/* Kartu rencana mengisi tinggi baris (sejajar dengan Tempat magang); progres turun ke bawah kartu */
+.dash-plans .plan-cards { flex: 1; grid-auto-rows: minmax(0, 1fr); align-content: stretch; }
+.dash-plans .plan-card-foot { margin-top: auto; padding-top: var(--space-3); }
