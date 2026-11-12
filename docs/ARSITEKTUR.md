@@ -97,3 +97,19 @@ Link aktivasi tampil di halaman Aktivasi Supervisor milik TU Fakultas dan bisa d
 ## Yang belum ada
 
 Lihat bagian "Belum dikerjakan" di `RIWAYAT-PROYEK.md`.
+
+## Pengingat otomatis (November 2026)
+
+Perintah `php artisan kp:pengingat` (aksi `App\Actions\Reminders\SendReminders`, notifikasi `App\Notifications\KpReminder`) dijadwalkan setiap hari pukul 07.00 di `routes/console.php`. Pengingat masuk ke lonceng notifikasi dan email (selama `MAIL_MAILER=log`, email hanya tercatat di `storage/logs`).
+
+| Penerima | Kapan | Frekuensi maksimal |
+|---|---|---|
+| Mahasiswa | 3 hari tidak mengisi catatan (hanya hari kerja) | sekali per 3 hari |
+| Mahasiswa | task belum selesai, tenggat hari ini s.d. 2 hari lagi | sekali per task per tenggat |
+| Company Supervisor | penilaian akhir dibuka (H-14) dan belum dikirim | sekali |
+| Company Supervisor | sisa KP <= 3 hari dan penilaian belum dikirim | sekali |
+| Dosen pembimbing | bimbingan menunggu konfirmasi lebih dari 3 hari (dirangkum per dosen) | sekali per 3 hari |
+
+Pengingat yang sama tidak dikirim ulang: setiap pengingat menyimpan kunci (`data.key`) di tabel `notifications` dan dicek sebelum kirim.
+
+**Saat hosting:** tambahkan cron `* * * * * cd /path/proyek && php artisan schedule:run >> /dev/null 2>&1` dan setel SMTP di `.env` (`MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`). Uji manual kapan saja dengan `php artisan kp:pengingat`.

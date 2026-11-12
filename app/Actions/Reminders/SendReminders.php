@@ -1,0 +1,179 @@
+<?php
+
+namespace App\Actions\Reminders;
+
+use App\Models\GuidanceSession;
+use App\Models\Internship;
+use App\Models\User;
+use App\Models\WeeklyTask;
+use App\Notifications\KpReminder;
+use Illuminate\Support\Carbon;
+
+/**
+ * Pengingat otomatis harian (dijalankan perintah kp:pengingat, terjadwal 07.00).
+ *
+ * - Mahasiswa: 3 hari tidak mengisi catatan (hanya hari kerja, paling sering sekali per 3 hari);
+ *   task belum selesai yang tenggatnya hari ini s.d. 2 hari lagi (sekali per task).
+ * - Company Supervisor: penilaian akhir dibuka (H-14), lalu sisa <= 3 hari dan belum dikirim (masing-masing sekali).
+ * - Dosen pembimbing: bimbingan menunggu konfirmasi lebih dari 3 hari (paling sering sekali per 3 hari).
+ *
+ * Pengingat yang sama tidak dikirim ulang: setiap pengingat punya kunci yang dicek di tabel notifications.
+ */
+class SendReminders
+{
+    public const IDLE_DAYS = 3;
+
+    public const DUE_SOON_DAYS = 2;
+
+    public const SUPERVISOR_LAST_DAYS = 3;
+
+    public const GUIDANCE_WAIT_DAYS = 3;
+
+    /** @return array{idle: int, due: int, assessment: int, guidance: int} */
+    public function handle(?Carbon $today = null): array
+    {
+        $today = ($today ?? Carbon::today())->copy()->startOfDay();
+        $sent = ['idle' => 0, 'due' => 0, 'assessment' => 0, 'guidance' => 0];
+
+        $running = Internship::query()
+            ->where('status', 'berjalan')
+            ->whereDate('start_date', '<=', $today)
+            ->with(['student', 'supervisor', 'assessment'])
+            ->get();
+
+        foreach ($running as $internship) {
+            $sent['idle'] += $this->idle($internship, $today);
+            $sent['due'] += $this->dueSoon($internship, $today);
+            $sent['assessment'] += $this->assessment($internship, $today);
+        }
+
+        $sent['guidance'] = $this->guidance($today);
+
+        return $sent;
+    }
+
+    /** Mahasiswa belum mengisi catatan selama IDLE_DAYS hari (tidak dikirim Sabtu/Minggu). */
+    private function idle(Internship $internship, Carbon $today): int
+    {
+        $student = $internship->student;
+        if (! $student || $today->isWeekend() || $internship->start_date->gt($today->copy()->subDays(self::IDLE_DAYS))) {
+            return 0;
+        }
+
+        $last = $internship->timeEntries()->max('work_date');
+        if ($last && Carbon::parse($last)->gt($today->copy()->subDays(self::IDLE_DAYS))) {
+            return 0;
+        }
+
+        $days = $last ? (int) Carbon::parse($last)->startOfDay()->diffInDays($today) : null;
+
+        return $this->send($student, "idle:{$internship->id}", self::IDLE_DAYS,
+            'Catatan kegiatan belum diisi',
+            $days ? "Catatan terakhir {$days} hari lalu. Isi catatan hari ini agar kegiatan KP tetap tercatat." : 'Belum ada catatan kegiatan. Isi catatan hari ini agar kegiatan KP tercatat.',
+            route('timesheet.index').'#catatan', 'edit');
+    }
+
+    /** Task belum selesai yang tenggatnya hari ini sampai DUE_SOON_DAYS hari lagi. */
+    private function dueSoon(Internship $internship, Carbon $today): int
+    {
+        if (! $internship->student) {
+            return 0;
+        }
+
+        $tasks = WeeklyTask::query()
+            ->where('internship_id', $internship->id)
+            ->where('status', '!=', 'completed')
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '>=', $today)
+            ->whereDate('due_date', '<=', $today->copy()->addDays(self::DUE_SOON_DAYS))
+            ->get();
+
+        $count = 0;
+        foreach ($tasks as $task) {
+            $when = $task->due_date->isSameDay($today) ? 'hari ini' : $task->due_date->locale('id')->translatedFormat('l, j M');
+            $count += $this->send($internship->student, "due:{$task->id}:{$task->due_date->toDateString()}", null,
+                "Tenggat task {$task->key()} {$when}",
+                $task->title,
+                route('tugas.show', $task), 'flag');
+        }
+
+        return $count;
+    }
+
+    /** Company Supervisor: penilaian dibuka, lalu pengingat terakhir bila sisa hari sedikit dan belum dikirim. */
+    private function assessment(Internship $internship, Carbon $today): int
+    {
+        $supervisor = $internship->supervisor;
+        $status = $internship->assessment?->status;
+        if (! $supervisor || in_array($status, ['submitted', 'validated'], true) || $today->lt($internship->assessmentOpensOn())) {
+            return 0;
+        }
+
+        $name = $internship->student?->name ?? 'mahasiswa';
+        $url = route('penilaian.edit', $internship);
+        $daysLeft = (int) $today->diffInDays($internship->end_date->copy()->startOfDay(), false);
+
+        if ($daysLeft <= self::SUPERVISOR_LAST_DAYS) {
+            $when = $daysLeft <= 0 ? 'hari ini' : "{$daysLeft} hari lagi";
+
+            return $this->send($supervisor, "assess-due:{$internship->id}", null,
+                "Penilaian {$name} belum dikirim",
+                "KP berakhir {$when}. Isi penilaian akhir agar dosen pembimbing bisa memvalidasi.",
+                $url, 'award', 'red');
+        }
+
+        return $this->send($supervisor, "assess-open:{$internship->id}", null,
+            "Penilaian akhir {$name} sudah dibuka",
+            'KP berakhir '.$internship->end_date->locale('id')->translatedFormat('j F Y').'. Penilaian bisa diisi bertahap dan disimpan sebagai draf.',
+            $url, 'award', 'blue');
+    }
+
+    /** Dosen pembimbing: bimbingan yang menunggu konfirmasi lebih dari GUIDANCE_WAIT_DAYS hari, dirangkum per dosen. */
+    private function guidance(Carbon $today): int
+    {
+        $waiting = GuidanceSession::query()
+            ->where('status', 'pending')
+            ->where('created_at', '<=', $today->copy()->subDays(self::GUIDANCE_WAIT_DAYS)->endOfDay())
+            ->whereHas('internship', fn ($q) => $q->whereNotNull('lecturer_id'))
+            ->with('internship.lecturer')
+            ->get()
+            ->groupBy(fn (GuidanceSession $s) => $s->internship->lecturer_id);
+
+        $count = 0;
+        foreach ($waiting as $sessions) {
+            $lecturer = $sessions->first()->internship->lecturer;
+            if (! $lecturer) {
+                continue;
+            }
+            $count += $this->send($lecturer, "guidance:{$lecturer->id}", self::GUIDANCE_WAIT_DAYS,
+                $sessions->count().' bimbingan menunggu konfirmasi',
+                'Sudah lebih dari '.self::GUIDANCE_WAIT_DAYS.' hari. Konfirmasi agar mahasiswa bisa memenuhi syarat bimbingan.',
+                route('bimbingan.antrean'), 'chat');
+        }
+
+        return $count;
+    }
+
+    /**
+     * Kirim bila pengingat dengan kunci yang sama belum pernah dikirim (atau sudah lebih dari $everyDays hari lalu).
+     * $everyDays null = hanya sekali.
+     */
+    private function send(User $user, string $key, ?int $everyDays, string $title, ?string $body, ?string $url, string $icon, string $tone = 'amber'): int
+    {
+        if (! $user->is_active) {
+            return 0;
+        }
+
+        $already = $user->notifications()
+            ->where('data', 'like', '%"key":"'.$key.'"%')
+            ->when($everyDays !== null, fn ($q) => $q->where('created_at', '>', now()->subDays($everyDays)->addHour()))
+            ->exists();
+        if ($already) {
+            return 0;
+        }
+
+        $user->notify(new KpReminder($key, $title, $body, $url, $icon, $tone));
+
+        return 1;
+    }
+}
