@@ -21,44 +21,45 @@
         </details>
     </div>
 
-    {{-- Profil ringkas: avatar bercincin progres task, identitas akademik, lalu deretan fakta dalam kotak dalam --}}
+    {{-- Profil ringkas (acuan kartu FlowMail di brief): kepala dengan avatar, nama, identitas dan status KP;
+         baris info kecil berikon; empat kotak angka berlabel. --}}
     <?php
         $id = $student->academicIdentity();
         $taskPct = $stats['tasks'] > 0 ? (int) round($stats['done'] / $stats['tasks'] * 100) : 0;
-        $timePct = $internship->status === 'berjalan' ? (int) min(100, round($internship->currentWeek() / max(1, $internship->totalWeeks()) * 100)) : 100;
     ?>
-    <div class="profile-strip card">
-        <div class="profile-strip-main">
-            <span class="icard-ring profile-ring" style="--p: {{ $taskPct }}" aria-hidden="true"><x-avatar :user="$student" /></span>
+    <div class="profile-strip card pcard">
+        <div class="pcard-head">
+            <x-avatar :user="$student" class="pcard-avatar" />
             <div class="min0">
-                <div class="profile-name">{{ $student->name }}</div>
-                <div class="profile-meta">{{ $id['university'] }} · {{ $id['faculty'] }}</div>
-                <div class="profile-meta">{{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif @if ($id['semester']) · Semester {{ $id['semester'] }}@endif</div>
+                <div class="pcard-name">{{ $student->name }}</div>
+                <div class="pcard-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif @if ($id['semester']) · Semester {{ $id['semester'] }}@endif</div>
+                <div class="pcard-sub">{{ $id['university'] }} · {{ $id['faculty'] }}</div>
             </div>
-            <span class="profile-badge">{{ $student->nim }}</span>
+            <x-chip :tone="$internship->statusTone()" class="pcard-status">{{ $internship->statusLabel() }}</x-chip>
         </div>
-        <dl class="profile-strip-facts">
+
+        <ul class="pcard-meta">
+            <li><x-ikon name="person" :size="15" /> {{ $internship->position ?? 'Posisi belum diisi' }}</li>
+            <li><x-ikon name="calendar" :size="15" /> {{ $internship->periodLabel() }} <span>· {{ $internship->durationMonths() }} bulan</span></li>
+            <li><x-ikon name="school" :size="15" /> {{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}: {{ $internship->lecturer?->listName() ?? '–' }}</li>
+        </ul>
+
+        <dl class="pcard-wells">
             <div>
-                <dt><span class="pf-icon"><x-ikon name="person" :size="14" /></span>Posisi</dt>
-                <dd>{{ $internship->position ?? '–' }}</dd>
+                <dt>Task selesai</dt>
+                <dd>{{ $stats['done'] }}<small>/{{ $stats['tasks'] }}</small> <span class="pcard-pill">{{ $taskPct }}%</span></dd>
             </div>
             <div>
-                <dt><span class="pf-icon"><x-ikon name="calendar" :size="14" /></span>Periode</dt>
-                <dd>{{ $internship->periodLabel() }}<small>{{ $internship->durationMonths() }} bulan · {{ $internship->status === 'berjalan' ? 'sisa '.$internship->daysLeft().' hari' : $internship->statusLabel() }}</small></dd>
-                <span class="pf-bar" aria-hidden="true"><span style="width: {{ $timePct }}%"></span></span>
+                <dt>{{ $internship->status === 'berjalan' ? 'Minggu' : 'Durasi' }}</dt>
+                <dd>@if ($internship->status === 'berjalan'){{ $internship->currentWeek() }}<small>/{{ $internship->totalWeeks() }}</small> <span class="pcard-pill is-soft">sisa {{ $internship->daysLeft() }} hari</span>@else{{ $internship->totalWeeks() }}<small class="is-word">minggu</small>@endif</dd>
             </div>
             <div>
-                <dt><span class="pf-icon"><x-ikon name="tasks" :size="14" /></span>Task selesai</dt>
-                <dd>{{ $stats['done'] }} / {{ $stats['tasks'] }}<small>{{ $taskPct }}% selesai</small></dd>
-                <span class="pf-bar" aria-hidden="true"><span style="width: {{ $taskPct }}%"></span></span>
+                <dt>Rencana</dt>
+                <dd>{{ $stats['plans'] }}<small class="is-word">kegiatan</small></dd>
             </div>
             <div>
-                <dt><span class="pf-icon"><x-ikon name="board" :size="14" /></span>Rencana</dt>
-                <dd>{{ $stats['plans'] }} kegiatan<small>{{ $stats['days'] }} hari tercatat</small></dd>
-            </div>
-            <div>
-                <dt><span class="pf-icon"><x-ikon name="school" :size="14" /></span>{{ $internship->lecturer?->roleLabelFor(auth()->user()) ?? 'Dosen pembimbing' }}</dt>
-                <dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd>
+                <dt>Hari tercatat</dt>
+                <dd>{{ $stats['days'] }}<small class="is-word">hari</small></dd>
             </div>
         </dl>
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
