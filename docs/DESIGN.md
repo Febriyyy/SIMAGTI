@@ -460,3 +460,8 @@ Semua halaman menu dan halaman detail untuk enam peran (ditambah mahasiswa tanpa
 - Pilihan nilai di formulir penilaian (`.rate-options`) dan tombol ubah/hapus pertanyaan di Standar Penilaian berjarak 8px.
 - Tooltip ⓘ di judul kartu dan judul halaman ditambatkan ke kiri judul agar tidak terpotong tepi kartu atau layar.
 - HP: pilihan Peran di tabel Akun tidak melewati kartu; judul kepala halaman 22px dan kotak ikon 38px agar ikon ⓘ tetap sebaris dengan judul.
+
+### Kartu mahasiswa di /pantau dan kartu Tempat magang (November 2026)
+
+- **Kartu mahasiswa** (`<x-intern-card>`): avatar dilingkari cincin progres task (`.icard-ring`, kuning bila tidak aktif lebih dari 7 hari), nama dan posisi, label kloter + periode, kotak dalam abu berisi task selesai (angka, persen, batang tipis) dan fakta Minggu / Rencana / Aktif dipisah garis putus-putus, lalu kaki kartu dengan status penilaian dan tautan Buka berpanah. Latar atas bergradasi hijau lembut (kuning untuk yang perlu konfirmasi).
+- **Tempat magang** (dashboard mahasiswa, `.place`): tanda inisial perusahaan + nama + kota, pil Divisi dan Posisi, kotak dalam berisi Company Supervisor dan Dosen pembimbing dengan avatar, lalu periode dengan batang bulan berjalan.

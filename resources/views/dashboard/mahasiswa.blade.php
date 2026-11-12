@@ -157,15 +157,50 @@
                 <div class="card-head">
                     <h2 class="card-title" id="place-title">Tempat magang</h2>
                 </div>
-                <div class="card-body">
-                    <dl class="kv">
-                        <div><dt>Perusahaan</dt><dd>{{ $internship->company?->name }}@if ($internship->company?->city)<small>{{ $internship->company->city }}</small>@endif</dd></div>
-                        <div><dt>Divisi</dt><dd>{{ $internship->division?->name ?? '–' }}</dd></div>
-                        <div><dt>Posisi</dt><dd>{{ $internship->position ?? '–' }}</dd></div>
-                        <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}@if ($internship->supervisor_title)<small>{{ $internship->supervisor_title }}</small>@endif</dd></div>
-                        <div><dt>Dosen pembimbing</dt><dd>{{ $internship->lecturer?->listName() ?? '–' }}</dd></div>
-                        <div><dt>Periode</dt><dd>{{ $internship->periodLabel() }}<small>Bulan ke-{{ $internship->currentMonth() }} dari {{ $internship->durationMonths() }}</small></dd></div>
-                    </dl>
+                {{-- Perusahaan di atas, divisi + posisi sebagai pil, dua pendamping dengan avatar, periode dengan batang bulan --}}
+                <div class="place">
+                    <div class="place-org">
+                        <x-org :name="$internship->company?->name ?? '?'" />
+                        <div class="min0">
+                            <div class="place-company">{{ $internship->company?->name }}</div>
+                            @if ($internship->company?->city)
+                                <div class="place-city">{{ $internship->company->city }}</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="place-tags">
+                        <span class="place-tag"><x-ikon name="building" :size="14" /> {{ $internship->division?->name ?? 'Divisi belum diisi' }}</span>
+                        <span class="place-tag"><x-ikon name="person" :size="14" /> {{ $internship->position ?? 'Posisi belum diisi' }}</span>
+                    </div>
+
+                    <ul class="place-people">
+                        <li>
+                            @if ($internship->supervisor)<x-avatar :user="$internship->supervisor" />@else<span class="avatar avatar-empty" aria-hidden="true">?</span>@endif
+                            <div class="min0">
+                                <span class="place-role">Company Supervisor</span>
+                                <span class="place-name">{{ $internship->supervisor?->listName() ?? 'Menunggu aktivasi TU' }}</span>
+                                @if ($internship->supervisor_title)<span class="place-sub">{{ $internship->supervisor_title }}</span>@endif
+                            </div>
+                        </li>
+                        <li>
+                            @if ($internship->lecturer)<x-avatar :user="$internship->lecturer" />@else<span class="avatar avatar-empty" aria-hidden="true">?</span>@endif
+                            <div class="min0">
+                                <span class="place-role">Dosen pembimbing</span>
+                                <span class="place-name">{{ $internship->lecturer?->listName() ?? 'Belum ditunjuk' }}</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    @php($months = max(1, $internship->durationMonths()))
+                    <div class="place-period">
+                        <div class="place-period-top">
+                            <span>Periode</span>
+                            <b>{{ $internship->periodLabel() }}</b>
+                        </div>
+                        <span class="place-bar" role="progressbar" aria-valuenow="{{ $internship->currentMonth() }}" aria-valuemin="0" aria-valuemax="{{ $months }}" aria-label="Bulan KP"><span style="width: {{ min(100, round($internship->currentMonth() / $months * 100)) }}%"></span></span>
+                        <span class="place-sub">Bulan ke-{{ $internship->currentMonth() }} dari {{ $months }}</span>
+                    </div>
                 </div>
             </section>
         </div>
