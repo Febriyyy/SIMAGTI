@@ -49,10 +49,18 @@ class CertificateController extends Controller
 
         // Keterangan nilai hanya untuk sertifikat yang sah dan penilaian yang sudah divalidasi dosen pembimbing.
         $grade = null;
-        $assessment = $certificate?->isValid() ? $certificate->internship->assessment()->with('scores', 'rubric.aspects', 'validator')->first() : null;
+        $assessment = $certificate?->isValid() ? $certificate->internship->assessment()->with('scores', 'rubric.aspects', 'validator', 'assessor')->first() : null;
         if ($assessment?->isValidated()) {
+            $scores = $assessment->scores->keyBy('rubric_aspect_id');
+            $aspects = $assessment->rubric->aspects->where('kind', '!=', 'text')->groupBy('category')
+                ->map(fn ($items) => $items->map(fn ($a) => [
+                    'name' => $a->name,
+                    'score' => $scores->get($a->id)?->score !== null ? (float) $scores->get($a->id)->score : null,
+                    'label' => $scores->get($a->id)?->score !== null ? AssessmentStandard::scaleLabel((float) $scores->get($a->id)->score) : null,
+                ])->values());
             $grade = [
                 'assessment' => $assessment,
+                'aspects' => $aspects,
                 'letter' => $certificate->internship->final_grade ?? $assessment->letter_grade,
                 'score' => (float) ($certificate->internship->final_score ?? $assessment->final_score),
                 'breakdown' => AssessmentStandard::breakdown($assessment->rubric, $assessment->scores, AssessmentStandard::weightsFor($assessment)),

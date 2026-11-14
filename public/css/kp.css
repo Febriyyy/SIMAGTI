@@ -4025,3 +4025,74 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .pf-qr { align-self: center; }
 }
 @media print { .pp-cert { display: none; } }
+
+/* KP Wrapped versi elegan: semua isi rata tengah, kicker berupa pil kaca, cincin cahaya halus di latar,
+   tipografi lebih tenang. */
+.wr-slide { align-items: center; justify-content: center; gap: 16px; padding: 104px 28px 64px; text-align: center; }
+.wr-slide::before, .wr-slide::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; }
+.wr-slide { isolation: isolate; }
+.wr-slide::before { width: 420px; height: 420px; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 0 0 60px rgba(255, 255, 255, 0.025), 0 0 0 140px rgba(255, 255, 255, 0.02); }
+.wr-slide::after { width: 260px; height: 260px; right: -80px; top: -60px; background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%); }
+.wr-kicker { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 99px; background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22); color: #fff; font-size: 12px; letter-spacing: 0.16em; backdrop-filter: blur(6px); }
+.wr-huge { font-size: clamp(44px, 12vw, 64px); font-weight: 800; letter-spacing: -0.035em; }
+.wr-number { font-size: clamp(64px, 20vw, 120px); font-weight: 800; letter-spacing: -0.045em; text-shadow: 0 10px 40px rgba(0, 0, 0, 0.18); }
+.wr-label { font-size: 21px; font-weight: 650; letter-spacing: -0.01em; }
+.wr-lead { margin-inline: auto; max-width: 30ch; color: rgba(255, 255, 255, 0.82); font-size: 16px; }
+.wr-ring, .wr-grade-badge { margin: 4px auto; }
+.wr-ring { width: 184px; height: 184px; background: conic-gradient(#fff calc(var(--p) * 1%), rgba(255, 255, 255, 0.18) 0); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); }
+.wr-ring span { width: 150px; height: 150px; background: linear-gradient(160deg, #0b3a7a, #1d5bc0); font-weight: 800; }
+.wr-grade-badge { width: 180px; height: 180px; font-weight: 800; }
+.wr-list { align-items: center; width: 100%; max-width: 360px; }
+.wr-list li { width: 100%; text-align: center; background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16); }
+.wr-card { width: 100%; max-width: 380px; text-align: center; }
+.wr-card-head { align-items: center; }
+.wr-card-grid div { text-align: center; }
+.wr-actions { justify-content: center; }
+.wr-intro .wr-huge { margin-top: 4px; }
+@media (max-width: 380px) { .wr-slide { padding: 96px 20px 56px; } .wr-slide::before { width: 320px; height: 320px; } }
+
+/* Peta kontribusi selebar kartu: ukuran kotak dihitung dari lebar kartu (container query), 11-40px */
+.contrib-body { container-type: inline-size; }
+.contrib-grid { --gap: clamp(3px, 0.5cqw, 5px); --cell: clamp(11px, calc((100cqw - 40px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); grid-template-columns: 34px auto; margin-inline: auto; }
+.contrib-cell { border-radius: clamp(3px, calc(var(--cell) * 0.22), 7px); }
+.contrib-days { font-size: clamp(10px, calc(var(--cell) * 0.42), 13px); }
+.contrib-months span { font-size: clamp(10px, calc(var(--cell) * 0.4), 13px); }
+.contrib-months { height: 18px; }
+.contrib-legend .contrib-cell { --cell: 14px; }
+.contrib-months { width: calc(var(--weeks) * var(--cell) + (var(--weeks) - 1) * var(--gap)); }
+.contrib-grid { --cell: clamp(11px, calc((100cqw - 46px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); }
+.contrib-grid { --cell: clamp(8px, calc((100cqw - 46px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); }
+@media (max-width: 700px) { .contrib-grid { --gap: 2px; grid-template-columns: 28px auto; } }
+
+/* Verifikasi sertifikat: tab Sertifikat / Keterangan nilai, rincian nilai lengkap */
+.vx-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.vx-tabs button { min-height: 42px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--gray); font: inherit; font-size: var(--text-sm); font-weight: 650; cursor: pointer; transition: background-color var(--dur-fast, 160ms), color var(--dur-fast, 160ms); }
+.vx-tabs button:hover { background: var(--primary-tint); color: var(--primary-dark); }
+.vx-tabs button[aria-selected="true"] { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(3, 122, 104, 0.25); }
+.vx-tabs button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+[data-vx-panel]:not([hidden]) { animation: fade-in 260ms var(--ease-premium, ease); }
+
+.vx-detail { gap: var(--space-4); }
+.vx-grade { position: relative; }
+.vx-grade-result { margin-left: auto; align-self: flex-start; padding: 4px 12px; border-radius: 99px; background: var(--primary); color: #fff; font-size: var(--text-xs); font-weight: 700; }
+.vx-meta { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: 0; }
+.vx-meta > div { min-width: 0; padding: var(--space-3); border-radius: var(--radius); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.vx-meta dt { color: var(--muted); font-size: var(--text-xs); }
+.vx-meta dd { margin: 2px 0 0; color: var(--text); font-size: var(--text-sm); font-weight: 650; overflow-wrap: anywhere; }
+.vx-meta dd small { display: block; margin-top: 2px; color: var(--muted); font-size: var(--text-2xs); font-weight: 400; }
+.vx-cat { padding: var(--space-4); border-radius: var(--radius); box-shadow: inset 0 0 0 1px var(--line); }
+.vx-cat-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.vx-cat-head h3 { margin: 0; color: var(--text); font-size: var(--text-md); font-weight: 700; }
+.vx-cat-head small { color: var(--muted); font-size: var(--text-xs); }
+.vx-cat-head > b { color: var(--primary-dark); font-size: 24px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.vx-cat .vx-bar { margin-top: var(--space-3); }
+.vx-aspects { display: flex; flex-direction: column; margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.vx-aspects li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-top: 1px dashed var(--line-strong); color: var(--gray); font-size: var(--text-sm); }
+.vx-aspects li:first-child { border-top: 0; }
+.vx-aspect-score { flex: none; color: var(--muted); font-size: var(--text-xs); white-space: nowrap; }
+.vx-aspect-score b { margin-left: 4px; color: var(--text); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+.vx-total { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius); background: var(--brand-ink, #03423e); color: #fff; }
+.vx-total span { color: rgba(255, 255, 255, 0.78); font-size: var(--text-xs); }
+.vx-total b { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .vx-meta { grid-template-columns: minmax(0, 1fr); } }
+@media print { .vx-tabs { display: none; } [data-vx-panel][hidden] { display: block !important; } }

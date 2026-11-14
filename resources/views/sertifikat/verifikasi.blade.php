@@ -55,13 +55,14 @@
     </section>
 
     @if ($state === 'valid')
-        <nav class="vx-jump" aria-label="Bagian">
-            <a href="#sertifikat">Sertifikat</a>
-            <a href="#nilai">Keterangan nilai</a>
-        </nav>
+        {{-- Tab: sertifikat tampil lebih dulu; keterangan nilai lengkap baru muncul saat diklik --}}
+        <div class="vx-tabs" role="tablist" aria-label="Bagian">
+            <button type="button" role="tab" id="tab-sertifikat" aria-controls="sertifikat" aria-selected="true" data-vx-tab="sertifikat">Sertifikat</button>
+            <button type="button" role="tab" id="tab-nilai" aria-controls="nilai" aria-selected="false" data-vx-tab="nilai">Keterangan nilai</button>
+        </div>
 
         {{-- Sertifikat potret --}}
-        <article id="sertifikat" class="vx-sheet" aria-label="Sertifikat Kerja Praktik {{ $internship->student->name }}">
+        <article id="sertifikat" class="vx-sheet" role="tabpanel" aria-labelledby="tab-sertifikat" data-vx-panel="sertifikat" aria-label="Sertifikat Kerja Praktik {{ $internship->student->name }}">
             <div class="vx-band" aria-hidden="true">
                 <div class="vx-year"><span>{{ $issued?->format('Y') ?? now()->format('Y') }}</span></div>
                 <div class="vx-tiles">
@@ -113,33 +114,71 @@
             </div>
         </article>
 
-        {{-- Keterangan nilai (terpisah dari sertifikat) --}}
-        <section id="nilai" class="vx-card" aria-labelledby="grade-title">
-            <h2 id="grade-title" class="vx-card-title">Keterangan nilai</h2>
+        {{-- Keterangan nilai lengkap (panel tab; tanpa JavaScript tampil di bawah sertifikat) --}}
+        <section id="nilai" class="vx-card vx-detail" role="tabpanel" aria-labelledby="tab-nilai" data-vx-panel="nilai">
+            <h2 class="vx-card-title">Keterangan nilai</h2>
             @if ($grade)
                 <div class="vx-grade">
                     <div class="vx-grade-letter" aria-label="Huruf mutu {{ $grade['letter'] }}">{{ $grade['letter'] }}</div>
                     <div class="min0">
                         <div class="vx-grade-score">{{ \App\Support\Num::short($grade['score']) }}<small>/100</small></div>
-                        <div class="vx-grade-sub">Nilai akhir · divalidasi {{ $grade['assessment']->validated_at?->locale('id')->translatedFormat('j M Y') }}</div>
+                        <div class="vx-grade-sub">Nilai akhir Kerja Praktik</div>
                     </div>
+                    <span class="vx-grade-result">Diterima</span>
                 </div>
-                <ul class="vx-cats">
-                    @foreach ($grade['breakdown']['categories'] as $cat)
-                        <li>
-                            <div class="vx-cat-top">
-                                <span>{{ $cat['label'] }} <small>bobot {{ \App\Support\Num::short($cat['weight']) }}%</small></span>
-                                <b>{{ $cat['average'] !== null ? \App\Support\Num::short($cat['average']) : '–' }}</b>
+
+                <dl class="vx-meta">
+                    <div><dt>Dinilai oleh</dt><dd>{{ $grade['assessment']->assessor?->name ?? 'Company Supervisor' }}<small>Company Supervisor · {{ $internship->placeName() }}</small></dd></div>
+                    <div><dt>Divalidasi oleh</dt><dd>{{ $grade['assessment']->validator?->name ?? 'Dosen pembimbing' }}<small>Dosen pembimbing · {{ $grade['assessment']->validated_at?->locale('id')->translatedFormat('j F Y') }}</small></dd></div>
+                </dl>
+
+                @foreach ($grade['breakdown']['categories'] as $key => $cat)
+                    <section class="vx-cat">
+                        <div class="vx-cat-head">
+                            <div class="min0">
+                                <h3>{{ $cat['label'] }}</h3>
+                                <small>Bobot {{ \App\Support\Num::short($cat['weight']) }}% · kontribusi {{ \App\Support\Num::short($cat['contribution']) }}</small>
                             </div>
-                            <span class="vx-bar" aria-hidden="true"><span style="width: {{ min(100, (float) ($cat['average'] ?? 0)) }}%"></span></span>
-                        </li>
-                    @endforeach
-                </ul>
-                <p class="vx-note">Nilai dari Company Supervisor, divalidasi dosen pembimbing.</p>
+                            <b>{{ $cat['average'] !== null ? \App\Support\Num::short($cat['average']) : '–' }}</b>
+                        </div>
+                        <span class="vx-bar" aria-hidden="true"><span style="width: {{ min(100, (float) ($cat['average'] ?? 0)) }}%"></span></span>
+                        <ul class="vx-aspects">
+                            @foreach ($grade['aspects'][$key] ?? [] as $aspect)
+                                <li>
+                                    <span>{{ $aspect['name'] }}</span>
+                                    <span class="vx-aspect-score">@if ($aspect['score'] !== null){{ $aspect['label'] ?? 'Nilai' }} <b>{{ \App\Support\Num::short($aspect['score']) }}</b>@else – @endif</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </section>
+                @endforeach
+
+                <div class="vx-total">
+                    <span>Nilai akhir = jumlah (rata-rata kategori × bobot)</span>
+                    <b>{{ \App\Support\Num::short($grade['score']) }}</b>
+                </div>
             @else
                 <p class="vx-empty">Keterangan nilai belum tersedia untuk sertifikat ini.</p>
             @endif
         </section>
+
+        <script>
+            (function () {
+                var tabs = [].slice.call(document.querySelectorAll('[data-vx-tab]'));
+                var panels = [].slice.call(document.querySelectorAll('[data-vx-panel]'));
+                function show(name, focus) {
+                    tabs.forEach(function (t) { var on = t.getAttribute('data-vx-tab') === name; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+                    panels.forEach(function (p) { p.hidden = p.getAttribute('data-vx-panel') !== name; });
+                }
+                tabs.forEach(function (t, i) {
+                    t.addEventListener('click', function () { show(t.getAttribute('data-vx-tab')); history.replaceState(null, '', '#' + t.getAttribute('data-vx-tab')); });
+                    t.addEventListener('keydown', function (e) {
+                        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; show(n.getAttribute('data-vx-tab'), true); }
+                    });
+                });
+                show(location.hash === '#nilai' ? 'nilai' : 'sertifikat');
+            })();
+        </script>
     @endif
 
     <p class="vx-foot">Halaman verifikasi resmi {{ config('app.name') }}. Data ditampilkan seperlunya untuk memastikan keaslian sertifikat.</p>

@@ -504,3 +504,7 @@ Tampilan potret untuk HP (lebar maks. 480px di desktop), acuan dua referensi ser
 ### Portofolio KP publik (November 2026)
 
 Pengaturan di menu **Portofolio** (mahasiswa, `/portofolio`): sakelar tautan publik dan tampilkan nilai (bawaan mati), judul singkat, tentang, keahlian (dipisah koma), pilih maks. 6 hasil kerja dari task selesai. Bila publik: tautan, tombol Salin, dan kode QR. Halaman publik `/p/{token}` (tanpa login, tanpa NIM, noindex): kepala bergradasi hijau merek dengan pil "Terverifikasi SIMAGTI", avatar inisial, nama, judul, prodi/kampus, posisi/tempat/periode/status; kartu angka (minggu, hari tercatat, task selesai, nilai akhir bila diizinkan); Tentang; Keahlian; Hasil kerja pilihan; Goal tercapai; peta kontribusi; tautan verifikasi sertifikat bila ada.
+
+- Pembaruan: halaman verifikasi memakai tab **Sertifikat / Keterangan nilai** (bawaan sertifikat). Tab nilai berisi rincian lengkap: huruf mutu + nilai akhir + pil Diterima, penilai (Company Supervisor) dan validator (dosen pembimbing), tiap kategori dengan bobot, kontribusi, rata-rata, dan nilai setiap pertanyaan, serta baris rumus nilai akhir. Tanpa JavaScript kedua bagian tampil berurutan; `#nilai` di alamat langsung membuka tab nilai.
+- KP Wrapped: semua isi rata tengah, kicker berupa pil kaca, cincin cahaya halus di latar setiap slide.
+- Peta kontribusi: ukuran kotak dihitung dari lebar kartu (8-40px) sehingga kisi memenuhi kartu di desktop dan muat tanpa geser di HP.

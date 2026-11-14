@@ -94,6 +94,7 @@ class CertificateTest extends TestCase
             ->assertSee($certificate->number)
             ->assertSee('class="vx-sheet"', false)   // sertifikat tampilan potret
             ->assertSee('Keterangan nilai')
+            ->assertSee('data-vx-tab="nilai"', false)   // nilai lengkap di tab terpisah, muncul saat diklik
             ->assertDontSee('2310511045')
             ->assertHeader('X-Robots-Tag', 'noindex');
 
