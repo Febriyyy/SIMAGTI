@@ -222,3 +222,25 @@ Portofolio KP publik pilihan mahasiswa, satu per KP.
 | skills | json, null | maks. 10 keahlian |
 | task_ids | json, null | maks. 6 task selesai milik KP ini |
 | timestamps | | |
+
+### report_chapters (November 2026)
+
+Laporan KP per bab. Dibuat otomatis (4 bab bawaan, `ReportChapter::DEFAULTS`) saat mahasiswa membuka halaman Dokumen untuk KP yang berjalan atau selesai. Bab yang memuat informasi perusahaan (`needs_supervisor`) disetujui Company Supervisor dulu, baru diteruskan ke dosen pembimbing.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| id | bigint | |
+| internship_id | FK internships | hapus berantai; unik bersama `position` |
+| position | tinyint | nomor bab |
+| title | string(150) | judul bab |
+| needs_supervisor | boolean | bawaan: Bab 2 Gambaran Umum Perusahaan dan Bab 3 Pelaksanaan KP |
+| status | string(30) | `belum`, `menunggu_supervisor`, `menunggu_dosen`, `revisi`, `disetujui` |
+| file_id | FK files, null | berkas terakhir (PDF/DOCX maks. 10 MB, disk privat); berkas lama dihapus saat diganti |
+| version | smallint | naik setiap unggah |
+| submitted_at | timestamp, null | |
+| supervisor_approved_by / _at | FK users / timestamp, null | dikosongkan lagi setiap unggah ulang |
+| approved_by / approved_at | FK users / timestamp, null | persetujuan dosen pembimbing |
+| revision_note / revision_by / revision_at | text / FK users / timestamp, null | catatan revisi terakhir |
+| timestamps | | |
+
+Tabel yang sudah ada dan kini dipakai: `defense_scores` (nilai sidang, diisi kaprodi di `/kaprodi/sidang`, huruf mutu dihitung ulang bila nilai berubah) dan `conversion_candidates` + `conversion_histories` (rekomendasi jadi karyawan).

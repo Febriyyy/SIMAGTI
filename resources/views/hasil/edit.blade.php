@@ -39,6 +39,8 @@
                         <div><dt>Rencana kegiatan</dt><dd>{{ $plans }} kegiatan</dd></div>
                         <div><dt>Task selesai</dt><dd>{{ $tasks[0] }} dari {{ $tasks[1] }}</dd></div>
                         <div><dt>Goals tercapai</dt><dd>{{ $goals->whereNotNull('achieved_at')->count() }} dari {{ $goals->count() }}</dd></div>
+                        @php($chapters = $internship->reportChapters)
+                        <div><dt>Laporan per bab</dt><dd>@if ($chapters->isEmpty())Belum mulai @else{{ $chapters->where('status', 'disetujui')->count() }} dari {{ $chapters->count() }} disetujui @endif</dd></div>
                     </dl>
                 </div>
             </section>
@@ -60,6 +62,9 @@
                             <div><dt>Hasil</dt><dd>{{ $internship->resultLabel() }}</dd></div>
                             @if ($internship->final_grade)
                                 <div><dt>Nilai</dt><dd>{{ $internship->final_grade }}<small>{{ \App\Support\Num::short($internship->final_score) }}</small></dd></div>
+                            @endif
+                            @if ($internship->defenseScore)
+                                <div><dt>Nilai sidang</dt><dd>{{ $internship->defenseScore->letter_grade }}<small>{{ \App\Support\Num::short($internship->defenseScore->score) }} · {{ $internship->defenseScore->defended_at?->locale('id')->translatedFormat('j M Y') }}</small></dd></div>
                             @endif
                             @if ($internship->result_note)<div><dt>Catatan</dt><dd>{{ $internship->result_note }}</dd></div>@endif
                             <div><dt>Diputuskan</dt><dd>{{ $internship->result_at?->locale('id')->translatedFormat('j F Y') }}</dd></div>

@@ -132,17 +132,20 @@ Prinsipnya: pihak perusahaan sesedikit mungkin direpotkan. Supervisor hanya konf
 - **Kata sandi**: ganti kata sandi sendiri untuk semua peran, atur ulang oleh admin dengan kata sandi sementara yang tampil sekali, dan wajib ganti kata sandi sementara sebelum memakai aplikasi (`users.must_change_password`, middleware `EnsurePasswordChanged`).
 - **Sertifikat KP dengan QR**: halaman cetak A4 (simpan PDF lewat browser) untuk KP yang Diterima, terbit otomatis saat hasil diputuskan, dan halaman verifikasi publik tanpa NIM. QR dibuat di server dengan pustaka gratis `chillerlan/php-qrcode`.
 
+### Tambahan 14 November 2026
+- **Nilai sidang** (kaprodi, menu Nilai Sidang): diisi setelah masa magang selesai, dicatat terpisah dari nilai akhir; tampil di Hasil KP dosen dan Status KP mahasiswa.
+- **Rekomendasi jadi karyawan**: Company Supervisor merekomendasikan dari detail mahasiswa, lalu menawarkan posisi; mahasiswa baru diberi tahu saat ditawari dan menjawab Terima / Tolak dari dashboard. Dosen pembimbing dan kaprodi melihat kartu Rekrutmen tanpa tombol.
+- **Laporan KP per bab**: mahasiswa mengunggah tiap bab di halaman Dokumen; bab berisi informasi perusahaan disetujui Company Supervisor dulu (dosen belum bisa membukanya), lalu dosen pembimbing menyetujui atau meminta revisi. Menu Laporan KP untuk supervisor dan dosen.
+
 ## 6. Belum dikerjakan
 
 Catatan v8: kuesioner milik dosen diganti standar penilaian kampus yang diatur admin.
 
 Ditunda atas keputusan Anda: persetujuan timesheet per periode oleh supervisor (agar perusahaan tidak terbebani) dan laporan IKU / akreditasi.
-KP v2 tahap 3: laporan per bab dengan persetujuan, dokumen Word dari template kampus (lampiran dan MB.xx), presentasi dan pengesahan, pengingat Google Calendar, audit privasi.
+KP v2 tahap 3: dokumen Word dari template kampus (lampiran dan MB.xx), presentasi dan pengesahan, pengingat Google Calendar, audit privasi.
 
 Dari rencana awal:
 
-- Input nilai sidang
-- UI konversi jadi karyawan
 - Dokumen dan template, surat pengantar
 - Lowongan magang, skill, template task (UI)
 - Ekspor Excel/PDF

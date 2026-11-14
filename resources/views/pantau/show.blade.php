@@ -64,7 +64,8 @@
             <div><dt>Hari tercatat</dt><dd>{{ $stats['days'] }}</dd></div>
         </dl>
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
-        @if ($canCorrect || $canReplace)
+        @php($canRecommend = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && in_array($internship->status, ['berjalan', 'selesai'], true) && ! $internship->conversion)
+        @if ($canCorrect || $canReplace || $canRecommend)
             <div class="profile-strip-tools">
                 @if ($canReplace)
                     <details class="inline-details tool-details">
@@ -79,6 +80,21 @@
                                 <textarea name="reason" class="textarea span-all" rows="2" maxlength="1000" placeholder="Alasan" required aria-label="Alasan"></textarea>
                             </div>
                             <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary"><x-ikon name="send" :size="16" /> Kirim ke TU</button></div>
+                        </form>
+                    </details>
+                @endif
+                @if ($canRecommend)
+                    <details class="inline-details tool-details">
+                        <summary class="btn btn-sm"><x-ikon name="star" :size="16" /> Rekomendasikan rekrut</summary>
+                        <form method="POST" action="{{ route('rekrutmen.update', $internship) }}" class="tool-form">
+                            @csrf
+                            <input type="hidden" name="langkah" value="rekomendasikan">
+                            <p class="hint">Mahasiswa baru diberi tahu saat Anda menawarkan kerja.</p>
+                            <div class="form-grid">
+                                <input type="text" name="posisi" class="input span-all" maxlength="100" placeholder="Posisi yang cocok (opsional)" aria-label="Posisi yang cocok">
+                                <textarea name="catatan" class="textarea span-all" rows="2" maxlength="500" placeholder="Alasan singkat (opsional)" aria-label="Alasan rekomendasi"></textarea>
+                            </div>
+                            <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary"><x-ikon name="star" :size="16" /> Rekomendasikan</button></div>
                         </form>
                     </details>
                 @endif
@@ -109,6 +125,7 @@
     </nav>
 
     @include('pantau._confirmation', ['internship' => $internship])
+    @include('pantau._rekrutmen', ['internship' => $internship])
 
     @if ($tab === 'kegiatan')
         <div class="toolbar board-toolbar">

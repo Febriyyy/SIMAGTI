@@ -14,7 +14,9 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DefenseController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentQueueController;
 use App\Http\Controllers\ExportController;
@@ -30,6 +32,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ReportChapterController;
 use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\StudentController;
@@ -102,6 +105,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
     Route::get('/timesheet/{entry}/foto', [TimesheetController::class, 'photo'])->whereNumber('entry')->name('timesheet.foto');
 
+    // Berkas laporan per bab (dicek ReportChapter::canBeReadBy)
+    Route::get('/laporan-bab/{chapter}/berkas', [ReportChapterController::class, 'file'])->whereNumber('chapter')->name('laporan.berkas');
+
     // ---------- Mahasiswa ----------
     Route::middleware(EnsureRole::class.':mahasiswa')->group(function () {
         // Status KP (dulu "Pengajuan KP"): pengajuan dan kemajuannya langkah demi langkah
@@ -160,12 +166,17 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         // Dokumen KP
         Route::get('/dokumen', [DocumentController::class, 'index'])->name('dokumen.index');
         Route::post('/dokumen/surat-pengantar', [DocumentController::class, 'requestLetter'])->name('dokumen.minta');
+        Route::post('/dokumen/laporan/{chapter}', [ReportChapterController::class, 'upload'])
+            ->whereNumber('chapter')->middleware('throttle:20,1')->name('laporan.unggah');
         Route::post('/dokumen/unggah/{type}', [DocumentController::class, 'upload'])
             ->whereIn('type', ['surat_balasan'])->middleware('throttle:20,1')->name('dokumen.unggah');
 
         // Pengajuan perubahan
         Route::get('/perubahan', [ChangeRequestController::class, 'index'])->name('perubahan.index');
         Route::post('/perubahan', [ChangeRequestController::class, 'store'])->middleware('throttle:10,1')->name('perubahan.store');
+
+        // Jawaban atas tawaran kerja dari tempat magang
+        Route::patch('/tawaran-kerja', [ConversionController::class, 'respond'])->middleware('throttle:10,1')->name('rekrutmen.jawab');
     });
 
     // ---------- Pemantauan: Company Supervisor, dosen pembimbing, kaprodi ----------
@@ -189,6 +200,14 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::patch('/pantau/{internship}/posisi', [MonitorController::class, 'position'])->whereNumber('internship')->name('pantau.posisi');
         Route::patch('/pantau/{internship}/konfirmasi', [SupervisorConfirmationController::class, 'update'])->whereNumber('internship')->name('supervisor.konfirmasi');
         Route::post('/pantau/{internship}/ganti-supervisor', [ChangeRequestController::class, 'storeBySupervisor'])->whereNumber('internship')->name('perubahan.supervisor');
+        // Rekomendasi jadi karyawan (rekomendasikan, tawarkan, catat hasil, batal)
+        Route::post('/pantau/{internship}/rekrutmen', [ConversionController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('rekrutmen.update');
+    });
+
+    // Tinjauan laporan per bab: Company Supervisor (bab berisi informasi perusahaan) lalu dosen pembimbing
+    Route::middleware(EnsureRole::class.':supervisor,dospem')->group(function () {
+        Route::get('/laporan-bab', [ReportChapterController::class, 'index'])->name('laporan.antrean');
+        Route::patch('/laporan-bab/{chapter}', [ReportChapterController::class, 'review'])->whereNumber('chapter')->middleware('throttle:30,1')->name('laporan.tinjau');
     });
 
     // Dosen pembimbing memvalidasi penilaian akhir
@@ -252,6 +271,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::patch('/kaprodi/persetujuan/{internship}', [KaprodiApprovalController::class, 'update'])->whereNumber('internship')->name('kaprodi.persetujuan.update');
         Route::get('/kaprodi/bobot', [AssessmentWeightController::class, 'edit'])->name('kaprodi.bobot');
         Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
+        // Nilai sidang KP (dicatat terpisah dari nilai akhir)
+        Route::get('/kaprodi/sidang', [DefenseController::class, 'index'])->name('kaprodi.sidang');
+        Route::put('/kaprodi/sidang/{internship}', [DefenseController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.simpan');
 
         Route::get('/mahasiswa', [StudentController::class, 'index'])->name('mahasiswa.index');
         Route::post('/mahasiswa', [StudentController::class, 'store'])->name('mahasiswa.store');

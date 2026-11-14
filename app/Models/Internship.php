@@ -212,6 +212,12 @@ class Internship extends Model
         return $this->hasOne(Certificate::class);
     }
 
+    /** Laporan KP per bab, urut nomor bab. */
+    public function reportChapters(): HasMany
+    {
+        return $this->hasMany(ReportChapter::class)->orderBy('position');
+    }
+
     /** Pasang Company Supervisor pada penempatan ini. */
     public function assignSupervisor(User|int $user): InternshipStaff
     {

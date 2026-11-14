@@ -28,7 +28,7 @@ class ResultController extends Controller
     public function edit(Request $request, Internship $internship): View
     {
         $this->authorizeLecturer($request, $internship);
-        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'assessment.scores', 'assessment.rubric.aspects']);
+        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'assessment.scores', 'assessment.rubric.aspects', 'defenseScore']);
 
         return view('hasil.edit', [
             'internship' => $internship,

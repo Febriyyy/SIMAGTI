@@ -522,3 +522,9 @@ Audit otomatis semua halaman per peran (desktop 1280px dan HP 390px: elemen bert
 - Angka ringkasan di kartu samping (mis. Aktivitas): angka ringkas, bukan oval lebar.
 - Hasil KP detail: tombol Lihat sertifikat selebar kartu di bawah ringkasan keputusan, tidak lagi menempel di tepi kotak.
 - Tag pada kartu task: jarak antarbaris 6px.
+
+### Fitur peran lain (14 November 2026)
+
+- **Nilai Sidang** (kaprodi): dua kartu, "Menunggu nilai sidang" (baris berisi nilai + tanggal + Simpan) dan "Sudah dinilai" (huruf mutu besar + angka kecil, tombol Ubah membuka form). Status kosong memakai kotak tenang bercentang.
+- **Rekrutmen** (detail mahasiswa): tombol "Rekomendasikan rekrut" di deret alat profil; setelah ada rekomendasi, kartu Rekrutmen berisi tiga langkah (Direkomendasikan, Ditawari kerja, Diterima / Menolak) bertitik dan bergaris, kutipan alasan, lalu aksi supervisor. Dashboard mahasiswa: kartu tawaran kerja bergradasi lembut emas-hijau dengan ikon bintang, tombol Tolak / Terima tawaran.
+- **Laporan KP per bab** (Dokumen mahasiswa): daftar bab bernomor dalam lingkaran (hijau bercentang bila disetujui), ikon gedung kecil untuk bab yang ditinjau perusahaan, nama berkas + versi, catatan revisi di kotak merah muda, tombol Unggah/Ganti satu klik. Antrean tinjauan (supervisor, dosen): baris bab + umur antrean + Buka, catatan revisi + Minta revisi + Setujui; kartu Progres laporan dengan titik nomor bab berwarna status.

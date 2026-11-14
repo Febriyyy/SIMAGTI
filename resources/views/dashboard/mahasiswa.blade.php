@@ -50,6 +50,24 @@
             </x-slot:meta>
         </x-hero>
 
+        {{-- Tawaran kerja dari tempat magang: tampil hanya saat menunggu jawaban mahasiswa --}}
+        @php($offer = $internship->conversion()->where('status', 'ditawari')->first())
+        @if ($offer)
+            <section class="offer-card" aria-labelledby="offer-title">
+                <span class="offer-icon" aria-hidden="true"><x-ikon name="star" :size="22" fill /></span>
+                <div class="min0 grow">
+                    <h2 id="offer-title" class="offer-title">Tawaran kerja dari {{ $internship->placeName() }}</h2>
+                    <p class="offer-sub">Posisi {{ $offer->offered_position ?? 'belum disebutkan' }}</p>
+                </div>
+                <form method="POST" action="{{ route('rekrutmen.jawab') }}" class="offer-actions">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" name="jawaban" value="tolak" class="btn" onclick="return confirm('Tolak tawaran kerja ini?')">Tolak</button>
+                    <button type="submit" name="jawaban" value="terima" class="btn btn-primary">Terima tawaran</button>
+                </form>
+            </section>
+        @endif
+
         {{-- Kartu Kemajuan KP: elemen khas dashboard mahasiswa (minggu berjalan, task, dan langkah KP dalam satu kartu) --}}
         @php($visibleSteps = collect($steps)->reject(fn ($st) => $st['state'] === 'later')->values())
         @php($doneSteps = $visibleSteps->where('state', 'done')->count())

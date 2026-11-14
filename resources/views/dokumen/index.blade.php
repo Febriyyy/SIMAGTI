@@ -77,5 +77,9 @@
         @empty
             <div class="card"><div class="empty"><strong>Surat balasan belum perlu</strong> Kolom unggah muncul setelah pengajuan KP disetujui.</div></div>
         @endforelse
+
+        @if ($chapters->isNotEmpty())
+            @include('dokumen._laporan', ['chapters' => $chapters, 'canUpload' => in_array($internship->status, ['berjalan', 'selesai'], true)])
+        @endif
     @endif
 @endsection

@@ -73,7 +73,7 @@ class MonitorController extends Controller
     {
         Gate::authorize('view', $internship);
 
-        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'lecturer', 'assessment']);
+        $internship->load(['student.studentProfile.studyProgram', 'company', 'division', 'supervisor', 'lecturer', 'assessment', 'conversion.histories']);
         $tab = in_array($request->query('tab'), ['kegiatan', 'rencana', 'timesheet', 'aktivitas', 'bimbingan'], true) ? $request->query('tab') : 'kegiatan';
 
         $data = [
