@@ -118,13 +118,18 @@
         <section id="nilai" class="vx-card vx-detail" role="tabpanel" aria-labelledby="tab-nilai" data-vx-panel="nilai">
             <h2 class="vx-card-title">Keterangan nilai</h2>
             @if ($grade)
-                <div class="vx-grade">
+                {{-- Huruf mutu + nilai akhir dengan batang tipis; status hasil sebagai satu baris tenang di bawah --}}
+                <div class="vx-grade vx-grade-v2">
                     <div class="vx-grade-letter" aria-label="Huruf mutu {{ $grade['letter'] }}">{{ $grade['letter'] }}</div>
-                    <div class="min0">
+                    <div class="vx-grade-main">
+                        <span class="vx-grade-label">Nilai akhir</span>
                         <div class="vx-grade-score">{{ \App\Support\Num::short($grade['score']) }}<small>/100</small></div>
-                        <div class="vx-grade-sub">Nilai akhir Kerja Praktik</div>
+                        <span class="vx-grade-bar" aria-hidden="true"><span style="width: {{ min(100, $grade['score']) }}%"></span></span>
                     </div>
-                    <span class="vx-grade-result">Diterima</span>
+                    <p class="vx-grade-status">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                        Kerja Praktik dinyatakan <b>diterima</b>
+                    </p>
                 </div>
 
                 <dl class="vx-meta">

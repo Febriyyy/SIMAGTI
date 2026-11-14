@@ -146,6 +146,26 @@
             setTimeout(function () { el.textContent = target; }, 1300);
         });
     }
+    // Konfeti ringan saat slide nilai/rangkuman muncul (dilewati bila pengguna memilih kurangi gerak)
+    function burst(slide) {
+        if (reduce || !(slide.classList.contains('wr-grade') || slide.classList.contains('wr-outro'))) return;
+        var old = slide.querySelector('.wr-confetti'); if (old) old.remove();
+        var box = document.createElement('div'); box.className = 'wr-confetti'; box.setAttribute('aria-hidden', 'true');
+        var colors = ['#a7f3d0', '#ffffff', '#fde68a', '#93c5fd', '#f9a8d4', '#6ee7b7'];
+        for (var n = 0; n < 64; n++) {
+            var p = document.createElement('i'), a = Math.random() * Math.PI * 2, dist = 90 + Math.random() * 220;
+            if (n % 3 === 0) p.className = 'dot';
+            p.style.setProperty('--c', colors[n % colors.length]);
+            p.style.setProperty('--dx', Math.round(Math.cos(a) * dist * 1.3) + 'px');
+            p.style.setProperty('--dy', Math.round(Math.sin(a) * dist - 80) + 'px');
+            p.style.setProperty('--r', Math.round(Math.random() * 720 - 360) + 'deg');
+            p.style.setProperty('--t', (2200 + Math.random() * 1400) + 'ms');
+            p.style.setProperty('--d', (slide.classList.contains('wr-grade') ? 550 : 350) + Math.random() * 180 + 'ms');
+            box.appendChild(p);
+        }
+        slide.appendChild(box);
+        setTimeout(function () { box.remove(); }, 4400);
+    }
     function paint() {
         bars.forEach(function (b, i) {
             b.style.animation = 'none'; b.style.transform = i < index ? 'scaleX(1)' : 'scaleX(0)';
@@ -166,7 +186,7 @@
         slides[index].classList.remove('is-active'); slides[index].hidden = true;
         index = i; elapsed = 0;
         slides[index].hidden = false; slides[index].classList.add('is-active');
-        countUp(slides[index]); paint(); schedule();
+        countUp(slides[index]); burst(slides[index]); paint(); schedule();
     }
     function togglePause() {
         paused = !paused;
