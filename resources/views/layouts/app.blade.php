@@ -96,7 +96,8 @@
                         <span class="crumb-now" aria-current="page">{{ $pageTitle }}</span>
                     @endif
                 @else
-                    <span class="crumb-now" aria-current="page">{{ $pageTitle }}</span>
+                    {{-- Halaman di luar menu tetap punya ikon (dipakai juga sebagai ikon kepala halaman) --}}
+                    <span class="crumb-root" aria-current="page">@if (request()->routeIs('notifikasi.*'))<x-ikon name="bell" :size="18" /> @elseif (request()->routeIs('akun.*'))<x-ikon name="lock" :size="18" /> @endif{{ $pageTitle }}</span>
                 @endif
             </nav>
             <div class="topbar-right">

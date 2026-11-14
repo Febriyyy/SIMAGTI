@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <div class="layout">
+    <div class="layout layout-natural">
         <div class="col">
             <section class="card">
                 <div class="card-head">

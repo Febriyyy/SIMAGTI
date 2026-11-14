@@ -510,3 +510,15 @@ Pengaturan di menu **Portofolio** (mahasiswa, `/portofolio`): sakelar tautan pub
 - KP Wrapped (animasi): latar slide masuk dengan zoom halus, isi muncul dari kabur ke tajam bertahap, angka besar "fokus" dari blur, cincin latar bernapas dan cahaya melayang, kilau menyapu kicker dan kartu rangkuman, cincin task terisi dari 0 (`@property --pv`), lencana nilai memantul lalu berpendar dengan halo, konfeti di slide nilai dan rangkuman. Semua mati bila pengguna memilih kurangi gerak.
 - Keterangan nilai di halaman verifikasi: huruf mutu dalam lingkaran, nilai akhir dengan batang tipis, status hasil sebagai satu baris tenang bertanda centang (tanpa pil).
 - Peta kontribusi: ukuran kotak dihitung dari lebar kartu (8-40px) sehingga kisi memenuhi kartu di desktop dan muat tanpa geser di HP.
+
+### Rapikan menyeluruh (14 November 2026)
+
+Audit otomatis semua halaman per peran (desktop 1280px dan HP 390px: elemen bertumpuk, meluber, berdempet, teks terpotong) lalu tinjauan visual. Yang dirapikan:
+- Notifikasi: ikon kepala halaman (lonceng) seperti halaman lain; kartu setinggi isinya sehingga tidak ada ruang kosong besar. Halaman Ganti sandi ikut berikon gembok.
+- Hasil KP: tabel tidak lagi memunculkan scrollbar mendatar di desktop; nama perusahaan boleh turun baris.
+- Aktivasi Company Supervisor: tombol Detail dan Undang sebaris dengan nama bila muat.
+- Log Aktivitas: kode aksi mentah (login/logout) dihapus dari baris; kolom pengguna lebih lebar agar nama tidak terpotong.
+- Kartu mahasiswa di Pantau: "Perlu konfirmasi" jadi baris tenang bertitik di bawah posisi, bukan pil yang menyempitkan nama.
+- Angka ringkasan di kartu samping (mis. Aktivitas): angka ringkas, bukan oval lebar.
+- Hasil KP detail: tombol Lihat sertifikat selebar kartu di bawah ringkasan keputusan, tidak lagi menempel di tepi kotak.
+- Tag pada kartu task: jarak antarbaris 6px.

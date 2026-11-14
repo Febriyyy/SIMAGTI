@@ -23,8 +23,8 @@
         <div class="icard-who">
             <a href="{{ route('pantau.show', $i) }}" class="icard-name" title="{{ $student->name }}">{{ $student->listName() }}</a>
             <span class="icard-role">{{ $i->position ?? 'Posisi belum diisi' }}</span>
+            @if ($needsConfirm)<span class="icard-flag">Perlu konfirmasi</span>@endif
         </div>
-        @if ($needsConfirm)<span class="icard-flag">Perlu konfirmasi</span>@endif
     </div>
 
     @if ($cohort)

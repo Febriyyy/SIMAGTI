@@ -4162,3 +4162,16 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .wr-slide.is-active, .wr-slide > *, .wr-slide::before, .wr-slide::after, .wr-kicker::after, .wr-card::after, .wr-grade-badge::before, .wr-list li { animation: none !important; }
     .wr-confetti { display: none; }
 }
+
+/* Rapikan menyeluruh (November 2026) */
+.activation > .activation-head { flex: 1 1 0; min-width: 260px; }   /* tombol Detail dan Undang sebaris dengan nama bila muat */
+.dt .w-person { width: 264px; }                                       /* nama lengkap tidak terpotong di log */
+.kcard-tags { row-gap: 6px; }                                   /* tag yang turun baris tidak berdempet */
+.layout-natural > .col > .card:last-child { flex-grow: 0 !important; }   /* notifikasi: kartu setinggi isinya, tanpa ruang kosong */
+.table td.col-place { white-space: normal; min-width: 150px; color: var(--text); }
+:is(.layout, .split) > .col:last-child .card > .item-list .num { width: auto; font-variant-numeric: tabular-nums; }   /* angka ringkas, bukan oval lebar */
+/* Kartu mahasiswa: "Perlu konfirmasi" jadi satu baris tenang di bawah posisi, bukan pil yang menyempitkan nama */
+.icard-grid .icard-flag, .icard-flag { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 0; border-radius: 0; background: none; color: var(--amber); font-size: var(--text-xs); font-weight: 650; }
+.icard-flag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px var(--amber-soft); }
+.side-action { margin-top: var(--space-4); }
+.side-action .btn { width: 100%; justify-content: center; }

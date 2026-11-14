@@ -22,7 +22,7 @@
                             @php($ready = $i->assessment?->isValidated() && $i->confirmed_count >= $min)
                             <tr>
                                 <td><x-person :user="$i->student" /></td>
-                                <td><span class="truncate" title="{{ $i->placeName() }}">{{ $i->placeName() }}</span></td>
+                                <td class="col-place">{{ $i->placeName() }}</td>
                                 <td class="muted">{{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</td>
                                 <td><x-chip :tone="$i->assessment?->isValidated() ? 'green' : 'gray'">{{ $i->assessment?->isValidated() ? 'Nilai '.$i->assessment->letter_grade : 'Belum' }}</x-chip></td>
                                 <td><x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip></td>

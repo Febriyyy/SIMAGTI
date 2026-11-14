@@ -57,7 +57,6 @@
                                 </td>
                                 <td>
                                     <span class="c-main c-plain" title="{{ $log->description }}">{{ $log->description }}</span>
-                                    <span class="c-sub">{{ $log->action }}</span>
                                 </td>
                                 <td>
                                     <span class="c-main c-plain">{{ $log->created_at->locale('id')->translatedFormat('j M Y') }}</span>
