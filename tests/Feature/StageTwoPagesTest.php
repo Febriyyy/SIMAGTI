@@ -56,7 +56,7 @@ class StageTwoPagesTest extends TestCase
             'kaprodi@kp.test' => ['/antrean-perubahan' => 'Pengajuan Perubahan', '/kaprodi/bobot' => 'Bobot kategori', '/aktivitas' => 'Linimasa'],
             'tu@kp.test' => ['/tu/surat' => 'Nadia Kirana', '/antrean-perubahan' => 'Ganti Company Supervisor', '/tu/aktivasi' => 'Menunggu aktivasi',
                 '/tu/dokumen' => 'Tari Anjani', '/tu/verifikasi' => 'Nadia Kirana', '/perusahaan' => 'PT Nusantara Digital'],
-            'admin@kp.test' => ['/admin/akun' => 'Rina Putri', '/admin/penilaian' => 'Pilihan jawaban', '/admin/log-aktivitas' => 'Log Aktivitas', '/dashboard' => 'Akun per peran'],
+            'admin@kp.test' => ['/admin/akun' => 'Rina Putri', '/admin/penilaian' => 'Skala nilai', '/admin/log-aktivitas' => 'Log Aktivitas', '/dashboard' => 'Akun per peran'],
         ];
         foreach ($pages as $email => $urls) {
             foreach ($urls as $url => $text) {

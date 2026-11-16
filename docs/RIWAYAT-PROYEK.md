@@ -16,9 +16,9 @@ Website untuk memantau kerja praktik (magang) mahasiswa, dibuat untuk **pameran 
 | Mahasiswa | Mengajukan KP mandiri (satu jenis KP), menyusun rencana kegiatan (Gantt) dan goals, membuat task di bawah rencana, mencatat kegiatan harian, mengirim bukti |
 | Company Supervisor (perusahaan) | Memantau kegiatan dan activity monitor, mengatur meeting, mengoreksi posisi, menilai di akhir periode KP (klik skala standar kampus) |
 | Dosen pembimbing | Memantau kegiatan dan activity monitor, mengonfirmasi bimbingan, memvalidasi penilaian, memutuskan hasil KP |
-| Kaprodi (Koordinator KP) | Menyetujui pengajuan, menunjuk dosen, mengelola mahasiswa dan penempatan, membuat pertanyaan penilaian per kategori dan mengatur bobot kategori (persen), mengisi nilai sidang |
+| Kaprodi (Koordinator KP) | Menyetujui pengajuan, menunjuk dosen, mengelola mahasiswa dan penempatan, mengatur bobot kategori penilaian (persen), mengisi nilai sidang |
 | TU Fakultas | Memverifikasi KP mandiri dan perusahaan, menerbitkan surat pengantar, memeriksa surat balasan, mengelola perusahaan, mengaktifkan Company Supervisor |
-| Admin | Mengubah peran dan menonaktifkan akun, mengatur standar nilai (nilai tiap pilihan jawaban dan huruf mutu), melihat log aktivitas |
+| Admin | Mengubah peran dan menonaktifkan akun, mengatur standar penilaian (pertanyaan per kategori, nilai tiap pilihan jawaban, huruf mutu), melihat log aktivitas |
 
 Sejak v7 (KP v2) peran mentor dan ketua divisi digabung menjadi Company Supervisor. Sejak v8 (revisi dosen) peran Biro Kerjasama dihapus dan diganti Admin.
 

@@ -298,7 +298,7 @@ class AssessmentFlowTest extends TestCase
     {
         $kaprodi = $this->user('kaprodi@kp.test');
 
-        $this->actingAs($kaprodi)->get('/kaprodi/bobot')->assertOk()->assertSee('Bobot kategori')->assertSee('Sangat tidak baik')->assertSee('Kualitas hasil kerja');
+        $this->actingAs($kaprodi)->get('/kaprodi/bobot')->assertOk()->assertSee('Bobot kategori')->assertSee('Sangat baik');
         $this->put('/kaprodi/bobot', ['weights' => ['hard' => 50, 'soft' => 30, 'attitude' => 30]])->assertSessionHasErrors('weights');
         $this->put('/kaprodi/bobot', ['weights' => ['hard' => 40, 'soft' => 30, 'attitude' => 30]])->assertSessionHasNoErrors();
 
@@ -320,7 +320,7 @@ class AssessmentFlowTest extends TestCase
     {
         $admin = $this->user('admin@kp.test');
 
-        $this->actingAs($admin)->get('/admin/penilaian')->assertOk()->assertSee('Pilihan jawaban')->assertSee('Huruf mutu')->assertDontSee('Kualitas hasil kerja');
+        $this->actingAs($admin)->get('/admin/penilaian')->assertOk()->assertSee('Kualitas hasil kerja')->assertSee('Huruf mutu');
 
         $this->put('/admin/penilaian/skala', ['scale' => [['label' => 'Baik', 'value' => 90], ['label' => 'Cukup', 'value' => 90]]])
             ->assertSessionHasErrors();
@@ -351,19 +351,14 @@ class AssessmentFlowTest extends TestCase
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/admin/penilaian')->assertForbidden();
     }
 
-    public function test_kaprodi_mengubah_pertanyaan_yang_sudah_dipakai_membuat_versi_baru(): void
+    public function test_admin_mengubah_pertanyaan_yang_sudah_dipakai_membuat_versi_baru(): void
     {
-        $kaprodi = $this->user('kaprodi@kp.test');
+        $admin = $this->user('admin@kp.test');
         $old = AssessmentStandard::rubric();
         $this->assertTrue($old->assessments()->exists(), 'Standar bawaan sudah dipakai penilaian contoh');
 
-        // Pertanyaan dibuat kaprodi; admin dan peran lain tidak bisa
-        foreach (['admin@kp.test', 'dospem@kp.test', 'supervisor@kp.test'] as $email) {
-            $this->actingAs($this->user($email))->post('/kaprodi/pertanyaan', ['category' => 'hard', 'name' => 'Ketelitian kerja'])->assertForbidden();
-        }
-
-        $this->actingAs($kaprodi)
-            ->post('/kaprodi/pertanyaan', ['category' => 'hard', 'name' => 'Ketelitian kerja'])
+        $this->actingAs($admin)
+            ->post('/admin/penilaian/pertanyaan', ['category' => 'hard', 'name' => 'Ketelitian kerja'])
             ->assertSessionHasNoErrors();
 
         $new = AssessmentStandard::rubric();
@@ -373,9 +368,9 @@ class AssessmentFlowTest extends TestCase
 
         // Versi baru belum dipakai: ubah dan hapus langsung di versi itu
         $aspect = $new->aspects->firstWhere('name', 'Ketelitian kerja');
-        $this->patch("/kaprodi/pertanyaan/{$aspect->id}", ['name' => 'Ketelitian dan kerapian'])->assertSessionHasNoErrors();
+        $this->patch("/admin/penilaian/pertanyaan/{$aspect->id}", ['name' => 'Ketelitian dan kerapian'])->assertSessionHasNoErrors();
         $this->assertSame('Ketelitian dan kerapian', $aspect->fresh()->name);
-        $this->delete("/kaprodi/pertanyaan/{$aspect->id}")->assertSessionHasNoErrors();
+        $this->delete("/admin/penilaian/pertanyaan/{$aspect->id}")->assertSessionHasNoErrors();
         $this->assertSame($new->id, AssessmentStandard::rubric()->id);
         $this->assertSame(4, AssessmentStandard::rubric()->aspects->where('category', 'hard')->count());
 

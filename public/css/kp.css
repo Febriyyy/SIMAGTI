@@ -4308,3 +4308,15 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .stat-grid .stat-bar + .stat-hint { padding-left: 0; color: var(--text); font-weight: 700; }
 .stat-grid .stat-bar + .stat-hint::before { display: none; }
 @media (max-width: 700px) { .stat-grid .stat-hint { white-space: nowrap; } }
+
+/* Kartu angka: bagian angka dan keterangan sejajar rata atas (sebelumnya angka turun 4px sehingga kotak abu bertangga) */
+.stat-grid .stat-value { margin-top: 0; }
+.stat-grid > .stat { align-items: stretch; }
+.stat-grid .stat-value { align-items: center; }
+/* Layar sedang: angka dan keterangan bersusun (atas-bawah) agar satuan tidak tertimpa keterangan */
+@media (max-width: 1199px) {
+    .stat-grid > .stat { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "value" "foot"; row-gap: 0; }
+    .stat-grid .stat-head { margin-bottom: var(--space-3); }
+    .stat-grid .stat-value { padding: var(--space-3) var(--space-4) var(--space-1); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+    .stat-grid .stat-foot { justify-content: flex-start; min-height: 34px; padding: 0 var(--space-4) var(--space-3); border-radius: 0 0 var(--radius-sm) var(--radius-sm); }
+}

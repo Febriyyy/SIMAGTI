@@ -14,6 +14,7 @@ use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
 use App\Models\WeeklyTask;
+use App\Support\AssessmentStandard;
 use App\Support\KpProgress;
 use App\Support\Period;
 use Illuminate\Http\Request;
@@ -191,6 +192,8 @@ class DashboardController extends Controller
         $stats = [
             'users' => (int) $roles->sum(),
             'inactive' => User::where('is_active', false)->count(),
+            // Pertanyaan pada rubrik kampus yang berlaku (dikelola admin)
+            'questions' => AssessmentStandard::rubric()->aspects()->count(),
             'logs_today' => ActivityLog::whereDate('created_at', Carbon::today())->count(),
         ];
 
