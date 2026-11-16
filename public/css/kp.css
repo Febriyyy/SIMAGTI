@@ -4325,3 +4325,33 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .dialog[open] { animation-delay: 0s; animation-fill-mode: both; }
 .dialog[open]::backdrop { animation-delay: 0s; }
 .motion .container > .dialog[open], .container > .dialog[open] { animation-delay: 0s; }
+
+/* Tombol jawaban penilaian (17 Nov 2026): lima tombol sama lebar dengan jarak lega, tidak berdempet.
+   Bila satu baris tidak muat, grid turun rapi (3 + 2, lalu 2 kolom di HP). */
+.rate-row-edit { flex-direction: column; align-items: stretch; gap: var(--space-3); padding-top: var(--space-5); padding-bottom: var(--space-5); }
+.rate-row-edit .rate-q small { margin-top: 4px; }
+.rate-row-edit .rate-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--space-3); flex: none; justify-content: stretch; }
+.rate-row-edit .rate-opt { min-width: 0; }
+.rate-row-edit .rate-opt span { width: 100%; min-height: 40px; padding-inline: var(--space-3); justify-content: center; white-space: nowrap; font-size: var(--text-sm); }
+@container (max-width: 460px) {
+    .rate-row-edit .rate-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2) var(--space-3); }
+    .rate-row-edit .rate-opt span { white-space: normal; }
+}
+.rate-row-edit .rate-options { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 10px; }
+.rate-row-edit .rate-opt span { padding-inline: var(--space-2); font-size: 13px; letter-spacing: -0.005em; }
+@container (max-width: 640px) {
+    .rate-row-edit .rate-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2) var(--space-3); }
+    .rate-row-edit .rate-opt:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .rate-row-edit .rate-opt span { font-size: var(--text-sm); }
+}
+/* Lebar sedang: 3 + 2 di tengah (seimbang), bukan 2 kolom tiga baris */
+@container (min-width: 461px) and (max-width: 680px) {
+    .rate-row-edit .rate-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; }
+    .rate-row-edit .rate-opt { flex: 0 0 calc((100% - 24px) / 3); }
+    .rate-row-edit .rate-opt:last-child:nth-child(odd) { grid-column: auto; }
+    .rate-row-edit .rate-opt span { font-size: var(--text-sm); }
+}
+@container (max-width: 460px) {
+    .rate-row-edit .rate-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rate-row-edit .rate-opt:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
