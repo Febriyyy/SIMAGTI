@@ -4320,3 +4320,8 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .stat-grid .stat-value { padding: var(--space-3) var(--space-4) var(--space-1); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
     .stat-grid .stat-foot { justify-content: flex-start; min-height: 34px; padding: 0 var(--space-4) var(--space-3); border-radius: 0 0 var(--radius-sm) var(--radius-sm); }
 }
+
+/* Dialog muncul sekali: jangan ikut jeda animasi masuk halaman (.container > :nth-child) yang membuatnya tampil lalu "muncul lagi" */
+.dialog[open] { animation-delay: 0s; animation-fill-mode: both; }
+.dialog[open]::backdrop { animation-delay: 0s; }
+.motion .container > .dialog[open], .container > .dialog[open] { animation-delay: 0s; }

@@ -24,11 +24,31 @@ class AssessmentStandard
         'attitude' => ['Attitude', 'Sikap, disiplin, dan tanggung jawab'],
     ];
 
-    /** Pertanyaan bawaan standar kampus (bisa diubah admin). */
+    /**
+     * Pertanyaan bawaan standar kampus (bisa diubah admin): kategori => [pertanyaan => keterangan singkat].
+     * Company Supervisor menjawab tiap pertanyaan dengan satu pilihan skala (Sangat baik sampai Sangat tidak baik).
+     */
     public const DEFAULT_QUESTIONS = [
-        'hard' => ['Kemampuan kerja', 'Keterampilan kerja', 'Kualitas hasil kerja', 'Kreativitas dan inovasi'],
-        'soft' => ['Kemampuan berkomunikasi', 'Kerja sama', 'Kerajinan dan inisiatif', 'Percaya diri'],
-        'attitude' => ['Ketepatan waktu dan disiplin', 'Sikap dan prosedur kerja', 'Tanggung jawab', 'Kehadiran', 'Mematuhi aturan perusahaan', 'Penampilan'],
+        'hard' => [
+            'Penguasaan bidang kerja' => 'Memahami dan memakai alat, teknologi, atau metode yang dibutuhkan posisinya.',
+            'Kualitas hasil kerja' => 'Hasil kerja akurat, rapi, dan sesuai standar perusahaan.',
+            'Penyelesaian tugas' => 'Tugas selesai sesuai target dan tenggat yang disepakati.',
+            'Kreativitas dan pemecahan masalah' => 'Menemukan solusi atau cara kerja yang lebih baik saat ada kendala.',
+        ],
+        'soft' => [
+            'Komunikasi' => 'Menyampaikan ide, progres, dan kendala dengan jelas, lisan maupun tulisan.',
+            'Kerja sama tim' => 'Bekerja sama dengan baik dan mau membantu rekan kerja.',
+            'Inisiatif' => 'Mengambil langkah sendiri tanpa harus selalu diarahkan.',
+            'Kemauan belajar dan menerima masukan' => 'Cepat mempelajari hal baru dan terbuka terhadap kritik.',
+        ],
+        'attitude' => [
+            'Kedisiplinan dan ketepatan waktu' => 'Tepat waktu masuk kerja, mengikuti rapat, dan menyerahkan pekerjaan.',
+            'Kehadiran' => 'Hadir sesuai jadwal; izin disampaikan sebelumnya.',
+            'Tanggung jawab' => 'Menuntaskan tugas yang diberikan dan mengakui kesalahan bila ada.',
+            'Kepatuhan pada aturan perusahaan' => 'Mengikuti aturan dan prosedur kerja serta menjaga kerahasiaan perusahaan.',
+            'Etika dan sopan santun' => 'Bersikap sopan dan profesional kepada atasan, rekan, dan klien.',
+            'Kerapian penampilan' => 'Berpakaian rapi dan sesuai ketentuan perusahaan.',
+        ],
     ];
 
     public const WEIGHTS_KEY = 'simagti.assessment.weights';
@@ -106,8 +126,8 @@ class AssessmentStandard
 
         $order = 0;
         foreach (self::DEFAULT_QUESTIONS as $category => $questions) {
-            foreach ($questions as $name) {
-                $rubric->aspects()->create(['category' => $category, 'name' => $name, 'kind' => 'score', 'weight' => 0, 'sort_order' => ++$order]);
+            foreach ($questions as $name => $description) {
+                $rubric->aspects()->create(['category' => $category, 'name' => $name, 'description' => $description, 'kind' => 'score', 'weight' => 0, 'sort_order' => ++$order]);
             }
         }
 
