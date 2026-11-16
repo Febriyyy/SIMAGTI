@@ -58,8 +58,8 @@ class KpFlowTest extends TestCase
 
         $this->actingAs($this->user('tu@kp.test'))->get('/dashboard')->assertSee('Aktivasi Supervisor')->assertSee('Verifikasi KP Mandiri')->assertSee('Dokumen KP');
         $this->actingAs($this->user('dospem@kp.test'))->get('/dashboard')->assertSee('Aktivitas')->assertDontSee('Kuesioner');
-        $this->actingAs($this->user('kaprodi@kp.test'))->get('/dashboard')->assertSee('Bobot Penilaian')->assertDontSee('Rekognisi');
-        $this->actingAs($this->user('admin@kp.test'))->get('/dashboard')->assertSee('Standar Penilaian')->assertSee('Log Aktivitas');
+        $this->actingAs($this->user('kaprodi@kp.test'))->get('/dashboard')->assertSee('Rubrik Penilaian')->assertDontSee('Rekognisi');
+        $this->actingAs($this->user('admin@kp.test'))->get('/dashboard')->assertSee('Standar Nilai')->assertSee('Log Aktivitas');
     }
 
     public function test_akun_nonaktif_tidak_bisa_masuk(): void

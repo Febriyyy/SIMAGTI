@@ -14,7 +14,7 @@
         <x-stat label="Total akun" :value="$stats['users']" unit="akun" :href="route('admin.akun')" hint="Semua peran" />
         <x-stat label="Akun nonaktif" :value="$stats['inactive']" unit="akun" :tone="$stats['inactive'] > 0 ? 'amber' : 'gray'"
                 :href="route('admin.akun', ['status' => 'nonaktif'])" hint="Tidak bisa masuk" />
-        <x-stat label="Pertanyaan penilaian" :value="$stats['questions']" unit="butir" tone="gray" :href="route('admin.penilaian')" hint="Standar kampus" />
+        <x-stat label="Pilihan jawaban" :value="count(\App\Support\AssessmentStandard::scale())" unit="pilihan" tone="gray" :href="route('admin.penilaian')" hint="Standar nilai" />
         <x-stat label="Aktivitas hari ini" :value="$stats['logs_today']" unit="catatan" tone="gray" :href="route('log.index')" hint="Seluruh pengguna" />
     </div>
 

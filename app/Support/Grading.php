@@ -7,7 +7,7 @@ use App\Models\Setting;
 
 class Grading
 {
-    /** Skala huruf mutu standar kampus (batas bawah). Admin bisa menggantinya di Standar Penilaian. */
+    /** Skala huruf mutu standar kampus (batas bawah). Admin bisa menggantinya di Standar Nilai. */
     public const DEFAULT_SCALE = [
         'A' => 80,
         'B+' => 74,

@@ -41,9 +41,9 @@ return [
         'scale' => [
             ['label' => 'Sangat baik', 'value' => 95],
             ['label' => 'Baik', 'value' => 85],
-            ['label' => 'Cukup', 'value' => 75],
-            ['label' => 'Kurang', 'value' => 60],
-            ['label' => 'Sangat kurang', 'value' => 45],
+            ['label' => 'Cukup baik', 'value' => 75],
+            ['label' => 'Tidak baik', 'value' => 60],
+            ['label' => 'Sangat tidak baik', 'value' => 45],
         ],
     ],
 ];

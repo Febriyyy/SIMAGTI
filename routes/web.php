@@ -271,6 +271,10 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::patch('/kaprodi/persetujuan/{internship}', [KaprodiApprovalController::class, 'update'])->whereNumber('internship')->name('kaprodi.persetujuan.update');
         Route::get('/kaprodi/bobot', [AssessmentWeightController::class, 'edit'])->name('kaprodi.bobot');
         Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
+        // Pertanyaan penilaian per kategori (hard skill, soft skill, attitude) dibuat kaprodi
+        Route::post('/kaprodi/pertanyaan', [AssessmentWeightController::class, 'storeQuestion'])->name('kaprodi.pertanyaan.store');
+        Route::patch('/kaprodi/pertanyaan/{aspect}', [AssessmentWeightController::class, 'updateQuestion'])->whereNumber('aspect')->name('kaprodi.pertanyaan.update');
+        Route::delete('/kaprodi/pertanyaan/{aspect}', [AssessmentWeightController::class, 'destroyQuestion'])->whereNumber('aspect')->name('kaprodi.pertanyaan.destroy');
         // Nilai sidang KP (dicatat terpisah dari nilai akhir)
         Route::get('/kaprodi/sidang', [DefenseController::class, 'index'])->name('kaprodi.sidang');
         Route::put('/kaprodi/sidang/{internship}', [DefenseController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.simpan');
@@ -290,11 +294,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
             ->whereNumber('account')->middleware('throttle:20,1')->name('admin.akun.sandi');
         Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
 
-        // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
+        // Standar nilai kampus: skala jawaban (nilai tiap pilihan) dan huruf mutu. Pertanyaan diatur kaprodi.
         Route::get('/penilaian', [AssessmentStandardController::class, 'index'])->name('admin.penilaian');
-        Route::post('/penilaian/pertanyaan', [AssessmentStandardController::class, 'storeQuestion'])->name('admin.penilaian.pertanyaan.store');
-        Route::patch('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'updateQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.update');
-        Route::delete('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'destroyQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.destroy');
         Route::put('/penilaian/skala', [AssessmentStandardController::class, 'updateScale'])->name('admin.penilaian.skala');
         Route::put('/penilaian/huruf', [AssessmentStandardController::class, 'updateGrades'])->name('admin.penilaian.huruf');
     });

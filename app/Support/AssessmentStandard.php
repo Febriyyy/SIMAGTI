@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 
 /**
  * Standar penilaian akhir kampus.
- * - Admin: pertanyaan per kategori (hard skill, soft skill, attitude), skala nilai, huruf mutu.
- * - Kaprodi: bobot tiap kategori dalam persen (total 100).
- * - Company Supervisor: mengklik satu skala untuk setiap pertanyaan.
+ * - Kaprodi: pertanyaan per kategori (hard skill, soft skill, attitude) dan bobot tiap kategori dalam persen (total 100).
+ * - Admin: pilihan jawaban beserta nilainya (skala nilai) dan huruf mutu.
+ * - Company Supervisor: memilih satu jawaban untuk setiap pertanyaan.
  *
  * Nilai kategori = rata-rata nilai pertanyaannya (0–100). Nilai akhir = jumlah (nilai kategori × bobot / 100).
  */
@@ -24,7 +24,7 @@ class AssessmentStandard
         'attitude' => ['Attitude', 'Sikap, disiplin, dan tanggung jawab'],
     ];
 
-    /** Pertanyaan bawaan standar kampus (bisa diubah admin). */
+    /** Pertanyaan bawaan standar kampus (bisa diubah kaprodi). */
     public const DEFAULT_QUESTIONS = [
         'hard' => ['Kemampuan kerja', 'Keterampilan kerja', 'Kualitas hasil kerja', 'Kreativitas dan inovasi'],
         'soft' => ['Kemampuan berkomunikasi', 'Kerja sama', 'Kerajinan dan inisiatif', 'Percaya diri'],
