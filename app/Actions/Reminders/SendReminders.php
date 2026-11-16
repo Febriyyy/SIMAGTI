@@ -2,6 +2,8 @@
 
 namespace App\Actions\Reminders;
 
+use App\Actions\Conversions\ManageConversion;
+use App\Models\ConversionCandidate;
 use App\Models\GuidanceSession;
 use App\Models\Internship;
 use App\Models\User;
@@ -16,6 +18,7 @@ use Illuminate\Support\Carbon;
  *   task belum selesai yang tenggatnya hari ini s.d. 2 hari lagi (sekali per task).
  * - Company Supervisor: penilaian akhir dibuka (H-14), lalu sisa <= 3 hari dan belum dikirim (masing-masing sekali).
  * - Dosen pembimbing: bimbingan menunggu konfirmasi lebih dari 3 hari (paling sering sekali per 3 hari).
+ * - Mahasiswa: tawaran kerja belum dijawab, H-3 dan H-1 sebelum batas (masing-masing sekali); lewat batas menjadi kedaluwarsa.
  *
  * Pengingat yang sama tidak dikirim ulang: setiap pengingat punya kunci yang dicek di tabel notifications.
  */
@@ -29,11 +32,11 @@ class SendReminders
 
     public const GUIDANCE_WAIT_DAYS = 3;
 
-    /** @return array{idle: int, due: int, assessment: int, guidance: int} */
+    /** @return array{idle: int, due: int, assessment: int, guidance: int, offers: int, expired: int} */
     public function handle(?Carbon $today = null): array
     {
         $today = ($today ?? Carbon::today())->copy()->startOfDay();
-        $sent = ['idle' => 0, 'due' => 0, 'assessment' => 0, 'guidance' => 0];
+        $sent = ['idle' => 0, 'due' => 0, 'assessment' => 0, 'guidance' => 0, 'offers' => 0, 'expired' => 0];
 
         $running = Internship::query()
             ->where('status', 'berjalan')
@@ -48,6 +51,8 @@ class SendReminders
         }
 
         $sent['guidance'] = $this->guidance($today);
+        $sent['offers'] = $this->offers($today);
+        $sent['expired'] = ManageConversion::expireOverdue($today);
 
         return $sent;
     }
@@ -158,6 +163,27 @@ class SendReminders
      * Kirim bila pengingat dengan kunci yang sama belum pernah dikirim (atau sudah lebih dari $everyDays hari lalu).
      * $everyDays null = hanya sekali.
      */
+    /** Tawaran kerja belum dijawab: pengingat ke mahasiswa H-3 dan H-1 sebelum batas jawaban. */
+    private function offers(Carbon $today): int
+    {
+        $sent = 0;
+        $candidates = ConversionCandidate::with('internship.student')->where('status', 'ditawari')->whereNotNull('respond_by')
+            ->whereDate('respond_by', '>=', $today)->whereDate('respond_by', '<=', $today->copy()->addDays(3))->get();
+
+        foreach ($candidates as $candidate) {
+            $days = (int) $today->diffInDays($candidate->respond_by->copy()->startOfDay());
+            if (! in_array($days, [3, 1], true) || ! $candidate->internship?->student) {
+                continue;
+            }
+            $sent += $this->send($candidate->internship->student, "offer:{$candidate->id}:{$days}", null,
+                'Tawaran kerja menunggu jawaban Anda',
+                'Batas jawaban '.$candidate->respond_by->locale('id')->translatedFormat('j F Y').' ('.$days.' hari lagi).',
+                route('rekrutmen.tawaran'), 'star');
+        }
+
+        return $sent;
+    }
+
     private function send(User $user, string $key, ?int $everyDays, string $title, ?string $body, ?string $url, string $icon, string $tone = 'amber'): int
     {
         if (! $user->is_active) {

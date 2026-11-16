@@ -105,6 +105,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
     Route::get('/timesheet/{entry}/foto', [TimesheetController::class, 'photo'])->whereNumber('entry')->name('timesheet.foto');
 
+    // Surat resmi tawaran kerja (hanya mahasiswa penerima dan Company Supervisor penempatannya)
+    Route::get('/rekrutmen/{candidate}/surat', [ConversionController::class, 'letter'])->whereNumber('candidate')->name('rekrutmen.surat');
+
     // Berkas laporan per bab (dicek ReportChapter::canBeReadBy)
     Route::get('/laporan-bab/{chapter}/berkas', [ReportChapterController::class, 'file'])->whereNumber('chapter')->name('laporan.berkas');
 
@@ -176,6 +179,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::post('/perubahan', [ChangeRequestController::class, 'store'])->middleware('throttle:10,1')->name('perubahan.store');
 
         // Jawaban atas tawaran kerja dari tempat magang
+        Route::get('/tawaran-kerja', [ConversionController::class, 'show'])->name('rekrutmen.tawaran');
         Route::patch('/tawaran-kerja', [ConversionController::class, 'respond'])->middleware('throttle:10,1')->name('rekrutmen.jawab');
     });
 
@@ -202,6 +206,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::post('/pantau/{internship}/ganti-supervisor', [ChangeRequestController::class, 'storeBySupervisor'])->whereNumber('internship')->name('perubahan.supervisor');
         // Rekomendasi jadi karyawan (rekomendasikan, tawarkan, catat hasil, batal)
         Route::post('/pantau/{internship}/rekrutmen', [ConversionController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('rekrutmen.update');
+        Route::post('/pantau/{internship}/rekrutmen/tawaran', [ConversionController::class, 'offer'])->whereNumber('internship')->middleware('throttle:20,1')->name('rekrutmen.tawarkan');
+        Route::patch('/pantau/{internship}/rekrutmen/batas', [ConversionController::class, 'extend'])->whereNumber('internship')->middleware('throttle:20,1')->name('rekrutmen.perpanjang');
     });
 
     // Tinjauan laporan per bab: Company Supervisor (bab berisi informasi perusahaan) lalu dosen pembimbing

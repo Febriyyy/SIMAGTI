@@ -57,14 +57,11 @@
                 <span class="offer-icon" aria-hidden="true"><x-ikon name="star" :size="22" fill /></span>
                 <div class="min0 grow">
                     <h2 id="offer-title" class="offer-title">Tawaran kerja dari {{ $internship->placeName() }}</h2>
-                    <p class="offer-sub">Posisi {{ $offer->offered_position ?? 'belum disebutkan' }}</p>
+                    <p class="offer-sub">{{ $offer->offered_position }}@if ($offer->respond_by) · jawab sebelum {{ $offer->respond_by->locale('id')->translatedFormat('j F') }}@endif</p>
                 </div>
-                <form method="POST" action="{{ route('rekrutmen.jawab') }}" class="offer-actions">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" name="jawaban" value="tolak" class="btn" onclick="return confirm('Tolak tawaran kerja ini?')">Tolak</button>
-                    <button type="submit" name="jawaban" value="terima" class="btn btn-primary">Terima tawaran</button>
-                </form>
+                <div class="offer-actions">
+                    <a href="{{ route('rekrutmen.tawaran') }}" class="btn btn-primary">Lihat tawaran <x-ikon name="arrow" :size="16" /></a>
+                </div>
             </section>
         @endif
 

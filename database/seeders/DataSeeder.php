@@ -523,8 +523,22 @@ class DataSeeder extends Seeder
         ]);
         $candidate->histories()->create(['to_status' => 'direkomendasikan', 'changed_by' => $supervisor->id]);
         if ($status !== 'direkomendasikan') {
+            // Tawaran kerja lengkap (tanpa surat PDF di data demo; supervisor mengunggahnya saat mengirim tawaran baru)
+            $candidate->update(['offered_position' => $position] + [
+                'unit' => 'Divisi Data & Insight',
+                'work_location' => 'Jakarta Selatan',
+                'work_mode' => 'hybrid',
+                'employment_type' => 'kontrak',
+                'contract_months' => 12,
+                'start_date' => now()->addMonth()->startOfMonth()->toDateString(),
+                'job_description' => "Menyusun dasbor dan laporan rutin untuk tim bisnis\nMembersihkan dan memvalidasi data transaksi\nMenganalisis tren penjualan dan menyampaikan temuan\nBerkoordinasi dengan tim produk untuk kebutuhan data",
+                'compensation' => 'Dibahas saat wawancara',
+                'hr_contact_name' => $supervisor->name,
+                'hr_contact_email' => $supervisor->email,
+                'offered_at' => now()->subDays(2),
+                'respond_by' => now()->addDays(5)->toDateString(),
+            ]);
             $candidate->moveTo($status, $supervisor->id, "Ditawari posisi {$position}.");
-            $candidate->update(['offered_position' => $position]);
         }
     }
 

@@ -13,8 +13,8 @@ Artisan::command('inspire', function () {
 Artisan::command('kp:pengingat', function (SendReminders $reminders) {
     $sent = $reminders->handle();
     $this->info(sprintf(
-        'Pengingat terkirim: %d catatan belum diisi, %d task mendekati tenggat, %d penilaian, %d bimbingan menunggu.',
-        $sent['idle'], $sent['due'], $sent['assessment'], $sent['guidance'],
+        'Pengingat terkirim: %d catatan belum diisi, %d task mendekati tenggat, %d penilaian, %d bimbingan menunggu, %d tawaran kerja; %d tawaran kedaluwarsa.',
+        $sent['idle'], $sent['due'], $sent['assessment'], $sent['guidance'], $sent['offers'], $sent['expired'],
     ));
 })->purpose('Kirim pengingat otomatis harian (catatan, tenggat task, penilaian, bimbingan)');
 

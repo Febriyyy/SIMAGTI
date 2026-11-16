@@ -4355,3 +4355,55 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .rate-row-edit .rate-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .rate-row-edit .rate-opt:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
+
+/* Tawaran kerja: halaman mahasiswa */
+.job-head { display: flex; align-items: center; gap: var(--space-5); padding: var(--space-5) var(--card-x); }
+.job-org { width: 56px; height: 56px; border-radius: 16px; font-size: 18px; flex: none; }
+.job-company { margin: 0; color: var(--muted); font-size: var(--text-sm); font-weight: 600; }
+.job-title { margin: 2px 0 0; color: var(--text); font-size: 24px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.2; }
+.job-meta { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 6px 0 0; color: var(--gray); font-size: var(--text-sm); }
+.job-meta span + span::before { content: '·'; margin: 0 8px; color: var(--muted-2, var(--muted)); }
+.job-state { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; text-align: right; }
+.job-state small { color: var(--muted); font-size: var(--text-xs); }
+.job-due { color: var(--primary-dark); font-size: var(--text-lg); font-weight: 750; font-variant-numeric: tabular-nums; }
+.job-due.is-soon { color: var(--amber); }
+.job-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4) var(--space-5); margin: 0; }
+.job-facts dt { color: var(--muted); font-size: var(--text-xs); }
+.job-facts dd { margin: 2px 0 0; color: var(--text); font-weight: 600; }
+.job-sub { margin: var(--space-5) 0 var(--space-2); padding-top: var(--space-4); border-top: 1px solid var(--line); color: var(--text); font-size: var(--text-md); font-weight: 700; }
+.job-points { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.job-points li { position: relative; padding-left: 22px; color: var(--gray); line-height: 1.55; }
+.job-points li::before { content: ''; position: absolute; left: 4px; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 3px var(--primary-tint); }
+.job-letter { display: block; width: 100%; height: 560px; border: 0; border-top: 1px solid var(--line); background: var(--surface-2); border-radius: 0 0 var(--radius) var(--radius); }
+.job-decide .stack { gap: var(--space-3); }
+.job-contact { display: flex; flex-direction: column; gap: 2px; font-size: var(--text-sm); }
+.job-contact-label { color: var(--muted); font-size: var(--text-xs); }
+.btn-danger { background: var(--red); border-color: var(--red); color: #fff; }
+.btn-danger:hover { background: #a42b22; border-color: #a42b22; color: #fff; }
+.decline-reasons { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; }
+.decline-reasons legend { margin-bottom: var(--space-2); }
+.decline-opt { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--line-strong); cursor: pointer; font-size: var(--text-sm); }
+.decline-opt:hover { box-shadow: inset 0 0 0 1px var(--gray); }
+.decline-opt:has(input:checked) { background: var(--primary-tint); box-shadow: inset 0 0 0 2px var(--primary); }
+.decline-opt input { accent-color: var(--primary); margin: 0; }
+
+/* Formulir tawaran kerja (supervisor) */
+.dialog-wide { width: min(760px, calc(100vw - 32px)); max-width: none; }
+.offer-form { display: grid; gap: var(--space-4); max-height: min(62vh, 640px); overflow-y: auto; padding-right: 4px; }
+.offer-fs { margin: 0; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius); }
+.offer-fs > legend { padding: 0 6px; color: var(--text); font-size: var(--text-sm); font-weight: 700; }
+.recruit-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin: var(--space-4) 0 0; }
+.recruit-facts > div { padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-2); }
+.recruit-facts dt { color: var(--muted); font-size: var(--text-xs); }
+.recruit-facts dd { margin: 2px 0 0; color: var(--text); font-weight: 650; font-size: var(--text-sm); }
+.recruit-facts dd small { display: block; color: var(--muted); font-weight: 500; font-size: var(--text-xs); }
+.recruit-actions { justify-content: flex-end; }
+@media (max-width: 700px) {
+    .job-head { flex-wrap: wrap; gap: var(--space-3) var(--space-4); }
+    .job-state { flex: 1 1 100%; flex-direction: row; align-items: baseline; justify-content: space-between; text-align: left; padding-top: var(--space-3); border-top: 1px solid var(--line); }
+    .job-title { font-size: 20px; }
+    .job-facts { grid-template-columns: minmax(0, 1fr); }
+    .job-letter { height: 420px; }
+    .dialog-wide .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.job-head > .grow { flex: 1; min-width: 0; }

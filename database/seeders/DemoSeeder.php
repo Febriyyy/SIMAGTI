@@ -465,6 +465,20 @@ class DemoSeeder extends Seeder
             'note' => 'Nilai akhir tertinggi di divisi.',
         ]);
         $candidate->histories()->create(['to_status' => 'direkomendasikan', 'changed_by' => $supervisor->id]);
+        $candidate->update(['offered_position' => 'Junior Data Analyst'] + [
+            'unit' => 'Divisi Data & Insight',
+            'work_location' => 'Jakarta Selatan',
+            'work_mode' => 'hybrid',
+            'employment_type' => 'kontrak',
+            'contract_months' => 12,
+            'start_date' => now()->addMonth()->startOfMonth()->toDateString(),
+            'job_description' => "Menyusun dasbor dan laporan rutin untuk tim bisnis\nMembersihkan dan memvalidasi data transaksi\nMenganalisis tren penjualan dan menyampaikan temuan\nBerkoordinasi dengan tim produk untuk kebutuhan data",
+            'compensation' => 'Dibahas saat wawancara',
+            'hr_contact_name' => $supervisor->name,
+            'hr_contact_email' => $supervisor->email,
+            'offered_at' => now()->subDays(2),
+            'respond_by' => now()->addDays(5)->toDateString(),
+        ]);
         $candidate->moveTo('ditawari', $supervisor->id, 'Ditawari posisi Junior Data Analyst.');
     }
 }

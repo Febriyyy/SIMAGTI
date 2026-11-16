@@ -98,9 +98,9 @@
                                     <div><dt>Sertifikat</dt><dd><a href="{{ route('sertifikat.cetak', $internship) }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="award" :size="16" /> Lihat sertifikat</a></dd></div>
                                 @endif
                             @endif
-                            @php($offer = $internship->conversion()->whereIn('status', ['ditawari', 'diterima', 'ditolak'])->first())
+                            @php($offer = $internship->conversion()->whereIn('status', ['ditawari', 'diterima', 'ditolak', 'kedaluwarsa'])->first())
                             @if ($offer)
-                                <div><dt>Tawaran kerja</dt><dd>{{ $offer->status === 'ditawari' ? 'Menunggu jawaban Anda' : ($offer->status === 'diterima' ? 'Diterima' : 'Ditolak') }}<small>{{ $offer->offered_position }}</small></dd></div>
+                                <div><dt>Tawaran kerja</dt><dd><a href="{{ route('rekrutmen.tawaran') }}">{{ ['ditawari' => 'Menunggu jawaban Anda', 'diterima' => 'Anda menerima', 'ditolak' => 'Anda menolak', 'kedaluwarsa' => 'Kedaluwarsa'][$offer->status] }}</a><small>{{ $offer->offered_position }}</small></dd></div>
                             @endif
                             @if ($internship->defenseScore)
                                 <div><dt>Nilai sidang</dt><dd>{{ $internship->defenseScore->letter_grade }} · {{ \App\Support\Num::short($internship->defenseScore->score) }}<small>Sidang {{ $internship->defenseScore->defended_at?->locale('id')->translatedFormat('j F Y') }}</small></dd></div>
