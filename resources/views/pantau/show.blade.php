@@ -66,54 +66,115 @@
         @php($canReplace = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && $internship->status === 'berjalan')
         @php($canRecommend = auth()->user()->role === 'supervisor' && $internship->isSupervisedBy(auth()->user()) && in_array($internship->status, ['berjalan', 'selesai'], true) && ! $internship->conversion)
         @if ($canCorrect || $canReplace || $canRecommend)
-            <div class="profile-strip-tools">
+            {{-- Alat Company Supervisor: satu deret tombol, tiap form dibuka sebagai dialog --}}
+            <div class="prof-tools">
+                @if ($canCorrect)
+                    <button type="button" class="btn btn-sm" data-open="dlg-posisi"><x-ikon name="edit" :size="16" /> Koreksi posisi</button>
+                @endif
                 @if ($canReplace)
-                    <details class="inline-details tool-details">
-                        <summary class="btn btn-sm btn-ghost"><x-ikon name="swap" :size="16" /> Ganti supervisor</summary>
-                        <form method="POST" action="{{ route('perubahan.supervisor', $internship) }}" class="tool-form">
-                            @csrf
-                            <p class="hint">Data pengganti Anda, diaktifkan TU.</p>
-                            <div class="form-grid">
-                                <input type="text" name="supervisor_name" class="input" maxlength="150" placeholder="Nama pengganti" required aria-label="Nama supervisor pengganti">
-                                <input type="text" name="supervisor_title" class="input" maxlength="100" placeholder="Jabatan" aria-label="Jabatan">
-                                <input type="email" name="supervisor_email" class="input span-all" maxlength="150" placeholder="Email kantor" required aria-label="Email supervisor pengganti">
-                                <textarea name="reason" class="textarea span-all" rows="2" maxlength="1000" placeholder="Alasan" required aria-label="Alasan"></textarea>
-                            </div>
-                            <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary"><x-ikon name="send" :size="16" /> Kirim ke TU</button></div>
-                        </form>
-                    </details>
+                    <button type="button" class="btn btn-sm" data-open="dlg-supervisor"><x-ikon name="swap" :size="16" /> Ganti supervisor</button>
                 @endif
                 @if ($canRecommend)
-                    <details class="inline-details tool-details">
-                        <summary class="btn btn-sm"><x-ikon name="star" :size="16" /> Rekomendasikan rekrut</summary>
-                        <form method="POST" action="{{ route('rekrutmen.update', $internship) }}" class="tool-form">
-                            @csrf
-                            <input type="hidden" name="langkah" value="rekomendasikan">
-                            <p class="hint">Mahasiswa baru diberi tahu saat Anda menawarkan kerja.</p>
-                            <div class="form-grid">
-                                <input type="text" name="posisi" class="input span-all" maxlength="100" placeholder="Posisi yang cocok (opsional)" aria-label="Posisi yang cocok">
-                                <textarea name="catatan" class="textarea span-all" rows="2" maxlength="500" placeholder="Alasan singkat (opsional)" aria-label="Alasan rekomendasi"></textarea>
-                            </div>
-                            <div class="row-actions"><button type="submit" class="btn btn-sm btn-primary"><x-ikon name="star" :size="16" /> Rekomendasikan</button></div>
-                        </form>
-                    </details>
-                @endif
-                @if ($canCorrect)
-                    <details class="inline-details tool-details">
-                        <summary class="btn btn-sm"><x-ikon name="edit" :size="16" /> Koreksi posisi</summary>
-                        <form method="POST" action="{{ route('pantau.posisi', $internship) }}" class="tool-form">
-                            @csrf
-                            @method('PATCH')
-                            <div class="inline-form">
-                                <input type="text" name="position" class="input input-sm" value="{{ $internship->position }}" maxlength="100" required aria-label="Posisi magang">
-                                <button type="submit" class="btn btn-sm btn-primary">Simpan</button>
-                            </div>
-                        </form>
-                    </details>
+                    <button type="button" class="btn btn-sm" data-open="dlg-rekrut"><x-ikon name="star" :size="16" /> Rekomendasikan rekrut</button>
                 @endif
             </div>
         @endif
     </div>
+
+    @if ($canCorrect)
+        <dialog id="dlg-posisi" class="dialog" @if ($errors->has('position')) data-autoopen @endif>
+            <form method="POST" action="{{ route('pantau.posisi', $internship) }}" class="dialog-body">
+                @csrf
+                @method('PATCH')
+                <div class="dialog-head">
+                    <h2 class="card-title">Koreksi posisi</h2>
+                    <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
+                </div>
+                <div>
+                    <label class="label" for="tool-position">Posisi magang</label>
+                    <input id="tool-position" type="text" name="position" class="input" value="{{ old('position', $internship->position) }}" maxlength="100" required>
+                    @error('position')<p class="field-error">{{ $message }}</p>@enderror
+                </div>
+                <div class="dialog-foot row-actions">
+                    <button type="button" class="btn" data-close>Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </dialog>
+    @endif
+
+    @if ($canReplace)
+        <dialog id="dlg-supervisor" class="dialog" @if ($errors->hasAny(['supervisor_name', 'supervisor_title', 'supervisor_email', 'reason'])) data-autoopen @endif>
+            <form method="POST" action="{{ route('perubahan.supervisor', $internship) }}" class="dialog-body">
+                @csrf
+                <div class="dialog-head">
+                    <div>
+                        <h2 class="card-title">Ganti supervisor</h2>
+                        <p class="card-sub">Pengganti Anda diaktifkan TU Fakultas</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
+                </div>
+                <div class="stack">
+                    <div class="form-grid">
+                        <div>
+                            <label class="label" for="tool-sv-name">Nama pengganti</label>
+                            <input id="tool-sv-name" type="text" name="supervisor_name" class="input" maxlength="150" required value="{{ old('supervisor_name') }}">
+                            @error('supervisor_name')<p class="field-error">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="label" for="tool-sv-title">Jabatan <span class="muted">(opsional)</span></label>
+                            <input id="tool-sv-title" type="text" name="supervisor_title" class="input" maxlength="100" value="{{ old('supervisor_title') }}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label" for="tool-sv-email">Email kantor</label>
+                        <input id="tool-sv-email" type="email" name="supervisor_email" class="input" maxlength="150" required value="{{ old('supervisor_email') }}">
+                        @error('supervisor_email')<p class="field-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="label" for="tool-sv-reason">Alasan</label>
+                        <textarea id="tool-sv-reason" name="reason" class="textarea" rows="3" maxlength="1000" required>{{ old('reason') }}</textarea>
+                        @error('reason')<p class="field-error">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+                <div class="dialog-foot row-actions">
+                    <button type="button" class="btn" data-close>Batal</button>
+                    <button type="submit" class="btn btn-primary"><x-ikon name="send" :size="16" /> Kirim ke TU</button>
+                </div>
+            </form>
+        </dialog>
+    @endif
+
+    @if ($canRecommend)
+        <dialog id="dlg-rekrut" class="dialog" @if ($errors->hasAny(['rekrutmen', 'posisi', 'catatan'])) data-autoopen @endif>
+            <form method="POST" action="{{ route('rekrutmen.update', $internship) }}" class="dialog-body">
+                @csrf
+                <input type="hidden" name="langkah" value="rekomendasikan">
+                <div class="dialog-head">
+                    <div>
+                        <h2 class="card-title">Rekomendasikan rekrut</h2>
+                        <p class="card-sub">Mahasiswa baru diberi tahu saat Anda menawarkan kerja</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
+                </div>
+                <div class="stack">
+                    <div>
+                        <label class="label" for="tool-rc-pos">Posisi yang cocok <span class="muted">(opsional)</span></label>
+                        <input id="tool-rc-pos" type="text" name="posisi" class="input" maxlength="100" value="{{ old('posisi') }}">
+                    </div>
+                    <div>
+                        <label class="label" for="tool-rc-note">Alasan singkat <span class="muted">(opsional)</span></label>
+                        <textarea id="tool-rc-note" name="catatan" class="textarea" rows="3" maxlength="500">{{ old('catatan') }}</textarea>
+                    </div>
+                    @error('rekrutmen')<p class="field-error">{{ $message }}</p>@enderror
+                </div>
+                <div class="dialog-foot row-actions">
+                    <button type="button" class="btn" data-close>Batal</button>
+                    <button type="submit" class="btn btn-primary"><x-ikon name="star" :size="16" /> Rekomendasikan</button>
+                </div>
+            </form>
+        </dialog>
+    @endif
 
     <nav class="tabs" aria-label="Bagian">
         <a href="{{ route('pantau.show', $internship) }}" @class(['tab', 'is-active' => $tab === 'kegiatan' && request('status') !== 'completed'])><x-ikon name="board" :size="16" /> Kegiatan</a>
