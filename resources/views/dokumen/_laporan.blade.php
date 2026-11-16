@@ -29,11 +29,15 @@
                         <p class="chapter-note"><b>{{ $chapter->reviser?->role === 'supervisor' ? 'Company Supervisor' : 'Dosen pembimbing' }}:</b> {{ $chapter->revision_note }}</p>
                     @endif
                 </div>
-                <x-chip :tone="$chapter->statusTone()">{{ $chapter->statusLabel() }}</x-chip>
+                @if ($chapter->status === 'belum')
+                    <span class="chapter-state" aria-hidden="true"></span>
+                @else
+                    <x-chip :tone="$chapter->statusTone()" class="chapter-state">{{ $chapter->statusLabel() }}</x-chip>
+                @endif
                 @if ($canUpload && $chapter->status !== 'disetujui')
                     <form method="POST" action="{{ route('laporan.unggah', $chapter) }}" enctype="multipart/form-data" class="chapter-upload">
                         @csrf
-                        <label class="btn btn-sm {{ in_array($chapter->status, ['belum', 'revisi'], true) ? 'btn-primary' : '' }}">
+                        <label class="btn btn-sm {{ $chapter->status === 'revisi' ? 'btn-primary' : '' }}">
                             <x-ikon name="upload" :size="16" /> {{ $chapter->file ? 'Ganti' : 'Unggah' }}
                             <input type="file" name="berkas" accept=".pdf,.docx" required class="sr-only" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()" aria-label="Berkas {{ $chapter->label() }}">
                         </label>
