@@ -11,13 +11,13 @@
             action="Mahasiswa" :href="route('pantau.index')" />
 
     <div class="stat-grid">
-        <x-stat label="Mahasiswa magang" :value="$stats['students']" unit="orang" :href="route('pantau.index')" hint="Yang sedang berjalan" />
+        <x-stat label="Mahasiswa magang" :value="$stats['students']" unit="orang" :href="route('pantau.index')" hint="Sedang berjalan" />
         <x-stat label="Perlu konfirmasi" :value="$stats['unconfirmed']" unit="mahasiswa"
                 :tone="$stats['unconfirmed'] > 0 ? 'amber' : 'green'" :href="$stats['unconfirmed'] > 0 ? '#konfirmasi' : null"
-                :hint="$stats['unconfirmed'] > 0 ? 'Data penempatan' : 'Semua sudah dikonfirmasi'" />
+                :hint="$stats['unconfirmed'] > 0 ? 'Data penempatan' : 'Sudah dikonfirmasi'" />
         <x-stat label="Catatan minggu ini" :value="$stats['week_notes']" unit="catatan" tone="gray" :href="route('aktivitas.index')" hint="Semua mahasiswa" />
         <x-stat label="Belum dinilai" :value="$stats['to_assess']" unit="mahasiswa" :href="route('penilaian.index')"
-                :tone="$stats['to_assess'] > 0 ? 'blue' : 'green'" hint="Penilaian akhir belum dikirim" />
+                :tone="$stats['to_assess'] > 0 ? 'blue' : 'green'" hint="Belum dikirim" />
     </div>
 
     @php($unconfirmed = $internships->whereNull('supervisor_confirmation'))

@@ -4242,3 +4242,69 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .chapter-title { display: block; }
 .chapter-co { margin-left: 6px; vertical-align: -5px; }
 @media (max-width: 640px) { .chapter-upload label { min-width: 104px; } }
+
+/* Laporan KP sebagai linimasa: titik per bab dihubungkan garis, batang progres bersegmen di kepala */
+.rtl-head { align-items: center; }
+.rtl-progress { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+.rtl-segs { display: flex; gap: 4px; }
+.rtl-segs i { width: 28px; height: 6px; border-radius: 99px; background: var(--line); }
+.rtl-segs i.is-done { background: var(--primary); }
+.rtl-segs i.is-wait { background: #9cc7f5; }
+.rtl-segs i.is-revise { background: #f2a3a3; }
+.rtl-count { color: var(--muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.rtl-count b { color: var(--text); font-weight: 750; }
+
+.rtl-list { margin: 0; padding: var(--space-2) var(--card-x) var(--space-3); list-style: none; }
+.rtl-item { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: start; gap: var(--space-4); padding: var(--space-4) 0; }
+/* Garis penghubung antar titik */
+.rtl-item:not(:last-child)::before { content: ''; position: absolute; left: 10px; top: calc(var(--space-4) + 26px); bottom: calc(-1 * var(--space-4) + 4px); width: 2px; border-radius: 2px; background: var(--line); }
+.rtl-item.is-done:not(:last-child)::before { background: var(--primary); }
+
+.rtl-node { display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; background: var(--surface); box-shadow: inset 0 0 0 2px var(--line-strong); color: #fff; font-size: 12px; font-weight: 800; }
+.is-wait > .rtl-node { box-shadow: inset 0 0 0 2px #5b9be6, 0 0 0 4px #e8f1fd; background: radial-gradient(circle, #5b9be6 0 4px, var(--surface) 5px); }
+.is-done > .rtl-node { background: var(--primary); box-shadow: 0 0 0 4px var(--primary-tint); }
+.is-revise > .rtl-node { background: var(--red, #d23c3c); box-shadow: 0 0 0 4px var(--red-soft, #fdecec); }
+
+.rtl-body { min-width: 0; }
+.rtl-title { color: var(--text); font-size: var(--text-md); font-weight: 650; line-height: 1.35; }
+.is-empty .rtl-title { color: var(--gray); }
+.rtl-co { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 6px; vertical-align: -4px; border-radius: 6px; background: var(--amber-soft); color: var(--amber); }
+.rtl-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-3); margin-top: 4px; color: var(--muted); font-size: var(--text-xs); }
+.rtl-file { display: inline-flex; align-items: center; gap: 4px; min-width: 0; max-width: 260px; color: var(--primary-dark); font-weight: 600; }
+.rtl-file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rtl-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; }
+.rtl-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.rtl-status.tone-blue { color: #2f6fde; }
+.rtl-status.tone-amber { color: var(--amber); }
+.rtl-status.tone-red { color: var(--red, #d23c3c); }
+.rtl-status.tone-green { color: var(--primary); }
+.rtl-note { margin: var(--space-2) 0 0; padding: var(--space-2) var(--space-3); border-left: 3px solid var(--red, #d23c3c); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: var(--red-soft, #fdecec); color: var(--text); font-size: var(--text-sm); line-height: 1.5; }
+.rtl-note b { display: block; color: var(--red, #d23c3c); font-size: var(--text-xs); }
+
+.rtl-action { margin: 0; }
+.rtl-action label { cursor: pointer; }
+.rtl-action label:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
+.rtl-foot { font-size: var(--text-sm); }
+.rtl-foot a { display: inline-flex; align-items: center; gap: 6px; }
+@media (max-width: 640px) {
+    .rtl-head { flex-wrap: wrap; }
+    .rtl-progress { align-items: flex-start; flex: 1 1 100%; }
+    .rtl-segs { width: 100%; } .rtl-segs i { flex: 1; width: auto; }
+    .rtl-item { gap: var(--space-3); }
+    .rtl-file { max-width: 180px; }
+}
+
+/* Keterangan kartu angka: satu baris tenang bertitik warna, tanpa pil yang bertumpuk; teks lengkap di tooltip */
+.stat-grid .stat-hint, .stat-grid .stat-blue .stat-hint, .stat-grid .stat-gray .stat-hint, .stat-grid .stat-amber .stat-hint, .stat-grid .stat-green .stat-hint {
+    display: block; max-width: 100%; padding: 0 0 0 14px; border-radius: 0; background: none; box-shadow: none;
+    position: relative; color: var(--muted); font-size: var(--text-xs); font-weight: 550; line-height: 1.4;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stat-grid .stat-hint::before { content: ''; position: absolute; left: 0; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--acc, var(--primary)); opacity: .85; }
+.stat-grid .stat-gray .stat-hint::before { background: var(--line-strong); }
+.stat-grid .stat-green .stat-hint::before { background: var(--primary); }
+.stat-grid .stat-amber .stat-hint { color: var(--acc-coral-ink, var(--amber)); }
+.stat-grid .stat-amber .stat-hint::before { background: var(--acc-coral, var(--amber)); }
+.stat-grid .stat-bar + .stat-hint { padding-left: 0; color: var(--text); font-weight: 700; }
+.stat-grid .stat-bar + .stat-hint::before { display: none; }
+@media (max-width: 700px) { .stat-grid .stat-hint { white-space: nowrap; } }

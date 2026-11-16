@@ -16,7 +16,7 @@
         <x-stat label="Perlu verifikasi" :value="$stats['verify']" unit="KP" :tone="$stats['verify'] > 0 ? 'amber' : 'gray'" :href="route('tu.verifikasi')"
                 hint="KP mandiri" />
         <x-stat label="Menunggu aktivasi" :value="$stats['pending']" unit="supervisor" :href="route('tu.aktivasi')"
-                :hint="$stats['students'].' mahasiswa belum punya supervisor'" />
+                :hint="$stats['students'].' mahasiswa'" />
         <x-stat label="Surat pengantar" :value="$stats['letters']" unit="diminta" :tone="$stats['letters'] > 0 ? 'amber' : 'gray'" :href="route('tu.surat')"
                 hint="Menunggu diterbitkan" />
         <x-stat label="KP berjalan" :value="$stats['running']" unit="mahasiswa" tone="gray" :href="route('penempatan.index')" :hint="$stats['partners'].' perusahaan mitra'" />

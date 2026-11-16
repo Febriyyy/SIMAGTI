@@ -141,11 +141,11 @@
         <div class="stat-grid dash-stats">
             @php($activePlans = $plans->filter(fn ($p) => $p->phase() === 'active')->count())
             <x-stat label="Rencana kegiatan" :value="$plans->count()" unit="kegiatan" :href="route('timesheet.index')"
-                    :tone="$plans->isEmpty() ? 'amber' : 'blue'" :hint="$plans->isEmpty() ? 'Isi rencana dulu di timesheet' : $activePlans.' sedang berjalan'" />
+                    :tone="$plans->isEmpty() ? 'amber' : 'blue'" :hint="$plans->isEmpty() ? 'Isi di Timesheet' : $activePlans.' sedang berjalan'" />
             @if ($internship->status === 'selesai' || $a?->isValidated())
                 <x-stat label="Nilai akhir" :value="$a?->isValidated() ? $a->letter_grade : null" :unit="$a?->isValidated() ? \App\Support\Num::short($a->final_score) : null"
                         :tone="$a?->isValidated() ? 'green' : 'gray'" empty="Belum dinilai"
-                        :hint="$a?->isValidated() ? 'Sudah divalidasi' : 'Muncul setelah divalidasi dosen pembimbing'" />
+                        :hint="$a?->isValidated() ? 'Sudah divalidasi' : 'Menunggu validasi'" />
             @else
                 <x-stat label="Goals tercapai" :value="$goals->whereNotNull('achieved_at')->count()" :unit="'dari '.$goals->count()" :href="route('kegiatan.index')"
                         tone="gray" :hint="$goals->isEmpty() ? 'Tulis di Kegiatan' : 'Tandai di Kegiatan'" />

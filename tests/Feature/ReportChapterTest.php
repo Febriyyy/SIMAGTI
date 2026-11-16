@@ -51,7 +51,7 @@ class ReportChapterTest extends TestCase
         $lecturer = $kp->lecturer;
 
         // Bab bawaan dibuat saat halaman Dokumen dibuka
-        $this->actingAs($student)->get('/dokumen')->assertOk()->assertSee('Laporan KP per bab')->assertSee('Gambaran Umum Perusahaan');
+        $this->actingAs($student)->get('/dokumen')->assertOk()->assertSee('Laporan KP')->assertSee('dari 4 disetujui')->assertSee('Gambaran Umum Perusahaan');
         $this->assertSame(4, $kp->reportChapters()->count());
 
         $bab2 = $this->chapter($kp, 2);

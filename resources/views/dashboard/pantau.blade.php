@@ -36,7 +36,7 @@
 
         <x-stat label="Nilai rata-rata" :value="$stats['average_score'] !== null ? \App\Support\Num::short($stats['average_score']) : null"
                 icon="award" empty="Belum ada nilai"
-                :hint="$assessment['validated'] > 0 ? 'dari '.$assessment['validated'].' penilaian tervalidasi' : 'Menunggu validasi pertama'" />
+                :hint="$assessment['validated'] > 0 ? $assessment['validated'].' tervalidasi' : 'Menunggu validasi'" />
 
     </div>
 

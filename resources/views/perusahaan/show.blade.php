@@ -17,11 +17,11 @@
         <x-stat label="Sedang magang" :value="$stats['ongoing_count']" unit="mahasiswa" icon="users"
                 :hint="$stats['finished_count'].' sudah selesai'" />
         <x-stat label="Rata-rata durasi" :value="\App\Support\Num::short($stats['average_duration_months'], 1)" unit="bulan" icon="calendar"
-                hint="Semua penempatan di sini" />
+                hint="Semua penempatan" />
         <x-stat label="Task selesai" :value="$stats['average_progress_percent'].'%'" icon="tasks" :percent="$stats['average_progress_percent']" />
         <x-stat label="Nilai rata-rata" :value="$perf['average_final_score'] !== null ? \App\Support\Num::short($perf['average_final_score']) : null"
                 icon="award" empty="Belum ada nilai"
-                :hint="$perf['assessed_count'] > 0 ? 'dari '.$perf['assessed_count'].' penilaian tervalidasi' : 'Menunggu validasi pertama'" />
+                :hint="$perf['assessed_count'] > 0 ? $perf['assessed_count'].' tervalidasi' : 'Menunggu validasi'" />
     </div>
 
     <section class="card">

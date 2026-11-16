@@ -213,7 +213,7 @@ class DashboardDataTest extends TestCase
 
         // Gilang belum menyusun rencana kegiatan
         $this->actingAs($this->user('gilang@kp.test'))->get('/dashboard')
-            ->assertOk()->assertSee('Isi rencana dulu di timesheet')->assertSee('Belum ada rencana');
+            ->assertOk()->assertSee('Isi di Timesheet')->assertSee('Belum ada rencana');
 
         $this->actingAs($this->user('nadia@kp.test'))->get('/dashboard')
             ->assertOk()->assertSee('sedang diproses')->assertSee('Lihat Status KP');
