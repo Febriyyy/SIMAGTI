@@ -93,8 +93,6 @@
         </section>
     @endif
 
-    <x-contrib :data="$contrib" title="Konsistensi selama KP" class="pp-contrib" />
-
     @if ($certificate)
         <a href="{{ route('sertifikat.verifikasi', $certificate->verification_token) }}" class="pp-cert">
             <span class="pp-cert-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14.5L7 22l5-3 5 3-1.5-7.5"/></svg></span>

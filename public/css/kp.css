@@ -3812,33 +3812,6 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 /* =====================================================================
    Peta kontribusi ala GitHub (dashboard mahasiswa, tab Aktivitas pantau), November 2026
    ===================================================================== */
-.contrib { --cell: 13px; --gap: 3px; }
-.contrib .card-head { flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
-.contrib-stats { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 0 auto; padding: 0; list-style: none; }
-.contrib-stats li { padding: 4px var(--space-3); border-radius: var(--radius-pill); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: var(--text-xs); }
-.contrib-stats b { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
-.contrib-body { padding: var(--space-4) var(--card-x) var(--card-y); }
-.contrib-scroll { overflow-x: auto; scrollbar-width: thin; padding-bottom: var(--space-1); }
-.contrib-grid { display: grid; grid-template-columns: 28px auto; grid-template-rows: auto auto; gap: 6px 6px; width: max-content; }
-.contrib-months { grid-column: 2; position: relative; height: 14px; width: calc(var(--weeks) * (var(--cell) + var(--gap))); }
-.contrib-months span { position: absolute; left: calc(var(--col) * (var(--cell) + var(--gap))); top: 0; color: var(--muted); font-size: var(--text-2xs); white-space: nowrap; }
-.contrib-days { display: grid; grid-template-rows: repeat(7, var(--cell)); gap: var(--gap); color: var(--muted); font-size: 10px; line-height: var(--cell); }
-.contrib-cells { display: grid; grid-template-rows: repeat(7, var(--cell)); grid-auto-flow: column; grid-auto-columns: var(--cell); gap: var(--gap); }
-.contrib-cell { display: block; width: var(--cell); height: var(--cell); border-radius: 3px; background: var(--surface-2); box-shadow: inset 0 0 0 1px rgba(15, 27, 25, 0.06); }
-.contrib-cell.l1 { background: #c9eedf; }
-.contrib-cell.l2 { background: #7fd3b2; }
-.contrib-cell.l3 { background: #26a97a; }
-.contrib-cell.l4 { background: #037a68; }
-.contrib-cell.is-future { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
-.contrib-cell.is-out { background: transparent; box-shadow: none; }
-.contrib-cells .contrib-cell:not(.is-out):hover { outline: 2px solid var(--text); outline-offset: 1px; }
-.contrib-legend { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: var(--space-3); color: var(--muted); font-size: var(--text-2xs); }
-.contrib-legend span { margin: 0 4px; }
-@media (max-width: 700px) {
-    .contrib { --cell: 11px; --gap: 3px; }
-    .contrib-stats { margin-left: 0; }
-    .contrib-body { padding: var(--space-3) var(--space-4) var(--space-4); }
-}
 
 /* Pemisah item menu (mis. Draf laporan KP di menu Unduh Timesheet) */
 .menu-item-sep { margin-top: var(--space-1); padding-top: var(--space-3); border-top: 1px solid var(--line); border-radius: 0 0 var(--radius-xs) var(--radius-xs); }
@@ -4008,7 +3981,6 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .pp-goals { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
 .pp-goals li { position: relative; padding-left: 28px; color: var(--text); font-weight: 550; }
 .pp-goals li::before { content: ''; position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--primary-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23037a68' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat; }
-.pp-contrib { border-radius: var(--radius-lg); }
 .pp-cert { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); color: var(--text); text-decoration: none; }
 .pp-cert:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--primary), var(--shadow-hover); }
 .pp-cert-icon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 14px; background: var(--primary-tint); color: var(--primary); }
@@ -4052,17 +4024,6 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 @media (max-width: 380px) { .wr-slide { padding: 96px 20px 56px; } .wr-slide::before { width: 320px; height: 320px; } }
 
 /* Peta kontribusi selebar kartu: ukuran kotak dihitung dari lebar kartu (container query), 11-40px */
-.contrib-body { container-type: inline-size; }
-.contrib-grid { --gap: clamp(3px, 0.5cqw, 5px); --cell: clamp(11px, calc((100cqw - 40px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); grid-template-columns: 34px auto; margin-inline: auto; }
-.contrib-cell { border-radius: clamp(3px, calc(var(--cell) * 0.22), 7px); }
-.contrib-days { font-size: clamp(10px, calc(var(--cell) * 0.42), 13px); }
-.contrib-months span { font-size: clamp(10px, calc(var(--cell) * 0.4), 13px); }
-.contrib-months { height: 18px; }
-.contrib-legend .contrib-cell { --cell: 14px; }
-.contrib-months { width: calc(var(--weeks) * var(--cell) + (var(--weeks) - 1) * var(--gap)); }
-.contrib-grid { --cell: clamp(11px, calc((100cqw - 46px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); }
-.contrib-grid { --cell: clamp(8px, calc((100cqw - 46px - (var(--weeks) - 1) * var(--gap)) / var(--weeks)), 40px); }
-@media (max-width: 700px) { .contrib-grid { --gap: 2px; grid-template-columns: 28px auto; } }
 
 /* Verifikasi sertifikat: tab Sertifikat / Keterangan nilai, rincian nilai lengkap */
 .vx-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Portfolio;
 use App\Support\ActiveInternship;
-use App\Support\Contribution;
 use App\Support\Qr;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -95,7 +94,6 @@ class PortfolioController extends Controller
             'grade' => $grade,
             'score' => $grade ? ($internship->final_score ?? $assessment?->final_score) : null,
             'certificate' => $internship->certificate?->isValid() ? $internship->certificate : null,
-            'contrib' => Contribution::build($internship),
         ])->header('X-Robots-Tag', 'noindex');
     }
 }

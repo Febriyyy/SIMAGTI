@@ -54,13 +54,11 @@ class ContributionTest extends TestCase
         $this->assertTrue($cells->last()['future']);
     }
 
-    public function test_peta_kontribusi_tampil_di_dashboard_dan_tab_aktivitas_pantau(): void
+    public function test_peta_kontribusi_tidak_lagi_tampil(): void
     {
-        $this->actingAs($this->user('mahasiswa@kp.test'))->get('/dashboard')->assertOk()
-            ->assertSee('Peta kontribusi')->assertSee('class="card contrib"', false);
+        $this->actingAs($this->user('mahasiswa@kp.test'))->get('/dashboard')->assertOk()->assertDontSee('Peta kontribusi');
 
         $internship = $this->internshipOf('mahasiswa@kp.test');
-        $this->actingAs($this->user('dospem@kp.test'))->get("/pantau/{$internship->id}?tab=aktivitas")->assertOk()
-            ->assertSee('Peta kontribusi')->assertSee('hari aktif');
+        $this->actingAs($this->user('dospem@kp.test'))->get("/pantau/{$internship->id}?tab=aktivitas")->assertOk()->assertDontSee('Peta kontribusi');
     }
 }
