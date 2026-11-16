@@ -82,21 +82,36 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Huruf mutu</h2>
-                        <p class="card-sub">Batas bawah nilai akhir</p>
+                        <p class="card-sub">Sesuai standar kampus</p>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('admin.penilaian.huruf') }}" class="card-body stack">
                     @csrf
                     @method('PUT')
-                    <div class="grade-grid">
-                        @foreach ($grades as $grade => $min)
-                            <label class="grade-cell">
-                                <span>{{ $grade }}</span>
-                                <input type="number" name="grades[{{ $grade }}]" class="input input-sm" min="0" max="100" step="0.5" value="{{ old('grades.'.$grade, 0 + $min) }}" aria-label="Batas bawah {{ $grade }}" required>
-                            </label>
-                        @endforeach
+                    <?php
+                        $gradeRows = old('grades', collect($grades)->map(fn ($min, $letter) => ['letter' => $letter, 'min' => 0 + $min])->values()->all());
+                        // Rentang tiap huruf: dari batas bawahnya sampai sebelum batas huruf di atasnya
+                        $ranges = [];
+                        $upper = null;
+                        foreach (collect($grades)->sortDesc() as $letter => $min) {
+                            $ranges[$letter] = \App\Support\Num::short($min).'–'.($upper === null ? '100' : \App\Support\Num::short($upper - 0.1, 1));
+                            $upper = $min;
+                        }
+                    ?>
+                    <div class="grade-table" role="group" aria-label="Huruf mutu dan batas bawah">
+                        <div class="grade-row grade-row-head" aria-hidden="true"><span>Huruf</span><span>Batas bawah</span><span>Rentang</span></div>
+                        @for ($i = 0; $i < min(12, count($gradeRows) + 2); $i++)
+                            @php($row = $gradeRows[$i] ?? null)
+                            <div class="grade-row">
+                                <input type="text" name="grades[{{ $i }}][letter]" class="input input-sm grade-letter" maxlength="3" value="{{ $row['letter'] ?? '' }}" placeholder="–" aria-label="Huruf mutu baris {{ $i + 1 }}">
+                                <input type="number" name="grades[{{ $i }}][min]" class="input input-sm" min="0" max="100" step="0.1" value="{{ $row['min'] ?? '' }}" placeholder="Nilai" aria-label="Batas bawah baris {{ $i + 1 }}">
+                                <span class="grade-range">{{ isset($row['letter']) ? ($ranges[$row['letter']] ?? '') : '' }}</span>
+                            </div>
+                        @endfor
                     </div>
-                    <p class="hint">Nilai yang sudah divalidasi tetap memakai skala saat divalidasi.</p>
+                    @error('grades')<p class="field-error">{{ $message }}</p>@enderror
+                    @foreach ($errors->get('grades.*') as $messages)<p class="field-error">{{ $messages[0] }}</p>@break @endforeach
+                    <p class="hint">Isi baris kosong untuk menambah, kosongkan baris untuk menghapus. Nilai di bawah batas terendah mendapat huruf E. Nilai yang sudah divalidasi tetap memakai skala lamanya.</p>
                     <div class="row-actions"><button type="submit" class="btn btn-primary btn-sm">Simpan</button></div>
                 </form>
             </section>

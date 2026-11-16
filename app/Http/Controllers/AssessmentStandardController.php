@@ -122,27 +122,38 @@ class AssessmentStandardController extends Controller
         return back()->with('status', 'Skala nilai disimpan.');
     }
 
+    /**
+     * Huruf mutu diatur bebas oleh admin sesuai standar kampus: nama huruf dan batas bawahnya.
+     * Baris kosong diabaikan; urutan mengikuti batas bawah dari tertinggi.
+     */
     public function updateGrades(Request $request): RedirectResponse
     {
+        $rows = collect($request->input('grades', []))
+            ->filter(fn ($row) => is_array($row) && (filled($row['letter'] ?? null) || filled($row['min'] ?? null)))
+            ->map(fn ($row) => ['letter' => strtoupper(trim((string) ($row['letter'] ?? ''))), 'min' => $row['min'] ?? null])
+            ->values()->all();
+        $request->merge(['grades' => $rows]);
+
         $data = $request->validate([
-            'grades' => ['required', 'array', 'min:2'],
-            'grades.*' => ['required', 'numeric', 'between:0,100', 'distinct'],
-        ], ['grades.*.distinct' => 'Batas bawah setiap huruf tidak boleh sama.']);
+            'grades' => ['required', 'array', 'min:2', 'max:12'],
+            'grades.*.letter' => ['required', 'string', 'max:3', 'regex:/^[A-Z]{1,2}[+-]?$/', 'distinct'],
+            'grades.*.min' => ['required', 'numeric', 'between:0,100', 'distinct'],
+        ], [
+            'grades.min' => 'Isi minimal 2 huruf mutu.',
+            'grades.max' => 'Maksimal 12 huruf mutu.',
+            'grades.*.letter.required' => 'Setiap baris perlu huruf.',
+            'grades.*.letter.regex' => 'Huruf mutu berupa huruf, boleh diakhiri + atau − (mis. A, B+, AB).',
+            'grades.*.letter.distinct' => 'Huruf mutu tidak boleh sama.',
+            'grades.*.min.required' => 'Setiap huruf perlu batas bawah.',
+            'grades.*.min.between' => 'Batas bawah di antara 0 dan 100.',
+            'grades.*.min.distinct' => 'Batas bawah setiap huruf tidak boleh sama.',
+        ]);
 
-        $grades = collect($data['grades'])->map(fn ($v) => (float) $v)->sortDesc()->all();
-        $current = Grading::scale();
+        $scale = collect($data['grades'])->sortByDesc(fn ($r) => (float) $r['min'])
+            ->mapWithKeys(fn ($r) => [$r['letter'] => round((float) $r['min'], 2)]);
 
-        // Huruf yang lebih tinggi harus punya batas lebih tinggi (urutan huruf tetap mengikuti skala yang berlaku)
-        $ordered = collect(array_keys($current))->filter(fn ($g) => isset($data['grades'][$g]))->mapWithKeys(fn ($g) => [$g => (float) $data['grades'][$g]]);
-        $values = $ordered->values()->all();
-        for ($i = 1; $i < count($values); $i++) {
-            if ($values[$i] >= $values[$i - 1]) {
-                return back()->withInput()->withErrors(['grades' => 'Batas bawah harus menurun dari huruf tertinggi ke terendah.']);
-            }
-        }
-
-        Grading::publishScale($ordered->all(), $request->user()->id);
-        ActivityLog::record('penilaian.huruf', 'Mengubah skala huruf mutu: '.$ordered->map(fn ($v, $g) => "{$g} ≥ ".(0 + $v))->join(', '));
+        Grading::publishScale($scale->all(), $request->user()->id);
+        ActivityLog::record('penilaian.huruf', 'Mengubah skala huruf mutu: '.$scale->map(fn ($v, $g) => "{$g} ≥ ".(0 + $v))->join(', '));
 
         return back()->with('status', 'Skala huruf mutu disimpan. Nilai yang sudah divalidasi tetap memakai skala lamanya.');
     }

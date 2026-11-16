@@ -329,13 +329,24 @@ class AssessmentFlowTest extends TestCase
         ]])->assertSessionHasNoErrors();
         $this->assertSame([100.0, 80.0, 60.0], array_column(AssessmentStandard::scale(), 'value'));
 
-        $this->put('/admin/penilaian/huruf', ['grades' => ['A' => 70, 'B+' => 75, 'B' => 60, 'C+' => 55, 'C' => 50, 'D' => 40, 'E' => 0]])
-            ->assertSessionHasErrors('grades');
+        $rows = fn (array $scale) => collect($scale)->map(fn ($min, $letter) => ['letter' => $letter, 'min' => $min])->values()->all();
+
+        // Huruf atau batas yang sama ditolak
+        $this->put('/admin/penilaian/huruf', ['grades' => [['letter' => 'A', 'min' => 80], ['letter' => 'A', 'min' => 70]]])
+            ->assertSessionHasErrors('grades.1.letter');
+        $this->put('/admin/penilaian/huruf', ['grades' => [['letter' => 'A', 'min' => 80], ['letter' => 'B', 'min' => 80]]])
+            ->assertSessionHasErrors('grades.1.min');
+
+        // Standar kampus sendiri: huruf dan jumlahnya bebas, baris kosong diabaikan, urutan mengikuti batas bawah
         $version = Grading::currentVersion();
-        $this->put('/admin/penilaian/huruf', ['grades' => ['A' => 85, 'B+' => 78, 'B' => 70, 'C+' => 63, 'C' => 56, 'D' => 45, 'E' => 0]])
+        $this->put('/admin/penilaian/huruf', ['grades' => [...$rows(['B' => 68, 'A' => 80, 'C+' => 62, 'B+' => 74, 'E' => 0]), ['letter' => '', 'min' => '']]])
             ->assertSessionHasNoErrors();
         $this->assertSame($version + 1, Grading::currentVersion());
-        $this->assertSame('B+', Grading::letterFor(80));
+        $this->assertSame(['A', 'B+', 'B', 'C+', 'E'], Grading::letters());
+        $this->assertSame('B+', Grading::letterFor(79.9));
+        $this->assertSame('A', Grading::letterFor(80));
+        $this->assertSame('E', Grading::letterFor(61.9));
+        $this->get('/admin/penilaian')->assertSee('74–79,9');
 
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/admin/penilaian')->assertForbidden();
     }
