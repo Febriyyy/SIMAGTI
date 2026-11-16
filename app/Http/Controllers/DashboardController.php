@@ -10,7 +10,6 @@ use App\Models\InternshipApproval;
 use App\Models\InternshipDocument;
 use App\Models\InternshipStaff;
 use App\Models\Invitation;
-use App\Models\RubricAspect;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
@@ -192,7 +191,6 @@ class DashboardController extends Controller
         $stats = [
             'users' => (int) $roles->sum(),
             'inactive' => User::where('is_active', false)->count(),
-            'questions' => RubricAspect::whereHas('rubric', fn ($q) => $q->where('is_active', true)->whereNull('owner_id'))->count(),
             'logs_today' => ActivityLog::whereDate('created_at', Carbon::today())->count(),
         ];
 
