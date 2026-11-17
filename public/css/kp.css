@@ -4953,3 +4953,31 @@ body { background: var(--page); }
 .gl-panel .gl-card strong { color: var(--ink); }
 .gl-submit { background: linear-gradient(135deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); }
 .gl-check input { accent-color: var(--primary); }
+
+/* Kartu rencana kegiatan (18 Nov 2026): warna mengikuti keadaan, bukan pelangi.
+   Berjalan = hijau (utama), Akan datang = lime (kedua), Selesai/Terlambat/Sudah lewat = gelap (ketiga). */
+.plan-card { --pc: var(--primary); background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); color: #fff; }
+.plan-card[data-state="active"] .plan-card-state { background: #fff; color: var(--primary-dark); }
+.plan-card[data-state="active"] .plan-card-bar > span { background: var(--lime); }
+
+.plan-card[data-state="upcoming"] { --pc: var(--lime-2); background: var(--lime); color: var(--ink); }
+.plan-card[data-state="upcoming"]::after { background: rgba(255, 255, 255, .4); }
+.plan-card[data-state="upcoming"] .plan-card-state { background: rgba(15, 31, 27, .1); color: var(--ink); }
+.plan-card[data-state="upcoming"] .plan-card-sub, .plan-card[data-state="upcoming"] .plan-card-foot small { color: rgba(15, 31, 27, .7); }
+.plan-card[data-state="upcoming"] .plan-card-go { background: rgba(15, 31, 27, .1); color: var(--ink); }
+.plan-card[data-state="upcoming"] .plan-card-bar { background: rgba(15, 31, 27, .14); }
+.plan-card[data-state="upcoming"] .plan-card-bar > span { background: var(--primary); }
+
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"]) { --pc: var(--ink); background: var(--ink); color: #fff; }
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"])::after { background: rgba(201, 240, 101, .12); }
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"]) .plan-card-sub,
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"]) .plan-card-foot small { color: rgba(255, 255, 255, .7); }
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"]) .plan-card-bar { background: rgba(255, 255, 255, .16); }
+.plan-card:is([data-state="done"], [data-state="late"], [data-state="past"]) .plan-card-bar > span { background: var(--lime); }
+.plan-card[data-state="done"] .plan-card-state { background: var(--lime); color: var(--ink); }
+.plan-card[data-state="past"] .plan-card-state { background: rgba(255, 255, 255, .14); color: #fff; }
+
+.plan-card:has(.plan-card-open):hover { box-shadow: 0 10px 22px color-mix(in srgb, var(--pc) 35%, transparent); }
+.plan-card:has(.plan-card-open):hover .plan-card-go { background: #fff; color: var(--primary-dark); }
+.plan-card[data-state="upcoming"]:has(.plan-card-open):hover .plan-card-go { background: var(--ink); color: var(--lime); }
+.plan-card-open:focus-visible::after { outline-color: var(--ink); }
