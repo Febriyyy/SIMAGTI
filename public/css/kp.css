@@ -4844,3 +4844,76 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .gl-logo-link { align-self: flex-start; display: inline-block; border-radius: 8px; transition: opacity 150ms; }
 .gl-logo-link:hover { opacity: .75; }
 .gl-logo-link:focus-visible { outline: 3px solid rgba(3, 122, 104, .35); outline-offset: 4px; }
+
+/* =====================================================================
+   Paduan warna landing page untuk seluruh aplikasi (18 Nov 2026).
+   Latar kertas hangat-hijau, teks tinta, hijau SIMAGTI sebagai dasar, lime sebagai aksen, tinta gelap sebagai pembanding.
+   Hanya warna yang diubah; tata letak dan komponen tetap.
+   ===================================================================== */
+:root {
+    --ink: #0f1f1b;
+    --ink-2: #1b2e29;
+    --lime: #c9f065;
+    --lime-2: #b3df45;
+    --lime-soft: #eef9d2;
+    --lime-ink: #3d5a00;
+
+    --page: #f3f5f0;
+    --bg: #f3f5f0;
+    --surface-2: #f6f8f3;
+    --sidebar-bg: #f3f5f0;
+    --line: #e2e7df;
+    --line-strong: #d3dbd0;
+    --text: #0f1f1b;
+    --bar-gradient: linear-gradient(90deg, var(--primary), var(--lime-2));
+}
+body { background: var(--page); }
+
+/* Menu samping: item aktif berwarna tinta dengan ikon lime, seperti tombol "Masuk" di landing page */
+.sidebar { background: var(--sidebar-bg); }
+.nav-item:hover { background: rgba(15, 31, 27, .05); color: var(--ink); }
+.nav-item.is-active { background: var(--ink); color: #fff; box-shadow: 0 8px 18px rgba(15, 31, 27, .14); }
+.nav-item.is-active .ikon, .nav-item.is-active:hover .ikon { color: var(--lime); }
+.nav-item.is-active:hover { background: var(--ink-2); color: #fff; }
+
+/* Banner sapaan: panel tinta dengan cahaya lime dan hijau, tombol lime */
+.hero {
+    background:
+        radial-gradient(circle at 92% 10%, rgba(201, 240, 101, .28) 0, rgba(201, 240, 101, 0) 34%),
+        radial-gradient(circle at 70% 120%, rgba(11, 154, 127, .45) 0, rgba(11, 154, 127, 0) 45%),
+        var(--ink);
+}
+.hero-eyebrow { color: var(--lime); }
+.hero-art { color: rgba(201, 240, 101, .5); }
+.hero-art-2 { color: rgba(201, 240, 101, .7); }
+.hero-tag .ikon { color: var(--lime); }
+.hero .btn-dark { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+.hero .btn-dark:hover { background: var(--lime-2); border-color: var(--lime-2); }
+.hero .btn-dark .btn-dark-icon { background: var(--ink); color: var(--lime); }
+.hero .btn-dark:focus-visible { box-shadow: 0 0 0 3px rgba(201, 240, 101, .55); }
+
+/* Kartu angka: aksen bergiliran hijau, lime, tinta, teal; kuning-oranye tetap untuk yang perlu tindakan */
+.stat { --acc: var(--primary); --acc-soft: var(--primary-soft); --acc-ink: var(--primary-dark); }
+.stat-grid > .stat:nth-child(4n + 2) { --acc: var(--lime-2); --acc-soft: var(--lime-soft); --acc-ink: var(--lime-ink); }
+.stat-grid > .stat:nth-child(4n + 3) { --acc: var(--ink); --acc-soft: #e4e9e2; --acc-ink: var(--ink); }
+.stat-grid > .stat:nth-child(4n + 4) { --acc: #0b9a7f; --acc-soft: #dcf5ee; --acc-ink: #036654; }
+.stat-grid > .stat.stat-green { --acc: var(--primary); --acc-soft: var(--primary-soft); --acc-ink: var(--primary-dark); }
+.stat-grid > .stat.stat-amber { --acc: var(--acc-coral); --acc-soft: var(--acc-coral-soft); --acc-ink: var(--acc-coral-ink); }
+.stat-grid > .stat:nth-child(4n + 3) .stat-icon { background: var(--ink); color: var(--lime); }
+.stat-grid > .stat:nth-child(4n + 3).stat-amber .stat-icon { background: var(--acc-soft); color: var(--acc-ink); }
+.stat-link:hover .stat-go { color: var(--primary); }
+
+/* Tombol utama: hijau SIMAGTI, berubah tinta saat diarahkan; tombol gelap memakai tinta */
+.btn-primary:hover { background: var(--ink); border-color: var(--ink); }
+.btn-dark { background: var(--ink); border-color: var(--ink); }
+
+.btn-dark:hover { background: var(--ink-2); border-color: var(--ink-2); }
+
+/* Banner judul halaman dan kartu bergradasi memakai hijau ke lime, bukan biru-ungu */
+:root { --banner-gradient: linear-gradient(115deg, #dcf2ea 0%, #e8f5dc 55%, #eef9d2 100%); }
+.vx-grade-v2 { background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.9), transparent 55%), linear-gradient(135deg, #e3f4ee 0%, #eef9d2 100%); }
+.offer-card { background: linear-gradient(120deg, #fff6e2 0%, #eef8ea 60%, #eef9d2 100%); }
+.job-tone-0 .job-card-band { background: linear-gradient(120deg, #e1f3ee, #d6efe6 60%, #e8f5dc); }
+.job-tone-1 .job-card-band { background: linear-gradient(120deg, #eef9d2, #e3f4c4 60%, #f1f8e4); }
+.job-tone-2 .job-card-band { background: linear-gradient(120deg, #e4e9e2, #dde4da 60%, #eef1ea); }
+.job-tone-3 .job-card-band { background: linear-gradient(120deg, #dcf5ee, #e6f6d6 60%, #eef9d2); }

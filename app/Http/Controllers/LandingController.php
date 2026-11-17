@@ -22,7 +22,7 @@ class LandingController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $openPostings = JobPosting::with('company')->where('status', 'published')
+        $openPostings = JobPosting::with(['company', 'skills'])->where('status', 'published')
             ->where(fn ($q) => $q->whereNull('deadline')->orWhereDate('deadline', '>=', today()));
 
         return view('landing', [

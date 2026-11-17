@@ -103,7 +103,7 @@
                     </div>
                 </article>
 
-                <article class="ld-role ld-role-fill" data-reveal style="--i: 1">
+                <article class="ld-role" data-reveal style="--i: 1">
                     <header class="ld-role-head"><span class="ld-role-icon">{!! $icon('<rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/>') !!}</span><h3>Company Supervisor</h3></header>
                     <p>Memantau progres dan menilai di akhir magang.</p>
                     <div class="ld-mock ld-mock-rate" aria-hidden="true">
@@ -170,31 +170,52 @@
     </section>
 
     @if ($postings->isNotEmpty())
-        {{-- Lowongan terbaru dari perusahaan mitra --}}
+        {{-- Lowongan terbaru: kartu gelap berisi jumlah lowongan, diikuti kartu lowongan yang bisa diklik --}}
         <section id="lowongan" class="ld-section" aria-labelledby="ld-jobs-title">
             <div class="ld-head" data-reveal>
                 <h2 id="ld-jobs-title" class="ld-h2">Lowongan dari perusahaan mitra.</h2>
-                <p class="ld-head-note">{{ $openCount }} lowongan sedang dibuka. Masuk sebagai mahasiswa untuk mengajukan KP dengan data perusahaan terisi.</p>
+                <p class="ld-head-note">Data perusahaan langsung terisi saat mahasiswa mengajukan KP dari lowongan.</p>
             </div>
             <div class="ld-jobs">
+                <article class="ld-jobs-lead" data-reveal>
+                    <svg class="ld-jobs-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
+                    <p class="ld-jobs-count"><span data-count="{{ $openCount }}">{{ $openCount }}</span></p>
+                    <p class="ld-jobs-label">lowongan magang sedang dibuka</p>
+                    <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk untuk mengajukan</a>
+                </article>
+
                 @foreach ($postings as $p)
                     <?php
                         $co = $p->company->name;
                         $words = collect(preg_split('/\s+/', trim(preg_replace('/^(PT|CV|UD|Yayasan)\.?\s+/i', '', $co))))->filter();
                         $initials = mb_strtoupper($words->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('')) ?: '?';
+                        $left = $p->deadline ? (int) today()->diffInDays($p->deadline, false) : null;
                     ?>
-                    <article class="ld-job ld-job-{{ $loop->index % 3 }}" data-reveal style="--i: {{ $loop->index }}">
+                    <a href="{{ route('login') }}" class="ld-job ld-job-{{ $loop->index % 3 }}" data-reveal style="--i: {{ $loop->index + 1 }}" aria-label="{{ $p->title }} di {{ $co }}. Masuk untuk mengajukan.">
                         <div class="ld-job-top">
                             <span class="ld-job-mark" aria-hidden="true">{{ $initials }}</span>
-                            @if ($p->deadline)<span class="ld-job-due">Tutup {{ $p->deadline->locale('id')->translatedFormat('j M') }}</span>@endif
+                            @if ($left !== null)
+                                <span @class(['ld-job-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? $left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
+                            @endif
                         </div>
                         <p class="ld-job-co">{{ $co }}</p>
                         <h3 class="ld-job-title">{{ $p->title }}</h3>
-                        <p class="ld-job-meta">{{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}@if ($p->quota), {{ $p->quota }} orang @endif</p>
-                    </article>
+                        @if ($p->description)<p class="ld-job-desc">{{ \Illuminate\Support\Str::limit($p->description, 110) }}</p>@endif
+                        @if ($p->skills->isNotEmpty())
+                            <ul class="ld-job-skills" aria-label="Keahlian">
+                                @foreach ($p->skills->take(3) as $skill)<li>{{ $skill->name }}</li>@endforeach
+                            </ul>
+                        @endif
+                        <div class="ld-job-foot">
+                            <span class="ld-job-meta">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+                                {{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}@if ($p->quota), {{ $p->quota }} orang @endif
+                            </span>
+                            <span class="ld-job-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+                        </div>
+                    </a>
                 @endforeach
             </div>
-            <a href="{{ route('login') }}" class="ld-btn ld-btn-dark ld-jobs-cta">Masuk untuk mengajukan</a>
         </section>
     @endif
 

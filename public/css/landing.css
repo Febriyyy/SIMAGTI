@@ -256,7 +256,7 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
 
 /* Navigasi menjadi kaca saat digulir */
 .ld-nav { position: sticky; top: 0; z-index: 30; transition: padding 250ms var(--ease); }
-.ld-nav::before { content: ""; position: absolute; inset: 0 -100vmax; z-index: -1; opacity: 0; pointer-events: none;
+.ld-nav::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%); z-index: -1; opacity: 0; pointer-events: none;
     background: rgba(243, 245, 240, .72); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
     border-bottom: 1px solid var(--line); transition: opacity 250ms; }
 .ld-nav.is-stuck { padding: 12px 0; }
@@ -311,7 +311,7 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
 .ld-role-icon { transition: transform 300ms var(--ease); }
 .ld-role:hover .ld-role-icon { transform: rotate(-8deg) scale(1.06); }
 .ld-js [data-reveal].is-settled { transition-delay: 0s; }
-.ld-js .ld-role.is-settled, .ld-js .ld-job.is-settled { transition: transform 250ms var(--ease), box-shadow 250ms; }
+.ld-js .ld-role.is-settled, .ld-js .ld-job.is-settled { transition: background-color 300ms var(--ease), border-color 300ms, color 300ms, transform 250ms var(--ease), box-shadow 250ms; }
 .ld-js .ld-role.is-settled:hover { transform: translateY(-4px); }
 .ld-js .ld-job.is-settled:hover { transform: translateY(-3px); }
 
@@ -333,3 +333,78 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
     .ld-nav, .ld-nav::before, .ld-role, .ld-role-icon { transition: none; }
     .ld-role:hover, .ld-role:hover .ld-role-icon { transform: none; }
 }
+
+/* =====================================================================
+   Penyempurnaan 18 Nov 2026: hero lebih ramping, kartu peran berubah hijau saat diarahkan,
+   bagian lowongan dengan kartu gelap penghitung dan kartu lowongan yang lebih kaya.
+   ===================================================================== */
+
+/* Hero lebih ramping */
+.ld-hero { width: min(1080px, calc(100% - 32px)); }
+.ld-hero-panel { padding: 72px 32px 140px; border-radius: 32px; }
+.ld-hero-title { font-size: clamp(36px, 5.2vw, 62px); max-width: 16ch; }
+.ld-hero-sub { font-size: 17px; margin-top: 20px; }
+.ld-hero-cta { margin-top: 28px; }
+.ld-stats { width: min(860px, calc(100% - 48px)); margin-top: -100px; }
+.ld-stat { min-height: 196px; }
+.ld-stat-num { font-size: 36px; }
+.ld-hero-star { left: 7%; }
+.ld-hero-spark { right: 9%; }
+
+/* Kartu peran: semuanya putih, berubah hijau saat diarahkan */
+.ld-role { transition: background-color 300ms var(--ease), border-color 300ms, color 300ms, transform 250ms var(--ease), box-shadow 250ms; }
+.ld-role-head, .ld-role > p, .ld-mock, .ld-role-icon { transition: background-color 300ms var(--ease), border-color 300ms, color 300ms, transform 300ms var(--ease); }
+.ld-role:hover { background: var(--green); border-color: var(--green); color: #fff; }
+.ld-role:hover .ld-role-head { border-color: rgba(255, 255, 255, .35); }
+.ld-role:hover .ld-role-icon { background: var(--lime); color: var(--ink); }
+.ld-role:hover > p { color: rgba(255, 255, 255, .85); }
+.ld-role:hover .ld-mock { background: var(--lime); }
+.ld-role:hover .ld-mock-tasks .is-done { color: rgba(15, 31, 27, .6); }
+.ld-role:hover .ld-mock-chart small { color: rgba(15, 31, 27, .7); }
+.ld-role:hover .ld-mock-chart span:nth-child(2) i { background: var(--ink); }
+.ld-role:hover .ld-mock-chart span:nth-child(3) i { background: rgba(15, 31, 27, .3); }
+.ld-role:hover .ld-mock-note .ld-note-out { background: var(--ink); }
+
+/* Lowongan: kartu gelap penghitung + kartu lowongan */
+.ld-jobs { grid-template-columns: minmax(0, 1.05fr) repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.ld-jobs-lead { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; min-height: 340px; padding: 28px; border-radius: 26px; background: var(--ink); color: #fff; }
+.ld-jobs-wave { position: absolute; top: 26px; left: 24px; width: 64%; color: var(--lime); }
+.ld-jobs-count { font-size: 88px; font-weight: 750; letter-spacing: -0.05em; line-height: .95; color: var(--lime); font-variant-numeric: tabular-nums; }
+.ld-jobs-label { max-width: 16ch; color: rgba(255, 255, 255, .78); font-size: 16px; margin-bottom: 18px; }
+.ld-jobs-lead .ld-btn { align-self: stretch; }
+
+.ld-job { position: relative; display: flex; flex-direction: column; text-decoration: none; color: var(--ink); padding: 22px; border-radius: 26px; }
+.ld-job-top { margin-bottom: 22px; }
+.ld-job-mark { width: 48px; height: 48px; border-radius: 15px; font-size: 16px; }
+.ld-job-due.is-soon { background: #fdecd8; color: #9a5800; }
+.ld-job-title { font-size: 18px; }
+.ld-job-desc { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ld-job-skills { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ld-job-skills li { padding: 5px 11px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 12.5px; font-weight: 600; }
+.ld-job-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 18px; }
+.ld-job-meta { display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 0; border: 0; color: var(--muted); font-size: 13.5px; }
+.ld-job-meta svg { flex: none; color: var(--green); }
+.ld-job-go { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--paper); color: var(--ink); transition: background-color 250ms, color 250ms, transform 250ms var(--ease); }
+.ld-job:hover .ld-job-go { background: var(--lime); transform: rotate(45deg); }
+.ld-job:hover { border-color: rgba(3, 122, 104, .35); }
+
+/* Gelombang kartu lowongan digambar saat muncul */
+.ld-js .ld-jobs-wave path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.ld-js .ld-jobs-lead.is-in .ld-jobs-wave path { animation: ld-draw 1.4s .3s var(--ease) forwards; }
+
+@media (max-width: 1024px) {
+    .ld-jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ld-jobs-lead { min-height: 280px; }
+}
+@media (max-width: 720px) {
+    .ld-hero-panel { padding: 52px 20px 60px; }
+    .ld-stats { width: 100%; margin-top: 16px; }
+    .ld-jobs { grid-template-columns: minmax(0, 1fr); }
+    .ld-jobs-lead { min-height: 0; padding-top: 110px; }
+    .ld-jobs-count { font-size: 68px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ld-role, .ld-role-head, .ld-role > p, .ld-mock, .ld-role-icon, .ld-job-go { transition: none; }
+}
+html:has(body.ld) { overflow-x: clip; }
+body.ld { overflow-x: clip; }
