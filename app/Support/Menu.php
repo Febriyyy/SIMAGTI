@@ -65,7 +65,7 @@ class Menu
                 ['label' => 'Mahasiswa', 'route' => 'mahasiswa.index', 'icon' => 'student', 'active' => 'mahasiswa.*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
                 ['label' => 'Rekap KP', 'route' => 'rekap.index', 'icon' => 'chart', 'active' => 'rekap.*'],
-                ['label' => 'Nilai Sidang', 'route' => 'kaprodi.sidang', 'icon' => 'school', 'active' => 'kaprodi.sidang*'],
+                ['label' => 'Sidang KP', 'route' => 'kaprodi.sidang', 'icon' => 'school', 'active' => 'kaprodi.sidang*'],
                 ['label' => 'Bobot Penilaian', 'route' => 'kaprodi.bobot', 'icon' => 'grade', 'active' => 'kaprodi.bobot*'],
             ],
             'admin' => [

@@ -283,6 +283,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
         // Nilai sidang KP (dicatat terpisah dari nilai akhir)
         Route::get('/kaprodi/sidang', [DefenseController::class, 'index'])->name('kaprodi.sidang');
+        Route::put('/kaprodi/sidang/{internship}/jadwal', [DefenseController::class, 'schedule'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.jadwal');
         Route::put('/kaprodi/sidang/{internship}', [DefenseController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.simpan');
 
         Route::get('/mahasiswa', [StudentController::class, 'index'])->name('mahasiswa.index');

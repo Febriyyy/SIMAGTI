@@ -4433,3 +4433,12 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .recap-recruit.tone-gray { color: var(--gray); }
 @media (max-width: 700px) { .recap-search { flex: 1 1 100%; } .recap-seg { width: 100%; } .recap-seg label { flex: 1; } .recap-seg span { justify-content: center; padding: 0 var(--space-2); } }
 .recap-table th { white-space: nowrap; }
+
+/* Sidang KP (kaprodi): tanggal sebagai ubin kecil, aksi di kanan */
+.defense-row { flex-wrap: wrap; row-gap: var(--space-2); }
+.defense-actions { display: flex; align-items: center; gap: var(--space-2); flex: none; margin-left: auto; }
+.defense-date { display: grid; place-items: center; flex: none; width: 44px; height: 48px; border-radius: 12px; background: var(--primary-tint); color: var(--primary-dark); line-height: 1; }
+.defense-date b { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.defense-date small { margin-top: -6px; font-size: 11px; font-weight: 650; }
+.defense-soon { color: var(--muted); font-size: var(--text-xs); font-weight: 600; margin-right: var(--space-1); }
+@media (max-width: 640px) { .defense-actions { flex: 1 1 100%; justify-content: flex-end; } }

@@ -102,6 +102,9 @@
                             @if ($offer)
                                 <div><dt>Tawaran kerja</dt><dd><a href="{{ route('rekrutmen.tawaran') }}">{{ ['ditawari' => 'Menunggu jawaban Anda', 'diterima' => 'Anda menerima', 'ditolak' => 'Anda menolak', 'kedaluwarsa' => 'Kedaluwarsa'][$offer->status] }}</a><small>{{ $offer->offered_position }}</small></dd></div>
                             @endif
+                            @if (! $internship->defenseScore && $internship->defenseSchedule)
+                                <div><dt>Sidang KP</dt><dd>{{ $internship->defenseSchedule->whenLabel() }}<small>{{ $internship->defenseSchedule->isOnline() ? 'Daring · ' : '' }}{{ $internship->defenseSchedule->place }}@if ($internship->defenseSchedule->examiner) · Penguji {{ $internship->defenseSchedule->examiner->name }}@endif</small></dd></div>
+                            @endif
                             @if ($internship->defenseScore)
                                 <div><dt>Nilai sidang</dt><dd>{{ $internship->defenseScore->letter_grade }} · {{ \App\Support\Num::short($internship->defenseScore->score) }}<small>Sidang {{ $internship->defenseScore->defended_at?->locale('id')->translatedFormat('j F Y') }}</small></dd></div>
                             @endif

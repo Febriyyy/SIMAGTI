@@ -17,7 +17,7 @@ class InternshipApplicationController extends Controller
     {
         $user = $request->user()->load('studentProfile.studyProgram');
 
-        $internship = Internship::with(['company', 'division', 'lecturer', 'supervisor', 'approvals.reviewer', 'invitations', 'staff', 'documents', 'assessment', 'defenseScore'])
+        $internship = Internship::with(['company', 'division', 'lecturer', 'supervisor', 'approvals.reviewer', 'invitations', 'staff', 'documents', 'assessment', 'defenseScore', 'defenseSchedule.examiner'])
             ->where('student_id', $user->id)
             ->latest('id')
             ->first();

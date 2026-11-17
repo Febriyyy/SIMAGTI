@@ -197,6 +197,11 @@ class Internship extends Model
         return $this->hasOne(Assessment::class);
     }
 
+    public function defenseSchedule(): HasOne
+    {
+        return $this->hasOne(DefenseSchedule::class);
+    }
+
     public function defenseScore(): HasOne
     {
         return $this->hasOne(DefenseScore::class);

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\DefenseSchedule;
 use App\Models\Internship;
 use App\Models\User;
 use Database\Seeders\TestingSeeder;
@@ -36,7 +37,7 @@ class DefenseTest extends TestCase
         $salsa->defenseScore()->delete(); // data demo sudah punya nilai sidang; mulai dari kosong
         $finalBefore = $salsa->final_score;
 
-        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertOk()->assertSee('Menunggu nilai sidang')->assertSee('Salsa');
+        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertOk()->assertSee('Perlu dijadwalkan')->assertSee('Salsa');
 
         $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}", ['score' => 88.5, 'defended_at' => today()->toDateString()])
             ->assertRedirect('/kaprodi/sidang');
@@ -69,5 +70,34 @@ class DefenseTest extends TestCase
         $this->actingAs($this->user('kaprodi@kp.test'))
             ->put("/kaprodi/sidang/{$salsa->id}", ['score' => 120, 'defended_at' => today()->addDay()->toDateString()])
             ->assertSessionHasErrors(['score', 'defended_at']);
+    }
+
+    public function test_kaprodi_menjadwalkan_sidang_dan_pihak_terkait_diberi_tahu(): void
+    {
+        $kaprodi = $this->user('kaprodi@kp.test');
+        $salsa = $this->internshipOf('salsa@kp.test');
+        $salsa->defenseScore()->delete();
+        $examiner = User::where('role', 'dospem')->where('id', '!=', $salsa->lecturer_id)->first() ?? $salsa->lecturer;
+        $date = today()->addDays(3)->toDateString();
+
+        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '09:30', 'cara' => 'luring', 'tempat' => 'Ruang B2.04', 'penguji' => $examiner->id])
+            ->assertRedirect('/kaprodi/sidang');
+
+        $schedule = $salsa->fresh()->defenseSchedule;
+        $this->assertSame($date.' 09:30', $schedule->scheduled_at->format('Y-m-d H:i'));
+        $this->assertSame(1, $this->user('salsa@kp.test')->notifications()->where('data', 'like', '%Sidang KP dijadwalkan%')->count());
+        $this->assertSame(1, $examiner->notifications()->where('data', 'like', '%Sidang KP%')->count());
+
+        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertSee('Jadwal sidang')->assertSee('Ruang B2.04');
+        $this->actingAs($this->user('salsa@kp.test'))->get('/status-kp')->assertSee('Ruang B2.04');
+
+        // Ubah jadwal: tetap satu jadwal, tanggal lampau ditolak
+        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => today()->subDay()->toDateString(), 'jam' => '09:30', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])
+            ->assertSessionHasErrorsIn('jadwal'.$salsa->id, 'tanggal');
+        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '13:00', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])->assertRedirect();
+        $this->assertSame('daring', $salsa->fresh()->defenseSchedule->mode);
+        $this->assertSame(1, DefenseSchedule::where('internship_id', $salsa->id)->count());
+
+        $this->actingAs($this->user('dospem@kp.test'))->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '09:00', 'cara' => 'luring', 'tempat' => 'R1'])->assertForbidden();
     }
 }
