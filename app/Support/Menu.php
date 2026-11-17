@@ -31,6 +31,7 @@ class Menu
                 $dashboard,
                 ['label' => 'Mahasiswa Magang', 'route' => 'pantau.index', 'icon' => 'student', 'active' => ['pantau.*', 'tugas.show']],
                 ['label' => 'Aktivitas', 'route' => 'aktivitas.index', 'icon' => 'activity', 'active' => 'aktivitas.*'],
+                ['label' => 'Template Task', 'route' => 'template.index', 'icon' => 'tasks', 'active' => 'template.*'],
                 ['label' => 'Laporan KP', 'route' => 'laporan.antrean', 'icon' => 'syllabus', 'active' => 'laporan.*'],
                 ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
                 ['label' => 'Pengajuan Perubahan', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],

@@ -45,6 +45,7 @@ use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskDetailController;
 use App\Http\Controllers\TaskEvidenceController;
+use App\Http\Controllers\TaskTemplateController;
 use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WrappedController;
@@ -196,6 +197,13 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     Route::middleware(EnsureRole::class.':supervisor')->group(function () {
         // Meeting mingguan diatur Company Supervisor
         Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
+
+        // Template task: kumpulan task baku yang diterapkan ke mahasiswa magang sekali klik
+        Route::get('/template-task', [TaskTemplateController::class, 'index'])->name('template.index');
+        Route::post('/template-task', [TaskTemplateController::class, 'store'])->middleware('throttle:30,1')->name('template.store');
+        Route::put('/template-task/{template}', [TaskTemplateController::class, 'update'])->whereNumber('template')->name('template.update');
+        Route::delete('/template-task/{template}', [TaskTemplateController::class, 'destroy'])->whereNumber('template')->name('template.destroy');
+        Route::post('/template-task/{template}/terapkan', [TaskTemplateController::class, 'apply'])->whereNumber('template')->middleware('throttle:20,1')->name('template.terapkan');
 
         // Penilaian akhir di akhir periode KP: diisi Company Supervisor dengan skala standar kampus
         Route::get('/penilaian', [AssessmentController::class, 'index'])->name('penilaian.index');
