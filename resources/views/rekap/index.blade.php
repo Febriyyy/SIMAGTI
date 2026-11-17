@@ -59,7 +59,7 @@
                             ?>
                             <tr>
                                 <td><x-person :user="$i->student" /></td>
-                                <td class="col-place">{{ $i->placeName() }}<span class="recap-sub">{{ $i->lecturer?->listName() ?? 'Dosen belum ditunjuk' }}</span></td>
+                                <td class="col-place" title="{{ $i->placeName() }}">{{ $i->placeName() }}<span class="recap-sub">{{ $i->lecturer?->listName() ?? 'Dosen belum ditunjuk' }}</span></td>
                                 <td><x-chip :tone="$i->statusTone()">{{ $i->statusLabel() }}</x-chip></td>
                                 <td class="num">@if ($score !== null)<span class="recap-grade"><b>{{ \App\Support\ProdiRecap::finalGrade($i) }}</b>{{ \App\Support\Num::short($score) }}</span>@else<span class="muted">–</span>@endif</td>
                                 <td class="num">@if ($i->defenseScore)<span class="recap-grade"><b>{{ $i->defenseScore->letter_grade }}</b>{{ \App\Support\Num::short($i->defenseScore->score) }}</span>@else<span class="muted">–</span>@endif</td>

@@ -4490,3 +4490,100 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .job-row-actions form { margin: 0; }
 .apply-from-job { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--primary-tint); color: var(--primary-dark); font-size: var(--text-sm); }
 @media (max-width: 640px) { .job-row-actions { flex: 1 1 100%; justify-content: flex-end; } }
+
+/* =====================================================================
+   Penyempurnaan visual (18 Nov 2026): ikon sejajar teks, input lebih lega, tabel simetris
+   ===================================================================== */
+
+/* 1. Koreksi optis ikon di samping teks.
+   Kotak ikon sudah di tengah baris, tetapi tinta huruf berada sekitar 1-1,5px di bawah tengah kotak
+   (diukur dari metrik Geist), sehingga ikon tampak "naik". Ikon ikut diturunkan 7% ukurannya. */
+:is(.btn:not(.btn-icon), .chip, .tab, .nav-item, .menu-item, .crumb-root, .hero-tag, .more-btn, .waiting, .prof-back,
+    .apply-from-job, .rtl-file, .rtl-foot a, .chapter-foot a, .job-card-meta span, .card-head a, .row-actions a,
+    .job-contact a, .recap-recruit, .page-back, a.link, label.btn, summary.btn, .stat-label, .cell-sub, .tpl-week) > .ikon :is(.ms, .ikon-fallback) {
+    transform: translateY(calc(var(--ikon, 18px) * 0.07));
+}
+
+/* 2. Kolom input: putih bersih, sudut lebih lembut, tinggi lega, fokus berupa cincin halus */
+.input, .select, .textarea {
+    min-height: 44px; padding: 10px 14px;
+    border: 1px solid var(--line-strong); border-radius: 12px;
+    background-color: var(--surface); box-shadow: 0 1px 2px rgba(15, 27, 25, 0.04);
+    font-size: var(--text-sm); line-height: 1.45;
+    transition: border-color 150ms, box-shadow 150ms, background-color 150ms;
+}
+.select { padding-right: 44px; background-position: right 14px center; }
+.textarea { min-height: 112px; line-height: 1.6; padding-top: 12px; }
+.input:hover, .select:hover, .textarea:hover { border-color: color-mix(in srgb, var(--primary) 30%, var(--line-strong)); }
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); background-color: var(--surface); }
+.input::placeholder, .textarea::placeholder { color: var(--muted-2); }
+.input-sm, .select-sm { min-height: 38px; padding-top: 8px; padding-bottom: 8px; border-radius: 10px; }
+.input[type="file"] { padding: 6px; line-height: 30px; }
+.input[type="file"]::file-selector-button { margin-right: 12px; padding: 6px 14px; border-radius: 8px; }
+.label { margin-bottom: 8px; font-size: 13px; font-weight: 650; letter-spacing: -0.005em; }
+.label .muted, .label-opt { font-weight: 500; }
+.form-grid { gap: 18px 20px; }
+.dialog-body { gap: var(--space-5); padding: 24px; }
+.offer-fs { padding: 18px 20px 20px; border-radius: 14px; }
+.offer-fs > legend { padding: 0 8px; }
+.tpl-rows { gap: 10px; }
+.tpl-row { gap: 10px; }
+.sidang-form, .review-form, .inline-form { gap: 10px; }
+@media (max-width: 1100px) { .dialog-wide .form-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 640px) { .dialog-wide .form-grid, .form-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; } .dialog-body { padding: 20px; } }
+
+/* 3. Tabel simetris: jarak sel seragam, judul dan isi sejajar, kolom angka di tengah */
+.table th { padding: 12px 16px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.01em; text-align: left; vertical-align: middle; }
+.table td { padding: 14px 16px; vertical-align: middle; }
+.table th:first-child, .table td:first-child { padding-left: var(--card-x); }
+.table th:last-child, .table td:last-child { padding-right: var(--card-x); }
+.table th.num, .table td.num { width: auto; text-align: center; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr { transition: background-color 120ms; }
+.table tbody tr:hover td { background: color-mix(in srgb, var(--primary-tint) 45%, transparent); }
+.recap-table { min-width: 860px; table-layout: fixed; }
+.recap-table th:nth-child(1) { width: 22%; } .recap-table th:nth-child(2) { width: 22%; } .recap-table th:nth-child(3) { width: 11%; }
+.recap-table th:nth-child(4), .recap-table th:nth-child(5) { width: 11%; } .recap-table th:nth-child(6) { width: 9%; } .recap-table th:nth-child(7) { width: 14%; }
+.recap-table td { white-space: normal; }
+.recap-table .person-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 4. Kartu lowongan (desain ulang): pita warna lembut di atas, tanda perusahaan menumpang di garis pita,
+   fakta tiga kolom berlabel, keahlian sebagai tag halus, tombol di kaki kartu */
+.job-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.job-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(15, 27, 25, 0.04); transition: box-shadow 200ms var(--ease-premium, ease), transform 200ms var(--ease-premium, ease); }
+.job-card:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 25%, var(--line)), 0 14px 34px rgba(3, 66, 62, 0.10); transform: translateY(-2px); }
+.job-card-band { position: relative; height: 72px; padding: 14px 18px; display: flex; align-items: flex-start; justify-content: flex-end; }
+.job-tone-0 .job-card-band { background: linear-gradient(120deg, #e6f6f0, #d9efe9 60%, #e9f3ff); }
+.job-tone-1 .job-card-band { background: linear-gradient(120deg, #eef3ff, #e4ecfc 60%, #f1ecff); }
+.job-tone-2 .job-card-band { background: linear-gradient(120deg, #fff6e6, #fdeedd 60%, #fbefe9); }
+.job-tone-3 .job-card-band { background: linear-gradient(120deg, #f3eefe, #ece6fb 60%, #eaf6f2); }
+.job-card-band .job-card-org { position: absolute; left: 18px; bottom: -24px; width: 52px; height: 52px; border-radius: 16px; font-size: 16px; box-shadow: 0 0 0 4px var(--surface), 0 6px 16px rgba(15, 27, 25, 0.10); }
+.job-card-due { color: var(--gray); font-size: var(--text-xs); font-weight: 650; }
+.job-card-due.is-soon { color: var(--amber); }
+.job-card-body { display: flex; flex-direction: column; gap: 10px; padding: 34px 18px 0; flex: 1; }
+.job-card-co { margin: 0; color: var(--muted); font-size: var(--text-xs); font-weight: 600; }
+.job-card-title { margin: -4px 0 0; color: var(--text); font-size: 17px; font-weight: 750; letter-spacing: -0.01em; line-height: 1.3; }
+.job-card-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 4px 0 0; padding: 10px 0; border-block: 1px solid var(--line); }
+.job-card-facts > div { min-width: 0; padding: 0 10px; }
+.job-card-facts > div:first-child { padding-left: 0; }
+.job-card-facts > div + div { border-left: 1px solid var(--line); }
+.job-card-facts dt { color: var(--muted); font-size: 11px; font-weight: 600; }
+.job-card-facts dd { margin: 2px 0 0; overflow: hidden; color: var(--text); font-size: var(--text-sm); font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.job-card-desc { margin: 0; color: var(--gray); font-size: var(--text-sm); line-height: 1.6; }
+.job-card-skills { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.job-card-skills li { padding: 4px 10px; border-radius: 8px; background: var(--surface-2); color: var(--gray); font-size: 12px; font-weight: 600; box-shadow: inset 0 0 0 1px var(--line); }
+.job-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; padding: 14px 18px; border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface-2) 60%, var(--surface)); }
+.job-dlg-head { display: flex; align-items: center; gap: 12px; }
+.job-dlg-head .job-card-org { width: 44px; height: 44px; border-radius: 14px; }
+.job-dlg-section h3 { margin: 0 0 6px; color: var(--text); font-size: var(--text-sm); font-weight: 700; }
+.job-dlg-section p { margin: 0; color: var(--gray); font-size: var(--text-sm); line-height: 1.65; }
+.job-dlg-addr { margin: 0; font-size: var(--text-xs); }
+@media (prefers-reduced-motion: reduce) { .job-card, .job-card:hover { transition: none; transform: none; } }
+.job-grid > .job-card { padding: 0; gap: 0; }
+/* Rekap: setiap sel satu baris (teks panjang dipotong "…", lengkapnya di tooltip) sehingga tinggi baris seragam */
+.recap-table { min-width: 0; }
+.recap-table td { white-space: nowrap; }
+.recap-table td.col-place, .recap-table td:last-child { overflow: hidden; text-overflow: ellipsis; }
+.recap-table .recap-sub { overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 1199px) { .recap-table { min-width: 880px; } }
+.table.recap-table td.col-place { white-space: nowrap; min-width: 0; }
