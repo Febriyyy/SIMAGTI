@@ -509,3 +509,6 @@ body.ld { overflow-x: clip; }
     .ld-hero-panel { padding-bottom: calc(var(--stat-h) * .5 + clamp(58px, 9vh, 84px)); }
     .ld-hero-sub { margin-top: clamp(14px, 2.6vh, 22px); }
 }
+@media (min-width: 721px) {
+    .ld-hero-panel { padding-bottom: calc(var(--stat-h) * .5 + clamp(76px, 11.5vh, 104px)); }
+}
