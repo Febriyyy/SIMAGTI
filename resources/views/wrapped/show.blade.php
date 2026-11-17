@@ -230,7 +230,7 @@
                 x.fillStyle = 'rgba(255,255,255,0.75)'; x.font = '500 32px Geist, sans-serif'; x.fillText(it[0], cx + 40, cy + 70);
                 x.fillStyle = '#fff'; x.font = '800 92px Geist, sans-serif'; x.fillText(String(it[1]), cx + 40, cy + 175);
             });
-            x.fillStyle = 'rgba(255,255,255,0.7)'; x.font = '600 30px Geist, sans-serif'; x.fillText('SIMAGTI · Sistem Monitoring KP', 90, 1260);
+            x.fillStyle = 'rgba(255,255,255,0.7)'; x.font = '600 30px Geist, sans-serif'; x.fillText('SIMAGTI · Sistem Monitoring Magang Terintegrasi', 90, 1260);
             var a = document.createElement('a'); a.download = 'kp-wrapped-' + d.year + '.png'; a.href = c.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
         };
         function roundRect(px, py, w, h, r) { x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r); x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath(); }

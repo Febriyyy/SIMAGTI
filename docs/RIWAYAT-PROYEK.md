@@ -1,4 +1,4 @@
-# Riwayat Proyek: Sistem Monitoring Kerja Praktik (KP Monitor)
+# Riwayat Proyek: SIMAGTI (Sistem Monitoring Magang Terintegrasi)
 
 Dokumen ini merangkum apa yang sudah kita bangun dari awal sampai sekarang, apa yang sudah terbukti jalan, dan apa yang belum.
 

@@ -69,7 +69,7 @@
         <div class="showcase-grid"></div>
 
         <div class="signin-tagline">
-            <span class="signin-kicker">Sistem Monitoring Kerja Praktik</span>
+            <span class="signin-kicker">Sistem Monitoring Magang Terintegrasi</span>
             <h2>Semua kegiatan KP dalam satu tempat.</h2>
             <p>Rencana kegiatan, task, catatan harian, bimbingan, dan penilaian untuk mahasiswa, perusahaan, dan kampus.</p>
         </div>
