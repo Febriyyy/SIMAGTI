@@ -10,94 +10,104 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
 </head>
-<body class="gl-body">
-{{-- Latar: cahaya lembut hijau-biru di atas putih, wadah kaca jernih di tengah --}}
-<div class="gl-aura" aria-hidden="true"><i></i><i></i><i></i></div>
+<body class="lq-body">
+{{-- Halaman putih dengan garis lengkung tipis, bingkai besar berlatar cairan seperti kain, kartu kaca di tengah --}}
+<svg class="lq-lines" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path d="M-80 640 C 240 420, 420 980, 760 720 S 1260 360, 1540 560" />
+    <path d="M-60 180 C 300 -40, 520 420, 820 260 S 1300 -60, 1520 160" />
+    <path d="M420 -60 C 260 260, 640 420, 560 940" />
+    <path d="M1080 -40 C 1240 320, 900 520, 1160 960" />
+</svg>
 
-<main class="gl">
-    {{-- Kiri: formulir masuk --}}
-    <section class="gl-form-side">
-        <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="gl-logo" width="132" height="40">
+<main class="lq">
+    {{-- Latar cairan: pita-pita bergradasi yang diburamkan, dengan garis kilau tipis --}}
+    <svg class="lq-art" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+            <linearGradient id="lq-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7b7"/><stop offset=".5" stop-color="#14b88a"/><stop offset="1" stop-color="#065f52"/></linearGradient>
+            <linearGradient id="lq-b" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset=".55" stop-color="#2dd4a3"/><stop offset="1" stop-color="#0b7a63"/></linearGradient>
+            <linearGradient id="lq-c" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#0f766e"/><stop offset="1" stop-color="#5eead4"/></linearGradient>
+            <filter id="lq-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>
+            <filter id="lq-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter>
+        </defs>
+        <g class="lq-flow" filter="url(#lq-soft)">
+            <path d="M120 -40 C 40 220, 260 360, 220 560 S 120 860, 380 820" stroke="url(#lq-a)" stroke-width="190" fill="none" opacity=".9"/>
+            <path d="M560 -60 C 760 120, 1180 120, 1240 360 S 960 640, 1180 820" stroke="url(#lq-b)" stroke-width="210" fill="none" opacity=".85"/>
+            <path d="M-60 720 C 260 560, 520 820, 820 640 S 1160 520, 1300 700" stroke="url(#lq-c)" stroke-width="150" fill="none" opacity=".75"/>
+        </g>
+        <g class="lq-sheen" filter="url(#lq-glow)" fill="none" stroke="#e8fff6" stroke-linecap="round">
+            @for ($n = 0; $n < 9; $n++)
+                <path d="M{{ 150 + $n * 9 }} -20 C {{ 70 + $n * 10 }} 230, {{ 290 + $n * 7 }} 360, {{ 250 + $n * 8 }} 560 S {{ 150 + $n * 9 }} 850, {{ 400 + $n * 6 }} 810" stroke-width="{{ $n % 3 === 0 ? 1.4 : 0.7 }}" opacity="{{ 0.18 + ($n % 4) * 0.06 }}"/>
+                <path d="M{{ 600 + $n * 10 }} -40 C {{ 800 + $n * 8 }} 140, {{ 1150 + $n * 4 }} 150, {{ 1200 - $n * 6 }} 380 S {{ 960 + $n * 6 }} 650, {{ 1170 + $n * 5 }} 820" stroke-width="{{ $n % 3 === 1 ? 1.3 : 0.7 }}" opacity="{{ 0.14 + ($n % 4) * 0.05 }}"/>
+            @endfor
+        </g>
+    </svg>
+    <div class="lq-grain" aria-hidden="true"></div>
 
-        <div class="gl-form-box">
-            <h1 class="gl-title">Masuk ke akun Anda</h1>
-            <p class="gl-sub">Sistem Monitoring Magang Terintegrasi</p>
+    <header class="lq-top">
+        <span class="lq-brand"><img src="{{ asset('images/logo-simagti-mark.svg') }}" alt="" width="30" height="30"> SIMAGTI</span>
+        <span class="lq-tag">Sistem Monitoring Magang Terintegrasi</span>
+    </header>
 
-            <form method="POST" action="{{ route('login') }}" class="gl-form" novalidate>
-                @csrf
+    {{-- Kartu kaca: formulir masuk --}}
+    <section class="lq-card" aria-labelledby="lq-title">
+        <h1 id="lq-title" class="lq-title">Masuk</h1>
+        <p class="lq-sub">Gunakan email dan kata sandi akun SIMAGTI Anda.</p>
 
-                @if (session('status'))
-                    <div class="alert alert-success" role="status">{{ session('status') }}</div>
-                @endif
-                @if ($errors->any())
-                    <div class="alert alert-error" role="alert">{{ $errors->first() }}</div>
-                @endif
+        <form method="POST" action="{{ route('login') }}" class="lq-form" novalidate>
+            @csrf
+            @if (session('status'))
+                <div class="lq-alert is-ok" role="status">{{ session('status') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="lq-alert" role="alert">{{ $errors->first() }}</div>
+            @endif
 
-                <div class="gl-field">
-                    <label for="email">Email</label>
-                    <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="nama@kampus.ac.id" required autofocus autocomplete="username">
+            <div class="lq-field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="nama@kampus.ac.id" required autofocus autocomplete="username">
+            </div>
+            <div class="lq-field">
+                <label for="password">Kata sandi</label>
+                <div class="lq-pass">
+                    <input id="password" name="password" type="password" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                    <button type="button" class="lq-eye" data-toggle-password aria-label="Tampilkan kata sandi" aria-pressed="false">
+                        <svg class="eye-open" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-closed" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.1 3.9M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    </button>
                 </div>
+            </div>
 
-                <div class="gl-field">
-                    <label for="password">Kata sandi</label>
-                    <div class="gl-pass">
-                        <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password">
-                        <button type="button" class="gl-eye" data-toggle-password aria-label="Tampilkan kata sandi" aria-pressed="false">
-                            <svg class="eye-open" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-closed" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.1 3.9M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-                        </button>
-                    </div>
-                </div>
+            <div class="lq-row">
+                <label class="lq-check"><input type="checkbox" name="remember" value="1" @checked(old('remember'))> Ingat saya</label>
+                <button type="button" class="lq-link" data-toggle-help aria-expanded="false" aria-controls="signin-help">Lupa kata sandi?</button>
+            </div>
+            <p id="signin-help" class="lq-help" hidden>Hubungi admin SIMAGTI untuk mengatur ulang kata sandi. Anda akan menerima kata sandi sementara yang wajib diganti saat masuk.</p>
 
-                <div class="gl-row">
-                    <label class="gl-check"><input type="checkbox" name="remember" value="1" @checked(old('remember'))> Ingat saya</label>
-                    <button type="button" class="gl-link" data-toggle-help aria-expanded="false" aria-controls="signin-help">Lupa kata sandi?</button>
-                </div>
-                <p id="signin-help" class="gl-help" hidden>Hubungi admin SIMAGTI untuk mengatur ulang kata sandi. Anda akan menerima kata sandi sementara yang wajib diganti saat masuk.</p>
+            <button type="submit" class="lq-submit"><span>Masuk</span></button>
+        </form>
 
-                <button type="submit" class="gl-submit">Masuk</button>
-            </form>
-        </div>
-
-        <p class="gl-foot">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
+        <p class="lq-foot">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
     </section>
 
-    {{-- Kanan: panel hijau dengan kutipan pengguna (bergeser) dan kartu kaca --}}
-    <section class="gl-panel" aria-label="Tentang SIMAGTI">
-        <svg class="gl-burst" viewBox="0 0 200 200" aria-hidden="true">
-            @for ($a = 0; $a < 360; $a += 22.5)
-                <line x1="100" y1="100" x2="{{ 100 + 92 * cos(deg2rad($a)) }}" y2="{{ 100 + 92 * sin(deg2rad($a)) }}" />
-            @endfor
-        </svg>
-
-        <h2 class="gl-panel-title">Apa kata<br>pengguna SIMAGTI.</h2>
-
-        <div class="gl-quotes" data-quotes aria-live="polite">
-            <span class="gl-quote-mark" aria-hidden="true">“</span>
+    {{-- Kartu kaca kecil: kutipan pengguna yang bergeser --}}
+    <aside class="lq-quote-card" aria-label="Kata pengguna SIMAGTI">
+        <div class="lq-quotes" aria-live="polite">
             @foreach ([
-                ['Rencana, task, dan catatan harian jadi satu. Laporan akhir tinggal menyusun dari yang sudah tercatat.', 'Nabila Azzahra', 'Mahasiswa Teknik Informatika'],
-                ['Saya cukup membuka satu halaman untuk melihat progres mahasiswa magang, lalu menilai di akhir dengan beberapa klik.', 'Andika Saputra', 'Company Supervisor'],
-                ['Bimbingan dan validasi nilai tercatat rapi, jadi keputusan hasil KP lebih cepat dan bisa dipertanggungjawabkan.', 'Bambang Sutrisno', 'Dosen pembimbing'],
+                ['Rencana, task, dan catatan harian jadi satu. Laporan akhir tinggal menyusun dari yang sudah tercatat.', 'Nabila Azzahra', 'Mahasiswa'],
+                ['Cukup satu halaman untuk melihat progres mahasiswa magang, lalu menilai di akhir dengan beberapa klik.', 'Andika Saputra', 'Company Supervisor'],
+                ['Bimbingan dan validasi nilai tercatat rapi, jadi keputusan hasil KP lebih cepat.', 'Bambang Sutrisno', 'Dosen pembimbing'],
             ] as $n => [$text, $name, $role])
-                <figure class="gl-quote {{ $n === 0 ? 'is-on' : '' }}" data-quote @if ($n !== 0) hidden @endif>
-                    <blockquote>{{ $text }}</blockquote>
-                    <figcaption><b>{{ $name }}</b><span>{{ $role }}</span></figcaption>
+                <figure class="lq-quote {{ $n === 0 ? 'is-on' : '' }}" data-quote @if ($n !== 0) hidden @endif>
+                    <blockquote>“{{ $text }}”</blockquote>
+                    <figcaption><b>{{ $name }}</b> · {{ $role }}</figcaption>
                 </figure>
             @endforeach
         </div>
-
-        <div class="gl-nav">
-            <button type="button" class="gl-nav-btn" data-quote-prev aria-label="Kutipan sebelumnya"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-            <button type="button" class="gl-nav-btn is-dark" data-quote-next aria-label="Kutipan berikutnya"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="lq-quote-nav">
+            <button type="button" data-quote-prev aria-label="Kutipan sebelumnya"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+            <button type="button" data-quote-next aria-label="Kutipan berikutnya"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
-
-        <div class="gl-card">
-            <span class="gl-spark" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 1.5c.6 5.4 3.1 7.9 8.5 8.5-5.4.6-7.9 3.1-8.5 8.5-.6-5.4-3.1-7.9-8.5-8.5 5.4-.6 7.9-3.1 8.5-8.5Z"/></svg></span>
-            <strong>Pantau KP dari pengajuan sampai sertifikat</strong>
-            <p>Mahasiswa, perusahaan, dosen, dan kampus bekerja di satu tempat.</p>
-            <div class="gl-avatars" aria-hidden="true"><i>M</i><i>S</i><i>D</i><i>K</i></div>
-        </div>
-    </section>
+    </aside>
 </main>
 
 <script>
