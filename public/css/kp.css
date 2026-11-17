@@ -4696,96 +4696,20 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
 .gl-logo { align-self: flex-start; }
 .gl-spark { box-shadow: 0 0 0 6px rgba(255, 255, 255, .38), 0 10px 20px rgba(3, 66, 62, .22); }
 
-/* =====================================================================
-   Halaman masuk (18 Nov 2026, gabungan dua referensi pemilik):
-   halaman putih bergaris lengkung tipis, bingkai besar berlatar cairan seperti kain (hijau SIMAGTI),
-   kartu kaca di tengah, dan kartu kaca kecil berisi kutipan pengguna di pojok kiri bawah.
-   ===================================================================== */
-.lq-body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: clamp(14px, 4vw, 56px); box-sizing: border-box;
-    background: #fbfdfc; font-family: Geist, system-ui, sans-serif; color: #fff; overflow-x: hidden; }
-.lq-lines { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-.lq-lines path { fill: none; stroke: #cdeee2; stroke-width: 6; stroke-linecap: round; opacity: .7; }
 
-.lq { position: relative; z-index: 1; width: min(1240px, 100%); min-height: min(760px, calc(100vh - 2 * clamp(14px, 4vw, 56px)));
-    display: grid; place-items: center; padding: 96px 24px 56px; box-sizing: border-box; overflow: hidden; isolation: isolate;
-    border-radius: 36px; background: linear-gradient(135deg, #0c8a6c 0%, #0a6f5d 45%, #0b5a54 100%);
-    box-shadow: 0 40px 90px rgba(6, 78, 64, .28), 0 4px 12px rgba(6, 78, 64, .12); }
-.lq-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
-.lq-flow { transform-origin: 50% 50%; animation: lq-drift 22s ease-in-out infinite alternate; }
-.lq-sheen { animation: lq-drift 28s ease-in-out infinite alternate-reverse; }
-@keyframes lq-drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-18px, 14px) scale(1.04); } }
-.lq-grain { position: absolute; inset: 0; z-index: -1; opacity: .18; mix-blend-mode: overlay; pointer-events: none;
-    background-image: radial-gradient(rgba(255, 255, 255, .55) .6px, transparent .7px); background-size: 3px 3px; }
-.lq::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 45%, transparent 0 30%, rgba(4, 40, 34, .28) 100%); }
-
-.lq-top { position: absolute; top: 30px; left: 40px; right: 40px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.lq-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 800; letter-spacing: .02em; }
-.lq-brand img { width: 30px; height: 30px; padding: 5px; border-radius: 10px; background: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, .15); }
-.lq-tag { color: rgba(255, 255, 255, .78); font-size: 13px; font-weight: 600; }
-
-/* Kartu kaca di tengah */
-.lq-card { position: relative; width: min(440px, 100%); box-sizing: border-box; padding: 46px 40px 34px; border-radius: 30px; text-align: center;
-    background: linear-gradient(160deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08));
-    border: 1px solid rgba(255, 255, 255, .34); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
-    box-shadow: 0 24px 60px rgba(2, 40, 34, .28), inset 0 1px 0 rgba(255, 255, 255, .35); }
-.lq-title { margin: 0; font-size: 34px; font-weight: 800; letter-spacing: .06em; text-transform: none; }
-.lq-sub { margin: 8px 0 30px; color: rgba(255, 255, 255, .8); font-size: 14px; }
-.lq-form { display: grid; gap: 16px; text-align: left; }
-.lq-field label { display: block; margin: 0 0 7px 4px; color: rgba(255, 255, 255, .9); font-size: 13px; font-weight: 600; }
-.lq-field input { width: 100%; box-sizing: border-box; height: 46px; padding: 0 20px; border: 0; border-radius: 999px; font: inherit; font-size: 14px; color: #0f1b19;
-    background: rgba(255, 255, 255, .95); box-shadow: 0 6px 18px rgba(2, 40, 34, .14), inset 0 0 0 1px rgba(255, 255, 255, .6); transition: box-shadow 150ms, background-color 150ms; }
-.lq-field input::placeholder { color: #8a9a97; }
-.lq-field input:focus { outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(167, 243, 208, .45), 0 6px 18px rgba(2, 40, 34, .14); }
-.lq-pass { position: relative; }
-.lq-pass input { padding-right: 52px; }
-.lq-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; color: #5b6b68; cursor: pointer; }
-.lq-eye:hover { background: rgba(3, 122, 104, .1); color: #065f52; }
-.lq-eye .eye-closed { display: none; }
-.lq-eye.is-open .eye-open { display: none; }
-.lq-eye.is-open .eye-closed { display: block; }
-.lq-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -2px 4px 0; }
-.lq-check { display: inline-flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, .9); font-size: 13px; cursor: pointer; }
-.lq-check input { width: 16px; height: 16px; margin: 0; accent-color: #34d399; }
-.lq-link { padding: 0; border: 0; background: none; color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.lq-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.lq-help { margin: -4px 0 0; padding: 12px 14px; border-radius: 16px; background: rgba(255, 255, 255, .14); color: rgba(255, 255, 255, .92); font-size: 13px; line-height: 1.55; }
-.lq-submit { position: relative; overflow: hidden; height: 48px; margin-top: 14px; border: 0; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 750; color: #063f36; cursor: pointer;
-    background: linear-gradient(90deg, #ecfdf5, #d1fae5 45%, #e0f2fe); box-shadow: 0 12px 28px rgba(2, 40, 34, .25), inset 0 1px 0 #fff; transition: transform 150ms, box-shadow 150ms; }
-.lq-submit::before { content: ""; position: absolute; left: 38%; top: 50%; width: 90px; height: 40px; transform: translate(-50%, -50%); border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(52, 211, 153, .55), transparent); filter: blur(6px); transition: left 400ms var(--ease-premium, ease); }
-.lq-submit:hover { transform: translateY(-1px); box-shadow: 0 16px 34px rgba(2, 40, 34, .3), inset 0 1px 0 #fff; }
-.lq-submit:hover::before { left: 62%; }
-.lq-submit span { position: relative; }
-.lq-foot { margin: 24px 0 0; color: rgba(255, 255, 255, .75); font-size: 12.5px; }
-.lq-alert { margin: 0; padding: 11px 14px; border-radius: 16px; background: rgba(254, 226, 226, .92); color: #9b1c1c; font-size: 13px; font-weight: 600; }
-.lq-alert.is-ok { background: rgba(209, 250, 229, .92); color: #065f46; }
-.lq-submit:focus-visible, .lq-link:focus-visible, .lq-eye:focus-visible, .lq-quote-nav button:focus-visible { outline: 3px solid rgba(167, 243, 208, .9); outline-offset: 3px; }
-
-/* Kartu kutipan kecil di pojok */
-.lq-quote-card { position: absolute; left: 40px; bottom: 36px; width: min(320px, calc(100% - 80px)); padding: 18px 20px 16px; border-radius: 22px; box-sizing: border-box;
-    background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .26); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
-.lq-quotes { min-height: 92px; }
-.lq-quote { margin: 0; }
-.lq-quote blockquote { margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, .95); }
-.lq-quote figcaption { margin-top: 10px; color: rgba(255, 255, 255, .75); font-size: 12px; }
-.lq-quote figcaption b { color: #fff; }
-.lq-quote.is-on { animation: lq-quote-in 520ms var(--ease-premium, ease) both; }
-@keyframes lq-quote-in { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
-.lq-quote-nav { display: flex; gap: 8px; margin-top: 12px; }
-.lq-quote-nav button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .14); color: #fff; cursor: pointer; transition: background-color 150ms; }
-.lq-quote-nav button:hover { background: rgba(255, 255, 255, .26); }
-.lq-quote-nav button + button { background: #fff; color: #065f52; border-color: #fff; }
-
-@media (max-width: 1080px) { .lq-quote-card { display: none; } }
-@media (max-width: 640px) {
-    .lq { border-radius: 26px; padding: 88px 14px 28px; min-height: calc(100vh - 28px); }
-    .lq-top { top: 22px; left: 20px; right: 20px; }
-    .lq-tag { display: none; }
-    .lq-card { padding: 34px 22px 26px; border-radius: 24px; }
-    .lq-title { font-size: 28px; }
-}
-@media (prefers-reduced-motion: reduce) { .lq-flow, .lq-sheen, .lq-quote.is-on { animation: none; } .lq-submit, .lq-submit::before { transition: none; } }
-/* Penyesuaian: tombol tanpa noda cahaya, kartu kutipan lebih ramping dan tidak mepet kartu masuk */
-.lq-submit::before { display: none; }
-.lq-quote-card { width: 280px; }
-@media (max-width: 1240px) { .lq-quote-card { display: none; } }
+/* Halaman masuk, versi akhir (18 Nov 2026): kartu terbelah kembali, panel kanan berlatar cairan seperti kain
+   dengan alur magang empat tahap menggantikan kutipan pengguna. */
+.gl-panel { isolation: isolate; }
+.gl-silk { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; animation: gl-drift 24s ease-in-out infinite alternate; }
+.gl-flow { position: relative; list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 22px; }
+.gl-flow::before { content: ""; position: absolute; left: 6px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(rgba(255, 255, 255, .7), rgba(255, 255, 255, .15)); }
+.gl-flow li { position: relative; display: grid; gap: 3px; padding-left: 32px; }
+.gl-flow-dot { position: absolute; left: 0; top: 4px; width: 13px; height: 13px; border-radius: 50%; background: rgba(255, 255, 255, .25); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .85); }
+.gl-flow li:first-child .gl-flow-dot { background: #fff; box-shadow: 0 0 0 5px rgba(255, 255, 255, .18); }
+.gl-flow b { font-size: 15.5px; font-weight: 700; letter-spacing: -0.01em; }
+.gl-flow small { color: rgba(255, 255, 255, .78); font-size: 13px; }
+.gl-panel .gl-card { margin-top: auto; }
+.gl-panel .gl-flow + .gl-card { margin-top: 40px; }
+@media (min-width: 921px) { .gl-panel .gl-flow + .gl-card { margin-top: auto; } .gl-flow { margin-bottom: 40px; } }
+@keyframes gl-drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-16px, 12px) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .gl-silk { animation: none; } }

@@ -547,4 +547,4 @@ Audit otomatis semua halaman per peran (desktop 1280px dan HP 390px: elemen bert
 
 ## Halaman masuk (Nov 2026)
 
-Bingkai besar berlatar cairan hijau SIMAGTI (pita SVG diburamkan + garis kilau), kartu kaca di tengah dengan input pil putih dan tombol kaca terang. Kartu kutipan pengguna di pojok kiri bawah, disembunyikan di bawah 1240px. Gaya `lq-*` di `public/css/kp.css`.
+Kartu kaca terbelah: kiri formulir, kanan panel hijau berlatar cairan seperti kain (`.gl-silk`) dengan alur magang empat tahap (`.gl-flow`) dan kartu kaca "Satu akun untuk setiap peran". Gaya `gl-*` di `public/css/kp.css`.
