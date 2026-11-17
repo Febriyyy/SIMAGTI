@@ -13,6 +13,28 @@
         @endif
     </div>
 
+    @if ($applicants->isNotEmpty())
+        <section class="card applicants-card">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Pengajuan masuk <span class="dash-count">{{ $applicants->count() }}</span></h2>
+                    <p class="card-sub">Mahasiswa yang mengajukan KP ke perusahaan Anda. Lihat portofolionya sebelum memutuskan.</p>
+                </div>
+            </div>
+            <ul class="item-list">
+                @foreach ($applicants as $a)
+                    <li class="item-row">
+                        <x-person :user="$a->student" />
+                        <div class="grow min0">
+                            <div class="cell-sub">{{ $a->student->studentProfile?->studyProgram?->name ?? 'Program studi belum diisi' }}, mengajukan ke {{ $a->company->name }}</div>
+                        </div>
+                        <a href="{{ route('portofolio.lihat', $a->student) }}" class="btn btn-sm"><x-ikon name="star" :size="16" /> Portofolio</a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     <section class="card">
         @if ($postings->isEmpty())
             <div class="empty">

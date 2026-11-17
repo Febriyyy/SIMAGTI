@@ -26,9 +26,15 @@ class JobPostingController extends Controller
     {
         $user = $request->user();
 
+        $companies = $this->companiesFor($user);
+
         return view('lowongan.kelola', [
             'postings' => $this->scope($user)->with(['company', 'skills'])->latest('id')->get(),
-            'companies' => $this->companiesFor($user),
+            'companies' => $companies,
+            // Mahasiswa yang sedang mengajukan KP ke perusahaan ini; portofolionya bisa dibuka sebelum diterima.
+            'applicants' => Internship::with(['student.studentProfile.studyProgram', 'company'])
+                ->where('status', 'diajukan')->whereIn('company_id', $companies->pluck('id'))
+                ->latest('id')->limit(30)->get(),
         ]);
     }
 

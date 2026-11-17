@@ -30,6 +30,7 @@
                             <th>Program studi</th>
                             <th>Angkatan</th>
                             <th>Status KP</th>
+                            <th><span class="sr-only">Portofolio</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,6 +48,7 @@
                                         <span class="muted">Belum ada</span>
                                     @endif
                                 </td>
+                                <td class="cell-action"><a href="{{ route('portofolio.lihat', $student) }}" class="btn btn-sm btn-ghost">Portofolio</a></td>
                             </tr>
                         @endforeach
                     </tbody>

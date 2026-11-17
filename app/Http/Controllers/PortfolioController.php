@@ -3,97 +3,167 @@
 namespace App\Http\Controllers;
 
 use App\Models\Portfolio;
-use App\Support\ActiveInternship;
+use App\Models\PortfolioCertificate;
+use App\Models\PortfolioProject;
+use App\Models\Skill;
+use App\Models\StoredFile;
+use App\Models\StudentProfile;
+use App\Models\User;
 use App\Support\Qr;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Portofolio KP: pengaturan oleh mahasiswa (nyala/mati tautan publik, judul singkat, tentang, keahlian,
- * pilihan hasil kerja, tampilkan nilai) dan halaman publik tanpa login (/p/{token}, tanpa NIM).
+ * Portofolio mahasiswa: diisi sejak sebelum magang (profil, minat, IPK, skill, proyek, sertifikat pelatihan).
+ * Dilihat oleh pemiliknya, pihak kampus, dosen pembimbing, Company Supervisor perusahaan terkait,
+ * dan publik lewat tautan /p/{token} bila mahasiswa menyalakannya.
  */
 class PortfolioController extends Controller
 {
     public function edit(Request $request): View
     {
-        $internship = ActiveInternship::for($request->user(), ['company', 'assessment']);
-        abort_unless($internship, 404, 'Belum ada KP berjalan.');
-
-        $portfolio = Portfolio::for($internship);
+        $user = $request->user()->load('studentProfile.studyProgram', 'skills');
+        $portfolio = Portfolio::forUser($user)->load(['projects.image', 'certificates.file']);
 
         return view('portofolio.edit', [
-            'internship' => $internship,
             'portfolio' => $portfolio,
-            'tasks' => $internship->tasks()->where('status', 'completed')->with('plan')->orderByDesc('completed_at')->get(),
-            'hasGrade' => (bool) ($internship->final_grade || $internship->assessment?->isValidated()),
+            'user' => $user,
+            'academic' => $user->academicIdentity(),
+            'gpa' => $user->studentProfile?->gpa,
+            'skills' => $user->skills->sortBy('name')->values(),
+            'skillOptions' => Skill::orderBy('name')->pluck('name'),
+            'internship' => $portfolio->latestInternship(),
             'qr' => $portfolio->is_public ? Qr::svg($portfolio->publicUrl()) : null,
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
-        $internship = ActiveInternship::for($request->user());
-        abort_unless($internship, 404);
-
+        $user = $request->user();
         $data = $request->validate([
             'is_public' => ['boolean'],
-            'show_grade' => ['boolean'],
+            'show_gpa' => ['boolean'],
             'headline' => ['nullable', 'string', 'max:120'],
             'about' => ['nullable', 'string', 'max:1000'],
-            'skills' => ['nullable', 'string', 'max:300'],
-            'task_ids' => ['nullable', 'array', 'max:'.Portfolio::MAX_TASKS],
-            'task_ids.*' => ['integer'],
+            'gpa' => ['nullable', 'numeric', 'between:0,4'],
+            'interests' => ['nullable', 'array', 'max:'.Portfolio::MAX_INTERESTS],
+            'interests.*' => ['string', Rule::in(Portfolio::INTERESTS)],
+            'skill_name' => ['nullable', 'array', 'max:'.Portfolio::MAX_SKILLS],
+            'skill_name.*' => ['nullable', 'string', 'max:80'],
+            'skill_level' => ['nullable', 'array'],
+            'skill_level.*' => ['nullable', Rule::in(array_keys(Portfolio::LEVELS))],
         ], [
-            'task_ids.max' => 'Pilih paling banyak '.Portfolio::MAX_TASKS.' hasil kerja.',
-        ]);
+            'interests.max' => 'Pilih paling banyak '.Portfolio::MAX_INTERESTS.' minat.',
+            'skill_name.max' => 'Paling banyak '.Portfolio::MAX_SKILLS.' skill.',
+            'gpa.between' => 'IPK antara 0 dan 4.',
+        ], ['gpa' => 'IPK']);
 
-        $allowed = $internship->tasks()->where('status', 'completed')->pluck('id')->all();
-        $skills = collect(explode(',', (string) ($data['skills'] ?? '')))->map(fn ($s) => trim($s))->filter()->unique()->take(Portfolio::MAX_SKILLS)->values()->all();
+        DB::transaction(function () use ($user, $data, $request) {
+            Portfolio::forUser($user)->update([
+                'is_public' => $request->boolean('is_public'),
+                'show_gpa' => $request->boolean('show_gpa'),
+                'headline' => $data['headline'] ?? null,
+                'about' => $data['about'] ?? null,
+                'interests' => array_values(array_intersect(Portfolio::INTERESTS, $data['interests'] ?? [])),
+            ]);
 
-        Portfolio::for($internship)->update([
-            'is_public' => $request->boolean('is_public'),
-            'show_grade' => $request->boolean('show_grade'),
-            'headline' => $data['headline'] ?? null,
-            'about' => $data['about'] ?? null,
-            'skills' => $skills,
-            'task_ids' => array_values(array_intersect(array_map('intval', $data['task_ids'] ?? []), $allowed)),
-        ]);
+            StudentProfile::updateOrCreate(['user_id' => $user->id], ['gpa' => $data['gpa'] ?? null]);
 
-        return redirect()->route('portofolio.edit')->with('status', $request->boolean('is_public') ? 'Portofolio disimpan dan tautan publik aktif.' : 'Portofolio disimpan. Tautan publik nonaktif.');
+            // Skill: nama dirapikan, tidak dobel; skill baru ditambahkan ke daftar umum.
+            $sync = [];
+            foreach ($data['skill_name'] ?? [] as $i => $name) {
+                $name = mb_substr(trim(preg_replace('/\s+/', ' ', (string) $name)), 0, 80);
+                if ($name === '') {
+                    continue;
+                }
+                $skill = Skill::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first() ?? Skill::create(['name' => $name]);
+                $sync[$skill->id] ??= ['level' => $data['skill_level'][$i] ?? 'menengah'];
+            }
+            $user->skills()->sync(array_slice($sync, 0, Portfolio::MAX_SKILLS, true));
+        });
+
+        return redirect()->route('portofolio.edit')->with('status', $request->boolean('is_public') ? 'Portofolio disimpan dan tautan publik aktif.' : 'Portofolio disimpan.');
     }
 
+    /** Portofolio mahasiswa untuk pihak kampus, dosen pembimbing, dan Company Supervisor. */
+    public function view(Request $request, User $student): Response
+    {
+        abort_unless($student->role === 'mahasiswa', 404);
+        $portfolio = Portfolio::forUser($student);
+        abort_unless($portfolio->canBeViewedBy($request->user()), 403);
+
+        return response()->view('portofolio.publik', $this->pageData($portfolio, false) + ['back' => url()->previous()]);
+    }
+
+    /** Halaman publik tanpa login (hanya bila mahasiswa menyalakannya). */
     public function show(string $token): Response
     {
-        $portfolio = Portfolio::where('token', $token)->where('is_public', true)
-            ->with('internship.student', 'internship.company', 'internship.division', 'internship.assessment', 'internship.certificate')
-            ->first();
+        $portfolio = Portfolio::where('token', $token)->where('is_public', true)->whereNotNull('user_id')->first();
         abort_unless($portfolio, 404, 'Portofolio tidak ditemukan atau tidak dibagikan.');
 
-        $internship = $portfolio->internship;
-        $tasks = $internship->tasks()->whereIn('id', $portfolio->task_ids ?? [])->where('status', 'completed')->with('plan')->get()
-            ->sortBy(fn ($t) => array_search($t->id, $portfolio->task_ids ?? [], true))->values();
-        $allTasks = $internship->tasks()->get(['id', 'status']);
-        $assessment = $internship->assessment;
-        $grade = $portfolio->show_grade ? ($internship->final_grade ?? ($assessment?->isValidated() ? $assessment->letter_grade : null)) : null;
+        return response()->view('portofolio.publik', $this->pageData($portfolio, true))->header('X-Robots-Tag', 'noindex');
+    }
 
-        return response()->view('portofolio.publik', [
+    /** Berkas proyek/sertifikat untuk pengguna yang boleh melihat portofolio. */
+    public function file(Request $request, StoredFile $file): StreamedResponse
+    {
+        $portfolio = $this->portfolioOf($file);
+        abort_unless($portfolio && $portfolio->canBeViewedBy($request->user()), 403);
+
+        return $this->stream($file);
+    }
+
+    /** Berkas proyek/sertifikat di halaman publik. */
+    public function publicFile(string $token, StoredFile $file): StreamedResponse
+    {
+        $portfolio = $this->portfolioOf($file);
+        abort_unless($portfolio && $portfolio->is_public && hash_equals($portfolio->token, $token), 404);
+
+        return $this->stream($file);
+    }
+
+    private function pageData(Portfolio $portfolio, bool $public): array
+    {
+        $portfolio->load(['projects.image', 'certificates.file', 'user.studentProfile.studyProgram', 'user.skills']);
+        $student = $portfolio->user;
+        $token = $portfolio->token;
+
+        return [
             'portfolio' => $portfolio,
-            'internship' => $internship,
-            'student' => $internship->student,
-            'academic' => $internship->student->academicIdentity(),
-            'tasks' => $tasks,
-            'goals' => $internship->goals()->whereNotNull('achieved_at')->get(),
-            'stats' => [
-                'days' => $internship->timeEntries()->distinct()->count('work_date'),
-                'done' => $allTasks->where('status', 'completed')->count(),
-                'tasks' => $allTasks->count(),
-                'weeks' => $internship->totalWeeks(),
-            ],
-            'grade' => $grade,
-            'score' => $grade ? ($internship->final_score ?? $assessment?->final_score) : null,
-            'certificate' => $internship->certificate?->isValid() ? $internship->certificate : null,
-        ])->header('X-Robots-Tag', 'noindex');
+            'student' => $student,
+            'academic' => $student->academicIdentity(),
+            'gpa' => $portfolio->show_gpa ? $student->studentProfile?->gpa : null,
+            'skills' => $student->skills->sortBy(fn ($s) => [array_search($s->pivot->level, ['mahir', 'menengah', 'pemula'], true), $s->name])->values(),
+            'internship' => $portfolio->latestInternship(),
+            'public' => $public,
+            'fileUrl' => fn (StoredFile $f) => $public
+                ? route('portofolio.publik.berkas', [$token, $f->id])
+                : route('portofolio.berkas', $f->id),
+        ];
+    }
+
+    private function portfolioOf(StoredFile $file): ?Portfolio
+    {
+        $id = PortfolioProject::where('image_file_id', $file->id)->value('portfolio_id')
+            ?? PortfolioCertificate::where('file_id', $file->id)->value('portfolio_id');
+
+        return $id ? Portfolio::find($id) : null;
+    }
+
+    private function stream(StoredFile $file): StreamedResponse
+    {
+        abort_unless(Storage::disk($file->disk)->exists($file->path), 404);
+
+        return Storage::disk($file->disk)->response($file->path, $file->original_name, [
+            'Content-Type' => $file->mime_type,
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, max-age=600',
+        ], $file->opensInline() ? 'inline' : 'attachment');
     }
 }

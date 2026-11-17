@@ -552,3 +552,9 @@ Kartu kaca terbelah: kiri formulir, kanan panel hijau berlatar cairan seperti ka
 ## Landing page (Nov 2026)
 
 Halaman depan tamu di `/` (`LandingController`, `resources/views/landing.blade.php`, `public/css/landing.css`). Pengguna yang sudah masuk diarahkan ke dasbor. Hijau SIMAGTI + aksen lime, kartu gelap sebagai pembanding. Bagian: hero dengan tiga kartu angka nyata, kartu per peran dengan cuplikan layar mini, pita lime berisi alur empat tahap, tiga lowongan terbaru yang dibuka, penutup gelap. Animasi hanya urutan pembuka di hero.
+
+### Portofolio mahasiswa (18 November 2026)
+
+Menggantikan portofolio KP berbasis task. Diisi mahasiswa sejak sebelum magang di menu **Portofolio**: Tentang saya (identitas kampus otomatis, judul singkat, deskripsi, IPK + sakelar tampilkan IPK), Minat (pil, maks. 5), Skill (baris nama + tingkat Pemula/Menengah/Mahir), Bagikan (tautan publik + QR), Pengalaman magang (otomatis: tempat magang terakhir dan Company Supervisor), Proyek (dialog tambah/ubah, gambar pratinjau, teknologi, tautan), Sertifikat pelatihan (dialog, berkas PDF/gambar, tautan kredensial).
+
+Halaman tampil `portofolio/publik.blade.php` (prefiks `pv-`) dipakai untuk tautan publik `/p/{token}` dan untuk pihak terkait `/portofolio/mahasiswa/{id}`: kepala hijau dengan avatar lime, minat, kotak IPK gelap; kolom kiri Tentang, Proyek, Sertifikat; kolom kanan Skill per tingkat dan kartu gelap Pengalaman magang. Yang boleh melihat (`Portfolio::canBeViewedBy`): pemilik, kaprodi/TU/admin, dosen pembimbing mahasiswa itu, Company Supervisor yang membimbingnya atau perusahaan tempat mahasiswa mengajukan. Tautan masuk: tombol Portofolio di detail Pantau, kolom di daftar Mahasiswa dan Rekap KP, dan bagian "Pengajuan masuk" di Lowongan Magang.

@@ -29,6 +29,7 @@
                 </div>
                 <div class="prof-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</div>
             </div>
+            <a href="{{ route('portofolio.lihat', $student) }}" class="btn prof-glass prof-porto"><x-ikon name="star" :size="18" /> Portofolio</a>
             <details class="menu prof-menu">
                 <summary class="btn prof-glass"><x-ikon name="download" :size="18" /> Unduh</summary>
                 <div class="menu-panel">

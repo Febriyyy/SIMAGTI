@@ -206,22 +206,54 @@ Dihapus di v3: `syllabus_items`, `monthly_reviews`, `credit_recognitions`, kuesi
 
 Migrasi v3: `2026_10_27_100000_kp_v3_revisi.php`. Setelah menarik versi ini jalankan `php artisan migrate:fresh --seed` (data lama tidak dipertahankan karena struktur berubah besar).
 
-### portfolios (November 2026)
+### portfolios (November 2026, diubah 18 November 2026)
 
-Portofolio KP publik pilihan mahasiswa, satu per KP.
+Portofolio milik mahasiswa (satu per mahasiswa), bisa diisi sebelum mendapat penempatan. Migrasi `2026_11_18_100000_rework_portfolios_for_students` memindahkan pemilik dari KP ke mahasiswa dan memindahkan keahlian lama ke `student_skills`.
 
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | id | bigint | |
-| internship_id | FK internships, unik | hapus berantai |
+| user_id | FK users, unik | pemilik (mahasiswa), hapus berantai |
+| internship_id | FK internships, null | sisa versi lama, tidak dipakai lagi |
 | token | string(40), unik | tautan publik `/p/{token}` |
 | is_public | boolean, bawaan false | tautan hanya aktif bila dinyalakan mahasiswa |
-| show_grade | boolean, bawaan false | huruf mutu dan nilai akhir ikut tampil |
+| show_gpa | boolean, bawaan false | IPK (`student_profiles.gpa`) ikut tampil |
+| show_grade | boolean | sisa versi lama, tidak dipakai lagi |
 | headline | string(120), null | judul singkat |
-| about | text, null | cerita singkat KP |
-| skills | json, null | maks. 10 keahlian |
-| task_ids | json, null | maks. 6 task selesai milik KP ini |
+| about | text, null | deskripsi diri |
+| interests | json, null | maks. 5 minat dari `Portfolio::INTERESTS` |
+| skills, task_ids | json, null | sisa versi lama; skill kini di `student_skills` (dengan `level` pemula/menengah/mahir) |
 | timestamps | | |
+
+### portfolio_projects (18 November 2026)
+
+Proyek yang pernah dibuat mahasiswa di luar task magang (maks. 12).
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| portfolio_id | FK portfolios | hapus berantai |
+| title | string(120) | |
+| role | string(80), null | peran di proyek |
+| description | text, null | |
+| tech | string(200), null | teknologi dipisah koma (maks. 10) |
+| url | string(255), null | hanya http/https |
+| year | smallint, null | |
+| image_file_id | FK files, null | gambar pratinjau (JPG/PNG/WEBP, maks. 3 MB) |
+| position | smallint | urutan |
+
+### portfolio_certificates (18 November 2026)
+
+Sertifikat pelatihan (bootcamp, kursus, lomba), tanpa verifikasi kampus (maks. 20).
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| portfolio_id | FK portfolios | hapus berantai |
+| name | string(150) | nama pelatihan |
+| issuer | string(120) | penyelenggara |
+| issued_on | date, null | tidak boleh di masa depan |
+| credential_url | string(255), null | hanya http/https |
+| file_id | FK files, null | PDF/JPG/PNG, maks. 5 MB |
+| position | smallint | urutan |
 
 ### report_chapters (November 2026)
 

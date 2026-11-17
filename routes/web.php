@@ -33,6 +33,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\PortfolioItemController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReportChapterController;
@@ -64,8 +65,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingController::class)->name('home');
 
 // Undangan Company Supervisor: halaman publik, keabsahan dicek lewat token.
-// Portofolio KP publik (tanpa login, hanya bila mahasiswa menyalakannya)
+// Portofolio mahasiswa publik (tanpa login, hanya bila mahasiswa menyalakannya)
 Route::get('/p/{token}', [PortfolioController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{20,64}')->name('portofolio.publik');
+Route::get('/p/{token}/berkas/{file}', [PortfolioController::class, 'publicFile'])->middleware('throttle:120,1')->where('token', '[A-Za-z0-9]{20,64}')->whereNumber('file')->name('portofolio.publik.berkas');
 Route::get('/undangan/{token}', [InvitationController::class, 'show'])->name('undangan.show');
 Route::post('/undangan/{token}', [InvitationController::class, 'store'])->middleware('throttle:10,1')->name('undangan.store');
 
@@ -86,6 +88,10 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     Route::put('/akun/sandi', [PasswordController::class, 'update'])->middleware('throttle:10,1')->name('akun.sandi.update');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    // Portofolio mahasiswa untuk pihak kampus, dosen pembimbing, dan Company Supervisor (dicek Portfolio::canBeViewedBy)
+    Route::get('/portofolio/mahasiswa/{student}', [PortfolioController::class, 'view'])->whereNumber('student')->name('portofolio.lihat');
+    Route::get('/portofolio/berkas/{file}', [PortfolioController::class, 'file'])->whereNumber('file')->name('portofolio.berkas');
 
     // ---------- Task (dilihat mahasiswa, Company Supervisor, dosen pembimbing; dicek WeeklyTaskPolicy) ----------
     Route::get('/tugas/{task}', [TaskDetailController::class, 'show'])->name('tugas.show')->whereNumber('task');
@@ -153,9 +159,15 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::get('/laporan', [ReportDraftController::class, 'show'])->name('laporan.draf');
         // KP Wrapped: rangkuman animasi setelah KP selesai
         Route::get('/wrapped', [WrappedController::class, 'show'])->name('wrapped');
-        // Portofolio KP publik pilihan mahasiswa (pengaturan)
+        // Portofolio mahasiswa (diisi sejak sebelum magang): profil, skill, proyek, sertifikat pelatihan
         Route::get('/portofolio', [PortfolioController::class, 'edit'])->name('portofolio.edit');
         Route::patch('/portofolio', [PortfolioController::class, 'update'])->name('portofolio.update');
+        Route::post('/portofolio/proyek', [PortfolioItemController::class, 'storeProject'])->middleware('throttle:30,1')->name('portofolio.proyek.store');
+        Route::post('/portofolio/proyek/{project}', [PortfolioItemController::class, 'updateProject'])->whereNumber('project')->middleware('throttle:30,1')->name('portofolio.proyek.update');
+        Route::delete('/portofolio/proyek/{project}', [PortfolioItemController::class, 'destroyProject'])->whereNumber('project')->name('portofolio.proyek.destroy');
+        Route::post('/portofolio/sertifikat', [PortfolioItemController::class, 'storeCertificate'])->middleware('throttle:30,1')->name('portofolio.sertifikat.store');
+        Route::post('/portofolio/sertifikat/{certificate}', [PortfolioItemController::class, 'updateCertificate'])->whereNumber('certificate')->middleware('throttle:30,1')->name('portofolio.sertifikat.update');
+        Route::delete('/portofolio/sertifikat/{certificate}', [PortfolioItemController::class, 'destroyCertificate'])->whereNumber('certificate')->name('portofolio.sertifikat.destroy');
         Route::post('/timesheet/rencana', [ActivityPlanController::class, 'store'])->middleware('throttle:60,1')->name('rencana.store');
         Route::patch('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'update'])->whereNumber('plan')->name('rencana.update');
         Route::delete('/timesheet/rencana/{plan}', [ActivityPlanController::class, 'destroy'])->whereNumber('plan')->name('rencana.destroy');
