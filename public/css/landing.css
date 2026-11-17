@@ -477,3 +477,24 @@ body.ld { overflow-x: clip; }
     .ld-footer-col h3 { flex-basis: 100%; }
     .ld-footer-bottom { gap: 6px; padding-top: 14px; }
 }
+
+/* Hero beserta kartu angka muat dalam layar pertama tanpa menggulir (ukuran mengikuti tinggi layar) */
+@media (min-width: 721px) {
+    .ld-nav { padding: 14px 0; }
+    .ld-hero { --stat-h: clamp(128px, 21vh, 196px); margin-top: 0; }
+    .ld-hero-panel { padding: clamp(28px, 5vh, 72px) 32px calc(var(--stat-h) * .55 + clamp(16px, 3vh, 40px)); }
+    .ld-hero-title { font-size: clamp(32px, min(5.2vw, 7.4vh), 62px); }
+    .ld-hero-sub { margin-top: clamp(10px, 2vh, 20px); font-size: clamp(15px, 2.2vh, 17px); }
+    .ld-hero-cta { margin-top: clamp(14px, 3vh, 28px); }
+    .ld-hero-cta .ld-btn { height: clamp(42px, 6vh, 48px); }
+    .ld-hero-star { top: clamp(40px, 9vh, 96px); width: clamp(28px, 4.5vh, 40px); }
+    .ld-hero-spark { top: clamp(32px, 7vh, 64px); }
+    .ld-stats { margin-top: calc(var(--stat-h) * -.55); }
+    .ld-stat { min-height: var(--stat-h); padding: clamp(16px, 2.6vh, 24px) clamp(18px, 2vw, 26px); }
+    .ld-stat-num { font-size: clamp(28px, 4.6vh, 36px); }
+    .ld-stat-label { margin-top: 4px; font-size: 13.5px; }
+    .ld-stat-faces i { width: clamp(32px, 5vh, 42px); height: clamp(32px, 5vh, 42px); font-size: 12px; }
+    .ld-stat-wave { width: 60%; max-height: clamp(36px, 7vh, 64px); }
+    .ld-stat-bars { width: 36%; max-height: clamp(30px, 6vh, 56px); }
+    .ld-stat-notch { padding: 11px 18px; font-size: 13.5px; }
+}
