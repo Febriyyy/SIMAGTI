@@ -26,6 +26,7 @@ use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\KaprodiApprovalController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\NotificationController;
@@ -60,7 +61,7 @@ use Illuminate\Support\Facades\Route;
  * tidak ada data pribadi di alamat URL (hanya id), dan setiap halaman/berkas dicek hak aksesnya lewat Policy.
  */
 
-Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'));
+Route::get('/', LandingController::class)->name('home');
 
 // Undangan Company Supervisor: halaman publik, keabsahan dicek lewat token.
 // Portofolio KP publik (tanpa login, hanya bila mahasiswa menyalakannya)

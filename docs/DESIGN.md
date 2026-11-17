@@ -548,3 +548,7 @@ Audit otomatis semua halaman per peran (desktop 1280px dan HP 390px: elemen bert
 ## Halaman masuk (Nov 2026)
 
 Kartu kaca terbelah: kiri formulir, kanan panel hijau berlatar cairan seperti kain (`.gl-silk`) dengan alur magang empat tahap (`.gl-flow`) dan kartu kaca "Satu akun untuk setiap peran". Gaya `gl-*` di `public/css/kp.css`.
+
+## Landing page (Nov 2026)
+
+Halaman depan tamu di `/` (`LandingController`, `resources/views/landing.blade.php`, `public/css/landing.css`). Pengguna yang sudah masuk diarahkan ke dasbor. Hijau SIMAGTI + aksen lime, kartu gelap sebagai pembanding. Bagian: hero dengan tiga kartu angka nyata, kartu per peran dengan cuplikan layar mini, pita lime berisi alur empat tahap, tiga lowongan terbaru yang dibuka, penutup gelap. Animasi hanya urutan pembuka di hero.
