@@ -498,3 +498,14 @@ body.ld { overflow-x: clip; }
     .ld-stat-bars { width: 36%; max-height: clamp(30px, 6vh, 56px); }
     .ld-stat-notch { padding: 11px 18px; font-size: 13.5px; }
 }
+/* Jarak lega antara tombol hero dan kartu angka */
+@media (min-width: 721px) {
+    .ld-hero-panel { padding-bottom: calc(var(--stat-h) * .5 + clamp(40px, 7.5vh, 72px)); }
+    .ld-stats { margin-top: calc(var(--stat-h) * -.5); }
+    .ld-nav { padding: 16px 0 18px; }
+}
+@media (min-width: 721px) {
+    .ld-hero { --stat-h: clamp(122px, 19.5vh, 196px); }
+    .ld-hero-panel { padding-bottom: calc(var(--stat-h) * .5 + clamp(58px, 9vh, 84px)); }
+    .ld-hero-sub { margin-top: clamp(14px, 2.6vh, 22px); }
+}
