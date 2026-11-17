@@ -52,6 +52,7 @@ class Menu
                 ['label' => 'Dokumen KP', 'route' => 'tu.dokumen', 'icon' => 'file', 'active' => 'tu.dokumen*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
                 ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'placement', 'active' => 'penempatan.*'],
+                ['label' => 'Rekap KP', 'route' => 'rekap.index', 'icon' => 'chart', 'active' => 'rekap.*'],
                 ['label' => 'Ganti Supervisor', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],
             ],
             'kaprodi' => [
@@ -63,6 +64,7 @@ class Menu
                 ['label' => 'Aktivitas', 'route' => 'aktivitas.index', 'icon' => 'activity', 'active' => 'aktivitas.*'],
                 ['label' => 'Mahasiswa', 'route' => 'mahasiswa.index', 'icon' => 'student', 'active' => 'mahasiswa.*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
+                ['label' => 'Rekap KP', 'route' => 'rekap.index', 'icon' => 'chart', 'active' => 'rekap.*'],
                 ['label' => 'Nilai Sidang', 'route' => 'kaprodi.sidang', 'icon' => 'school', 'active' => 'kaprodi.sidang*'],
                 ['label' => 'Bobot Penilaian', 'route' => 'kaprodi.bobot', 'icon' => 'grade', 'active' => 'kaprodi.bobot*'],
             ],

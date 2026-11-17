@@ -4407,3 +4407,29 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .dialog-wide .form-grid { grid-template-columns: minmax(0, 1fr); }
 }
 .job-head > .grow { flex: 1; min-width: 0; }
+
+/* Rekap KP (kaprodi, TU) */
+.recap-filter { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.recap-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.recap-seg label { position: relative; cursor: pointer; }
+.recap-seg input { position: absolute; opacity: 0; pointer-events: none; }
+.recap-seg span { display: inline-flex; align-items: center; min-height: 34px; padding: 0 var(--space-4); border-radius: var(--radius-pill); color: var(--gray); font-size: var(--text-sm); font-weight: 600; transition: background-color .15s, color .15s; }
+.recap-seg label:hover span { color: var(--primary-dark); }
+.recap-seg label.is-on span, .recap-seg input:checked + span { background: var(--primary); color: #fff; }
+.recap-seg input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+.recap-search { display: flex; gap: var(--space-2); flex: 0 1 360px; }
+.recap-search .input { flex: 1; min-width: 0; }
+.recap-table td { vertical-align: middle; }
+.recap-sub { display: block; margin-top: 2px; color: var(--muted); font-size: var(--text-xs); }
+.recap-grade { display: inline-flex; align-items: baseline; gap: 6px; color: var(--muted); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+.recap-grade b { color: var(--text); font-size: var(--text-md); font-weight: 750; }
+.recap-report { color: var(--gray); font-weight: 650; font-variant-numeric: tabular-nums; }
+.recap-report.is-done { color: var(--primary); }
+.recap-recruit { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); font-weight: 650; }
+.recap-recruit::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.recap-recruit.tone-green { color: var(--primary); }
+.recap-recruit.tone-amber { color: var(--amber); }
+.recap-recruit.tone-blue { color: var(--blue); }
+.recap-recruit.tone-gray { color: var(--gray); }
+@media (max-width: 700px) { .recap-search { flex: 1 1 100%; } .recap-seg { width: 100%; } .recap-seg label { flex: 1; } .recap-seg span { justify-content: center; padding: 0 var(--space-2); } }
+.recap-table th { white-space: nowrap; }

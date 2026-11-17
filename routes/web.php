@@ -32,6 +32,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReportChapterController;
 use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
@@ -253,6 +254,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
     // ---------- Data master ----------
     Route::middleware(EnsureRole::class.':tu,kaprodi')->group(function () {
+        // Rekap KP tingkat prodi + unduh Excel
+        Route::get('/rekap', [RecapController::class, 'index'])->name('rekap.index');
+        Route::get('/rekap/unduh', [RecapController::class, 'export'])->middleware('throttle:20,1')->name('rekap.unduh');
         Route::get('/perusahaan', [CompanyController::class, 'index'])->name('perusahaan.index');
         Route::get('/perusahaan/{company}', [CompanyController::class, 'show'])->whereNumber('company')->name('perusahaan.show');
         Route::get('/penempatan', [PlacementController::class, 'index'])->name('penempatan.index');
