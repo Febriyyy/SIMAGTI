@@ -512,3 +512,18 @@ body.ld { overflow-x: clip; }
 @media (min-width: 721px) {
     .ld-hero-panel { padding-bottom: calc(var(--stat-h) * .5 + clamp(76px, 11.5vh, 104px)); }
 }
+
+/* Hero memenuhi layar pertama: teks berada di tengah ruang di atas kartu angka, kartu menempel di bawah layar */
+@media (min-width: 721px) {
+    .ld-hero { --nav-h: 78px; }
+    .ld-hero-panel {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        min-height: min(860px, calc(100vh - var(--nav-h) - var(--stat-h) * .5 - 28px));
+        min-height: min(860px, calc(100svh - var(--nav-h) - var(--stat-h) * .5 - 28px));
+        padding-top: clamp(24px, 4vh, 48px);
+    }
+    .ld-hero-title { font-size: clamp(32px, min(5.2vw, 7vh), 62px); }
+}
+@media (min-width: 721px) {
+    .ld-hero-panel { padding-top: 24px; padding-bottom: calc(var(--stat-h) * .5 + 24px); }
+}
