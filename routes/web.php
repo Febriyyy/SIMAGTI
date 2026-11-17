@@ -24,6 +24,7 @@ use App\Http\Controllers\GoalController;
 use App\Http\Controllers\GuidanceController;
 use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\KaprodiApprovalController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitorController;
@@ -182,6 +183,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
         // Jawaban atas tawaran kerja dari tempat magang
         Route::get('/tawaran-kerja', [ConversionController::class, 'show'])->name('rekrutmen.tawaran');
+        // Lowongan magang yang sedang dibuka
+        Route::get('/lowongan-magang', [JobPostingController::class, 'browse'])->name('lowongan.index');
         Route::patch('/tawaran-kerja', [ConversionController::class, 'respond'])->middleware('throttle:10,1')->name('rekrutmen.jawab');
     });
 
@@ -239,6 +242,15 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::get('/hasil', [ResultController::class, 'index'])->name('hasil.index');
         Route::get('/hasil/{internship}', [ResultController::class, 'edit'])->whereNumber('internship')->name('hasil.edit');
         Route::patch('/hasil/{internship}', [ResultController::class, 'update'])->whereNumber('internship')->name('hasil.update');
+    });
+
+    // Lowongan magang: TU Fakultas (semua perusahaan) dan Company Supervisor (perusahaannya)
+    Route::middleware(EnsureRole::class.':tu,supervisor')->group(function () {
+        Route::get('/lowongan', [JobPostingController::class, 'manage'])->name('lowongan.kelola');
+        Route::post('/lowongan', [JobPostingController::class, 'store'])->middleware('throttle:30,1')->name('lowongan.store');
+        Route::put('/lowongan/{posting}', [JobPostingController::class, 'update'])->whereNumber('posting')->name('lowongan.update');
+        Route::patch('/lowongan/{posting}/status', [JobPostingController::class, 'status'])->whereNumber('posting')->name('lowongan.status');
+        Route::delete('/lowongan/{posting}', [JobPostingController::class, 'destroy'])->whereNumber('posting')->name('lowongan.destroy');
     });
 
     // Antrean pengajuan perubahan: Company Supervisor (perpanjangan), kaprodi, TU Fakultas (ganti supervisor)

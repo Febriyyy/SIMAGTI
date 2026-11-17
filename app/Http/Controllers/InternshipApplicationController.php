@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Applications\SubmitInternshipApplication;
 use App\Http\Requests\Applications\SubmitInternshipRequest;
 use App\Models\Internship;
+use App\Models\JobPosting;
 use App\Support\KpProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,22 @@ class InternshipApplicationController extends Controller
         $steps = $internship ? KpProgress::steps($internship) : [];
         $semester = $user->studentProfile?->semester();
 
-        return view('pengajuan.index', compact('internship', 'canSubmit', 'steps', 'semester', 'user'));
+        // Dari halaman Lowongan: data perusahaan dan posisi terisi otomatis
+        $posting = $canSubmit && $request->filled('lowongan')
+            ? JobPosting::with('company')->where('status', 'published')->find($request->integer('lowongan'))
+            : null;
+        $prefill = $posting ? [
+            'company_name' => $posting->company->name,
+            'industry' => $posting->company->industry,
+            'position' => $posting->title,
+            'city' => $posting->company->city,
+            'company_email' => $posting->company->email,
+            'address' => $posting->company->address,
+            'phone' => $posting->company->phone,
+            'website' => $posting->company->website,
+        ] : [];
+
+        return view('pengajuan.index', compact('internship', 'canSubmit', 'steps', 'semester', 'user', 'posting', 'prefill'));
     }
 
     public function store(SubmitInternshipRequest $request, SubmitInternshipApplication $submit): RedirectResponse

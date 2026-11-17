@@ -244,3 +244,19 @@ Laporan KP per bab. Dibuat otomatis (4 bab bawaan, `ReportChapter::DEFAULTS`) sa
 | timestamps | | |
 
 Tabel yang sudah ada dan kini dipakai: `defense_scores` (nilai sidang, diisi kaprodi di `/kaprodi/sidang`, huruf mutu dihitung ulang bila nilai berubah) dan `conversion_candidates` + `conversion_histories` (rekomendasi jadi karyawan).
+
+### defense_schedules (November 2026)
+
+Jadwal sidang/presentasi KP oleh kaprodi, satu per KP.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| internship_id | FK internships, unik | hapus berantai |
+| scheduled_at | datetime | tanggal dan jam |
+| mode | string(10) | `luring` atau `daring` |
+| place | string(200) | ruang atau tautan rapat |
+| examiner_id | FK users, null | dosen penguji |
+| note | text, null | |
+| created_by | FK users, null | kaprodi |
+
+Tabel yang sudah ada dan kini dipakai UI: `task_templates` + `task_template_items` (template task supervisor), `job_postings` + `job_posting_skill` (lowongan magang). Kolom tambahan `conversion_candidates` untuk tawaran kerja resmi: lihat migrasi `2026_11_17_120000_add_offer_details_to_conversion_candidates`.

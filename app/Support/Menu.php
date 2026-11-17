@@ -19,6 +19,7 @@ class Menu
             'mahasiswa' => [
                 $dashboard,
                 ['label' => 'Status KP', 'route' => 'kp.status', 'icon' => 'approval', 'active' => 'kp.*'],
+                ['label' => 'Lowongan', 'route' => 'lowongan.index', 'icon' => 'search', 'active' => 'lowongan.index'],
                 // Rencana kegiatan (Gantt) diisi lebih dulu, baru task dibuat di halaman Kegiatan
                 ['label' => 'Timesheet', 'route' => 'timesheet.index', 'icon' => 'calendar', 'active' => 'timesheet.*'],
                 ['label' => 'Kegiatan', 'route' => 'kegiatan.index', 'icon' => 'board', 'active' => ['kegiatan.*', 'tugas.show']],
@@ -32,6 +33,7 @@ class Menu
                 ['label' => 'Mahasiswa Magang', 'route' => 'pantau.index', 'icon' => 'student', 'active' => ['pantau.*', 'tugas.show']],
                 ['label' => 'Aktivitas', 'route' => 'aktivitas.index', 'icon' => 'activity', 'active' => 'aktivitas.*'],
                 ['label' => 'Template Task', 'route' => 'template.index', 'icon' => 'tasks', 'active' => 'template.*'],
+                ['label' => 'Lowongan Magang', 'route' => 'lowongan.kelola', 'icon' => 'search', 'active' => 'lowongan.*'],
                 ['label' => 'Laporan KP', 'route' => 'laporan.antrean', 'icon' => 'syllabus', 'active' => 'laporan.*'],
                 ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
                 ['label' => 'Pengajuan Perubahan', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],
@@ -52,6 +54,7 @@ class Menu
                 ['label' => 'Surat Pengantar', 'route' => 'tu.surat', 'icon' => 'mail', 'active' => 'tu.surat*'],
                 ['label' => 'Dokumen KP', 'route' => 'tu.dokumen', 'icon' => 'file', 'active' => 'tu.dokumen*'],
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
+                ['label' => 'Lowongan Magang', 'route' => 'lowongan.kelola', 'icon' => 'search', 'active' => 'lowongan.*'],
                 ['label' => 'Penempatan', 'route' => 'penempatan.index', 'icon' => 'placement', 'active' => 'penempatan.*'],
                 ['label' => 'Rekap KP', 'route' => 'rekap.index', 'icon' => 'chart', 'active' => 'rekap.*'],
                 ['label' => 'Ganti Supervisor', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],

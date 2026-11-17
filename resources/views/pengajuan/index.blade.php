@@ -116,7 +116,7 @@
     @endif
 
     @if ($canSubmit)
-        <section class="card">
+        <section class="card" id="ajukan">
             <div class="card-head">
                 <div>
                     <h2 class="card-title">{{ $internship ? 'Ajukan ulang' : 'Ajukan KP' }}</h2>
@@ -133,42 +133,49 @@
                 <form method="POST" action="{{ route('kp.apply') }}" class="stack">
                     @csrf
 
+                    @if ($posting)
+                        <div class="apply-from-job">
+                            <x-ikon name="search" :size="18" />
+                            <span>Diisi dari lowongan <b>{{ $posting->title }}</b> · {{ $posting->company->name }}. Periksa lagi sebelum mengirim.</span>
+                        </div>
+                    @endif
+
                     <div class="form-section">
                         <h3 class="form-section-title">Perusahaan</h3>
                         <div class="form-grid">
                             <div>
                                 <label for="company_name" class="label">Nama perusahaan</label>
-                                <input id="company_name" name="company_name" type="text" class="input" value="{{ old('company_name') }}" maxlength="150" required>
+                                <input id="company_name" name="company_name" type="text" class="input" value="{{ old('company_name', $prefill['company_name'] ?? '') }}" maxlength="150" required>
                             </div>
-                            <x-industry-select required />
+                            <x-industry-select required :value="$prefill['industry'] ?? null" />
                             <div>
                                 <label for="division_name" class="label">Divisi penempatan</label>
                                 <input id="division_name" name="division_name" type="text" class="input" value="{{ old('division_name') }}" maxlength="100" placeholder="Misalnya Engineering">
                             </div>
                             <div>
                                 <label for="position" class="label">Posisi magang</label>
-                                <input id="position" name="position" type="text" class="input" value="{{ old('position') }}" maxlength="100" placeholder="Misalnya Frontend Developer Intern" required>
+                                <input id="position" name="position" type="text" class="input" value="{{ old('position', $prefill['position'] ?? '') }}" maxlength="100" placeholder="Misalnya Frontend Developer Intern" required>
                                 <p class="hint">Bisa dikoreksi Company Supervisor nanti.</p>
                             </div>
                             <div>
                                 <label for="city" class="label">Kota</label>
-                                <input id="city" name="city" type="text" class="input" value="{{ old('city') }}" maxlength="100">
+                                <input id="city" name="city" type="text" class="input" value="{{ old('city', $prefill['city'] ?? '') }}" maxlength="100">
                             </div>
                             <div>
                                 <label for="company_email" class="label">Email perusahaan</label>
-                                <input id="company_email" name="company_email" type="email" class="input" value="{{ old('company_email') }}" maxlength="150">
+                                <input id="company_email" name="company_email" type="email" class="input" value="{{ old('company_email', $prefill['company_email'] ?? '') }}" maxlength="150">
                             </div>
                             <div class="span-all">
                                 <label for="address" class="label">Alamat</label>
-                                <textarea id="address" name="address" class="textarea" maxlength="500" rows="2">{{ old('address') }}</textarea>
+                                <textarea id="address" name="address" class="textarea" maxlength="500" rows="2">{{ old('address', $prefill['address'] ?? '') }}</textarea>
                             </div>
                             <div>
                                 <label for="phone" class="label">Telepon perusahaan</label>
-                                <input id="phone" name="phone" type="text" class="input" value="{{ old('phone') }}" maxlength="20">
+                                <input id="phone" name="phone" type="text" class="input" value="{{ old('phone', $prefill['phone'] ?? '') }}" maxlength="20">
                             </div>
                             <div>
                                 <label for="website" class="label">Website <span class="label-opt">(opsional)</span></label>
-                                <input id="website" name="website" type="text" inputmode="url" class="input" value="{{ old('website') }}" maxlength="200" placeholder="perusahaan.co.id">
+                                <input id="website" name="website" type="text" inputmode="url" class="input" value="{{ old('website', $prefill['website'] ?? '') }}" maxlength="200" placeholder="perusahaan.co.id">
                                 <p class="hint">Kosongkan bila perusahaan tidak punya website.</p>
                             </div>
                         </div>

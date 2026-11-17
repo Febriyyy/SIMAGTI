@@ -137,6 +137,12 @@ Prinsipnya: pihak perusahaan sesedikit mungkin direpotkan. Supervisor hanya konf
 - **Rekomendasi jadi karyawan**: Company Supervisor merekomendasikan dari detail mahasiswa, lalu menawarkan posisi; mahasiswa baru diberi tahu saat ditawari dan menjawab Terima / Tolak dari dashboard. Dosen pembimbing dan kaprodi melihat kartu Rekrutmen tanpa tombol.
 - **Laporan KP per bab**: mahasiswa mengunggah tiap bab di halaman Dokumen; bab berisi informasi perusahaan disetujui Company Supervisor dulu (dosen belum bisa membukanya), lalu dosen pembimbing menyetujui atau meminta revisi. Menu Laporan KP untuk supervisor dan dosen.
 
+### Tambahan 18 November 2026
+- **Rekap KP** (kaprodi, TU): satu halaman semua mahasiswa KP (status, nilai akhir, nilai sidang, laporan per bab, rekrutmen) dengan filter status, pencarian, ringkasan angka, dan unduh Excel.
+- **Jadwal sidang** (kaprodi, menu Sidang KP): jadwalkan waktu, cara (luring/daring), ruang atau tautan, dan dosen penguji; mahasiswa, dosen pembimbing, dan penguji diberi tahu; jadwal tampil di Status KP mahasiswa; nilai diisi setelah sidang lewat.
+- **Template task** (Company Supervisor): kumpulan task baku per minggu dan hari yang diterapkan ke mahasiswa magang terpilih sekali klik (minggu 1 = minggu KP saat diterapkan).
+- **Lowongan magang**: TU (semua perusahaan) dan Company Supervisor (perusahaannya) memasang, membuka, dan menutup lowongan; mahasiswa tanpa KP aktif diberi tahu saat lowongan dibuka, melihatnya di menu Lowongan, dan "Ajukan KP di sini" mengisi formulir pengajuan otomatis.
+
 ## 6. Belum dikerjakan
 
 Catatan v8: kuesioner milik dosen diganti standar penilaian kampus yang diatur admin.
@@ -147,8 +153,7 @@ KP v2 tahap 3: dokumen Word dari template kampus (lampiran dan MB.xx), presentas
 Dari rencana awal:
 
 - Dokumen dan template, surat pengantar
-- Lowongan magang, skill, template task (UI)
-- Ekspor Excel/PDF
+- Ekspor PDF rekap prodi (Excel sudah ada)
 - Email notifikasi
 
 Urutan yang dikorbankan jika waktu mepet: lowongan, template laporan dan surat, ekspor laporan, status konversi lanjutan.
