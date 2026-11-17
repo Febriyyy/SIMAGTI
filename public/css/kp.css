@@ -4839,3 +4839,8 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .gl-form-side { padding: 18px 16px 12px; }
     .gl-form-box { max-width: none; padding: 26px 0 20px; }
 }
+
+/* Logo halaman masuk menjadi tautan ke landing page */
+.gl-logo-link { align-self: flex-start; display: inline-block; border-radius: 8px; transition: opacity 150ms; }
+.gl-logo-link:hover { opacity: .75; }
+.gl-logo-link:focus-visible { outline: 3px solid rgba(3, 122, 104, .35); outline-offset: 4px; }

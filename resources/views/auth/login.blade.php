@@ -17,7 +17,7 @@
 <main class="gl">
     {{-- Kiri: formulir masuk --}}
     <section class="gl-form-side">
-        <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" class="gl-logo" width="132" height="40">
+        <a href="{{ route('home') }}" class="gl-logo-link" aria-label="SIMAGTI, kembali ke beranda"><img src="{{ asset('images/logo-simagti.svg') }}" alt="" class="gl-logo" width="132" height="40"></a>
 
         <div class="gl-form-box">
             <h1 class="gl-title">Masuk ke akun Anda</h1>
