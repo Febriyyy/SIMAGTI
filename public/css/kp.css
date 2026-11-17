@@ -5013,3 +5013,15 @@ body { background: var(--page); }
     .grow-go, .motion .hero-art, .motion .hero-art-2 { animation: none; }
     .stat-link:hover { transform: none; }
 }
+
+/* Banner judul halaman: ikon dan teks selalu sejajar di tengah, berapa pun baris teksnya (18 Nov 2026).
+   Sebelumnya ikon selalu memakan 3 baris sehingga judul tunggal menempel ke atas. */
+.page-head-main { align-items: center; row-gap: 2px; }
+.page-head-main > .page-icon { align-self: center; grid-row: 1; }
+.page-head-main:has(> :nth-child(3)) > .page-icon { grid-row: 1 / span 2; }
+.page-head-main:has(> :nth-child(4)) > .page-icon { grid-row: 1 / span 3; }
+.page-head-main:has(> :nth-child(3)) > :nth-child(2) { align-self: end; }
+.page-head-main:has(> :nth-child(3)) > :last-child:not(.page-icon) { align-self: start; }
+.page-head-main:has(> :nth-child(4)) > :nth-child(3) { align-self: center; }
+.page-head-main > .page-title { display: flex; align-items: center; gap: 8px; margin: 0; }
+.page-head-main .page-title .info-tip { margin-left: 0; }
