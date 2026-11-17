@@ -55,7 +55,7 @@
                 </div>
                 <p id="signin-help" class="gl-help" hidden>Hubungi admin SIMAGTI untuk mengatur ulang kata sandi. Anda akan menerima kata sandi sementara yang wajib diganti saat masuk.</p>
 
-                <button type="submit" class="gl-submit">Masuk</button>
+                <button type="submit" class="gl-submit"><span class="gl-submit-label">Masuk</span><span class="gl-spin" aria-hidden="true"></span></button>
             </form>
         </div>
 
@@ -83,8 +83,9 @@
 
         <h2 class="gl-panel-title">Magang tercatat rapi<br>dari awal sampai akhir.</h2>
 
-        <ol class="gl-flow">
-            <li><span class="gl-flow-dot"></span><b>Pengajuan KP</b><small>Pilih lowongan, ajukan, tunggu persetujuan</small></li>
+        <ol class="gl-flow" data-flow>
+            <span class="gl-flow-fill" aria-hidden="true"></span>
+            <li class="is-on"><span class="gl-flow-dot"></span><b>Pengajuan KP</b><small>Pilih lowongan, ajukan, tunggu persetujuan</small></li>
             <li><span class="gl-flow-dot"></span><b>Task dan catatan harian</b><small>Dikerjakan dan dipantau setiap hari</small></li>
             <li><span class="gl-flow-dot"></span><b>Bimbingan dan penilaian</b><small>Dosen dan supervisor memberi nilai</small></li>
             <li><span class="gl-flow-dot"></span><b>Sertifikat</b><small>Terbit otomatis setelah KP selesai</small></li>
@@ -124,6 +125,29 @@
             });
         }
 
+        // Kirim formulir: tombol menunjukkan proses agar tidak diklik dua kali.
+        var form = document.querySelector('.gl-form'), submit = document.querySelector('.gl-submit');
+        if (form && submit) {
+            form.addEventListener('submit', function () {
+                submit.classList.add('is-loading');
+                submit.setAttribute('aria-busy', 'true');
+                setTimeout(function () { submit.disabled = true; }, 0);
+            });
+        }
+
+        // Alur magang: tahap aktif bergeser pelan, garis terisi mengikuti tahap.
+        var flow = document.querySelector('[data-flow]');
+        var still = false;
+        try { still = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+        if (flow && !still) {
+            var steps = [].slice.call(flow.querySelectorAll('li')), at = 0;
+            var paint = function () {
+                steps.forEach(function (li, n) { li.classList.toggle('is-on', n === at); li.classList.toggle('is-past', n < at); });
+                flow.style.setProperty('--fill', steps.length > 1 ? at / (steps.length - 1) : 1);
+            };
+            paint();
+            setInterval(function () { if (!document.hidden) { at = (at + 1) % steps.length; paint(); } }, 2800);
+        }
     })();
 </script>
 </body>
