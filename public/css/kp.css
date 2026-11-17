@@ -4789,3 +4789,53 @@ a, .btn, .seg, .tab, .menu-item, .nav-item, .sidebar a { transition: color var(-
     .gl-aura i, .gl-spark svg, .gl-panel .gl-card::after, .gl-flow li.is-on .gl-flow-dot { animation: none; }
     .gl-submit::after, .gl-flow-fill, .gl-flow li { transition: none; }
 }
+
+/* Halaman masuk: kartu lebih ringkas dan muat satu layar tanpa gulir (18 Nov 2026). */
+.gl-body { min-height: 100vh; min-height: 100dvh; padding: 20px; }
+.gl { width: min(940px, 100%); min-height: 0; gap: 14px; padding: 14px; border-radius: 28px; }
+.gl-form-side { padding: 18px 26px 14px; }
+.gl-logo { height: 30px; }
+.gl-form-box { max-width: 340px; padding: 22px 0; }
+.gl-title { font-size: 26px; }
+.gl-sub { margin: 6px 0 22px; }
+.gl-form { gap: 14px; }
+.gl-field label { margin-bottom: 6px; }
+.gl-field input { height: 44px; }
+.gl-submit { height: 46px; margin-top: 4px; }
+.gl-panel { padding: 32px 28px 24px; border-radius: 20px; }
+.gl-panel-title { font-size: 26px; }
+.gl-flow { margin-top: 20px; gap: 2px; }
+.gl-flow li { padding: 8px 14px 8px 42px; border-radius: 14px; }
+.gl-flow-dot { top: 12px; }
+.gl-flow::before, .gl-flow-fill { top: 18px; }
+.gl-flow::before { bottom: 18px; }
+.gl-flow-fill { height: calc(100% - 36px); }
+.gl-flow b { font-size: 14.5px; }
+.gl-flow small { font-size: 12.5px; }
+@media (min-width: 921px) { .gl-flow { margin-bottom: 26px; } }
+.gl-panel .gl-card { padding: 16px 20px 14px; border-radius: 18px; }
+.gl-card strong { font-size: 15px; }
+.gl-card p { margin-top: 4px; font-size: 12.5px; }
+.gl-spark { width: 40px; height: 40px; top: -18px; box-shadow: 0 0 0 5px #1f9d78, 0 8px 16px rgba(3, 66, 62, .2); }
+.gl-spark svg { width: 18px; height: 18px; }
+
+/* Layar pendek: rapatkan lagi */
+@media (min-width: 921px) and (max-height: 640px) {
+    .gl-body { padding: 12px; }
+    .gl-form-box { padding: 12px 0; }
+    .gl-sub { margin-bottom: 16px; }
+    .gl-form { gap: 10px; }
+    .gl-field input { height: 40px; }
+    .gl-submit { height: 42px; }
+    .gl-panel { padding: 24px 24px 18px; }
+    .gl-flow small { display: none; }
+}
+
+/* HP dan tablet: hanya formulir, panel hijau disembunyikan agar tidak perlu menggulir */
+@media (max-width: 920px) {
+    .gl-body { place-items: center; padding: 14px; }
+    .gl { grid-template-columns: minmax(0, 1fr); width: min(440px, 100%); }
+    .gl-panel { display: none; }
+    .gl-form-side { padding: 18px 16px 12px; }
+    .gl-form-box { max-width: none; padding: 26px 0 20px; }
+}
