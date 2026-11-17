@@ -246,3 +246,90 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
     .ld-stat-faces i { width: 34px; height: 34px; font-size: 11px; border-width: 2px; }
     .ld-stat-wave { width: 70%; }
 }
+
+/* =====================================================================
+   Animasi halaman depan (18 Nov 2026).
+   Hero: urutan pembuka, gelombang digambar, batang tumbuh, bintang melayang.
+   Bagian lain: muncul saat digulir, cincin progres terisi, grafik dan skala nilai terisi.
+   Semua bergantung pada kelas .motion / .ld-js, jadi tanpa JS atau dengan gerak dikurangi halaman tampil utuh.
+   ===================================================================== */
+
+/* Navigasi menjadi kaca saat digulir */
+.ld-nav { position: sticky; top: 0; z-index: 30; transition: padding 250ms var(--ease); }
+.ld-nav::before { content: ""; position: absolute; inset: 0 -100vmax; z-index: -1; opacity: 0; pointer-events: none;
+    background: rgba(243, 245, 240, .72); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
+    border-bottom: 1px solid var(--line); transition: opacity 250ms; }
+.ld-nav.is-stuck { padding: 12px 0; }
+.ld-nav.is-stuck::before { opacity: 1; }
+
+/* Hero: hiasan melayang pelan */
+.motion .ld-hero-spark { animation: ld-twinkle 4s ease-in-out infinite; transform-origin: center; }
+.motion .ld-hero-star { animation: ld-spin 18s linear infinite; transform-origin: center; }
+@keyframes ld-twinkle { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.78) rotate(20deg); opacity: .7; } }
+@keyframes ld-spin { to { transform: rotate(360deg); } }
+
+/* Hero: gelombang digambar, batang tumbuh, wajah muncul satu per satu */
+.motion .ld-stat-wave path, .motion .ld-close.is-in .ld-close-wave path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ld-draw 1.4s .55s var(--ease) forwards; }
+@keyframes ld-draw { to { stroke-dashoffset: 0; } }
+.motion .ld-stat-bars rect { transform-box: fill-box; transform-origin: bottom; animation: ld-grow 800ms var(--ease) both; }
+.motion .ld-stat-bars rect:nth-child(1) { animation-delay: 500ms; } .motion .ld-stat-bars rect:nth-child(2) { animation-delay: 560ms; }
+.motion .ld-stat-bars rect:nth-child(3) { animation-delay: 620ms; } .motion .ld-stat-bars rect:nth-child(4) { animation-delay: 680ms; }
+.motion .ld-stat-bars rect:nth-child(5) { animation-delay: 740ms; } .motion .ld-stat-bars rect:nth-child(6) { animation-delay: 800ms; }
+@keyframes ld-grow { from { transform: scaleY(0); } to { transform: none; } }
+.motion .ld-stat-faces i { animation: ld-pop 500ms var(--ease) both; }
+.motion .ld-stat-faces i:nth-child(1) { animation-delay: 480ms; } .motion .ld-stat-faces i:nth-child(2) { animation-delay: 540ms; }
+.motion .ld-stat-faces i:nth-child(3) { animation-delay: 600ms; } .motion .ld-stat-faces i:nth-child(4) { animation-delay: 660ms; }
+@keyframes ld-pop { from { opacity: 0; transform: scale(.4); } 70% { transform: scale(1.08); } to { opacity: 1; transform: none; } }
+
+/* Muncul saat digulir */
+.ld-js [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity 700ms var(--ease), transform 700ms var(--ease); transition-delay: calc(var(--i, 0) * 90ms); }
+.ld-js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Kartu peran: isi cuplikan bergerak setelah kartunya muncul */
+.ld-js .ld-mock-tasks .is-done i { transform: scale(0); transition: transform 400ms var(--ease); }
+.ld-js .is-in .ld-mock-tasks .is-done i { transform: none; }
+.ld-js .is-in .ld-mock-tasks .is-done:nth-child(1) i { transition-delay: 450ms; }
+.ld-js .is-in .ld-mock-tasks .is-done:nth-child(2) i { transition-delay: 650ms; }
+.ld-js .ld-rate i.is-on { background: rgba(15, 31, 27, .14); transition: background-color 250ms; }
+.ld-js .is-in .ld-rate i.is-on { background: var(--ink); }
+.ld-js .is-in .ld-rate i:nth-child(1) { transition-delay: 500ms; } .ld-js .is-in .ld-rate i:nth-child(2) { transition-delay: 600ms; }
+.ld-js .is-in .ld-rate i:nth-child(3) { transition-delay: 700ms; } .ld-js .is-in .ld-rate i:nth-child(4) { transition-delay: 800ms; }
+.ld-js .is-in .ld-rate i:nth-child(5) { transition-delay: 900ms; }
+.ld-js .ld-mock-note span { opacity: 0; transform: translateY(8px) scale(.96); transition: opacity 400ms var(--ease), transform 400ms var(--ease); }
+.ld-js .is-in .ld-mock-note span { opacity: 1; transform: none; }
+.ld-js .is-in .ld-note-in { transition-delay: 500ms; }
+.ld-js .is-in .ld-note-out { transition-delay: 1100ms; }
+.ld-js .ld-mock-chart i { transform: scaleX(0); transform-origin: left; transition: transform 900ms var(--ease); }
+.ld-js .is-in .ld-mock-chart i { transform: none; }
+.ld-js .is-in .ld-mock-chart span:nth-child(1) i { transition-delay: 500ms; }
+.ld-js .is-in .ld-mock-chart span:nth-child(2) i { transition-delay: 620ms; }
+.ld-js .is-in .ld-mock-chart span:nth-child(3) i { transition-delay: 740ms; }
+
+/* Kartu peran: sedikit terangkat saat diarahkan */
+.ld-role { transition: transform 250ms var(--ease), box-shadow 250ms; }
+.ld-role:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(3, 66, 62, .12); }
+.ld-role-icon { transition: transform 300ms var(--ease); }
+.ld-role:hover .ld-role-icon { transform: rotate(-8deg) scale(1.06); }
+.ld-js [data-reveal].is-settled { transition-delay: 0s; }
+.ld-js .ld-role.is-settled, .ld-js .ld-job.is-settled { transition: transform 250ms var(--ease), box-shadow 250ms; }
+.ld-js .ld-role.is-settled:hover { transform: translateY(-4px); }
+.ld-js .ld-job.is-settled:hover { transform: translateY(-3px); }
+
+/* Alur: cincin progres terisi, nomor tahap memantul */
+.ld-js .ld-ring-val { stroke-dasharray: 0 100; transition: stroke-dasharray 1.4s var(--ease) .3s; }
+.ld-js .ld-progress.is-in .ld-ring-val { stroke-dasharray: 68 100; }
+.ld-js .ld-progress-rows span { opacity: 0; transform: translateX(-12px); transition: opacity 500ms var(--ease), transform 500ms var(--ease); }
+.ld-js .ld-progress.is-in .ld-progress-rows span { opacity: 1; transform: none; }
+.ld-js .ld-progress.is-in .ld-progress-rows span:nth-child(1) { transition-delay: 600ms; }
+.ld-js .ld-progress.is-in .ld-progress-rows span:nth-child(2) { transition-delay: 720ms; }
+.ld-js .ld-progress.is-in .ld-progress-rows span:nth-child(3) { transition-delay: 840ms; }
+.ld-js .ld-steps li .ld-step-n { transform: scale(.5); transition: transform 500ms cubic-bezier(.34, 1.56, .64, 1); transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.ld-js .ld-steps li.is-in .ld-step-n { transform: none; }
+.ld-flow::before { transition: transform 1.6s var(--ease); }
+.ld-js .ld-flow::before { transform: translate(-50%, 18%); }
+.ld-js .ld-flow:has(.is-in)::before { transform: translateX(-50%); }
+
+@media (prefers-reduced-motion: reduce) {
+    .ld-nav, .ld-nav::before, .ld-role, .ld-role-icon { transition: none; }
+    .ld-role:hover, .ld-role:hover .ld-role-icon { transform: none; }
+}
