@@ -527,3 +527,30 @@ body.ld { overflow-x: clip; }
 @media (min-width: 721px) {
     .ld-hero-panel { padding-top: 24px; padding-bottom: calc(var(--stat-h) * .5 + 24px); }
 }
+
+/* =====================================================================
+   Urutan warna (18 Nov 2026): hijau = warna utama, lime = warna kedua, gelap = warna ketiga. Latar tetap terang.
+   ===================================================================== */
+.ld-btn-primary { background: var(--green); color: #fff; }
+.ld-btn-primary:hover { background: #03665a; box-shadow: 0 10px 24px rgba(3, 122, 104, .3); }
+
+/* Kartu angka: hijau, lime, gelap */
+.ld-stat-c1 { background: linear-gradient(150deg, var(--green-2), var(--green) 55%, var(--green-deep)); color: #fff; }
+.ld-stat-c1 .ld-stat-label { color: rgba(255, 255, 255, .8); }
+.ld-stat-c1 .ld-stat-faces i { border-color: var(--green); }
+.ld-stat-c1 .ld-stat-faces i:nth-child(1) { background: var(--lime); color: var(--ink); }
+.ld-stat-c2 { background: var(--lime); color: var(--ink); }
+.ld-stat-c2 .ld-stat-label { color: rgba(15, 31, 27, .72); }
+.ld-stat-c2 .ld-stat-wave { color: var(--green); }
+.ld-stat-c3 { background: var(--ink); color: #fff; }
+.ld-stat-c3 .ld-stat-label { color: rgba(255, 255, 255, .7); max-width: calc(100% - 150px); }
+.ld-stat-c3 .ld-stat-bars { fill: rgba(255, 255, 255, .22); }
+.ld-stat-c3 .ld-stat-bars rect:last-child { fill: var(--lime); }
+@media (max-width: 720px) { .ld-stat-c3 { grid-column: 1 / -1; } }
+
+/* Alur KP: nomor tahap hijau di atas pita lime */
+.ld-step-n { background: var(--green); color: #fff; }
+
+/* Penutup: panel hijau dengan aksen lime */
+.ld-close { background: radial-gradient(circle at 88% 0%, rgba(201, 240, 101, .3), transparent 40%), linear-gradient(150deg, var(--green-2) 0%, var(--green) 50%, var(--green-deep) 100%); }
+.ld-close-sub { color: rgba(255, 255, 255, .82); }

@@ -36,7 +36,7 @@
         <a href="#alur">Alur KP</a>
         @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan</a>@endif
     </nav>
-    <a href="{{ route('login') }}" class="ld-btn ld-btn-dark">Masuk</a>
+    <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
 </header>
 
 <main id="isi">
@@ -53,23 +53,23 @@
             </h1>
             <p class="ld-hero-sub">Mahasiswa, perusahaan, dosen, dan kampus bekerja di satu tempat. Setiap task, bimbingan, dan nilai tercatat rapi.</p>
             <div class="ld-hero-cta">
-                <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk ke SIMAGTI</a>
+                <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk ke SIMAGTI</a>
                 <a href="#alur" class="ld-btn ld-btn-ghost">Lihat alur KP</a>
             </div>
         </div>
 
         <div class="ld-stats">
-            <article class="ld-stat ld-stat-lime">
+            <article class="ld-stat ld-stat-c1">
                 <div class="ld-stat-faces" aria-hidden="true"><i>NA</i><i>RP</i><i>DS</i><i>+</i></div>
                 <p class="ld-stat-num" data-count="{{ $stats['interns'] }}">{{ $num($stats['interns']) }}</p>
                 <p class="ld-stat-label">Mahasiswa magang tercatat</p>
             </article>
-            <article class="ld-stat ld-stat-dark">
+            <article class="ld-stat ld-stat-c2">
                 <svg class="ld-stat-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
                 <p class="ld-stat-num" data-count="{{ $stats['companies'] }}">{{ $num($stats['companies']) }}</p>
                 <p class="ld-stat-label">Perusahaan mitra kampus</p>
             </article>
-            <article class="ld-stat ld-stat-green">
+            <article class="ld-stat ld-stat-c3">
                 <svg class="ld-stat-bars" viewBox="0 0 120 60" aria-hidden="true">
                     @foreach ([22, 34, 28, 44, 38, 52] as $n => $h)
                         <rect x="{{ $n * 20 }}" y="{{ 60 - $h }}" width="12" height="{{ $h }}" rx="6"/>
@@ -253,7 +253,7 @@
             <h3>Sudah punya akun?</h3>
             <div class="ld-footer-pill">
                 <span>Lanjutkan KP Anda</span>
-                <a href="{{ route('login') }}" class="ld-btn ld-btn-dark">Masuk</a>
+                <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
             </div>
         </div>
     </div>

@@ -4917,3 +4917,39 @@ body { background: var(--page); }
 .job-tone-1 .job-card-band { background: linear-gradient(120deg, #eef9d2, #e3f4c4 60%, #f1f8e4); }
 .job-tone-2 .job-card-band { background: linear-gradient(120deg, #e4e9e2, #dde4da 60%, #eef1ea); }
 .job-tone-3 .job-card-band { background: linear-gradient(120deg, #dcf5ee, #e6f6d6 60%, #eef9d2); }
+
+/* =====================================================================
+   Urutan warna (18 Nov 2026): hijau = warna utama, lime = warna kedua, gelap = warna ketiga. Latar tetap terang.
+   ===================================================================== */
+/* Menu samping: item aktif hijau dengan ikon lime */
+.nav-item.is-active { background: var(--primary); color: #fff; box-shadow: 0 8px 18px rgba(3, 122, 104, .22); }
+.nav-item.is-active:hover { background: var(--primary-dark); color: #fff; }
+.nav-item.is-active .ikon, .nav-item.is-active:hover .ikon { color: var(--lime); }
+
+/* Banner sapaan: gradasi hijau dengan cahaya lime, tombol lime */
+.hero {
+    background:
+        radial-gradient(circle at 90% 8%, rgba(201, 240, 101, .32) 0, rgba(201, 240, 101, 0) 36%),
+        linear-gradient(120deg, var(--primary-dark) 0%, var(--primary) 52%, #0b9a7f 100%);
+}
+
+/* Tombol utama hijau; hover tetap hijau tua (gelap hanya warna ketiga) */
+.btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+
+/* Kartu angka: aksen hijau, lime, gelap, lalu teal */
+.stat-grid > .stat:nth-child(4n + 3) .stat-icon { background: var(--ink); color: var(--lime); }
+
+/* Halaman masuk: aksen lime dan gelap mendampingi hijau */
+.gl-aura i:nth-child(2) { background: #e6f6c4; }
+.gl-aura i:nth-child(3) { background: #eef9d2; }
+.gl-avatars i:nth-child(1) { background: var(--primary); }
+.gl-avatars i:nth-child(2) { background: var(--lime); color: var(--ink); }
+.gl-avatars i:nth-child(3) { background: var(--ink); }
+.gl-avatars i:nth-child(4) { background: #0b9a7f; }
+.gl-spark { background: var(--lime); color: var(--ink); }
+.gl-flow-fill { background: var(--lime); }
+.gl-flow li.is-on .gl-flow-dot, .gl-flow li.is-past .gl-flow-dot { background: var(--lime); }
+.gl-panel-title { color: #fff; }
+.gl-panel .gl-card strong { color: var(--ink); }
+.gl-submit { background: linear-gradient(135deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); }
+.gl-check input { accent-color: var(--primary); }
