@@ -239,7 +239,7 @@
         <div class="ld-footer-brand">
             <h2 id="ld-footer-title" class="ld-visually-hidden">Tentang SIMAGTI</h2>
             <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="124" height="38">
-            <p>Sistem Monitoring Magang Terintegrasi. Satu tempat untuk mahasiswa, perusahaan, dosen, dan kampus mengelola kerja praktik.</p>
+            <p>Sistem Monitoring Magang Terintegrasi untuk mahasiswa, perusahaan, dosen, dan kampus.</p>
         </div>
 
         <nav class="ld-footer-col" aria-label="Bagian halaman">
@@ -249,21 +249,12 @@
             @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan magang</a>@endif
         </nav>
 
-        <div class="ld-footer-col">
-            <h3>Untuk pengguna</h3>
-            <span>Mahasiswa</span>
-            <span>Company Supervisor</span>
-            <span>Dosen pembimbing</span>
-            <span>Kaprodi dan TU</span>
-        </div>
-
         <div class="ld-footer-cta">
             <h3>Sudah punya akun?</h3>
             <div class="ld-footer-pill">
                 <span>Lanjutkan KP Anda</span>
                 <a href="{{ route('login') }}" class="ld-btn ld-btn-dark">Masuk</a>
             </div>
-            <p>Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
         </div>
     </div>
 

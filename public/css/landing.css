@@ -453,3 +453,27 @@ body.ld { overflow-x: clip; }
     .ld-footer-top-link { justify-self: start; }
 }
 @media (prefers-reduced-motion: reduce) { .ld-footer-top-link span { transition: none; } }
+
+/* Footer lebih ringkas (tidak terlalu tinggi) */
+.ld-footer { padding: 40px 48px 20px; margin: 28px auto 24px; border-radius: 28px; }
+.ld-footer-top { grid-template-columns: minmax(0, 1.3fr) minmax(0, .8fr) minmax(0, 1.2fr); gap: 32px; padding-bottom: 32px; }
+.ld-footer-brand img { height: 32px; }
+.ld-footer-brand p { margin-top: 12px; font-size: 14px; }
+.ld-footer h3 { margin-bottom: 2px; font-size: 15px; }
+.ld-footer-col { gap: 8px; }
+.ld-footer-col a { font-size: 14px; }
+.ld-footer-cta h3 { margin-bottom: 10px; }
+.ld-footer-bottom { padding-top: 16px; font-size: 13px; }
+.ld-footer-top-link span { width: 30px; height: 30px; }
+@media (max-width: 1024px) {
+    .ld-footer { padding: 32px 32px 18px; }
+    .ld-footer-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 28px; padding-bottom: 24px; }
+    .ld-footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+    .ld-footer { padding: 26px 20px 16px; border-radius: 24px; }
+    .ld-footer-top { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-bottom: 20px; }
+    .ld-footer-col { flex-direction: row; flex-wrap: wrap; gap: 6px 18px; }
+    .ld-footer-col h3 { flex-basis: 100%; }
+    .ld-footer-bottom { gap: 6px; padding-top: 14px; }
+}
