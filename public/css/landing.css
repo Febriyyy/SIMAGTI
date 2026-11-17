@@ -182,9 +182,6 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
 .ld-close-title { position: relative; max-width: 18ch; margin: 0 auto; font-size: clamp(30px, 4.4vw, 52px); font-weight: 750; letter-spacing: -0.04em; line-height: 1.08; text-wrap: balance; }
 .ld-close-sub { position: relative; margin: 18px auto 30px; color: rgba(255, 255, 255, .68); }
 
-.ld-foot { width: min(var(--wrap), calc(100% - 32px)); margin: 0 auto; display: flex; align-items: center; gap: 18px; padding: 36px 0 44px; color: var(--muted); font-size: 14px; }
-.ld-foot img { height: 28px; width: auto; }
-.ld-foot-year { margin-left: auto !important; }
 
 /* Animasi pembuka: hanya hero, satu urutan */
 .motion .ld-hero-title, .motion .ld-hero-sub, .motion .ld-hero-cta, .motion .ld-stat { animation: ld-in 760ms var(--ease) both; }
@@ -231,7 +228,6 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
     .ld-close { margin-top: 80px; padding: 64px 22px; border-radius: 28px; }
     .ld-close .ld-btn { width: 100%; }
     .ld-close-wave { width: 140px; top: 14px; right: -40px; opacity: .5; }
-    .ld-foot { flex-wrap: wrap; gap: 8px 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -408,3 +404,52 @@ body.ld { margin: 0; background: var(--paper); color: var(--ink); font-family: G
 }
 html:has(body.ld) { overflow-x: clip; }
 body.ld { overflow-x: clip; }
+
+/* =====================================================================
+   Footer (18 Nov 2026): panel bersudut bulat, putih ke lime-hijau, lingkaran konsentris di kanan atas.
+   ===================================================================== */
+.ld-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ld-footer { position: relative; overflow: hidden; isolation: isolate; width: min(var(--wrap), calc(100% - 32px)); margin: 32px auto 32px; padding: 64px 64px 28px; border-radius: 32px;
+    background:
+        radial-gradient(120% 140% at 100% 100%, rgba(11, 154, 127, .55) 0%, rgba(201, 240, 101, .55) 38%, rgba(255, 255, 255, 0) 70%),
+        linear-gradient(160deg, #ffffff 0%, #fbfdf6 45%, #eef9d2 100%);
+    box-shadow: 0 24px 60px rgba(15, 31, 27, .08), inset 0 0 0 1px rgba(15, 31, 27, .05); }
+.ld-footer-rings { position: absolute; right: -120px; top: -140px; z-index: -1; width: 640px; height: 640px; pointer-events: none; }
+.ld-footer-rings circle { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 34; }
+
+.ld-footer-top { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr) minmax(0, .9fr) minmax(0, 1.3fr); gap: 40px; padding-bottom: 72px; }
+.ld-footer-brand img { height: 36px; width: auto; }
+.ld-footer-brand p { margin-top: 18px; max-width: 34ch; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.ld-footer-col { display: flex; flex-direction: column; gap: 12px; }
+.ld-footer h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+.ld-footer-col a, .ld-footer-col span { width: fit-content; color: var(--muted); font-size: 15px; text-decoration: none; }
+.ld-footer-col a { transition: color 150ms; }
+.ld-footer-col a:hover { color: var(--green); }
+.ld-footer-cta p { margin-top: 12px; max-width: 34ch; color: var(--muted); font-size: 13.5px; }
+.ld-footer-pill { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 20px; border-radius: 999px;
+    background: rgba(255, 255, 255, .78); border: 1px solid rgba(3, 122, 104, .25); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.ld-footer-pill span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 14px; }
+.ld-footer-pill .ld-btn { height: 42px; padding: 0 22px; }
+
+.ld-footer-bottom { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding-top: 24px; border-top: 1px solid rgba(15, 31, 27, .14); font-size: 14px; color: var(--ink); }
+.ld-footer-bottom p { margin: 0; }
+.ld-footer-bottom p:first-child { color: var(--ink-2); }
+.ld-footer-bottom p:nth-child(2) { color: rgba(15, 31, 27, .72); text-align: center; }
+.ld-footer-top-link { justify-self: end; display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 600; text-decoration: none; }
+.ld-footer-top-link span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--ink); transition: background-color 200ms, color 200ms, transform 200ms var(--ease); }
+.ld-footer-top-link:hover span { background: var(--ink); color: var(--lime); transform: translateY(-2px); }
+
+@media (max-width: 1024px) {
+    .ld-footer { padding: 48px 36px 24px; }
+    .ld-footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 28px; padding-bottom: 48px; }
+}
+@media (max-width: 720px) {
+    .ld-footer { padding: 36px 22px 22px; border-radius: 26px; margin: 24px auto 16px; }
+    .ld-footer-rings { width: 420px; height: 420px; right: -140px; top: -120px; }
+    .ld-footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding-bottom: 36px; }
+    .ld-footer-brand, .ld-footer-cta { grid-column: 1 / -1; }
+    .ld-footer-bottom { grid-template-columns: 1fr; text-align: left; gap: 10px; }
+    .ld-footer-bottom p:nth-child(2) { text-align: left; }
+    .ld-footer-top-link { justify-self: start; }
+}
+@media (prefers-reduced-motion: reduce) { .ld-footer-top-link span { transition: none; } }

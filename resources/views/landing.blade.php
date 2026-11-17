@@ -228,10 +228,53 @@
     </section>
 </main>
 
-<footer class="ld-foot">
-    <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="104" height="32">
-    <p>Sistem Monitoring Magang Terintegrasi</p>
-    <p class="ld-foot-year">© {{ now()->year }}</p>
+<footer class="ld-footer" aria-labelledby="ld-footer-title">
+    <svg class="ld-footer-rings" viewBox="0 0 600 600" aria-hidden="true">
+        @foreach ([300, 250, 200, 150, 100] as $r)
+            <circle cx="500" cy="100" r="{{ $r }}" />
+        @endforeach
+    </svg>
+
+    <div class="ld-footer-top">
+        <div class="ld-footer-brand">
+            <h2 id="ld-footer-title" class="ld-visually-hidden">Tentang SIMAGTI</h2>
+            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="124" height="38">
+            <p>Sistem Monitoring Magang Terintegrasi. Satu tempat untuk mahasiswa, perusahaan, dosen, dan kampus mengelola kerja praktik.</p>
+        </div>
+
+        <nav class="ld-footer-col" aria-label="Bagian halaman">
+            <h3>Jelajahi</h3>
+            <a href="#peran">Peran pengguna</a>
+            <a href="#alur">Alur KP</a>
+            @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan magang</a>@endif
+        </nav>
+
+        <div class="ld-footer-col">
+            <h3>Untuk pengguna</h3>
+            <span>Mahasiswa</span>
+            <span>Company Supervisor</span>
+            <span>Dosen pembimbing</span>
+            <span>Kaprodi dan TU</span>
+        </div>
+
+        <div class="ld-footer-cta">
+            <h3>Sudah punya akun?</h3>
+            <div class="ld-footer-pill">
+                <span>Lanjutkan KP Anda</span>
+                <a href="{{ route('login') }}" class="ld-btn ld-btn-dark">Masuk</a>
+            </div>
+            <p>Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
+        </div>
+    </div>
+
+    <div class="ld-footer-bottom">
+        <p>Dibuat untuk program kerja praktik kampus.</p>
+        <p>© {{ now()->year }} SIMAGTI. Hak cipta dilindungi.</p>
+        <a href="#isi" class="ld-footer-top-link">
+            Kembali ke atas
+            <span aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
+        </a>
+    </div>
 </footer>
 <script>
     // Animasi halaman depan: muncul saat digulir, angka dihitung naik, navigasi kaca saat digulir.
