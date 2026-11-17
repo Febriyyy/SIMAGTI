@@ -4981,3 +4981,35 @@ body { background: var(--page); }
 .plan-card:has(.plan-card-open):hover .plan-card-go { background: #fff; color: var(--primary-dark); }
 .plan-card[data-state="upcoming"]:has(.plan-card-open):hover .plan-card-go { background: var(--ink); color: var(--lime); }
 .plan-card-open:focus-visible::after { outline-color: var(--ink); }
+
+/* =====================================================================
+   Animasi seperti landing page untuk semua halaman (18 Nov 2026). Dipasang oleh public/js/app.js
+   hanya bila .motion aktif; tanpa JS atau dengan kurangi gerak, halaman tampil utuh.
+   ===================================================================== */
+/* Blok di bawah layar muncul saat digulir */
+.motion .container > .rv, .motion .container > * > .rv { animation: none; opacity: 0; transform: translateY(26px); transition: opacity 700ms var(--ease-premium), transform 700ms var(--ease-premium); }
+.motion .rv.is-in { opacity: 1; transform: none; }
+
+/* Batang progres tumbuh saat terlihat */
+.grow-wait { transform: scaleX(0); transform-origin: left center; }
+.grow-go { transform-origin: left center; animation: grow-x 1100ms var(--ease-premium) both; }
+
+/* Banner sapaan: bintang hiasan berkedip dan berputar pelan, tombol lime bergeser halus */
+.motion .hero-art { animation: hero-twinkle 5s ease-in-out infinite; }
+.motion .hero-art-2 { animation: hero-spin 16s linear infinite; }
+@keyframes hero-twinkle { 0%, 100% { scale: 1; opacity: 1; } 50% { scale: .86; opacity: .75; } }
+@keyframes hero-spin { to { rotate: 360deg; } }
+.hero .btn-dark .btn-dark-icon { transition: transform 250ms var(--ease-premium); }
+.hero .btn-dark:hover .btn-dark-icon { transform: translateX(3px); }
+
+/* Kartu yang bisa diklik terangkat sedikit saat diarahkan */
+.stat-link, .plan-card, .icard { will-change: transform; }
+.stat-link { transition: transform 220ms var(--ease-premium), box-shadow 220ms, background-color 220ms; }
+.stat-link:hover { transform: translateY(-3px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .motion .rv { opacity: 1; transform: none; transition: none; }
+    .grow-wait { transform: none; }
+    .grow-go, .motion .hero-art, .motion .hero-art-2 { animation: none; }
+    .stat-link:hover { transform: none; }
+}

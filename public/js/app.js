@@ -516,30 +516,69 @@ setTimeout(function () {
     });
 }, 1200);
 
-/* Angka kartu angka berhitung naik sekali saat halaman dibuka (hanya bilangan bulat, ±700 ms).
-   Teks akhir sama persis dengan isi dari server; dilewati bila pengguna memilih kurangi gerak. */
+/* Animasi seperti landing page (18 Nov 2026):
+   - blok di bawah layar muncul saat digulir;
+   - angka kartu angka dihitung naik saat terlihat (bilangan bulat, desimal "88,01", dan persen "49%");
+   - batang progres tumbuh saat terlihat.
+   Teks akhir selalu sama persis dengan isi dari server. Dilewati bila pengguna memilih kurangi gerak
+   atau halaman dibuka di latar belakang (kelas .motion tidak ada). */
 (function () {
-    if (!window.requestAnimationFrame) return;
+    var root = document.documentElement;
+    if (!root.classList.contains('motion') || !window.requestAnimationFrame || !('IntersectionObserver' in window)) return;
     try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
-    if (document.visibilityState !== 'visible') return;
+
     var ease = function (t) { return 1 - Math.pow(1 - t, 4); };
-    document.querySelectorAll('.stat-value, .kpp-fig strong').forEach(function (el) {
+    var count = function (el) {
         var node = el.firstChild;
         if (!node || node.nodeType !== 3) return;
         var text = node.textContent.trim();
-        if (!/^\d{1,4}$/.test(text)) return;
-        var target = parseInt(text, 10);
+        var m = /^(\d{1,5})(?:([.,])(\d{1,2}))?(%?)$/.exec(text);
+        if (!m) return;
+        var decimals = m[3] ? m[3].length : 0;
+        var target = parseFloat(m[1] + (m[3] ? '.' + m[3] : ''));
         if (target < 2) return;
-        var start = null, dur = 700;
-        node.textContent = '0';
-        function step(ts) {
+        var fmt = function (v) { var s = v.toFixed(decimals); return (decimals ? s.replace('.', m[2]) : s) + m[4]; };
+        var start = null, dur = 1000, done = false;
+        node.textContent = fmt(0);
+        var step = function (ts) {
+            if (done) return;
             if (start === null) start = ts;
             var t = Math.min(1, (ts - start) / dur);
-            node.textContent = String(Math.round(target * ease(t)));
-            if (t < 1) requestAnimationFrame(step); else node.textContent = text;
-        }
-        setTimeout(function () { requestAnimationFrame(step); }, 150);
-        // Cadangan: tab di latar belakang menahan requestAnimationFrame; angka akhir tetap dipasang.
-        setTimeout(function () { node.textContent = text; }, dur + 400);
-    });
+            node.textContent = fmt(target * ease(t));
+            if (t < 1) requestAnimationFrame(step); else { done = true; node.textContent = text; }
+        };
+        requestAnimationFrame(step);
+        // Cadangan: bila frame animasi tertahan, angka akhir tetap dipasang.
+        setTimeout(function () { done = true; node.textContent = text; }, dur + 400);
+    };
+
+    var counters = [].slice.call(document.querySelectorAll('.stat-value, .kpp-fig strong'));
+    var bars = [].slice.call(document.querySelectorAll('.stat-bar > span, .progress > span, .progress-in > span'));
+    bars.forEach(function (b) { b.classList.add('grow-wait'); });
+
+    // Blok isi halaman yang awalnya di bawah layar: disembunyikan lalu muncul saat digulir.
+    var vh = window.innerHeight;
+    var blocks = [].slice.call(document.querySelectorAll('.container > *, .container > .grid-2 > *, .container > .split > *'))
+        .filter(function (el) { return el.getBoundingClientRect().top > vh * 0.95; });
+    blocks.forEach(function (el) { el.classList.add('rv'); });
+
+    var seen = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            var el = en.target;
+            seen.unobserve(el);
+            if (el.classList.contains('rv')) el.classList.add('is-in');
+            if (el.classList.contains('grow-wait')) { el.classList.remove('grow-wait'); el.classList.add('grow-go'); }
+            if (counters.indexOf(el) !== -1) setTimeout(function () { count(el); }, 120);
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    blocks.concat(bars, counters).forEach(function (el) { seen.observe(el); });
+
+    // Cadangan: periksa posisi saat digulir untuk peramban yang menunda pengamat.
+    var check = function () {
+        blocks.forEach(function (el) { if (!el.classList.contains('is-in') && el.getBoundingClientRect().top < window.innerHeight * 0.92) el.classList.add('is-in'); });
+    };
+    window.addEventListener('scroll', check, { passive: true });
+    // Pengaman terakhir: semua blok tampil setelah 6 detik apa pun yang terjadi.
+    setTimeout(function () { blocks.forEach(function (el) { el.classList.add('is-in'); }); bars.forEach(function (b) { b.classList.remove('grow-wait'); }); }, 6000);
 })();
