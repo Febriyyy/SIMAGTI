@@ -8,6 +8,9 @@
         $isSoon = fn ($p) => $p->deadline && today()->diffInDays($p->deadline, false) >= 0 && today()->diffInDays($p->deadline, false) <= 7;
         $matchCount = $postings->filter($isMatch)->count();
         $soonCount = $postings->filter($isSoon)->count();
+        $companies = $postings->pluck('company')->unique('id')->values();
+        $nearest = $postings->filter(fn ($p) => $p->deadline && today()->diffInDays($p->deadline, false) >= 0)->sortBy('deadline')->first();
+        $initials = fn (string $name) => mb_strtoupper(collect(preg_split('/\s+/', trim(preg_replace('/^(PT|CV|UD|Yayasan)\.?\s+/i', '', $name))))->filter()->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('')) ?: '?';
     ?>
     <section class="jb-head">
         <div class="jb-head-text">
@@ -17,6 +20,16 @@
                 <a href="{{ route('portofolio.edit') }}" class="jb-head-link">Lengkapi portofolio agar skillmu terlihat perusahaan <x-ikon name="arrow" :size="16" /></a>
             @endunless
         </div>
+        @if ($postings->isNotEmpty())
+            <div class="jb-head-side">
+                <div class="jb-head-orgs" aria-hidden="true">
+                    @foreach ($companies->take(4) as $n => $c)<span class="jb-head-org jb-head-org-{{ $n % 4 }}">{{ $initials($c->name) }}</span>@endforeach
+                    @if ($companies->count() > 4)<span class="jb-head-org jb-head-org-more">+{{ $companies->count() - 4 }}</span>@endif
+                </div>
+                <p class="jb-head-count"><b>{{ $postings->count() }} lowongan</b> dari {{ $companies->count() }} perusahaan mitra</p>
+                @if ($nearest)<p class="jb-head-near">Tutup terdekat {{ $nearest->deadline->locale('id')->translatedFormat('j F Y') }}</p>@endif
+            </div>
+        @endif
         @if ($postings->isNotEmpty())
             <div class="jb-tools">
                 <label class="jb-search">

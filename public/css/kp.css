@@ -5819,3 +5819,27 @@ body { background: var(--page); }
     .jb-row-actions { width: 100%; margin-top: 4px; }
     .jb-row-actions .btn { flex: 1; justify-content: center; }
 }
+
+/* Lowongan mahasiswa: kepala dan alat cari dalam satu panel */
+.jb-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: center; padding: 30px 32px 22px; border-radius: 24px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(15, 31, 27, .04); }
+.jb-head-title { font-size: clamp(28px, 3vw, 38px); }
+.jb-head-sub { font-size: 15.5px; }
+.jb-head-side { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.jb-head-orgs { display: flex; padding-left: 10px; }
+.jb-head-org { display: grid; place-items: center; width: 46px; height: 46px; margin-left: -10px; border-radius: 14px; box-shadow: 0 0 0 3px var(--surface); font-size: 14px; font-weight: 750; }
+.jb-head-org-0 { background: var(--primary); color: #fff; }
+.jb-head-org-1 { background: var(--primary-soft); color: var(--primary-dark); }
+.jb-head-org-2 { background: #0b9a7f; color: #fff; }
+.jb-head-org-3 { background: var(--lime-soft); color: var(--lime-ink); }
+.jb-head-org-more { background: var(--surface-2); color: var(--gray); }
+.jb-head-count { margin: 12px 0 0; color: var(--gray); font-size: 14px; }
+.jb-head-count b { color: var(--text); }
+.jb-head-near { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.jb-head .jb-tools { grid-column: 1 / -1; margin: 6px -14px -8px; padding: 18px 14px 0; border-radius: 0; background: none; box-shadow: none; border-top: 1px solid var(--line); }
+@media (max-width: 760px) {
+    .jb-head { grid-template-columns: minmax(0, 1fr); padding: 24px 20px 18px; border-radius: 20px; }
+    .jb-head-side { align-items: flex-start; text-align: left; }
+    .jb-head-orgs { order: -1; }
+    .jb-head .jb-tools { margin: 4px -8px -6px; padding: 16px 8px 0; }
+}
+.jb-head-orgs { gap: 6px; padding-left: 0; } .jb-head-org { margin-left: 0; box-shadow: none; }
