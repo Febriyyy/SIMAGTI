@@ -5032,7 +5032,7 @@ body { background: var(--page); }
 /* ---------- Halaman ubah ---------- */
 .pf-identity { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--surface-2); }
 .pf-identity b { display: block; font-size: var(--text-md); }
-.pf-identity span { display: block; color: var(--muted); font-size: var(--text-sm); }
+.pf-identity .min0 > span { display: block; color: var(--muted); font-size: var(--text-sm); }
 .pf-gpa { display: grid; grid-template-columns: 160px minmax(0, 1fr); align-items: end; gap: var(--space-4); }
 .pf-gpa .pf-switch { padding-bottom: 6px; }
 .pf-interests { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -5381,3 +5381,97 @@ body { background: var(--page); }
 @media (max-width: 560px) {
     .dash-plans .plan-cards, .plan-cards { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Portofolio: kotak identitas mahasiswa */
+.pf-identity { gap: 16px; padding: 16px 18px; border-radius: 20px; background: linear-gradient(135deg, var(--primary-tint) 0%, #ffffff 100%); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .14); }
+.pf-identity-avatar { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(150deg, #0b9a7f, var(--primary) 60%, var(--primary-dark)); color: #fff; font-size: 18px; font-weight: 750; letter-spacing: -0.02em; box-shadow: 0 8px 18px rgba(3, 122, 104, .22); }
+.pf-identity b { font-size: 17px; letter-spacing: -0.015em; }
+.pf-identity-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pf-identity-tags > span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: 12.5px; font-weight: 600; }
+.pf-identity-tags .ikon { color: var(--primary); }
+
+/* =====================================================================
+   Lowongan magang untuk mahasiswa (18 Nov 2026): banner ajakan + kartu yang mengundang.
+   60:30:10: kartu putih, hijau untuk tombol/ikon/kecocokan, lime untuk sorotan kecil.
+   ===================================================================== */
+.jb-hero { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 32px 36px; border-radius: 28px; color: #fff;
+    background: radial-gradient(circle at 92% 0%, rgba(201, 240, 101, .28), transparent 38%), linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #0b9a7f 100%); }
+.jb-hero-wave { position: absolute; right: -28px; bottom: -22px; width: 230px; color: var(--lime); opacity: .4; pointer-events: none; }
+.jb-hero-text { position: relative; max-width: 640px; }
+.jb-hero-title { margin: 0; font-size: clamp(28px, 3vw, 40px); font-weight: 750; letter-spacing: -0.04em; line-height: 1.08; }
+.jb-hero-sub { margin: 10px 0 0; color: rgba(255, 255, 255, .86); font-size: 15px; line-height: 1.6; }
+.jb-hero-sub b { color: var(--lime); }
+.jb-hero-cta { position: relative; flex: none; display: flex; align-items: center; gap: 14px; max-width: 320px; padding: 14px 14px 14px 18px; border-radius: 20px; background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); color: #fff; text-decoration: none; transition: background-color 200ms; }
+.jb-hero-cta:hover { background: rgba(255, 255, 255, .2); color: #fff; text-decoration: none; }
+.jb-hero-cta b { display: block; font-size: 15px; }
+.jb-hero-cta small { display: block; margin-top: 2px; color: rgba(255, 255, 255, .78); font-size: 12.5px; line-height: 1.45; }
+.jb-hero-cta-go { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--lime); color: var(--ink); transition: transform 220ms var(--ease-premium); }
+.jb-hero-cta:hover .jb-hero-cta-go { transform: rotate(45deg); }
+
+.jb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+.jb-card { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 24px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(15, 31, 27, .04); transition: transform 220ms var(--ease-premium), box-shadow 220ms; }
+.jb-card:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .3), 0 18px 36px rgba(15, 31, 27, .08); }
+.jb-card-top { display: flex; align-items: center; gap: 12px; }
+.jb-card .jb-org { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 15px; font-size: 15px; font-weight: 700; }
+.jb-co { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--gray); font-size: 13.5px; font-weight: 600; }
+.jb-due { display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.jb-due.is-soon { color: #b45309; }
+.jb-due .ikon { color: currentColor; }
+.jb-go { flex: none; margin-left: auto; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--surface-2); color: var(--text); cursor: pointer; transition: background-color 220ms, color 220ms, transform 220ms var(--ease-premium); }
+.jb-card:hover .jb-go { background: var(--lime); color: var(--ink); transform: rotate(45deg); }
+.jb-go:focus-visible { outline: 3px solid rgba(3, 122, 104, .35); outline-offset: 2px; }
+
+.jb-title { margin: 4px 0 0; font-size: 19px; font-weight: 750; letter-spacing: -0.025em; line-height: 1.25; }
+.jb-facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.jb-facts li { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; background: var(--surface-2); color: var(--gray); font-size: 12.5px; font-weight: 600; }
+.jb-facts .ikon { color: var(--primary); }
+.jb-desc { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.jb-skills { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.jb-skills li { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--gray); font-size: 12.5px; font-weight: 600; }
+.jb-skills li.is-match { box-shadow: none; background: var(--primary-soft); color: var(--primary-dark); }
+.jb-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.jb-match { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark); font-size: 13px; font-weight: 600; }
+.jb-match::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lime-2); box-shadow: 0 0 0 3px var(--lime-soft); }
+.jb-match b { font-weight: 750; }
+.jb-detail { padding: 0; border: 0; background: none; color: var(--gray); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.jb-detail:hover { color: var(--primary); }
+.jb-apply { min-height: 42px; }
+
+@media (max-width: 720px) {
+    .jb-hero { flex-direction: column; align-items: flex-start; padding: 24px 20px; border-radius: 22px; }
+    .jb-hero-cta { max-width: none; width: 100%; box-sizing: border-box; }
+    .jb-grid { grid-template-columns: minmax(0, 1fr); }
+    .jb-card { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .jb-card, .jb-go, .jb-hero-cta-go { transition: none; }
+    .jb-card:hover, .jb-card:hover .jb-go, .jb-hero-cta:hover .jb-hero-cta-go { transform: none; }
+}
+
+/* ---------- Portofolio: kotak tautan publik ---------- */
+.pf-link { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: center; padding: 16px; border-radius: 20px; background: var(--primary-tint); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .14); }
+.pf-link .pf-qr { width: 96px; height: 96px; padding: 8px; box-sizing: border-box; border-radius: 16px; background: #fff; box-shadow: 0 6px 16px rgba(15, 31, 27, .08); }
+.pf-link .pf-qr svg { width: 100%; height: 100%; display: block; }
+.pf-link-info { min-width: 0; }
+.pf-link-status { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark); font-size: 13px; font-weight: 700; }
+.pf-link-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lime-2); box-shadow: 0 0 0 3px rgba(179, 223, 69, .3); }
+.pf-link-url { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12.5px; }
+.pf-link-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pf-link-actions .btn { width: 100%; justify-content: center; }
+
+/* Portofolio: isian minat lainnya diberi jarak dari pilihan */
+.pf-other { margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--line-strong); }
+.pf-other .label { margin-bottom: 8px; }
+.pf-other .hint { margin-top: 8px; }
+[data-pf-interest-count].is-over { color: var(--red); font-weight: 700; }
+
+/* Portofolio: daftar tautan dalam formulir proyek/sertifikat */
+.pf-links { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pf-link-row { display: grid; grid-template-columns: minmax(0, 1fr) 36px; gap: 8px; align-items: center; }
+.pf-links-add { align-self: flex-start; margin-top: 8px; }
+.pf-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; padding: 0; list-style: none; }
+.pf-chips a { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-size: 12px; font-weight: 650; text-decoration: none; }
+.pf-chips a:hover { background: var(--primary); color: #fff; text-decoration: none; }
+.pv-links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; }
+.pv-links .pv-link { margin-top: 0; }
+.pv-cert-actions { flex-wrap: wrap; justify-content: flex-end; }

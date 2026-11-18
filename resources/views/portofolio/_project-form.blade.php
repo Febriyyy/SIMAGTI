@@ -37,11 +37,7 @@
                 <input id="{{ $id }}-tech" name="tech" class="input" maxlength="200" value="{{ $v('tech', $project?->tech) }}" placeholder="Laravel, MySQL, Tailwind">
                 <p class="hint">Pisahkan dengan koma.</p>
             </div>
-            <div class="span-all">
-                <label class="label" for="{{ $id }}-url">Tautan</label>
-                <input id="{{ $id }}-url" name="url" type="url" class="input" maxlength="255" value="{{ $v('url', $project?->url) }}" placeholder="https://github.com/nama/proyek">
-                @if ($e->has('url'))<p class="field-error">{{ $e->first('url') }}</p>@endif
-            </div>
+            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($project?->linkList() ?? [], 'url'), 'hint' => 'Repo, demo, desain Figma, video, dokumen, atau tautan lain tentang proyek ini.'])
             <div class="span-all">
                 <label class="label" for="{{ $id }}-img">Gambar pratinjau</label>
                 <input id="{{ $id }}-img" name="image" type="file" class="input" accept="image/jpeg,image/png,image/webp">

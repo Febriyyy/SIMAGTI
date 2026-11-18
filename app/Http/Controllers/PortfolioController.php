@@ -16,6 +16,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -54,6 +55,7 @@ class PortfolioController extends Controller
             'gpa' => ['nullable', 'numeric', 'between:0,4'],
             'interests' => ['nullable', 'array', 'max:'.Portfolio::MAX_INTERESTS],
             'interests.*' => ['string', Rule::in(Portfolio::INTERESTS)],
+            'interest_other' => ['nullable', 'string', 'max:160'],
             'skill_name' => ['nullable', 'array', 'max:'.Portfolio::MAX_SKILLS],
             'skill_name.*' => ['nullable', 'string', 'max:80'],
             'skill_level' => ['nullable', 'array'],
@@ -64,13 +66,21 @@ class PortfolioController extends Controller
             'gpa.between' => 'IPK antara 0 dan 4.',
         ], ['gpa' => 'IPK']);
 
-        DB::transaction(function () use ($user, $data, $request) {
+        // Minat pilihan ditambah minat yang diketik sendiri (dipisah koma), paling banyak 5 total.
+        $interests = collect(array_intersect(Portfolio::INTERESTS, $data['interests'] ?? []))
+            ->merge(collect(explode(',', (string) ($data['interest_other'] ?? '')))->map(fn ($i) => mb_substr(trim(preg_replace('/\s+/', ' ', $i)), 0, 40))->filter())
+            ->unique(fn ($i) => mb_strtolower($i))->values();
+        if ($interests->count() > Portfolio::MAX_INTERESTS) {
+            throw ValidationException::withMessages(['interests' => 'Pilih atau tulis paling banyak '.Portfolio::MAX_INTERESTS.' minat.']);
+        }
+
+        DB::transaction(function () use ($user, $data, $request, $interests) {
             Portfolio::forUser($user)->update([
                 'is_public' => $request->boolean('is_public'),
                 'show_gpa' => $request->boolean('show_gpa'),
                 'headline' => $data['headline'] ?? null,
                 'about' => $data['about'] ?? null,
-                'interests' => array_values(array_intersect(Portfolio::INTERESTS, $data['interests'] ?? [])),
+                'interests' => $interests->all(),
             ]);
 
             StudentProfile::updateOrCreate(['user_id' => $user->id], ['gpa' => $data['gpa'] ?? null]);

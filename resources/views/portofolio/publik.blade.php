@@ -77,11 +77,12 @@
                                     @if ($project->techList())
                                         <ul class="pv-tags">@foreach ($project->techList() as $t)<li>{{ $t }}</li>@endforeach</ul>
                                     @endif
-                                    @if ($project->url)
-                                        <a href="{{ $project->url }}" class="pv-link" target="_blank" rel="noopener nofollow ugc">
-                                            {{ $project->host() ?: 'Buka tautan' }}
-                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-                                        </a>
+                                    @if ($project->linkList())
+                                        <div class="pv-links">
+                                            @foreach ($project->linkList() as $l)
+                                                <a href="{{ $l['url'] }}" class="pv-link" target="_blank" rel="noopener nofollow ugc">{{ $l['label'] }}<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+                                            @endforeach
+                                        </div>
                                     @endif
                                 </div>
                             </li>
@@ -105,7 +106,7 @@
                                 </div>
                                 <div class="pv-cert-actions">
                                     @if ($cert->file)<a href="{{ $fileUrl($cert->file) }}" target="_blank" rel="noopener">Lihat</a>@endif
-                                    @if ($cert->credential_url)<a href="{{ $cert->credential_url }}" target="_blank" rel="noopener nofollow ugc">Kredensial</a>@endif
+                                    @foreach ($cert->linkList() as $l)<a href="{{ $l['url'] }}" target="_blank" rel="noopener nofollow ugc">{{ $l['label'] }}</a>@endforeach
                                 </div>
                             </li>
                         @endforeach

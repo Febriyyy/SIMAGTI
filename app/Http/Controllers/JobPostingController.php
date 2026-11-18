@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\Company;
 use App\Models\Internship;
 use App\Models\JobPosting;
+use App\Models\Portfolio;
 use App\Models\Skill;
 use App\Models\User;
 use App\Support\Notify;
@@ -90,11 +91,16 @@ class JobPostingController extends Controller
     {
         $active = Internship::where('student_id', $request->user()->id)->whereIn('status', ['diajukan', 'berjalan'])->exists();
 
+        $user = $request->user();
+
         return view('lowongan.index', [
             'postings' => JobPosting::with(['company', 'skills'])->where('status', 'published')
                 ->where(fn ($q) => $q->whereNull('deadline')->orWhereDate('deadline', '>=', today()))
                 ->orderByRaw('deadline IS NULL')->orderBy('deadline')->get(),
             'canApply' => ! $active,
+            // Skill mahasiswa (dari portofolio) untuk menandai lowongan yang cocok
+            'mySkills' => $user->skills()->pluck('skills.id')->all(),
+            'hasPortfolio' => $user->skills()->exists() || Portfolio::where('user_id', $user->id)->whereNotNull('about')->exists(),
         ]);
     }
 

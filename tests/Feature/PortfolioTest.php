@@ -174,4 +174,37 @@ class PortfolioTest extends TestCase
         $this->actingAs($this->user('dospem@kp.test'))->get('/portofolio')->assertForbidden();
         $this->actingAs($this->user('kaprodi@kp.test'))->get(route('portofolio.lihat', $this->user('dospem@kp.test')))->assertNotFound();
     }
+
+    public function test_minat_lainnya_bisa_ditulis_sendiri_maksimal_lima(): void
+    {
+        $rania = $this->freshStudent();
+        $this->actingAs($rania)->patch('/portofolio', ['interests' => ['Backend'], 'interest_other' => 'Game Development, robotika, Game development'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame(['Backend', 'Game Development', 'robotika'], Portfolio::where('user_id', $rania->id)->firstOrFail()->interests);
+
+        $this->actingAs($rania)->patch('/portofolio', ['interests' => ['Backend', 'Data', 'Mobile'], 'interest_other' => 'Game, Robotika, IoT'])
+            ->assertSessionHasErrors('interests');
+    }
+
+    public function test_proyek_dan_sertifikat_bisa_punya_banyak_tautan_berlabel(): void
+    {
+        $rania = $this->freshStudent();
+        $this->actingAs($rania)->post('/portofolio/proyek', [
+            'title' => 'Aplikasi Kasir',
+            'links' => ['https://github.com/rania/kasir', 'https://kasir.vercel.app', 'https://www.figma.com/file/abc', '', 'https://github.com/rania/kasir'],
+        ])->assertSessionHasNoErrors();
+        $project = PortfolioProject::firstOrFail();
+        $this->assertCount(3, $project->links);
+        $this->assertSame(['GitHub', 'Demo', 'Figma'], array_column($project->linkList(), 'label'));
+
+        $this->actingAs($rania)->post('/portofolio/proyek', ['title' => 'Salah', 'links' => ['bukan tautan']])->assertSessionHasErrorsIn('project', 'links.0');
+
+        $this->actingAs($rania)->post('/portofolio/sertifikat', [
+            'name' => 'Cloud Practitioner', 'issuer' => 'AWS',
+            'links' => ['https://www.credly.com/badges/123', 'https://drive.google.com/file/d/xyz'],
+        ])->assertSessionHasNoErrors();
+        $this->assertSame(['Credly', 'Google Drive'], array_column(PortfolioCertificate::firstOrFail()->linkList(), 'label'));
+
+        $this->actingAs($rania)->get(route('portofolio.lihat', $rania))->assertOk()->assertSee('GitHub')->assertSee('Figma')->assertSee('Google Drive');
+    }
 }

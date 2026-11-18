@@ -3,57 +3,77 @@
 @section('title', 'Lowongan Magang')
 
 @section('content')
-    <div class="page-head">
-        <div>
-            <h1 class="page-title">Lowongan Magang</h1>
-            <p class="page-sub">Dari perusahaan mitra kampus. Pilih lowongan untuk mengajukan KP dengan data perusahaan terisi.</p>
+    <section class="jb-hero">
+        <svg class="jb-hero-wave" viewBox="0 0 220 90" aria-hidden="true"><path d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round"/></svg>
+        <div class="jb-hero-text">
+            <h1 class="jb-hero-title">{{ $postings->count() > 0 ? 'Saatnya mulai magang.' : 'Lowongan magang' }}</h1>
+            <p class="jb-hero-sub">
+                @if ($postings->count() > 0)
+                    <b>{{ $postings->count() }} lowongan</b> dari perusahaan mitra kampus sedang dibuka. Pilih yang paling cocok, data perusahaan langsung terisi saat mengajukan KP.
+                @else
+                    Lowongan dari perusahaan mitra kampus akan tampil di sini.
+                @endif
+            </p>
         </div>
-    </div>
+        @unless ($hasPortfolio)
+            <a href="{{ route('portofolio.edit') }}" class="jb-hero-cta">
+                <span><b>Lengkapi portofolio</b><small>Skill dan proyekmu dilihat perusahaan saat kamu mengajukan.</small></span>
+                <span class="jb-hero-cta-go" aria-hidden="true"><x-ikon name="arrow-up-right" :size="18" /></span>
+            </a>
+        @endunless
+    </section>
 
     @if (! $canApply)
         <div class="alert alert-info" role="status">Anda sudah punya pengajuan atau KP yang berjalan. Lowongan tetap bisa dilihat sebagai referensi.</div>
     @endif
 
     @if ($postings->isEmpty())
-        <section class="card"><div class="empty"><strong>Belum ada lowongan dibuka</strong> Lowongan dari perusahaan mitra akan tampil di sini.</div></section>
+        <section class="card"><div class="empty"><strong>Belum ada lowongan dibuka</strong> Sambil menunggu, lengkapi portofolio agar siap saat lowongan dibuka.</div></section>
     @else
-        <ul class="job-grid">
+        <ul class="jb-grid">
             @foreach ($postings as $p)
                 <?php
                     $left = $p->deadline ? (int) today()->diffInDays($p->deadline, false) : null;
-                    $tone = crc32($p->company->name) % 4;
+                    $matched = $p->skills->filter(fn ($s) => in_array($s->id, $mySkills, true));
                 ?>
-                <li class="job-card job-tone-{{ $tone }}">
-                    <div class="job-card-band">
-                        <x-org :name="$p->company->name" class="job-card-org" />
-                        @if ($left !== null)
-                            <span @class(['job-card-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? $left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
-                        @endif
+                <li class="jb-card">
+                    <div class="jb-card-top">
+                        <x-org :name="$p->company->name" class="jb-org" />
+                        <div class="min0">
+                            <p class="jb-co">{{ $p->company->name }}</p>
+                            @if ($left !== null)
+                                <span @class(['jb-due', 'is-soon' => $left <= 7])><x-ikon name="clock" :size="14" /> {{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? 'Tutup '.$left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
+                            @endif
+                        </div>
+                        <button type="button" class="jb-go" data-open="job-{{ $p->id }}" aria-label="Detail {{ $p->title }}"><x-ikon name="arrow-up-right" :size="18" /></button>
                     </div>
 
-                    <div class="job-card-body">
-                        <p class="job-card-co">{{ $p->company->name }}</p>
-                        <h2 class="job-card-title">{{ $p->title }}</h2>
+                    <h2 class="jb-title">{{ $p->title }}</h2>
 
-                        <dl class="job-card-facts">
-                            <div><dt>Lokasi</dt><dd>{{ $p->location ?: ($p->company->city ?: 'Menyusul') }}</dd></div>
-                            <div><dt>Kuota</dt><dd>{{ $p->quota ? $p->quota.' orang' : 'Terbuka' }}</dd></div>
-                            <div><dt>Bidang</dt><dd title="{{ $p->company->industry }}">{{ $p->company->industry ?: '–' }}</dd></div>
-                        </dl>
+                    <ul class="jb-facts">
+                        <li><x-ikon name="placement" :size="16" /> {{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}</li>
+                        <li><x-ikon name="users" :size="16" /> {{ $p->quota ? $p->quota.' orang' : 'Kuota terbuka' }}</li>
+                        @if ($p->company->industry)<li><x-ikon name="building" :size="16" /> {{ $p->company->industry }}</li>@endif
+                    </ul>
 
-                        <p class="job-card-desc">{{ \Illuminate\Support\Str::limit($p->description, 150) }}</p>
+                    <p class="jb-desc">{{ \Illuminate\Support\Str::limit($p->description, 140) }}</p>
 
-                        @if ($p->skills->isNotEmpty())
-                            <ul class="job-card-skills" aria-label="Keahlian">
-                                @foreach ($p->skills->take(4) as $skill)<li>{{ $skill->name }}</li>@endforeach
-                            </ul>
+                    @if ($p->skills->isNotEmpty())
+                        <ul class="jb-skills" aria-label="Keahlian">
+                            @foreach ($p->skills->take(5) as $skill)
+                                <li @class(['is-match' => in_array($skill->id, $mySkills, true)])>@if (in_array($skill->id, $mySkills, true))<x-ikon name="check" :size="13" />@endif{{ $skill->name }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+
+                    <div class="jb-foot">
+                        @if ($p->skills->isNotEmpty() && $matched->isNotEmpty())
+                            <span class="jb-match"><b>{{ $matched->count() }}/{{ $p->skills->count() }}</b> skill kamu cocok</span>
+                        @else
+                            <button type="button" class="jb-detail" data-open="job-{{ $p->id }}">Lihat detail</button>
                         @endif
-                    </div>
-
-                    <div class="job-card-foot">
-                        <button type="button" class="btn btn-sm btn-ghost" data-open="job-{{ $p->id }}">Lihat detail</button>
                         @if ($canApply)
-                            <a href="{{ route('kp.status', ['lowongan' => $p->id]) }}#ajukan" class="btn btn-sm btn-primary">Ajukan KP <x-ikon name="arrow" :size="16" /></a>
+                            <a href="{{ route('kp.status', ['lowongan' => $p->id]) }}#ajukan" class="btn btn-primary jb-apply">Ajukan KP <x-ikon name="arrow" :size="16" /></a>
                         @endif
                     </div>
                 </li>

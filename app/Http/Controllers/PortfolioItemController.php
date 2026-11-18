@@ -7,6 +7,7 @@ use App\Models\PortfolioCertificate;
 use App\Models\PortfolioProject;
 use App\Models\StoredFile;
 use App\Models\User;
+use App\Support\LinkLabel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -101,15 +102,21 @@ class PortfolioItemController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'tech' => ['nullable', 'string', 'max:200'],
             'url' => ['nullable', 'url:http,https', 'max:255'],
+            'links' => ['nullable', 'array', 'max:5'],
+            'links.*' => ['nullable', 'url:http,https', 'max:255'],
             'year' => ['nullable', 'integer', 'between:2000,'.(now()->year + 1)],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
         ], [
             'title.required' => 'Nama proyek wajib diisi.',
             'url.url' => 'Tautan harus diawali http:// atau https://.',
+            'links.*.url' => 'Setiap tautan harus diawali http:// atau https://.',
+            'links.max' => 'Paling banyak 5 tautan.',
             'image.max' => 'Gambar paling besar 3 MB.',
             'image.mimes' => 'Gambar harus JPG, PNG, atau WEBP.',
         ]);
         $data['tech'] = collect(explode(',', (string) ($data['tech'] ?? '')))->map(fn ($t) => trim($t))->filter()->unique()->take(10)->implode(', ') ?: null;
+        $data['links'] = LinkLabel::clean(array_merge($data['links'] ?? [], [$data['url'] ?? null]));
+        $data['url'] = $data['links'][0] ?? null;
         unset($data['image']);
 
         return $data;
@@ -122,15 +129,21 @@ class PortfolioItemController extends Controller
             'issuer' => ['required', 'string', 'max:120'],
             'issued_on' => ['nullable', 'date', 'before_or_equal:today'],
             'credential_url' => ['nullable', 'url:http,https', 'max:255'],
+            'links' => ['nullable', 'array', 'max:5'],
+            'links.*' => ['nullable', 'url:http,https', 'max:255'],
             'file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ], [
             'name.required' => 'Nama pelatihan wajib diisi.',
             'issuer.required' => 'Penyelenggara wajib diisi.',
             'issued_on.before_or_equal' => 'Tanggal terbit tidak boleh di masa depan.',
             'credential_url.url' => 'Tautan harus diawali http:// atau https://.',
+            'links.*.url' => 'Setiap tautan harus diawali http:// atau https://.',
+            'links.max' => 'Paling banyak 5 tautan.',
             'file.max' => 'Berkas paling besar 5 MB.',
             'file.mimes' => 'Berkas harus PDF, JPG, atau PNG.',
         ]);
+        $data['links'] = LinkLabel::clean(array_merge($data['links'] ?? [], [$data['credential_url'] ?? null]));
+        $data['credential_url'] = $data['links'][0] ?? null;
         unset($data['file']);
 
         return $data;

@@ -5,6 +5,7 @@
 @section('content')
     <?php
         $interests = old('interests', $portfolio->interests ?? []);
+        $otherInterests = old('interest_other', implode(', ', array_diff($portfolio->interests ?? [], \App\Models\Portfolio::INTERESTS)));
         $skillRows = old('skill_name')
             ? collect(old('skill_name'))->map(fn ($n, $i) => ['name' => $n, 'level' => old('skill_level')[$i] ?? 'menengah'])->all()
             : $skills->map(fn ($s) => ['name' => $s->name, 'level' => $s->pivot->level])->all();
@@ -28,10 +29,14 @@
                 <div class="card-head"><h2 class="card-title">Tentang saya</h2></div>
                 <div class="card-body stack">
                     <div class="pf-identity">
-                        <x-avatar :user="$user" />
+                        <span class="pf-identity-avatar" aria-hidden="true">{{ collect(preg_split('/\s+/', trim($user->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('') }}</span>
                         <div class="min0">
                             <b>{{ $user->name }}</b>
-                            <span>{{ $place ?: 'Program studi belum diatur admin' }}@if ($academic['entry_year']), angkatan {{ $academic['entry_year'] }}@endif</span>
+                            <div class="pf-identity-tags">
+                                <span><x-ikon name="school" :size="14" /> {{ $academic['program'] ?? 'Program studi belum diatur' }}</span>
+                                <span><x-ikon name="building" :size="14" /> {{ $academic['university'] }}</span>
+                                @if ($academic['entry_year'])<span><x-ikon name="calendar" :size="14" /> Angkatan {{ $academic['entry_year'] }}</span>@endif
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -73,6 +78,11 @@
                                 <span>{{ $interest }}</span>
                             </label>
                         @endforeach
+                    </div>
+                    <div class="pf-other">
+                        <label class="label" for="pf-interest-other">Minat lainnya</label>
+                        <input id="pf-interest-other" name="interest_other" class="input" maxlength="160" value="{{ $otherInterests }}" placeholder="Game Development, Robotika" data-pf-interest-other>
+                        <p class="hint">Tulis sendiri bila tidak ada di pilihan. Pisahkan dengan koma.</p>
                     </div>
                     @error('interests')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
@@ -125,12 +135,14 @@
                     @if ($portfolio->is_public)
                         <div class="pf-link">
                             <div class="pf-qr" role="img" aria-label="Kode QR portofolio">{!! $qr !!}</div>
-                            <div class="min0">
-                                <input class="input input-sm" value="{{ $portfolio->publicUrl() }}" readonly aria-label="Tautan portofolio" data-pf-url>
-                                <div class="row-actions pf-link-actions">
-                                    <button type="button" class="btn btn-sm" data-pf-copy>Salin tautan</button>
-                                    <a href="{{ $portfolio->publicUrl() }}" target="_blank" rel="noopener" class="btn btn-sm">Buka</a>
-                                </div>
+                            <div class="pf-link-info">
+                                <span class="pf-link-status">Tautan aktif</span>
+                                <span class="pf-link-url" title="{{ $portfolio->publicUrl() }}">{{ preg_replace('#^https?://#', '', $portfolio->publicUrl()) }}</span>
+                                <input type="hidden" value="{{ $portfolio->publicUrl() }}" data-pf-url>
+                            </div>
+                            <div class="pf-link-actions">
+                                <button type="button" class="btn btn-sm btn-primary" data-pf-copy><x-ikon name="copy" :size="16" /> Salin tautan</button>
+                                <a href="{{ $portfolio->publicUrl() }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="arrow-up-right" :size="16" /> Buka</a>
                             </div>
                         </div>
                     @else
@@ -199,6 +211,9 @@
                             @if ($project->techList())
                                 <ul class="pf-tags">@foreach ($project->techList() as $t)<li>{{ $t }}</li>@endforeach</ul>
                             @endif
+                            @if ($project->linkList())
+                                <ul class="pf-chips">@foreach ($project->linkList() as $l)<li><a href="{{ $l['url'] }}" target="_blank" rel="noopener nofollow ugc">{{ $l['label'] }}</a></li>@endforeach</ul>
+                            @endif
                         </div>
                         <div class="pf-item-actions">
                             <button type="button" class="btn btn-sm btn-ghost" data-open="pf-project-{{ $project->id }}"><x-ikon name="edit" :size="16" /> Ubah</button>
@@ -231,6 +246,9 @@
                         <div class="min0">
                             <b>{{ $cert->name }}</b>
                             <small>{{ $cert->issuer }}@if ($cert->issued_on), {{ $cert->issued_on->locale('id')->translatedFormat('F Y') }}@endif</small>
+                            @if ($cert->linkList())
+                                <ul class="pf-chips">@foreach ($cert->linkList() as $l)<li><a href="{{ $l['url'] }}" target="_blank" rel="noopener nofollow ugc">{{ $l['label'] }}</a></li>@endforeach</ul>
+                            @endif
                         </div>
                         <div class="pf-item-actions">
                             @if ($cert->file)<a href="{{ route('portofolio.berkas', $cert->file) }}" target="_blank" rel="noopener" class="btn btn-sm btn-ghost">Berkas</a>@endif
@@ -264,12 +282,16 @@
             if (box) {
                 var max = parseInt(box.getAttribute('data-max'), 10);
                 var checks = [].slice.call(box.querySelectorAll('input'));
+                var other = document.querySelector('[data-pf-interest-other]');
                 var sync = function () {
-                    var n = checks.filter(function (c) { return c.checked; }).length;
+                    var extra = other ? other.value.split(',').filter(function (v) { return v.trim() !== ''; }).length : 0;
+                    var n = checks.filter(function (c) { return c.checked; }).length + extra;
                     counter.textContent = n + '/' + max;
+                    counter.classList.toggle('is-over', n > max);
                     checks.forEach(function (c) { c.disabled = !c.checked && n >= max; c.closest('.pf-interest').classList.toggle('is-disabled', c.disabled); });
                 };
                 checks.forEach(function (c) { c.addEventListener('change', sync); });
+                if (other) other.addEventListener('input', sync);
                 sync();
             }
 
@@ -300,12 +322,34 @@
                 refresh();
             }
 
+            // Tautan proyek/sertifikat: tambah dan hapus baris (paling banyak 5)
+            document.addEventListener('click', function (e) {
+                var add = e.target.closest('[data-pf-link-add]');
+                if (add) {
+                    var box = add.closest('[data-pf-links]');
+                    var list = box.querySelector('[data-pf-links-list]');
+                    if (list.children.length >= 5) return;
+                    list.appendChild(box.querySelector('[data-pf-link-template]').content.cloneNode(true));
+                    list.lastElementChild.querySelector('input').focus();
+                    add.disabled = list.children.length >= 5;
+                    return;
+                }
+                var rm = e.target.closest('[data-pf-link-remove]');
+                if (rm) {
+                    var wrap = rm.closest('[data-pf-links]');
+                    var rows = wrap.querySelector('[data-pf-links-list]');
+                    if (rows.children.length > 1) rm.closest('.pf-link-row').remove();
+                    else rm.closest('.pf-link-row').querySelector('input').value = '';
+                    wrap.querySelector('[data-pf-link-add]').disabled = false;
+                }
+            });
+
             var copy = document.querySelector('[data-pf-copy]');
             if (copy) copy.addEventListener('click', function () {
                 var input = document.querySelector('[data-pf-url]');
-                var done = function () { copy.textContent = 'Tersalin'; setTimeout(function () { copy.textContent = 'Salin tautan'; }, 1800); };
+                var label = copy.innerHTML; var done = function () { copy.textContent = 'Tersalin'; setTimeout(function () { copy.innerHTML = label; }, 1800); };
                 if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(input.value).then(done);
-                else { input.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+                else { var t = document.createElement('textarea'); t.value = input.value; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) {} t.remove(); }
             });
         })();
     </script>

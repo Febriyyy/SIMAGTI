@@ -292,3 +292,7 @@ Jadwal sidang/presentasi KP oleh kaprodi, satu per KP.
 | created_by | FK users, null | kaprodi |
 
 Tabel yang sudah ada dan kini dipakai UI: `task_templates` + `task_template_items` (template task supervisor), `job_postings` + `job_posting_skill` (lowongan magang). Kolom tambahan `conversion_candidates` untuk tawaran kerja resmi: lihat migrasi `2026_11_17_120000_add_offer_details_to_conversion_candidates`.
+
+### links pada portfolio_projects dan portfolio_certificates (18 November 2026)
+
+Kolom `links` (json, null): sampai 5 tautan http/https per proyek atau sertifikat (repo, demo, Figma, video, dokumen, kredensial). Label tampil dikenali otomatis oleh `App\Support\LinkLabel` (GitHub, Figma, YouTube, Google Drive, LinkedIn, Credly, dll; selain itu nama domain). Kolom lama `url`/`credential_url` diisi tautan pertama untuk kompatibilitas. `portfolios.interests` kini juga menyimpan minat yang ditulis sendiri mahasiswa (total maks. 5).

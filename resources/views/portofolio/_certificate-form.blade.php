@@ -29,11 +29,7 @@
                 <input id="{{ $id }}-date" name="issued_on" type="date" class="input" max="{{ today()->toDateString() }}" value="{{ $v('issued_on', $certificate?->issued_on?->toDateString()) }}">
                 @if ($e->has('issued_on'))<p class="field-error">{{ $e->first('issued_on') }}</p>@endif
             </div>
-            <div class="span-all">
-                <label class="label" for="{{ $id }}-url">Tautan kredensial</label>
-                <input id="{{ $id }}-url" name="credential_url" type="url" class="input" maxlength="255" value="{{ $v('credential_url', $certificate?->credential_url) }}" placeholder="https://www.dicoding.com/certificates/...">
-                @if ($e->has('credential_url'))<p class="field-error">{{ $e->first('credential_url') }}</p>@endif
-            </div>
+            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($certificate?->linkList() ?? [], 'url'), 'hint' => 'Halaman kredensial, verifikasi, atau berkas daring sertifikat ini.'])
             <div class="span-all">
                 <label class="label" for="{{ $id }}-file">Berkas sertifikat</label>
                 <input id="{{ $id }}-file" name="file" type="file" class="input" accept="application/pdf,image/jpeg,image/png">
