@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}">
+    {{-- Percobaan gaya landing (hapus baris ini untuk kembali ke UI sebelumnya) --}}
+    <link rel="stylesheet" href="{{ asset('css/theme-landing.css') }}?v={{ filemtime(public_path('css/theme-landing.css')) }}">
 </head>
 <body class="err-body">
     <main class="err">
