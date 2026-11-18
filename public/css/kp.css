@@ -5475,3 +5475,10 @@ body { background: var(--page); }
 .pv-links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; }
 .pv-links .pv-link { margin-top: 0; }
 .pv-cert-actions { flex-wrap: wrap; justify-content: flex-end; }
+/* Isian tautan: jarak lebih lega, tombol hapus bulat */
+.pf-links { gap: 12px; }
+.pf-link-row { grid-template-columns: minmax(0, 1fr) 40px; gap: 10px; }
+.pf-link-row [data-pf-link-remove] { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: var(--surface-2); color: var(--muted); font-size: 18px; }
+.pf-link-row [data-pf-link-remove]:hover { background: var(--red-soft); color: var(--red); }
+.pf-links-add { margin-top: 16px; }
+[data-pf-links] .hint { margin-top: 10px; }
