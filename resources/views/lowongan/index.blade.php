@@ -42,36 +42,39 @@
                         <div class="min0">
                             <p class="jb-co">{{ $p->company->name }}</p>
                             @if ($left !== null)
-                                <span @class(['jb-due', 'is-soon' => $left <= 7])><x-ikon name="clock" :size="14" /> {{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? 'Tutup '.$left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
+                                <span @class(['jb-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? 'Tutup '.$left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M Y')) }}</span>
                             @endif
                         </div>
-                        <button type="button" class="jb-go" data-open="job-{{ $p->id }}" aria-label="Detail {{ $p->title }}"><x-ikon name="arrow-up-right" :size="18" /></button>
                     </div>
 
                     <h2 class="jb-title">{{ $p->title }}</h2>
 
-                    <ul class="jb-facts">
-                        <li><x-ikon name="placement" :size="16" /> {{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}</li>
-                        <li><x-ikon name="users" :size="16" /> {{ $p->quota ? $p->quota.' orang' : 'Kuota terbuka' }}</li>
-                        @if ($p->company->industry)<li><x-ikon name="building" :size="16" /> {{ $p->company->industry }}</li>@endif
-                    </ul>
+                    <p class="jb-facts">
+                        <span><x-ikon name="placement" :size="15" /> {{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}</span>
+                        <span><x-ikon name="users" :size="15" /> {{ $p->quota ? $p->quota.' orang' : 'Kuota terbuka' }}</span>
+                        @if ($p->company->industry)<span><x-ikon name="building" :size="15" /> {{ $p->company->industry }}</span>@endif
+                    </p>
 
                     <p class="jb-desc">{{ \Illuminate\Support\Str::limit($p->description, 140) }}</p>
 
                     @if ($p->skills->isNotEmpty())
                         <ul class="jb-skills" aria-label="Keahlian">
                             @foreach ($p->skills->take(5) as $skill)
-                                <li @class(['is-match' => in_array($skill->id, $mySkills, true)])>@if (in_array($skill->id, $mySkills, true))<x-ikon name="check" :size="13" />@endif{{ $skill->name }}</li>
+                                <li @class(['is-match' => in_array($skill->id, $mySkills, true)])>{{ $skill->name }}</li>
                             @endforeach
                         </ul>
                     @endif
 
+                    @if ($p->skills->isNotEmpty() && $matched->isNotEmpty())
+                        <div class="jb-fit" title="Skill di portofoliomu yang dicari lowongan ini">
+                            <span>Kecocokan skill</span>
+                            <span class="jb-fit-bar"><i style="width: {{ round($matched->count() / $p->skills->count() * 100) }}%"></i></span>
+                            <b>{{ $matched->count() }}/{{ $p->skills->count() }}</b>
+                        </div>
+                    @endif
+
                     <div class="jb-foot">
-                        @if ($p->skills->isNotEmpty() && $matched->isNotEmpty())
-                            <span class="jb-match"><b>{{ $matched->count() }}/{{ $p->skills->count() }}</b> skill kamu cocok</span>
-                        @else
-                            <button type="button" class="jb-detail" data-open="job-{{ $p->id }}">Lihat detail</button>
-                        @endif
+                        <button type="button" class="jb-detail" data-open="job-{{ $p->id }}">Lihat detail</button>
                         @if ($canApply)
                             <a href="{{ route('kp.status', ['lowongan' => $p->id]) }}#ajukan" class="btn btn-primary jb-apply">Ajukan KP <x-ikon name="arrow" :size="16" /></a>
                         @endif
