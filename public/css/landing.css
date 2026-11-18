@@ -554,3 +554,45 @@ body.ld { overflow-x: clip; }
 /* Penutup: panel hijau dengan aksen lime */
 .ld-close { background: radial-gradient(circle at 88% 0%, rgba(201, 240, 101, .3), transparent 40%), linear-gradient(150deg, var(--green-2) 0%, var(--green) 50%, var(--green-deep) 100%); }
 .ld-close-sub { color: rgba(255, 255, 255, .82); }
+
+/* =====================================================================
+   Aturan warna 60:30:10 (18 Nov 2026): 60% netral (kertas, putih, tinta), 30% hijau, 10% aksen lime.
+   Blok besar lime dan gelap diganti netral atau hijau.
+   ===================================================================== */
+.ld-hero-panel::before { opacity: .45; }
+
+/* Kartu angka: hijau, lalu dua kartu putih dengan aksen kecil */
+.ld-stat-c2, .ld-stat-c3 { background: var(--card); color: var(--ink); box-shadow: 0 24px 50px rgba(15, 31, 27, .10), inset 0 0 0 1px var(--line); }
+.ld-stat-c2 .ld-stat-label, .ld-stat-c3 .ld-stat-label { color: var(--muted); }
+.ld-stat-c2 .ld-stat-wave { color: var(--green); }
+.ld-stat-c3 .ld-stat-bars { fill: #d7eee6; }
+.ld-stat-c3 .ld-stat-bars rect:last-child { fill: var(--lime-2); }
+.ld-stat-c1 .ld-stat-faces i:nth-child(1) { background: #fff; color: var(--green); }
+.ld-stat-faces i:nth-child(2) { background: #0b9a7f; }
+.ld-stat-faces i:nth-child(3) { background: #36b38f; }
+.ld-stat-faces i:nth-child(4) { background: var(--green-deep); }
+
+/* Peran: saat diarahkan kartu hijau, isi cuplikan putih */
+.ld-role:hover .ld-mock { background: #fff; }
+.ld-role:hover .ld-role-icon { background: #fff; color: var(--green); }
+.ld-role:hover .ld-mock-chart span:nth-child(2) i { background: var(--lime-2); }
+.ld-role:hover .ld-mock-note .ld-note-out { background: var(--green); }
+
+/* Alur KP: pita netral, kartu progres hijau dengan cincin lime */
+.ld-flow { background: var(--panel); }
+.ld-flow::before { color: rgba(15, 31, 27, .04); }
+.ld-progress { background: linear-gradient(150deg, var(--green-2) 0%, var(--green) 55%, var(--green-deep) 100%); box-shadow: 0 30px 60px rgba(3, 66, 62, .22); }
+.ld-progress-who > i { background: #fff; color: var(--green); }
+.ld-progress-rows span { background: rgba(255, 255, 255, .1); }
+.ld-ring circle { stroke: rgba(255, 255, 255, .18); }
+.ld-steps p { color: var(--muted); }
+
+/* Lowongan: kartu penghitung hijau, tanda perusahaan hijau lembut */
+.ld-jobs-lead { background: linear-gradient(150deg, var(--green-2) 0%, var(--green) 55%, var(--green-deep) 100%); }
+.ld-job-1 .ld-job-mark { background: var(--panel); color: var(--green); }
+.ld-job-2 .ld-job-mark { background: #e1f3ee; color: var(--green-deep); }
+.ld-job:hover .ld-job-go { background: var(--green); color: #fff; }
+
+/* Footer: putih dengan semburat hijau sangat muda di pojok */
+.ld-footer { background: radial-gradient(110% 130% at 100% 100%, rgba(11, 154, 127, .18) 0%, rgba(11, 154, 127, 0) 60%), linear-gradient(160deg, #ffffff 0%, #f8faf7 100%); }
+.ld-footer-rings circle { stroke: rgba(3, 122, 104, .06); }

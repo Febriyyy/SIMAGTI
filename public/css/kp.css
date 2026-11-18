@@ -5177,3 +5177,112 @@ body { background: var(--page); }
     .pf-section .card-head { flex-wrap: wrap; gap: 10px; }
 }
 @media (max-width: 640px) { .pv-avatar { align-self: start; } }
+
+/* =====================================================================
+   Portofolio dengan aturan warna 60:30:10 (18 Nov 2026).
+   60% netral (latar kertas, kartu putih, teks tinta), 30% hijau SIMAGTI (banner, ikon, penanda utama),
+   10% aksen lime (sorotan kecil: angka IPK, titik tingkat Mahir, garis aktif). Gelap hanya untuk teks.
+   ===================================================================== */
+/* ---------- Halaman tampil ---------- */
+.pv-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #0b8f76 100%); }
+.pv-hero-wave { opacity: .35; }
+.pv-avatar { background: rgba(255, 255, 255, .14); color: #fff; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .35); }
+.pv-interests li { background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.pv-gpa { background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.pv-gpa b { color: var(--lime); }
+
+.pv-card { background: var(--surface); box-shadow: 0 1px 2px rgba(15, 31, 27, .04), inset 0 0 0 1px var(--line); }
+.pv-title { display: flex; align-items: center; gap: 10px; }
+.pv-title::before { content: ""; width: 4px; height: 18px; border-radius: 4px; background: var(--primary); }
+
+.pv-project { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow 200ms, transform 200ms var(--ease-premium); }
+.pv-project:hover { box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .35), 0 10px 24px rgba(15, 31, 27, .06); transform: translateY(-2px); }
+.pv-project-img { background: var(--surface-2); }
+.pv-tags li { background: var(--surface-2); color: var(--gray); box-shadow: inset 0 0 0 1px var(--line); }
+
+.pv-cert-icon { background: var(--primary-soft); color: var(--primary); }
+
+.pv-skills li { background: var(--surface); }
+.pv-level-mahir + .pv-skills li { background: var(--primary-soft); color: var(--primary-dark); }
+.pv-level-mahir::before { background: var(--lime-2); box-shadow: 0 0 0 3px var(--primary-soft); }
+.pv-level-menengah::before { background: var(--primary); }
+.pv-level-pemula::before { background: var(--line-strong); }
+
+.pv-exp { position: relative; overflow: hidden; background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(15, 31, 27, .04), inset 0 0 0 1px var(--line); }
+.pv-exp::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); }
+.pv-exp .pv-title { color: var(--text); }
+.pv-exp-place { color: var(--text); }
+.pv-exp-role, .pv-exp-period { color: var(--muted); }
+.pv-exp-mentor { border-top-color: var(--line); display: flex; align-items: center; gap: 10px; }
+.pv-exp-mentor::before { content: ""; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--primary-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23037a68' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6'/%3E%3C/svg%3E") center / 18px no-repeat; }
+.pv-exp-mentor span { color: var(--muted); }
+.pv-exp-mentor b { color: var(--text); }
+
+/* ---------- Halaman ubah ---------- */
+.pf-project { background: var(--surface); }
+.pf-project-thumb { background: var(--primary-soft); color: var(--primary); }
+.pf-tags li { background: var(--surface-2); }
+.pf-cert-icon { background: var(--primary-soft); color: var(--primary); }
+.pf-interest input:checked + span { background: var(--primary-soft); color: var(--primary-dark); box-shadow: inset 0 0 0 1.5px var(--primary); }
+.pf-interest input:checked + span::before { content: ""; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: var(--lime-2); }
+.pf-identity { background: var(--primary-tint); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .12); }
+.pf-exp { padding-left: 14px; border-left: 3px solid var(--primary); }
+
+/* =====================================================================
+   Aturan warna 60:30:10 untuk seluruh aplikasi (18 Nov 2026).
+   60% netral: latar kertas, kartu putih, teks tinta.
+   30% hijau SIMAGTI: menu aktif, banner sapaan, tombol utama, ikon, batang progres.
+   10% aksen lime: sorotan kecil (ikon menu aktif, tombol di banner, titik/garis penanda).
+   Blok besar berwarna lime atau gelap tidak dipakai lagi.
+   ===================================================================== */
+
+/* Kartu angka: semua ikon hijau lembut; oranye tetap untuk yang perlu tindakan */
+.stat-grid > .stat:nth-child(n) { --acc: var(--primary); --acc-soft: var(--primary-soft); --acc-ink: var(--primary-dark); }
+.stat-grid > .stat.stat-amber:nth-child(n) { --acc: var(--acc-coral); --acc-soft: var(--acc-coral-soft); --acc-ink: var(--acc-coral-ink); }
+.stat-grid > .stat:nth-child(n) .stat-icon { background: var(--acc-soft); color: var(--acc-ink); }
+.stat-bar > span { background: var(--primary); }
+
+/* Banner judul halaman: putih ke hijau sangat muda (netral), ikon hijau */
+:root { --banner-gradient: linear-gradient(115deg, #ffffff 0%, #f4faf7 55%, #e9f6f0 100%); }
+.page-head { box-shadow: inset 0 0 0 1px var(--line); }
+.page-icon { color: var(--primary); }
+
+/* Kartu rencana kegiatan: kartu putih, garis atas berwarna sesuai keadaan, label kecil */
+.plan-cards .plan-card[data-state] { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.plan-cards .plan-card[data-state]::after { display: none; }
+.plan-cards .plan-card[data-state]::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--line-strong); }
+.plan-cards .plan-card[data-state="active"]::before { background: var(--primary); }
+.plan-cards .plan-card[data-state="upcoming"]::before { background: var(--lime-2); }
+.plan-cards .plan-card[data-state="late"]::before { background: var(--red); }
+.plan-cards .plan-card[data-state="done"]::before { background: var(--primary-dark); }
+.plan-cards .plan-card[data-state] .plan-card-sub,
+.plan-cards .plan-card[data-state] .plan-card-foot small { color: var(--muted); }
+.plan-cards .plan-card[data-state] .plan-card-bar { background: var(--gray-soft); }
+.plan-cards .plan-card[data-state] .plan-card-bar > span { background: var(--primary); }
+.plan-cards .plan-card[data-state] .plan-card-go { background: var(--surface-2); color: var(--primary); }
+.plan-cards .plan-card[data-state] .plan-card-state { background: var(--gray-soft); color: var(--gray); }
+.plan-cards .plan-card[data-state="active"] .plan-card-state { background: var(--primary); color: #fff; }
+.plan-cards .plan-card[data-state="upcoming"] .plan-card-state { background: var(--lime-soft); color: var(--lime-ink); }
+.plan-cards .plan-card[data-state="late"] .plan-card-state { background: var(--red-soft); color: var(--red); }
+.plan-cards .plan-card[data-state="done"] .plan-card-state { background: var(--primary-soft); color: var(--primary-dark); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):hover { box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .35), 0 10px 22px rgba(15, 31, 27, .07); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):hover .plan-card-go { background: var(--primary); color: #fff; }
+
+/* Gradasi kartu lain: hijau sangat muda, bukan lime */
+.vx-grade-v2 { background: linear-gradient(135deg, #ffffff 0%, #eef8f4 100%); }
+.offer-card { background: linear-gradient(120deg, #fffaf0 0%, #f4faf7 100%); }
+.job-tone-0 .job-card-band { background: linear-gradient(120deg, #e1f3ee, #eef8f4); }
+.job-tone-1 .job-card-band { background: linear-gradient(120deg, #f1f9f6, #e6f4ee); }
+.job-tone-2 .job-card-band { background: linear-gradient(120deg, #f3f5f0, #eceff0); }
+.job-tone-3 .job-card-band { background: linear-gradient(120deg, #e9f6f0, #f6faf8); }
+
+/* Halaman masuk: aura latar netral-hijau, aksen lime hanya pada penanda kecil */
+.gl-aura i:nth-child(2) { background: #dcefe8; }
+.gl-aura i:nth-child(3) { background: #eef6f2; }
+.gl-avatars i:nth-child(2) { background: #0b9a7f; color: #fff; }
+.gl-avatars i:nth-child(3) { background: var(--primary-dark); }
+.gl-spark { background: #fff; color: var(--primary); }
+.pv-exp::after { display: none; }
+.pv-exp-mentor { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; align-items: center; }
+.pv-exp-mentor::before { grid-row: 1 / span 2; }
+.pv-exp-mentor span, .pv-exp-mentor b { grid-column: 2; }
