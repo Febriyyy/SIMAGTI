@@ -117,3 +117,42 @@
     .stat-grid > .stat { padding: 14px; border-radius: 20px; }
     .stat-go { width: 26px; height: 26px; }
 }
+
+/* ---------- Kartu angka: hijau mengikuti kursor ----------
+   Kartu yang diarahkan menjadi hijau penuh. Saat kursor di kartu lain, kartu pertama kembali putih,
+   sehingga hanya satu kartu hijau. Tanpa kursor, kartu pertama tetap menjadi sorotan. */
+.stat-grid > .stat { transition: background-color 260ms var(--ease-ld), color 260ms, box-shadow 260ms, transform 220ms var(--ease-ld); }
+.stat-grid > .stat .stat-value, .stat-grid > .stat .stat-foot, .stat-grid > .stat .stat-icon, .stat-grid > .stat .stat-go { transition: background-color 260ms, color 260ms; }
+
+/* Kartu pertama kembali putih ketika kartu lain diarahkan */
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) { background: var(--surface); border-color: var(--line); color: var(--text); }
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-label,
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-hint,
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-value small { color: var(--muted); }
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-value,
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-foot { background: var(--surface-2); color: var(--text); }
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-icon { background: var(--acc-soft); color: var(--acc-ink); }
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-go { background: var(--surface-2); color: var(--text); }
+.stat-grid.stat-grid:hover > .stat:first-child:not(.stat-amber):not(:hover) .stat-bar > span { background: var(--primary); }
+
+/* Kartu yang diarahkan menjadi hijau penuh */
+.stat-grid.stat-grid > .stat:hover { background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); border-color: transparent; color: #fff; box-shadow: 0 16px 34px rgba(3, 122, 104, .22); }
+.stat-grid.stat-grid > .stat:hover .stat-label,
+.stat-grid.stat-grid > .stat:hover .stat-hint,
+.stat-grid.stat-grid > .stat:hover .stat-value small,
+.stat-grid.stat-grid > .stat:hover .stat-value.is-empty { color: rgba(255, 255, 255, .82); }
+.stat-grid.stat-grid > .stat:hover .stat-value,
+.stat-grid.stat-grid > .stat:hover .stat-foot { background: rgba(255, 255, 255, .1); color: #fff; }
+.stat-grid.stat-grid > .stat:hover .stat-icon { background: rgba(255, 255, 255, .16); color: #fff; }
+.stat-grid.stat-grid > .stat:hover .stat-go { background: var(--lime); color: var(--ink); }
+.stat-grid.stat-grid > .stat:hover .stat-bar { background: rgba(255, 255, 255, .2); }
+.stat-grid.stat-grid > .stat:hover .stat-bar > span { background: var(--lime); }
+.stat-grid.stat-grid > .stat:hover .stat-hint::before { background: var(--lime); }
+.stat-grid.stat-grid > .stat:hover .stat-bar + .stat-hint { color: #fff; }
+
+@media (hover: none) {
+    .stat-grid.stat-grid > .stat:hover { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .stat-grid > .stat, .stat-grid > .stat .stat-value, .stat-grid > .stat .stat-foot, .stat-grid > .stat .stat-icon, .stat-grid > .stat .stat-go { transition: none; }
+}
