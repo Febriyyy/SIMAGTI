@@ -3,24 +3,27 @@
 @section('title', 'Lowongan Magang')
 
 @section('content')
+    <?php
+        $matchCount = $postings->filter(fn ($p) => $p->skills->contains(fn ($s) => in_array($s->id, $mySkills, true)))->count();
+        $soonest = $postings->filter(fn ($p) => $p->deadline)->map(fn ($p) => (int) today()->diffInDays($p->deadline, false))->filter(fn ($d) => $d >= 0)->min();
+    ?>
     <section class="jb-hero">
-        <svg class="jb-hero-wave" viewBox="0 0 220 90" aria-hidden="true"><path d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round"/></svg>
         <div class="jb-hero-text">
             <h1 class="jb-hero-title">{{ $postings->count() > 0 ? 'Saatnya mulai magang.' : 'Lowongan magang' }}</h1>
             <p class="jb-hero-sub">
-                @if ($postings->count() > 0)
-                    <b>{{ $postings->count() }} lowongan</b> dari perusahaan mitra kampus sedang dibuka. Pilih yang paling cocok, data perusahaan langsung terisi saat mengajukan KP.
-                @else
-                    Lowongan dari perusahaan mitra kampus akan tampil di sini.
-                @endif
+                {{ $postings->count() > 0 ? 'Pilih lowongan dari perusahaan mitra kampus. Data perusahaan langsung terisi saat kamu mengajukan KP.' : 'Lowongan dari perusahaan mitra kampus akan tampil di sini.' }}
             </p>
+            @unless ($hasPortfolio)
+                <a href="{{ route('portofolio.edit') }}" class="jb-hero-link">Lengkapi portofolio agar skillmu terlihat perusahaan <x-ikon name="arrow" :size="16" /></a>
+            @endunless
         </div>
-        @unless ($hasPortfolio)
-            <a href="{{ route('portofolio.edit') }}" class="jb-hero-cta">
-                <span><b>Lengkapi portofolio</b><small>Skill dan proyekmu dilihat perusahaan saat kamu mengajukan.</small></span>
-                <span class="jb-hero-cta-go" aria-hidden="true"><x-ikon name="arrow-up-right" :size="18" /></span>
-            </a>
-        @endunless
+        @if ($postings->count() > 0)
+            <dl class="jb-hero-stats">
+                <div><dt>Lowongan dibuka</dt><dd>{{ $postings->count() }}</dd></div>
+                <div><dt>Cocok dengan skillmu</dt><dd>{{ $matchCount }}</dd></div>
+                @if ($soonest !== null)<div><dt>Tutup terdekat</dt><dd>@if ($soonest === 0)Hari ini@else{{ $soonest }}<small> hari</small>@endif</dd></div>@endif
+            </dl>
+        @endif
     </section>
 
     @if (! $canApply)
