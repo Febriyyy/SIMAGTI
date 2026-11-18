@@ -147,13 +147,23 @@
                 <div class="card-body">
                     @if ($internship)
                         <div class="pf-exp">
-                            <x-org :name="$internship->placeName()" />
-                            <div class="min0">
-                                <b>{{ $internship->position ?? 'Kerja Praktik' }}</b>
-                                <span>{{ $internship->placeName() }}</span>
-                                <small>{{ $internship->periodLabel() }}</small>
-                                @if ($internship->supervisor)<small>Dibimbing {{ $internship->supervisor->name }}</small>@endif
+                            <div class="pf-exp-head">
+                                <x-org :name="$internship->placeName()" class="pf-exp-org" />
+                                <div class="min0">
+                                    <b>{{ $internship->placeName() }}</b>
+                                    <span>{{ $internship->position ?? 'Kerja Praktik' }}</span>
+                                </div>
                             </div>
+                            <span class="pf-exp-period"><x-ikon name="calendar" :size="16" /> {{ $internship->periodLabel() }}</span>
+                            @if ($internship->supervisor)
+                                <div class="pf-exp-mentor">
+                                    <x-avatar :user="$internship->supervisor" small />
+                                    <div class="min0">
+                                        <small>Company Supervisor</small>
+                                        <b>{{ $internship->supervisor->name }}</b>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <p class="pf-empty-line">Muncul otomatis setelah kamu mendapat tempat magang.</p>

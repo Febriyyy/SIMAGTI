@@ -5049,9 +5049,6 @@ body { background: var(--page); }
 .pf-skills:not(:empty) + .pf-empty-line { display: none; }
 .pf-note { margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: 1.5; }
 .pf-exp { display: flex; align-items: flex-start; gap: var(--space-3); }
-.pf-exp b { display: block; }
-.pf-exp span, .pf-exp small { display: block; color: var(--muted); font-size: var(--text-sm); }
-.pf-exp small { font-size: var(--text-xs); }
 .pf-section { margin-top: var(--space-5); }
 .pf-projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-3); margin: 0; padding: var(--space-4) var(--card-x) var(--card-y); list-style: none; }
 .pf-project { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
@@ -5286,3 +5283,26 @@ body { background: var(--page); }
 .pv-exp-mentor { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; align-items: center; }
 .pv-exp-mentor::before { grid-row: 1 / span 2; }
 .pv-exp-mentor span, .pv-exp-mentor b { grid-column: 2; }
+
+/* Portofolio (halaman ubah): kartu Pengalaman magang yang rapi */
+.pf-exp { display: flex; flex-direction: column; gap: 14px; padding-left: 0; border-left: 0; }
+.pf-exp-head { display: flex; align-items: center; gap: 14px; }
+.pf-exp .pf-exp-org { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; }
+.pf-exp-head b { display: block; font-size: var(--text-md); line-height: 1.3; }
+.pf-exp-head span { display: block; margin-top: 2px; color: var(--primary); font-size: var(--text-sm); font-weight: 600; }
+.pf-exp-period { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--gray); font-size: var(--text-sm); font-weight: 600; }
+.pf-exp-period .ikon { color: var(--primary); }
+.pf-exp-mentor { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+.pf-exp-mentor small { display: block; color: var(--muted); font-size: var(--text-xs); }
+.pf-exp-mentor b { display: block; font-size: var(--text-base); }
+/* Netralkan aturan lama ".pf-exp span/small {display:block}" yang ikut mengenai ikon dan avatar */
+.pf-exp .pf-exp-head b { display: block; }
+.pf-exp .pf-exp-head span { display: block; margin-top: 2px; color: var(--primary); font-size: var(--text-sm); font-weight: 600; }
+.pf-exp .pf-exp-period { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: var(--text-sm); }
+.pf-exp .pf-exp-mentor small { display: block; color: var(--muted); font-size: var(--text-xs); }
+.pf-exp .pf-exp-head b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Kotak inisial perusahaan dan avatar supervisor: inisial di tengah */
+.pf-exp .pf-exp-head .org-mark, .pf-exp .pf-exp-mentor .avatar { display: grid; place-items: center; margin: 0; font-size: 14px; font-weight: 700; line-height: 1; }
+.pf-exp .pf-exp-head .org-mark { width: 52px; height: 52px; border-radius: 16px; font-size: 15px; }
+.pf-exp .pf-exp-mentor .avatar { flex: none; width: 36px; height: 36px; font-size: 12px; }
+.pf-exp { align-items: stretch; }
