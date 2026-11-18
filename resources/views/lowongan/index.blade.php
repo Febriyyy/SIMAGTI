@@ -21,7 +21,7 @@
             <dl class="jb-hero-stats">
                 <div><dt>Lowongan dibuka</dt><dd>{{ $postings->count() }}</dd></div>
                 <div><dt>Cocok dengan skillmu</dt><dd>{{ $matchCount }}</dd></div>
-                @if ($soonest !== null)<div><dt>Tutup terdekat</dt><dd>@if ($soonest === 0)Hari ini@else{{ $soonest }}<small> hari</small>@endif</dd></div>@endif
+                @if ($soonest !== null)<div><dt>Tutup terdekat</dt><dd>{!! $soonest === 0 ? 'Hari ini' : e($soonest).'<small> hari</small>' !!}</dd></div>@endif
             </dl>
         @endif
     </section>
