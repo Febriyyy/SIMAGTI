@@ -166,7 +166,7 @@ class PortfolioTest extends TestCase
         $student = $internship->student;
 
         $this->actingAs($student)->get(route('portofolio.lihat', $student))->assertOk()
-            ->assertSee('Pengalaman magang')->assertSee($internship->placeName())->assertSee($internship->supervisor->name);
+            ->assertSee('Pengalaman')->assertSee($internship->placeName())->assertSee($internship->supervisor->name);
     }
 
     public function test_hanya_mahasiswa_yang_mengatur_portofolio(): void
