@@ -6025,50 +6025,61 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .gnext-actions .btn { flex: 1 1 auto; justify-content: center; }
 }
 
-/* Jadwal bimbingan dari dosen (halaman Bimbingan dosen)
-   tanggal | topik + mahasiswa, cara | jam + waktu relatif | aksi.
-   Mengikuti lebar kartu lewat container query, sehingga tidak terpotong di kolom sempit. */
-.gsch { container-type: inline-size; margin: 0; padding: 4px 0; list-style: none; }
-.gsch-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto; grid-template-areas: "date main time act"; align-items: center; column-gap: 20px; row-gap: 12px; padding: 14px var(--card-x, 24px); transition: background-color 160ms; }
-.gsch-row:hover { background: var(--surface-2); }
-.gsch-row + .gsch-row { border-top: 1px solid var(--line); }
-.gsch-date { grid-area: date; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 48px; height: 50px; border-radius: 14px; background: var(--primary-tint); line-height: 1; }
-.gsch-date b { font-size: 18px; font-weight: 750; letter-spacing: -0.02em; color: var(--primary); font-variant-numeric: tabular-nums; }
-.gsch-date span { margin-top: 4px; font-size: 11px; font-weight: 650; color: var(--muted); }
-.gsch-row.is-due .gsch-date { background: var(--primary); }
-.gsch-row.is-due .gsch-date b { color: #fff; }
-.gsch-row.is-due .gsch-date span { color: var(--lime, #c9f065); }
-.gsch-main { grid-area: main; display: flex; flex-direction: column; gap: 4px; }
-.gsch-topic { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.35; overflow-wrap: anywhere; }
-.gsch-meta { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; font-size: 13px; color: var(--muted); }
-.gsch-meta span { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
-.gsch-meta .ikon { color: var(--line-strong); }
-/* Jam sebagai jangkar baris: angka besar, waktu relatif kecil di bawahnya */
-.gsch-time { grid-area: time; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; margin: 0; line-height: 1; text-align: right; }
-.gsch-time b { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
-.gsch-time span { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
-.gsch-time.is-now span { color: var(--primary); }
-.gsch-actions { grid-area: act; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-.gsch-actions form { margin: 0; }
-.gsch-actions .btn { margin-right: 4px; white-space: nowrap; }
-.gsch-icon { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; transition: background-color 160ms, color 160ms; }
-.gsch-icon:hover { background: var(--primary-tint); color: var(--primary); }
-.gsch-icon.is-danger:hover { background: var(--red-soft, #fdecec); color: var(--red, #d23c3c); }
-.gsch-icon:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.gsch-short { display: none; }
-
-/* Kartu sempit: aksi pindah ke baris kedua, sejajar kolom isi */
-@container (max-width: 600px) {
-    .gsch-row { grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "date main time" ". act act"; column-gap: 14px; align-items: start; }
-    .gsch-date { width: 44px; height: 46px; }
-    .gsch-actions { justify-content: flex-start; }
-}
-@container (max-width: 340px) {
-    .gsch-long { display: none; }
-    .gsch-short { display: inline; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .gsch-row, .gsch-icon { transition: none; }
-}
 .gsch-msg { margin: 0 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); font-size: 14px; line-height: 1.5; }
 .gsch-msg b { display: block; margin-bottom: 2px; font-size: 12px; color: var(--muted); }
+
+/* =====================================================================
+   Jadwal bimbingan dosen sebagai kartu tiket janji temu.
+   Potongan hijau (hari, tanggal, jam) | sobekan berlubang | isi | aksi.
+   Tiket duduk di nampan abu tipis supaya lubang sobekan terlihat. Mengikuti lebar kartu.
+   ===================================================================== */
+.gtk-list { --tray: var(--surface-2); container-type: inline-size; display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 16px; list-style: none; background: var(--tray); border-radius: 0 0 24px 24px; }
+.gtk { position: relative; display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; grid-template-areas: "stub body act"; align-items: stretch; min-height: 104px; border-radius: 20px; background: var(--surface); box-shadow: 0 1px 2px rgba(15, 31, 27, .05), 0 0 0 1px var(--line); transition: transform 220ms var(--ease-ld, ease), box-shadow 220ms; }
+.gtk:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(15, 31, 27, .08), 0 0 0 1px var(--line); }
+
+/* Potongan tiket */
+.gtk-stub { grid-area: stub; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 12px 6px; border-radius: 20px 0 0 20px; background: var(--primary-tint); color: var(--primary); line-height: 1; }
+.gtk.is-due .gtk-stub { background: linear-gradient(160deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark, #025f51) 100%); color: #fff; }
+.gtk-dow { font-size: 11.5px; font-weight: 600; opacity: .75; }
+.gtk-day { font-size: 28px; font-weight: 780; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.gtk-mon { font-size: 12px; font-weight: 650; }
+.gtk-clock { margin-top: 7px; padding: 3px 8px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gtk.is-due .gtk-clock { background: var(--lime, #c9f065); color: var(--ink, #10231d); }
+/* Sobekan: garis putus-putus + dua lubang setengah lingkaran berwarna nampan */
+.gtk-stub::after { content: ""; position: absolute; top: 14px; bottom: 14px; right: 0; border-right: 2px dashed var(--line-strong); opacity: .7; }
+.gtk::before, .gtk::after { content: ""; position: absolute; left: 92px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--tray); box-shadow: inset 0 0 0 1px var(--line); }
+.gtk::before { top: -9px; clip-path: inset(50% 0 0 0); }
+.gtk::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+
+/* Isi tiket */
+.gtk-body { grid-area: body; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 14px 20px; }
+.gtk-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+.gtk-rel, .gtk-mode { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.gtk-rel { background: var(--surface-2); color: var(--text); }
+.gtk-rel.is-now { background: var(--lime, #c9f065); color: var(--ink, #10231d); }
+.gtk-mode { color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+.gtk-topic { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; overflow-wrap: anywhere; }
+.gtk-who { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13.5px; color: var(--muted); }
+
+/* Aksi */
+.gtk-act { grid-area: act; display: flex; align-items: center; gap: 10px; padding: 14px 18px 14px 0; }
+.gtk-act .btn { white-space: nowrap; }
+.gtk-tools { display: inline-flex; align-items: center; gap: 2px; }
+.gtk-tools form { margin: 0; }
+.gtk-icon { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; transition: background-color 160ms, color 160ms; }
+.gtk-icon:hover { background: var(--primary-tint); color: var(--primary); }
+.gtk-icon.is-danger:hover { background: var(--red-soft, #fdecec); color: var(--red, #d23c3c); }
+.gtk-icon:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Kartu sempit: aksi pindah ke bawah isi, tetap di dalam tiket */
+@container (max-width: 560px) {
+    .gtk { grid-template-columns: 80px minmax(0, 1fr); grid-template-areas: "stub body" "stub act"; }
+    .gtk::before, .gtk::after { left: 80px; }
+    .gtk-body { padding: 14px 16px 6px; }
+    .gtk-act { padding: 4px 16px 14px; justify-content: space-between; }
+    .gtk-day { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .gtk, .gtk-icon { transition: none; }
+    .gtk:hover { transform: none; }
+}

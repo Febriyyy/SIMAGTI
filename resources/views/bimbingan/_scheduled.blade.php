@@ -1,11 +1,10 @@
 {{--
-    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Satu baris per sesi:
-    tanggal | topik, lalu mahasiswa dan cara (berikon, boleh turun baris) | jam + waktu relatif | aksi.
-    Tata letak mengikuti lebar kartu (container query), bukan lebar layar, jadi tidak terpotong di kolom sempit.
-    Setelah sesi berlangsung, "Tandai selesai" membuka dialog untuk catatan hasil.
+    Jadwal bimbingan dari dosen sebagai kartu tiket janji temu:
+    potongan kiri (hari, tanggal, jam) | garis sobekan | isi tiket (waktu relatif, cara, topik, mahasiswa) | aksi.
+    Tata letak mengikuti lebar kartu (container query). "Tandai selesai" membuka dialog catatan hasil.
     Variabel: $sessions
 --}}
-<ul class="gsch">
+<ul class="gtk-list">
     @foreach ($sessions as $s)
         <?php
             $days = (int) today()->diffInDays($s->held_on, false);
@@ -16,38 +15,42 @@
                 default => $days.' hari lagi',
             };
             $held = ! $s->held_on->isFuture();
+            $time = $s->start_time ? substr($s->start_time, 0, 2).'.'.substr($s->start_time, 3, 2) : null;
         ?>
-        <li @class(['gsch-row', 'is-due' => $held])>
-            <time class="gsch-date" datetime="{{ $s->startsAt()->toIso8601String() }}">
-                <b>{{ $s->held_on->format('j') }}</b>
-                <span>{{ $s->held_on->locale('id')->translatedFormat('M') }}</span>
+        <li @class(['gtk', 'is-due' => $held])>
+            <time class="gtk-stub" datetime="{{ $s->startsAt()->toIso8601String() }}">
+                <span class="gtk-dow">{{ $s->held_on->locale('id')->translatedFormat('D') }}</span>
+                <b class="gtk-day">{{ $s->held_on->format('j') }}</b>
+                <span class="gtk-mon">{{ $s->held_on->locale('id')->translatedFormat('M') }}</span>
+                @if ($time)<span class="gtk-clock">{{ $time }}</span>@endif
             </time>
 
-            <div class="gsch-main min0">
-                <h3 class="gsch-topic" title="{{ $s->topic }}">{{ $s->topic }}</h3>
-                <p class="gsch-meta" @if ($s->notes) title="Pesan: {{ $s->notes }}" @endif>
-                    <span><x-ikon name="person" :size="15" />{{ $s->internship->student->listName() }}</span>
-                    <span><x-ikon name="{{ $s->mode === 'daring' ? 'video' : 'building' }}" :size="15" />{{ $s->modeLabel() }}</span>
+            <div class="gtk-body min0">
+                <p class="gtk-tags">
+                    <span @class(['gtk-rel', 'is-now' => $held])>{{ $when }}</span>
+                    <span class="gtk-mode"><x-ikon name="{{ $s->mode === 'daring' ? 'video' : 'building' }}" :size="14" />{{ $s->modeLabel() }}</span>
+                </p>
+                <h3 class="gtk-topic">{{ $s->topic }}</h3>
+                <p class="gtk-who" @if ($s->notes) title="Pesan: {{ $s->notes }}" @endif>
+                    <x-avatar :user="$s->internship->student" small />
+                    <span>{{ $s->internship->student->listName() }}</span>
                 </p>
             </div>
 
-            <p @class(['gsch-time', 'is-now' => $held])>
-                <b>{{ $s->start_time ? substr($s->start_time, 0, 2).'.'.substr($s->start_time, 3, 2) : '–' }}</b>
-                <span>{{ $when }}</span>
-            </p>
-
-            <div class="gsch-actions">
+            <div class="gtk-act">
                 @if ($held)
-                    <button type="button" class="btn btn-sm btn-primary" data-open="dlg-gdone-{{ $s->id }}"><x-ikon name="check" :size="16" /> <span class="gsch-long">Tandai selesai</span><span class="gsch-short">Selesai</span></button>
+                    <button type="button" class="btn btn-sm btn-primary" data-open="dlg-gdone-{{ $s->id }}"><x-ikon name="check" :size="16" /> Tandai selesai</button>
                 @elseif ($s->canJoin())
                     <a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"><x-ikon name="video" :size="16" /> Gabung</a>
                 @endif
-                <a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer" class="gsch-icon" title="Tambah ke Google Calendar" aria-label="Tambah {{ $s->topic }} ke Google Calendar"><x-ikon name="calendar" :size="18" /></a>
-                <form method="POST" action="{{ route('bimbingan.decide', $s) }}" onsubmit="return confirm('Batalkan jadwal bimbingan ini? Mahasiswa akan diberi tahu.')">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" name="keputusan" value="tolak" class="gsch-icon is-danger" title="Batalkan jadwal" aria-label="Batalkan jadwal {{ $s->topic }}"><x-ikon name="close" :size="18" /></button>
-                </form>
+                <span class="gtk-tools">
+                    <a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer" class="gtk-icon" title="Tambah ke Google Calendar" aria-label="Tambah {{ $s->topic }} ke Google Calendar"><x-ikon name="calendar" :size="18" /></a>
+                    <form method="POST" action="{{ route('bimbingan.decide', $s) }}" onsubmit="return confirm('Batalkan jadwal bimbingan ini? Mahasiswa akan diberi tahu.')">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" name="keputusan" value="tolak" class="gtk-icon is-danger" title="Batalkan jadwal" aria-label="Batalkan jadwal {{ $s->topic }}"><x-ikon name="close" :size="18" /></button>
+                    </form>
+                </span>
             </div>
         </li>
     @endforeach
