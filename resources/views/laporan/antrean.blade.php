@@ -62,23 +62,31 @@
         @else
             <ul class="item-list">
                 @foreach ($internships as $i)
-                    @php($chapters = $i->reportChapters)
-                    <li class="item-row">
+                    <?php
+                        $chapters = $i->reportChapters;
+                        $approved = $chapters->where('status', 'disetujui')->count();
+                    ?>
+                    {{-- Kolom tetap: siswa | titik bab (selalu 4, kosong bila belum mulai) | tombol, agar setiap baris sejajar --}}
+                    <li class="item-row lp-row">
                         <x-avatar :user="$i->student" />
-                        <div class="grow min0">
+                        <div class="min0">
                             <div class="cell-title" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
-                            <div class="cell-sub">{{ $chapters->isEmpty() ? 'Belum mulai' : $chapters->where('status', 'disetujui')->count().' dari '.$chapters->count().' bab disetujui' }}</div>
+                            <div class="cell-sub">{{ $chapters->isEmpty() ? 'Belum mulai' : $approved.' dari '.$chapters->count().' bab disetujui' }}</div>
                         </div>
-                        @if (! $isSupervisor)
-                            <a href="{{ route('laporan.diskusi', $i) }}" class="btn btn-sm btn-ghost"><x-ikon name="chat" :size="16" /> Buka laporan</a>
-                        @endif
-                        @if ($chapters->isNotEmpty())
-                            <ol class="chapter-dots" aria-label="Status per bab">
+                        <ol class="chapter-dots lp-dots" aria-label="Status per bab">
+                            @if ($chapters->isEmpty())
+                                @foreach (\App\Models\ReportChapter::DEFAULTS as $position => [$title])
+                                    <li class="is-blank" title="Bab {{ $position }}: belum diunggah"><span class="sr-only">Bab {{ $position }}: belum diunggah</span>{{ $position }}</li>
+                                @endforeach
+                            @else
                                 @foreach ($chapters as $chapter)
                                     <li class="tone-{{ $chapter->statusTone() }}" title="{{ $chapter->label() }}: {{ $chapter->statusLabel() }}"><span class="sr-only">{{ $chapter->label() }}: {{ $chapter->statusLabel() }}</span>{{ $chapter->position }}</li>
                                 @endforeach
-                            </ol>
-                        @endif
+                            @endif
+                        </ol>
+                        @unless ($isSupervisor)
+                            <a href="{{ route('laporan.diskusi', $i) }}" class="btn btn-sm lp-open">Buka laporan <x-ikon name="next" :size="16" /></a>
+                        @endunless
                     </li>
                 @endforeach
             </ul>
