@@ -104,6 +104,9 @@
                             <div class="cell-sub">Sidang {{ $d->defended_at?->locale('id')->translatedFormat('j M Y') }}@if ($d->lecturer_score !== null) · dosen {{ \App\Support\Num::short($d->lecturer_score) }}, industri {{ \App\Support\Num::short($d->industry_score) }}@endif</div>
                         </div>
                         <span class="sidang-score"><b>{{ $d->letter_grade }}</b>{{ \App\Support\Num::short($d->score) }}</span>
+                        @if ($d->lecturer_score !== null)
+                            <a href="{{ route('sidang.berita', $i) }}" target="_blank" rel="noopener" class="btn btn-sm btn-ghost"><x-ikon name="print" :size="16" /> Berita acara</a>
+                        @endif
                         <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-score-{{ $i->id }}">Periksa</button>
                     </li>
                 @endforeach

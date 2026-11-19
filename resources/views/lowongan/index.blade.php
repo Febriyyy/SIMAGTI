@@ -80,6 +80,9 @@
                     </div>
 
                     <div class="jb-row-side">
+                        @if ($rv = $reviews->get($p->company_id))
+                            <span class="jb-row-rating" title="{{ $rv['count'] }} ulasan alumni magang"><x-stars :value="$rv['rating']" /> <b>{{ \App\Support\Num::short($rv['rating'], 1) }}</b> <small>({{ $rv['count'] }})</small></span>
+                        @endif
                         @if ($left !== null)
                             <span @class(['jb-row-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? 'Tutup '.$left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M Y')) }}</span>
                         @endif
@@ -159,6 +162,19 @@
                         <div><dt>Tutup</dt><dd>{{ $p->deadline?->locale('id')->translatedFormat('j F Y') ?? 'Belum ditentukan' }}</dd></div>
                     </dl>
                     @if ($p->company->address)<p class="muted job-dlg-addr">{{ $p->company->address }}</p>@endif
+                    @if ($rv = $reviews->get($p->company_id))
+                        <div class="job-dlg-section job-reviews">
+                            <h3>Kata alumni magang <small>{{ $rv['count'] }} ulasan · {{ $rv['recommend'] }}% merekomendasikan</small></h3>
+                            <dl class="rv-bars">
+                                @foreach (\App\Models\CompanyReview::ASPECTS as $key => [$label])
+                                    <div><dt>{{ $label }}</dt><dd><span class="rv-bar"><i style="width: {{ $rv['aspects'][$key] / 5 * 100 }}%"></i></span><b>{{ \App\Support\Num::short($rv['aspects'][$key], 1) }}</b></dd></div>
+                                @endforeach
+                            </dl>
+                            @foreach ($rv['comments'] as $comment)
+                                <blockquote class="rv-quote">{{ $comment }}</blockquote>
+                            @endforeach
+                        </div>
+                    @endif
                     <div class="dialog-foot row-actions">
                         <button type="button" class="btn" data-close>Tutup</button>
                         @if ($canApply)

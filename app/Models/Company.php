@@ -67,6 +67,12 @@ class Company extends Model
         return $this->hasMany(JobPosting::class);
     }
 
+    /** Ulasan mahasiswa yang pernah magang di sini. */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(CompanyReview::class);
+    }
+
     public function logo(): BelongsTo
     {
         return $this->belongsTo(StoredFile::class, 'logo_file_id');

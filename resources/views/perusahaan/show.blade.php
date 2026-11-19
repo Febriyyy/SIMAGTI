@@ -152,4 +152,37 @@
             </section>
         </div>
     </div>
+    <section class="card" id="ulasan">
+        <div class="card-head">
+            <div>
+                <h2 class="card-title">Ulasan mahasiswa</h2>
+                <p class="card-sub">{{ $reviewSummary['count'] ? $reviewSummary['count'].' ulasan · '.$reviewSummary['recommend'].'% merekomendasikan' : 'Diisi mahasiswa setelah masa magang berakhir' }}</p>
+            </div>
+            @if ($reviewSummary['count'])
+                <span class="rv-score"><b>{{ \App\Support\Num::short($reviewSummary['rating'], 1) }}</b><x-stars :value="$reviewSummary['rating']" :size="16" /></span>
+            @endif
+        </div>
+        @if ($reviews->isEmpty())
+            <div class="empty"><strong>Belum ada ulasan</strong> Mahasiswa bisa mengulas tempat magang dari halaman Status KP setelah magang berakhir.</div>
+        @else
+            <div class="card-body rv-company">
+                <dl class="rv-bars">
+                    @foreach (\App\Models\CompanyReview::ASPECTS as $key => [$label])
+                        <div><dt>{{ $label }}</dt><dd><span class="rv-bar"><i style="width: {{ $reviewSummary['aspects'][$key] / 5 * 100 }}%"></i></span><b>{{ \App\Support\Num::short($reviewSummary['aspects'][$key], 1) }}</b></dd></div>
+                    @endforeach
+                </dl>
+                <ul class="rv-list">
+                    @foreach ($reviews as $r)
+                        <li>
+                            <x-avatar :user="$r->student" small />
+                            <div class="min0">
+                                <p class="rv-list-head"><b>{{ $r->student?->listName() }}</b><x-stars :value="$r->rating" /><span>{{ $r->created_at->locale('id')->translatedFormat('j M Y') }}</span>@unless ($r->recommend)<span class="rv-norec">Tidak merekomendasikan</span>@endunless</p>
+                                @if ($r->comment)<p class="rv-list-body">{{ $r->comment }}</p>@endif
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </section>
 @endsection

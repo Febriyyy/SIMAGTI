@@ -122,3 +122,9 @@ Pengingat yang sama tidak dikirim ulang: setiap pengingat menyimpan kunci (`data
 - **Riwayat versi laporan**: setiap unggahan bab disimpan di `report_chapter_versions`; berkas lama tidak lagi dihapus.
 
 **Pilihan SMTP saat hosting** (pilih satu, isi di `.env`): email bawaan hosting cPanel (biasanya sudah termasuk paket), Gmail dengan App Password (cocok untuk uji coba, ada batas kirim harian), atau layanan email transaksional seperti Brevo, Resend, Mailgun, atau Amazon SES (punya paket gratis dengan kuota; cek harga terbaru di situs masing-masing). Setel `MAIL_FROM_ADDRESS` ke alamat domain sendiri agar tidak masuk spam.
+
+## Ulasan tempat magang, berita acara sidang, PWA (19 November 2026)
+
+- **Ulasan tempat magang**: kartu di Status KP setelah magang berakhir (`CompanyReviewController`, `pengajuan/_ulasan`). Rating tampil di Lowongan dan halaman perusahaan.
+- **Berita acara sidang**: `/sidang/{internship}/berita-acara` (`DefenseMinutesController`, `sidang/berita-acara`), halaman cetak A4 tegak; dibuka mahasiswa, dosen pembimbingnya, dan kaprodi setelah nilai sidang disahkan. Simpan PDF lewat jendela cetak browser (tanpa pustaka PDF).
+- **PWA**: `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, ikon di `public/icons/`, disisipkan lewat `partials/pwa`. Service worker hanya menyimpan aset statis; halaman HTML tidak pernah disimpan karena berisi data pribadi. **Wajib HTTPS saat hosting** (service worker hanya aktif di HTTPS atau localhost). Bila daftar aset di `sw.js` berubah, naikkan `VERSION`. Pastikan server menyajikan `.webmanifest` dengan tipe `application/manifest+json`.

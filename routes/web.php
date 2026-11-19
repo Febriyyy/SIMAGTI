@@ -14,9 +14,11 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanyReviewController;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DefenseController;
+use App\Http\Controllers\DefenseMinutesController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentQueueController;
 use App\Http\Controllers\ExportController;
@@ -129,11 +131,16 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     Route::get('/laporan-kp/komentar/{comment}/berkas', [ReportDiscussionController::class, 'commentFile'])->whereNumber('comment')->name('laporan.komentar.berkas');
     Route::get('/laporan-kp/{internship}/akhir/berkas', [ReportDiscussionController::class, 'finalFile'])->whereNumber('internship')->name('laporan.akhir.berkas');
 
+    // Berita acara sidang KP (mahasiswa, dosen pembimbing, kaprodi), setelah nilai sidang disahkan
+    Route::get('/sidang/{internship}/berita-acara', [DefenseMinutesController::class, 'show'])->whereNumber('internship')->name('sidang.berita');
+
     // ---------- Mahasiswa ----------
     Route::middleware(EnsureRole::class.':mahasiswa')->group(function () {
         // Status KP (dulu "Pengajuan KP"): pengajuan dan kemajuannya langkah demi langkah
         Route::get('/status-kp', [InternshipApplicationController::class, 'index'])->name('kp.status');
         Route::post('/status-kp', [InternshipApplicationController::class, 'store'])->middleware('throttle:10,1')->name('kp.apply');
+        // Ulasan tempat magang setelah masa magang berakhir
+        Route::post('/status-kp/ulasan', [CompanyReviewController::class, 'store'])->middleware('throttle:10,1')->name('ulasan.simpan');
 
         // Kegiatan: board, list, proyek, kolom, task
         Route::get('/kegiatan', [StudentTaskController::class, 'index'])->name('kegiatan.index');

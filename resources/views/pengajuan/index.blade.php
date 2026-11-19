@@ -106,13 +106,17 @@
                                 <div><dt>Sidang KP</dt><dd>{{ $internship->defenseSchedule->whenLabel() }}<small>{{ $internship->defenseSchedule->isOnline() ? 'Daring · ' : '' }}{{ $internship->defenseSchedule->place }}@if ($internship->defenseSchedule->examiner) · Penguji {{ $internship->defenseSchedule->examiner->name }}@endif<a href="{{ \App\Support\CalendarLink::defense($internship->defenseSchedule, $internship->student->name) }}" target="_blank" rel="noopener noreferrer" class="cal-link">Tambah ke Google Calendar</a></small></dd></div>
                             @endif
                             @if ($internship->defenseScore)
-                                <div><dt>Nilai sidang</dt><dd>{{ $internship->defenseScore->letter_grade }} · {{ \App\Support\Num::short($internship->defenseScore->score) }}<small>Sidang {{ $internship->defenseScore->defended_at?->locale('id')->translatedFormat('j F Y') }}</small></dd></div>
+                                <div><dt>Nilai sidang</dt><dd>{{ $internship->defenseScore->letter_grade }} · {{ \App\Support\Num::short($internship->defenseScore->score) }}<small>Sidang {{ $internship->defenseScore->defended_at?->locale('id')->translatedFormat('j F Y') }}@if ($internship->defenseScore->lecturer_score !== null)<a href="{{ route('sidang.berita', $internship) }}" target="_blank" rel="noopener" class="cal-link">Berita acara sidang</a>@endif</small></dd></div>
                             @endif
                         </dl>
                     </div>
                 </section>
             </div>
         </div>
+    @endif
+
+    @if (\App\Http\Controllers\CompanyReviewController::canReview($internship))
+        @include('pengajuan._ulasan', ['internship' => $internship, 'review' => \App\Models\CompanyReview::where('internship_id', $internship->id)->first()])
     @endif
 
     @if ($canSubmit)

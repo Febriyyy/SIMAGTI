@@ -346,3 +346,19 @@ Riwayat berkas bab laporan; setiap unggahan menjadi satu versi dan berkas lama t
 | file_id | FK files | berkas versi ini |
 | version | int | unik per bab |
 | submitted_at | timestamp, null | |
+
+### company_reviews (19 November 2026)
+
+Ulasan tempat magang dari mahasiswa setelah masa magang berakhir (status `selesai`, atau `berjalan` dengan `end_date` sudah lewat). Satu ulasan per KP, bisa diperbarui.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| internship_id | FK internships, unik | hapus berantai |
+| company_id | FK companies | untuk rata-rata per perusahaan |
+| student_id | FK users | penulis (nama hanya tampil untuk TU/kaprodi di halaman perusahaan) |
+| mentoring, work_fit, environment | tinyint 1–5 | bimbingan supervisor, kesesuaian tugas, lingkungan kerja |
+| rating | decimal(3,2) | rata-rata tiga aspek |
+| recommend | boolean | merekomendasikan ke adik tingkat |
+| comment | text, null | |
+
+Tampil tanpa nama di halaman Lowongan (rating per perusahaan, rincian aspek, 3 komentar terbaru).

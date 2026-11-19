@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Company;
+use App\Models\CompanyReview;
 use App\Models\Internship;
 use App\Models\JobPosting;
 use App\Models\Portfolio;
@@ -101,6 +102,9 @@ class JobPostingController extends Controller
             // Skill mahasiswa (dari portofolio) untuk menandai lowongan yang cocok
             'mySkills' => $user->skills()->pluck('skills.id')->all(),
             'hasPortfolio' => $user->skills()->exists() || Portfolio::where('user_id', $user->id)->whereNotNull('about')->exists(),
+            // Ulasan alumni magang per perusahaan (tanpa nama)
+            'reviews' => CompanyReview::latest()->get(['company_id', 'mentoring', 'work_fit', 'environment', 'rating', 'recommend', 'comment', 'created_at'])
+                ->groupBy('company_id')->map(fn ($r) => CompanyReview::summarize($r) + ['comments' => $r->whereNotNull('comment')->take(3)->pluck('comment')->all()]),
         ]);
     }
 

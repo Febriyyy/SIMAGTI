@@ -6,6 +6,7 @@ use App\Actions\Companies\BuildCompanyStats;
 use App\Actions\Companies\SaveCompany;
 use App\Http\Requests\Companies\SaveCompanyRequest;
 use App\Models\Company;
+use App\Models\CompanyReview;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,9 +21,9 @@ class CompanyController extends Controller
         $search = trim((string) $request->query('q'));
 
         $companies = Company::withCount([
-                'internships',
-                'internships as active_internships_count' => fn ($q) => $q->where('status', 'berjalan'),
-            ])
+            'internships',
+            'internships as active_internships_count' => fn ($q) => $q->where('status', 'berjalan'),
+        ])
             ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->orderBy('name')
             ->limit(200)
@@ -39,8 +40,10 @@ class CompanyController extends Controller
         Gate::authorize('viewStats', $company);
 
         $stats = $build->handle($company);
+        $reviews = $company->reviews()->with('student')->latest()->get();
+        $reviewSummary = CompanyReview::summarize($reviews);
 
-        return view('perusahaan.show', compact('company', 'stats'));
+        return view('perusahaan.show', compact('company', 'stats', 'reviews', 'reviewSummary'));
     }
 
     public function create(): View

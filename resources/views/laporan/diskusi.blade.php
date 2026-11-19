@@ -41,6 +41,7 @@
         <div class="rd-archive" role="status">
             <x-ikon name="lock" :size="18" />
             <p><b>Nilai sidang sudah disahkan.</b> Laporan KP ini kini arsip dan hanya bisa dibaca.@if ($internship->defenseScore) Nilai sidang {{ \App\Support\Num::short($internship->defenseScore->score) }} ({{ $internship->defenseScore->letter_grade }}).@endif</p>
+            <a href="{{ route('sidang.berita', $internship) }}" target="_blank" rel="noopener" class="btn btn-sm">Berita acara</a>
         </div>
     @endif
 

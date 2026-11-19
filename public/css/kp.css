@@ -6051,5 +6051,70 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 
 /* Laporan KP arsip (nilai sidang sudah disahkan) */
 .rd-archive { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 20px; background: var(--primary-tint); color: var(--primary); }
-.rd-archive p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text); }
+.rd-archive p { flex: 1; margin: 0; font-size: 14px; line-height: 1.5; color: var(--text); }
 .rd-archive b { color: var(--primary); }
+
+/* =====================================================================
+   Ulasan tempat magang
+   ===================================================================== */
+/* Bintang tampilan: dua lapis bintang, lapis berwarna dipotong sesuai nilai */
+.stars { --star-size: 14px; position: relative; display: inline-block; width: calc(var(--star-size) * 5); height: var(--star-size); vertical-align: -2px;
+    --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z'/%3E%3C/svg%3E");
+    background: var(--line-strong); -webkit-mask: var(--star) repeat-x left center / var(--star-size) var(--star-size); mask: var(--star) repeat-x left center / var(--star-size) var(--star-size); }
+.stars::before { content: ""; position: absolute; inset: 0; width: var(--stars); background: #f2b01e; }
+
+/* Formulir ulasan di Status KP: bintang besar yang bisa diklik (urutan terbalik agar hover menyala ke kiri) */
+.rv-form { display: flex; flex-direction: column; gap: 4px; }
+.rv-aspect { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0; padding: 12px 0; border: 0; border-bottom: 1px dashed var(--line); }
+.rv-aspect legend { float: left; display: flex; flex-direction: column; gap: 2px; padding: 0; }
+.rv-aspect legend b { font-size: 14.5px; font-weight: 650; }
+.rv-aspect legend small { font-size: 12.5px; color: var(--muted); }
+.rv-aspect .field-error { flex-basis: 100%; margin: 0; }
+.rv-aspect { flex-wrap: wrap; }
+.rv-rate { display: inline-flex; flex-direction: row-reverse; gap: 2px; }
+.rv-rate input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.rv-rate label { width: 30px; height: 30px; cursor: pointer; background: var(--line-strong); transition: transform 140ms, background-color 140ms;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z'/%3E%3C/svg%3E") center / 26px no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z'/%3E%3C/svg%3E") center / 26px no-repeat; }
+.rv-rate input:checked ~ label, .rv-rate label:hover, .rv-rate label:hover ~ label { background: #f2b01e; }
+.rv-rate label:hover { transform: scale(1.12); }
+.rv-rate input:focus-visible + label { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+.rv-choice { display: inline-flex; gap: 6px; }
+.rv-choice label { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line-strong); font-size: 14px; font-weight: 600; cursor: pointer; }
+.rv-choice input { accent-color: var(--primary); margin: 0; }
+.rv-choice label:has(input:checked) { background: var(--primary-tint); box-shadow: inset 0 0 0 1.5px var(--primary); color: var(--primary); }
+.rv-form .field { margin-top: 12px; }
+.rv-form .row-actions { margin-top: 8px; }
+
+/* Rating di daftar lowongan dan dialog detail */
+.jb-row-rating { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.jb-row-rating b { color: var(--text); font-weight: 700; }
+.job-reviews h3 small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.rv-bars { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 0; }
+.rv-bars > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 12px; font-size: 13.5px; }
+.rv-bars dt { color: var(--text); }
+.rv-bars dd { display: flex; align-items: center; gap: 10px; margin: 0; }
+.rv-bars dd b { width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+.rv-bar { flex: 1; height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.rv-bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary); }
+.rv-quote { margin: 12px 0 0; padding: 10px 14px; border-left: 3px solid var(--lime, #c9f065); border-radius: 0 12px 12px 0; background: var(--surface-2); font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+/* Halaman perusahaan */
+.rv-score { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.rv-score b { font-size: 28px; font-weight: 750; letter-spacing: -0.03em; line-height: 1; color: var(--text); }
+.rv-company { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.rv-company .rv-bars { margin: 0; }
+.rv-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.rv-list > li { display: flex; gap: 12px; padding: 12px 0; }
+.rv-list > li + li { border-top: 1px solid var(--line); }
+.rv-list-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; font-size: 13.5px; color: var(--muted); }
+.rv-list-head b { color: var(--text); }
+.rv-list-body { margin: 4px 0 0; font-size: 14px; line-height: 1.55; }
+.rv-norec { padding: 1px 8px; border-radius: 999px; background: var(--red-soft, #fdecec); color: var(--red, #d23c3c); font-size: 12px; font-weight: 600; }
+@media (max-width: 760px) {
+    .rv-company { grid-template-columns: 1fr; gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rv-rate label { transition: none; }
+    .rv-rate label:hover { transform: none; }
+}
