@@ -6,7 +6,7 @@ use Illuminate\Notifications\Notification;
 
 /**
  * Kabar singkat di lonceng notifikasi (disimpan di tabel notifications).
- * Hanya kanal database untuk sekarang; kanal email bisa ditambah di via() setelah SMTP siap.
+ * Kabar penting juga dikirim lewat email oleh Notify::send(..., email: true) memakai KpEmail.
  */
 class KpNotice extends Notification
 {

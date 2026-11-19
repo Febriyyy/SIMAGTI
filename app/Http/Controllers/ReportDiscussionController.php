@@ -43,7 +43,7 @@ class ReportDiscussionController extends Controller
         $user = $request->user();
         abort_unless(DiscussReport::canDiscuss($user, $internship), 403);
 
-        $chapters = ManageReportChapters::ensureFor($internship)->load('reviser');
+        $chapters = ManageReportChapters::ensureFor($internship)->load(['reviser', 'versions.file']);
         $chapters->each->setRelation('internship', $internship);
         $internship->load(['student', 'lecturer', 'finalReport.file', 'reportScore', 'defenseScore', 'reportComments.user', 'reportComments.file']);
         $threads = $internship->reportComments->groupBy(fn (ReportComment $c) => $c->report_chapter_id ?? 'akhir');

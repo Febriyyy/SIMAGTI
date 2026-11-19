@@ -80,7 +80,7 @@ class RecordDefense
         $name = $internship->student->name;
         ActivityLog::record($isNew ? 'sidang.sahkan' : 'sidang.ubah', ($isNew ? 'Mengesahkan' : 'Mengubah').' nilai sidang '.$name, $defense);
         if ($isNew) {
-            Notify::send($internship->student, 'Nilai sidang KP sudah disahkan', 'Nilai '.Num::short($defense->score).' ('.$defense->letter_grade.').', route('kp.status'), 'award', 'green');
+            Notify::send($internship->student, 'Nilai sidang KP sudah disahkan', 'Nilai '.Num::short($defense->score).' ('.$defense->letter_grade.').', route('kp.status'), 'award', 'green', email: true);
             if ($internship->lecturer) {
                 Notify::send($internship->lecturer, 'Nilai sidang '.$internship->student->listName().' disahkan', 'Nilai '.Num::short($defense->score).' ('.$defense->letter_grade.').', route('laporan.diskusi', $internship).'#nilai', 'award', 'green');
             }

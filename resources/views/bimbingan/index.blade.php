@@ -58,9 +58,14 @@
                     <h2 class="gnext-title">{{ $next->topic }}</h2>
                     <p class="gnext-sub">Dijadwalkan {{ $internship->lecturer?->listName() ?? 'dosen pembimbing' }}</p>
                 </div>
-                @if ($next->canJoin())
-                    <a href="{{ $next->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary gnext-join"><x-ikon name="video" :size="18" /> Gabung</a>
-                @endif
+                <div class="gnext-actions">
+                    <a href="{{ \App\Support\CalendarLink::guidance($next) }}" target="_blank" rel="noopener noreferrer" class="btn">
+                        <x-ikon name="calendar" :size="18" /> Tambah ke Google Calendar
+                    </a>
+                    @if ($next->canJoin())
+                        <a href="{{ $next->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary gnext-join"><x-ikon name="video" :size="18" /> Gabung</a>
+                    @endif
+                </div>
             </section>
         @endif
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Reports\ManageReportChapters;
 use App\Models\Internship;
 use App\Models\ReportChapter;
+use App\Models\ReportChapterVersion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +65,20 @@ class ReportChapterController extends Controller
         $reports->review($request->user(), $chapter->load('internship.student'), $data['keputusan'] === 'setujui', $data['catatan'] ?? null);
 
         return back()->with('status', $data['keputusan'] === 'setujui' ? "{$chapter->label()} disetujui." : "Catatan revisi {$chapter->label()} dikirim ke mahasiswa.");
+    }
+
+    /** Berkas versi lama satu bab (hak baca sama dengan berkas bab). */
+    public function version(Request $request, ReportChapterVersion $version): StreamedResponse
+    {
+        abort_unless($version->chapter->canBeReadBy($request->user()), 403);
+        $file = $version->file;
+        abort_unless($file && Storage::disk($file->disk)->exists($file->path), 404);
+
+        return Storage::disk($file->disk)->response($file->path, $file->original_name, [
+            'Content-Type' => $file->mime_type,
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-store',
+        ]);
     }
 
     public function file(Request $request, ReportChapter $chapter): StreamedResponse

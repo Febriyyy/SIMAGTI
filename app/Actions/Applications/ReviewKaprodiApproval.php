@@ -53,7 +53,7 @@ class ReviewKaprodiApproval
                 $internship->update(['status' => 'ditolak']);
             }
 
-            Notify::send($internship->student, $approve ? 'Pengajuan KP disetujui' : 'Pengajuan KP tidak disetujui', $note, route('kp.status'), 'approval', $approve ? 'green' : 'red');
+            Notify::send($internship->student, $approve ? 'Pengajuan KP disetujui' : 'Pengajuan KP tidak disetujui', $note, route('kp.status'), 'approval', $approve ? 'green' : 'red', email: true);
             if ($approve && $lecturerId) {
                 Notify::send(User::find($lecturerId), "Anda ditunjuk sebagai dosen pembimbing {$internship->student->name}", $internship->placeName(), route('pantau.show', $internship), 'student');
             }

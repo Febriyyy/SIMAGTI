@@ -106,6 +106,15 @@
                                     @include('laporan._upload-chapter', ['label' => $chapter->status === 'revisi' ? 'Unggah revisi' : 'Ganti berkas', 'primary' => $chapter->status === 'revisi'])
                                 @endif
                             </div>
+                            <?php $older = $chapter->versions->where('version', '<', $chapter->version); ?>
+                            @if ($older->isNotEmpty())
+                                <div class="rd-versions">
+                                    <span>Versi sebelumnya</span>
+                                    @foreach ($older as $v)
+                                        <a href="{{ route('laporan.versi', $v) }}" target="_blank" rel="noopener" title="{{ $v->file?->original_name }}">v{{ $v->version }} <small>{{ $v->submitted_at?->locale('id')->translatedFormat('j M') }}</small></a>
+                                    @endforeach
+                                </div>
+                            @endif
                         @elseif (! $chapter->file)
                             @if ($canUpload)
                                 <div class="rd-drop">

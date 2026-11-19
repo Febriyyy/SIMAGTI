@@ -6009,3 +6009,18 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .rd-file-row, .rd-drop { flex-direction: column; align-items: stretch; }
     .rd-up label { width: 100%; justify-content: center; }
 }
+
+/* Riwayat versi bab laporan */
+.rd-versions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: -6px; font-size: 13px; }
+.rd-versions > span { color: var(--muted); margin-right: 2px; }
+.rd-versions a { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); font-weight: 600; text-decoration: none; font-variant-numeric: tabular-nums; }
+.rd-versions a:hover { border-color: var(--primary); color: var(--primary); }
+.rd-versions small { font-weight: 400; color: var(--muted); }
+
+/* Tambah ke Google Calendar */
+.gnext-actions { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cal-link { display: block; margin-top: 4px; font-weight: 600; color: var(--primary); }
+@media (max-width: 640px) {
+    .gnext-actions { flex: 1 1 100%; }
+    .gnext-actions .btn { flex: 1 1 auto; justify-content: center; }
+}

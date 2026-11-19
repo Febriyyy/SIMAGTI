@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /** Satu bab laporan KP beserta status persetujuannya. */
 class ReportChapter extends Model
@@ -50,6 +51,12 @@ class ReportChapter extends Model
     public function file(): BelongsTo
     {
         return $this->belongsTo(StoredFile::class, 'file_id');
+    }
+
+    /** Semua versi berkas bab ini, terbaru di atas. */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(ReportChapterVersion::class)->orderByDesc('version');
     }
 
     public function reviser(): BelongsTo

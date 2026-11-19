@@ -77,7 +77,7 @@ class DiscussReport
             $title = $isStudent
                 ? $internship->student->listName().' membalas diskusi '.$where
                 : ($stored ? 'Berkas koreksi '.$where.' dari dosen pembimbing' : 'Komentar baru pada '.$where);
-            Notify::send($to, $title, $body ? Str::limit($body, 120) : $stored?->original_name, $this->link($internship, $chapter), 'chat', $stored && ! $isStudent ? 'amber' : 'blue');
+            Notify::send($to, $title, $body ? Str::limit($body, 120) : $stored?->original_name, $this->link($internship, $chapter), 'chat', $stored && ! $isStudent ? 'amber' : 'blue', email: $stored !== null && ! $isStudent);
 
             return $comment;
         });

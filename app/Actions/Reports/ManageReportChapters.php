@@ -11,13 +11,13 @@ use App\Support\Notify;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
  * Laporan KP per bab. Mahasiswa mengunggah tiap bab; bab berisi informasi perusahaan ditinjau Company Supervisor
  * lebih dulu (bisa berisi data sensitif), lalu semua bab ditinjau dosen pembimbing. Revisi kembali ke awal alur.
+ * Setiap unggahan disimpan sebagai versi (report_chapter_versions) supaya revisi bisa dibandingkan.
  */
 class ManageReportChapters
 {
@@ -64,7 +64,6 @@ class ManageReportChapters
                 'uploaded_by' => $student->id,
             ]);
 
-            $old = $chapter->file;
             $chapter->update([
                 'file_id' => $stored->id,
                 'version' => $chapter->version + 1,
@@ -77,10 +76,8 @@ class ManageReportChapters
                 'revision_by' => null,
                 'revision_at' => null,
             ]);
-            if ($old) {
-                Storage::disk($old->disk)->delete($old->path);
-                $old->forceDelete();
-            }
+            // Versi lama tetap disimpan agar revisi bisa dibandingkan
+            $chapter->versions()->create(['file_id' => $stored->id, 'version' => $chapter->version, 'submitted_at' => $chapter->submitted_at]);
 
             ActivityLog::record('laporan.unggah', 'Mengunggah laporan '.$chapter->label(), $chapter);
             $reviewer = $chapter->needs_supervisor ? 'supervisor' : 'lecturer';
@@ -110,7 +107,7 @@ class ManageReportChapters
         if (! $approve) {
             $chapter->update(['status' => 'revisi', 'revision_note' => $note, 'revision_by' => $reviewer->id, 'revision_at' => now()]);
             ActivityLog::record('laporan.revisi', 'Meminta revisi '.$chapter->label().' '.$student->name, $chapter);
-            Notify::send($student, $chapter->label().' perlu revisi', $note, route('dokumen.index').'#laporan', 'file', 'amber');
+            Notify::send($student, $chapter->label().' perlu revisi', $note, route('laporan.diskusi', $internship).'#bab-'.$chapter->position, 'file', 'amber', email: true);
 
             return $chapter;
         }

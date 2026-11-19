@@ -44,9 +44,9 @@ class ScheduleDefense
         ActivityLog::record('sidang.jadwal', 'Sidang KP '.$student->name.' '.$verb.': '.$schedule->whenLabel(), $schedule);
 
         $where = ($schedule->isOnline() ? 'Daring' : 'Ruang '.$schedule->place);
-        Notify::send($student, 'Sidang KP '.$verb, $schedule->whenLabel().' · '.$where, route('kp.status'), 'calendar', 'blue');
+        Notify::send($student, 'Sidang KP '.$verb, $schedule->whenLabel().' · '.$where, route('kp.status'), 'calendar', 'blue', email: true);
         $staff = collect([$internship->lecturer, $schedule->examiner])->filter()->unique('id');
-        Notify::send($staff, 'Sidang KP '.$student->listName().' '.$verb, $schedule->whenLabel().' · '.$where, route('pantau.show', $internship), 'calendar', 'blue');
+        Notify::send($staff, 'Sidang KP '.$student->listName().' '.$verb, $schedule->whenLabel().' · '.$where, route('pantau.show', $internship), 'calendar', 'blue', email: true);
 
         return $schedule;
     }

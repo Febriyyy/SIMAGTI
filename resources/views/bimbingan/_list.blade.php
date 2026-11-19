@@ -29,6 +29,7 @@
                         <div><dt>Topik</dt><dd>{{ $s->topic }}</dd></div>
                         <div><dt>Waktu</dt><dd>{{ $s->held_on->locale('id')->translatedFormat('l, j F Y') }}{{ $s->timeLabel() ? ', '.$s->timeLabel() : '' }} · {{ \App\Models\GuidanceSession::MODES[$s->mode] ?? $s->mode }}</dd></div>
                         @if ($s->meeting_link)<div><dt>Tautan rapat</dt><dd><a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer">{{ $s->meeting_link }}</a></dd></div>@endif
+                        @if ($s->status === 'scheduled')<div><dt>Kalender</dt><dd><a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer">Tambah ke Google Calendar</a></dd></div>@endif
                         @if ($s->notes)<div><dt>Catatan mahasiswa</dt><dd>{{ $s->notes }}</dd></div>@endif
                         @if ($s->lecturer_note)<div><dt>Catatan dosen</dt><dd>{{ $s->lecturer_note }}</dd></div>@endif
                     </dl>

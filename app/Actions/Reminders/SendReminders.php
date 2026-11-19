@@ -4,6 +4,7 @@ namespace App\Actions\Reminders;
 
 use App\Actions\Conversions\ManageConversion;
 use App\Models\ConversionCandidate;
+use App\Models\DefenseSchedule;
 use App\Models\GuidanceSession;
 use App\Models\Internship;
 use App\Models\User;
@@ -21,6 +22,9 @@ use Illuminate\Support\Carbon;
  * - Mahasiswa: tawaran kerja belum dijawab, H-3 dan H-1 sebelum batas (masing-masing sekali); lewat batas menjadi kedaluwarsa.
  *
  * Pengingat yang sama tidak dikirim ulang: setiap pengingat punya kunci yang dicek di tabel notifications.
+ *
+ * Pengingat jadwal (perintah kp:pengingat-jadwal, tiap 15 menit; lihat upcoming()):
+ * bimbingan terjadwal dan sidang KP diingatkan sehari sebelumnya dan sekitar satu jam sebelum mulai.
  */
 class SendReminders
 {
@@ -31,6 +35,9 @@ class SendReminders
     public const SUPERVISOR_LAST_DAYS = 3;
 
     public const GUIDANCE_WAIT_DAYS = 3;
+
+    /** Pengingat "sebentar lagi" dikirim bila acara mulai dalam rentang ini (menit); jadwal perintah tiap 15 menit. */
+    public const SOON_MINUTES = 75;
 
     /** @return array{idle: int, due: int, assessment: int, guidance: int, offers: int, expired: int} */
     public function handle(?Carbon $today = null): array
@@ -55,6 +62,73 @@ class SendReminders
         $sent['expired'] = ManageConversion::expireOverdue($today);
 
         return $sent;
+    }
+
+    /**
+     * Pengingat bimbingan terjadwal dan sidang KP: H-1 (acara dalam 24 jam ke depan) dan menjelang mulai (<= SOON_MINUTES).
+     * Bila acara sudah dekat, hanya pengingat menjelang mulai yang dikirim.
+     *
+     * @return array{guidance: int, defense: int}
+     */
+    public function upcoming(?Carbon $now = null): array
+    {
+        $now = ($now ?? Carbon::now())->copy();
+        $sent = ['guidance' => 0, 'defense' => 0];
+
+        $sessions = GuidanceSession::with('internship.student', 'internship.lecturer')
+            ->where('status', 'scheduled')
+            ->whereDate('held_on', '>=', $now->toDateString())
+            ->whereDate('held_on', '<=', $now->copy()->addDay()->toDateString())
+            ->get();
+        foreach ($sessions as $s) {
+            $stage = $this->stage($now, $s->startsAt());
+            if (! $stage) {
+                continue;
+            }
+            $when = $stage === 'soon' ? 'Mulai pukul '.$s->timeLabel() : 'Besok pukul '.$s->timeLabel();
+            if ($stage === 'day' && $s->held_on->isSameDay($now)) {
+                $when = 'Hari ini pukul '.$s->timeLabel();
+            }
+            $body = $when.' · '.$s->modeLabel().($s->meeting_link ? '. Gabung: '.$s->meeting_link : '');
+            $title = ($stage === 'soon' ? 'Sebentar lagi: bimbingan ' : 'Pengingat bimbingan: ').$s->topic;
+            $sent['guidance'] += $this->send($s->internship->student, "guidance-{$stage}:{$s->id}", null, $title, $body, route('bimbingan.index'), 'calendar', 'blue');
+            if ($stage === 'soon' && $s->internship->lecturer) {
+                $this->send($s->internship->lecturer, "guidance-{$stage}:{$s->id}", null, 'Sebentar lagi: bimbingan '.$s->internship->student->listName(), $body, route('bimbingan.antrean'), 'calendar', 'blue');
+            }
+        }
+
+        $defenses = DefenseSchedule::with('internship.student', 'internship.lecturer', 'internship.defenseScore', 'examiner')
+            ->whereBetween('scheduled_at', [$now, $now->copy()->addDay()])
+            ->get()
+            ->filter(fn (DefenseSchedule $d) => $d->internship->defenseScore === null);
+        foreach ($defenses as $d) {
+            $stage = $this->stage($now, $d->scheduled_at);
+            if (! $stage) {
+                continue;
+            }
+            $student = $d->internship->student;
+            $body = $d->whenLabel().' · '.($d->isOnline() ? 'Daring: ' : 'Ruang ').$d->place;
+            $prefix = $stage === 'soon' ? 'Sebentar lagi: ' : 'Pengingat: ';
+            $sent['defense'] += $this->send($student, "defense-{$stage}:{$d->id}", null, $prefix.'sidang KP', $body, route('kp.status'), 'calendar', 'blue');
+            foreach (collect([$d->internship->lecturer, $d->examiner])->filter()->unique('id') as $staff) {
+                $this->send($staff, "defense-{$stage}:{$d->id}", null, $prefix.'sidang KP '.$student->listName(), $body, route('pantau.show', $d->internship), 'calendar', 'blue');
+            }
+        }
+
+        return $sent;
+    }
+
+    /** 'soon' bila mulai dalam SOON_MINUTES menit, 'day' bila dalam 24 jam, null bila lewat atau masih jauh. */
+    private function stage(Carbon $now, Carbon $start): ?string
+    {
+        $minutes = $now->diffInMinutes($start, false);
+
+        return match (true) {
+            $minutes <= 0 => null,
+            $minutes <= self::SOON_MINUTES => 'soon',
+            $minutes <= 24 * 60 => 'day',
+            default => null,
+        };
     }
 
     /** Mahasiswa belum mengisi catatan selama IDLE_DAYS hari (tidak dikirim Sabtu/Minggu). */

@@ -121,6 +121,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
     // Berkas laporan per bab (dicek ReportChapter::canBeReadBy)
     Route::get('/laporan-bab/{chapter}/berkas', [ReportChapterController::class, 'file'])->whereNumber('chapter')->name('laporan.berkas');
+    Route::get('/laporan-bab/versi/{version}/berkas', [ReportChapterController::class, 'version'])->whereNumber('version')->name('laporan.versi');
 
     // Laporan KP bersama mahasiswa dan dosen pembimbing: diskusi per bab, berkas koreksi, laporan akhir (dicek DiscussReport)
     Route::get('/laporan-kp/{internship}', [ReportDiscussionController::class, 'show'])->whereNumber('internship')->name('laporan.diskusi');

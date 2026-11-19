@@ -53,7 +53,7 @@ class LogGuidance
 
         $when = $session->held_on->locale('id')->translatedFormat('l, j F Y').' pukul '.$session->timeLabel();
         ActivityLog::record('bimbingan.jadwal', "Menjadwalkan bimbingan {$internship->student->name}: {$session->topic}", $session);
-        Notify::send($internship->student, 'Jadwal bimbingan: '.$session->topic, $when.($session->meeting_link ? '. Gabung lewat tautan rapat di halaman Bimbingan.' : '.'), route('bimbingan.index'), 'calendar', 'blue');
+        Notify::send($internship->student, 'Jadwal bimbingan: '.$session->topic, $when.($session->meeting_link ? '. Gabung lewat tautan rapat di halaman Bimbingan.' : '.'), route('bimbingan.index'), 'calendar', 'blue', email: true);
 
         return $session;
     }
