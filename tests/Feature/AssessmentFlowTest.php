@@ -200,7 +200,7 @@ class AssessmentFlowTest extends TestCase
         $lecturer = $this->user('dospem@kp.test');
 
         $this->actingAs($lecturer)->get('/validasi')->assertOk()->assertSee('Fajar Pratama')->assertSee('Menunggu validasi');
-        $this->get("/validasi/{$fajar->id}")->assertOk()->assertSee('Rincian nilai')->assertSee('Hard skill')->assertSee('kontribusi');
+        $this->get("/validasi/{$fajar->id}")->assertOk()->assertSeeInOrder(['Nilai dosen pembimbing', 'Nilai Company Supervisor', 'Hard skill'])->assertSee('kontribusi');
 
         $this->patch("/validasi/{$fajar->id}", ['keputusan' => 'validasi', 'catatan' => 'Sesuai.'])
             ->assertRedirect('/validasi');

@@ -1,11 +1,11 @@
-{{-- Rincian nilai per kategori (hanya baca). Variabel: $rubric, $assessment --}}
+{{-- Rincian nilai per kategori (hanya baca), tiap kategori bisa dibuka-tutup. Variabel: $rubric, $assessment --}}
 @php($scores = $assessment ? $assessment->scores->keyBy('rubric_aspect_id') : collect())
 @php($sum = \App\Support\AssessmentStandard::breakdown($rubric, $assessment?->scores ?? collect(), \App\Support\AssessmentStandard::weightsFor($assessment)))
 @foreach (\App\Support\AssessmentStandard::CATEGORIES as $key => [$label, $hint])
     @php($cat = $sum['categories'][$key])
     @php($aspects = $rubric->aspects->where('category', $key)->where('kind', '!=', 'text'))
-    <div class="rate-group">
-        <div class="rate-head">
+    <details class="rate-group rate-fold">
+        <summary class="rate-head">
             <div>
                 <h3 class="rate-title">{{ $label }}</h3>
                 <p class="rate-sub">Bobot {{ \App\Support\Num::short($cat['weight']) }}% · {{ $cat['answered'] }}/{{ $cat['total'] }} dinilai</p>
@@ -14,7 +14,8 @@
                 <strong>{{ $cat['average'] !== null ? \App\Support\Num::short($cat['average']) : '–' }}</strong>
                 <small>kontribusi {{ \App\Support\Num::short($cat['contribution']) }}</small>
             </div>
-        </div>
+            <span class="rate-chev" aria-hidden="true"><x-ikon name="expand" :size="20" /></span>
+        </summary>
         <ul class="rate-list">
             @foreach ($aspects as $aspect)
                 @php($value = $scores->get($aspect->id)?->score)
@@ -30,7 +31,7 @@
                 </li>
             @endforeach
         </ul>
-    </div>
+    </details>
 @endforeach
 <div class="rate-total">
     <span>Nilai akhir</span>

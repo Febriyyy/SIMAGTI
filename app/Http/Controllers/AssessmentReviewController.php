@@ -37,7 +37,7 @@ class AssessmentReviewController extends Controller
     {
         Gate::authorize('view', $internship);
 
-        $internship->load(['student', 'company', 'supervisor', 'assessment.scores', 'assessment.assessor', 'assessment.validator']);
+        $internship->load(['student', 'company', 'supervisor', 'assessment.scores', 'assessment.assessor', 'assessment.validator', 'reportScore']);
         $assessment = $internship->assessment;
         $rubric = Assessment::rubricFor($internship);
         $canReview = $request->user()->can('validateAssessment', $internship);
@@ -51,7 +51,7 @@ class AssessmentReviewController extends Controller
         $assessment = $review->handle($request->user(), $internship, $data['keputusan'], $data['catatan'] ?? null);
 
         $message = $data['keputusan'] === 'validasi'
-            ? "Penilaian {$internship->student->name} tervalidasi: {$assessment->letter_grade} (".Num::short($assessment->final_score).")."
+            ? "Penilaian {$internship->student->name} tervalidasi: {$assessment->letter_grade} (".Num::short($assessment->final_score).').'
             : "Penilaian {$internship->student->name} dikembalikan ke penilai.";
 
         return redirect()->route('validasi.index')->with('status', $message);

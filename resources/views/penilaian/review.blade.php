@@ -18,7 +18,20 @@
         <div class="col">
             <section class="card">
                 <div class="card-head">
-                    <h2 class="card-title">Rincian nilai</h2>
+                    <div>
+                        <h2 class="card-title">Nilai dosen pembimbing</h2>
+                        <p class="card-sub">Laporan akhir · 50% nilai sidang</p>
+                    </div>
+                </div>
+                @include('penilaian._report-scores', ['report' => $internship->reportScore, 'canGrade' => (int) $internship->lecturer_id === (int) auth()->id()])
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <div>
+                        <h2 class="card-title">Nilai Company Supervisor</h2>
+                        <p class="card-sub">Hard skill, soft skill, attitude · 50% nilai sidang</p>
+                    </div>
                 </div>
                 @if ($assessment && $rubric)
                     @include('penilaian._scores')

@@ -6118,3 +6118,16 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .rv-rate label { transition: none; }
     .rv-rate label:hover { transform: none; }
 }
+
+/* Rincian nilai yang bisa dibuka-tutup (validasi, hasil, formulir penilaian) */
+.rate-fold > summary { list-style: none; cursor: pointer; transition: background-color 160ms; }
+.rate-fold > summary::-webkit-details-marker { display: none; }
+.rate-fold > summary:hover { background: var(--primary-tint); }
+.rate-fold > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.rate-fold > summary > div:first-child { flex: 1; min-width: 0; }
+.rate-chev { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); transition: transform 200ms var(--ease-ld, ease), color 160ms; }
+.rate-fold[open] .rate-chev { transform: rotate(180deg); color: var(--primary); }
+.rate-fold:not([open]) > summary { padding-bottom: var(--space-4); }
+@media (prefers-reduced-motion: reduce) {
+    .rate-fold > summary, .rate-chev { transition: none; }
+}
