@@ -78,8 +78,12 @@
             <div class="card"><div class="empty"><strong>Surat balasan belum perlu</strong> Kolom unggah muncul setelah pengajuan KP disetujui.</div></div>
         @endforelse
 
-        @if ($chapters->isNotEmpty())
-            @include('dokumen._laporan', ['chapters' => $chapters, 'internship' => $internship, 'canUpload' => in_array($internship->status, ['berjalan', 'selesai'], true)])
+        @if (in_array($internship->status, ['berjalan', 'selesai'], true))
+            <a href="{{ route('laporan.diskusi', $internship) }}" class="doc-report-link">
+                <x-ikon name="syllabus" :size="18" />
+                <span>Unggah dan diskusi laporan KP ada di menu <b>Laporan KP</b></span>
+                <x-ikon name="next" :size="16" />
+            </a>
         @endif
     @endif
 @endsection

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Documents\ManageDocuments;
-use App\Actions\Reports\ManageReportChapters;
 use App\Models\Internship;
 use App\Models\InternshipDocument;
 use App\Support\Campus;
@@ -35,8 +34,6 @@ class DocumentController extends Controller
         return view('dokumen.index', [
             'internship' => $internship,
             'canEdit' => $internship && in_array($internship->status, ['diajukan', 'berjalan'], true),
-            // Laporan per bab: muncul setelah KP berjalan
-            'chapters' => $internship ? ManageReportChapters::ensureFor($internship)->load('reviser') : collect(),
         ]);
     }
 

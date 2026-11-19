@@ -116,11 +116,11 @@ class ManageReportChapters
             $chapter->update(['status' => 'menunggu_dosen', 'supervisor_approved_by' => $reviewer->id, 'supervisor_approved_at' => now()]);
             ActivityLog::record('laporan.setuju_perusahaan', 'Menyetujui isi '.$chapter->label().' '.$student->name, $chapter);
             Notify::send(Notify::parties($internship, ['lecturer']), $student->listName().': '.$chapter->label().' disetujui perusahaan', 'Perlu ditinjau.', route('laporan.antrean'), 'file', 'blue');
-            Notify::send($student, $chapter->label().' disetujui Company Supervisor', 'Diteruskan ke dosen pembimbing.', route('dokumen.index').'#laporan', 'file', 'green');
+            Notify::send($student, $chapter->label().' disetujui Company Supervisor', 'Diteruskan ke dosen pembimbing.', route('laporan.diskusi', $internship).'#bab-'.$chapter->position, 'file', 'green');
         } else {
             $chapter->update(['status' => 'disetujui', 'approved_by' => $reviewer->id, 'approved_at' => now()]);
             ActivityLog::record('laporan.setuju', 'Menyetujui '.$chapter->label().' '.$student->name, $chapter);
-            Notify::send($student, $chapter->label().' disetujui dosen pembimbing', null, route('dokumen.index').'#laporan', 'file', 'green');
+            Notify::send($student, $chapter->label().' disetujui dosen pembimbing', null, route('laporan.diskusi', $internship).'#bab-'.$chapter->position, 'file', 'green');
         }
 
         return $chapter;

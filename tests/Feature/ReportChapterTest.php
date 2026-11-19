@@ -50,8 +50,8 @@ class ReportChapterTest extends TestCase
         $supervisor = $kp->supervisor;
         $lecturer = $kp->lecturer;
 
-        // Bab bawaan dibuat saat halaman Dokumen dibuka
-        $this->actingAs($student)->get('/dokumen')->assertOk()->assertSee('Laporan KP')->assertSee('dari 4 disetujui')->assertSee('Gambaran Umum Perusahaan');
+        // Bab bawaan dibuat saat halaman Laporan KP dibuka
+        $this->actingAs($student)->get("/laporan-kp/{$kp->id}")->assertOk()->assertSee('Laporan KP')->assertSee('dari 4 bab disetujui')->assertSee('Gambaran Umum Perusahaan');
         $this->assertSame(4, $kp->reportChapters()->count());
 
         $bab2 = $this->chapter($kp, 2);
@@ -70,7 +70,7 @@ class ReportChapterTest extends TestCase
         $this->actingAs($supervisor)->patch("/laporan-bab/{$bab2->id}", ['keputusan' => 'revisi'])->assertSessionHasErrors('catatan');
         $this->actingAs($supervisor)->patch("/laporan-bab/{$bab2->id}", ['keputusan' => 'revisi', 'catatan' => 'Hapus angka omzet.'])->assertSessionHasNoErrors();
         $this->assertSame('revisi', $bab2->fresh()->status);
-        $this->actingAs($student)->get('/dokumen')->assertSee('Hapus angka omzet.');
+        $this->actingAs($student)->get("/laporan-kp/{$kp->id}")->assertSee('Hapus angka omzet.');
 
         $this->actingAs($student)->post("/dokumen/laporan/{$bab2->id}", ['berkas' => $this->pdf()]);
         $this->actingAs($supervisor)->patch("/laporan-bab/{$bab2->id}", ['keputusan' => 'setujui'])->assertSessionHasNoErrors();
@@ -92,7 +92,7 @@ class ReportChapterTest extends TestCase
     {
         $student = $this->user('fajar@kp.test');
         $kp = $this->internshipOf('fajar@kp.test');
-        $this->actingAs($student)->get('/dokumen');
+        $this->actingAs($student)->get("/laporan-kp/{$kp->id}");
 
         $bab1 = $this->chapter($kp, 1);
         $this->actingAs($student)->post("/dokumen/laporan/{$bab1->id}", ['berkas' => $this->pdf()]);
@@ -106,7 +106,7 @@ class ReportChapterTest extends TestCase
     public function test_orang_lain_tidak_bisa_mengunggah_atau_membuka(): void
     {
         $kp = $this->internshipOf('fajar@kp.test');
-        $this->actingAs($this->user('fajar@kp.test'))->get('/dokumen');
+        $this->actingAs($this->user('fajar@kp.test'))->get("/laporan-kp/{$kp->id}");
         $bab1 = $this->chapter($kp, 1);
 
         $this->actingAs($this->user('mahasiswa@kp.test'))->post("/dokumen/laporan/{$bab1->id}", ['berkas' => $this->pdf()])->assertForbidden();
