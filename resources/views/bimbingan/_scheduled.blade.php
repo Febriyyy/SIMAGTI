@@ -1,7 +1,8 @@
 {{--
-    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Setiap sesi hanya satu baris dua tingkat:
-    tanggal | topik, lalu mahasiswa · jam · cara | waktu relatif | aksi.
-    Setelah sesi berlangsung, "Tandai selesai" membuka dialog untuk catatan hasil (tidak menumpuk di daftar).
+    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Satu baris per sesi:
+    tanggal | topik, lalu mahasiswa dan cara (berikon, boleh turun baris) | jam + waktu relatif | aksi.
+    Tata letak mengikuti lebar kartu (container query), bukan lebar layar, jadi tidak terpotong di kolom sempit.
+    Setelah sesi berlangsung, "Tandai selesai" membuka dialog untuk catatan hasil.
     Variabel: $sessions
 --}}
 <ul class="gsch">
@@ -25,13 +26,15 @@
             <div class="gsch-main min0">
                 <h3 class="gsch-topic" title="{{ $s->topic }}">{{ $s->topic }}</h3>
                 <p class="gsch-meta" @if ($s->notes) title="Pesan: {{ $s->notes }}" @endif>
-                    <span>{{ $s->internship->student->listName() }}</span>
-                    <span>{{ $s->timeLabel() }}</span>
-                    <span>{{ $s->modeLabel() }}</span>
+                    <span><x-ikon name="person" :size="15" />{{ $s->internship->student->listName() }}</span>
+                    <span><x-ikon name="{{ $s->mode === 'daring' ? 'video' : 'building' }}" :size="15" />{{ $s->modeLabel() }}</span>
                 </p>
             </div>
 
-            <span @class(['gsch-rel', 'is-now' => $held])>{{ $when }}</span>
+            <p @class(['gsch-time', 'is-now' => $held])>
+                <b>{{ $s->start_time ? substr($s->start_time, 0, 2).'.'.substr($s->start_time, 3, 2) : '–' }}</b>
+                <span>{{ $when }}</span>
+            </p>
 
             <div class="gsch-actions">
                 @if ($held)
