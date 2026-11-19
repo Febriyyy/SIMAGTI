@@ -50,6 +50,9 @@ class ManageReportChapters
         if (! in_array($internship->status, ['berjalan', 'selesai'], true)) {
             throw ValidationException::withMessages(['berkas' => 'Laporan hanya untuk KP yang berjalan atau selesai.']);
         }
+        if (DiscussReport::isLocked($internship)) {
+            throw ValidationException::withMessages(['berkas' => 'Nilai sidang sudah disahkan; laporan KP kini hanya bisa dibaca.']);
+        }
 
         $path = $file->storeAs("laporan/{$internship->id}", Str::uuid().'.'.strtolower($file->extension()), self::DISK);
 

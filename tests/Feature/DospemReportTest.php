@@ -115,6 +115,13 @@ class DospemReportTest extends TestCase
         $this->actingAs($lecturer)->put("/laporan-kp/{$salsa->id}/nilai", ['writing' => 30] + $points)->assertSessionHasErrors('writing');
         $this->actingAs($salsa->student)->post("/laporan-kp/{$salsa->id}/akhir", ['berkas' => $this->pdf()])->assertSessionHasErrors('berkas');
         $this->actingAs($kaprodi)->get("/laporan-kp/{$salsa->id}/akhir/berkas")->assertOk();
+
+        // Arsip hanya-baca: komentar dan unggah bab ditolak, tampil keterangan arsip
+        $this->actingAs($salsa->student)->get("/laporan-kp/{$salsa->id}")->assertSee('Nilai sidang sudah disahkan')->assertDontSee('Tulis pertanyaan atau tanggapan');
+        $this->actingAs($lecturer)->post("/laporan-kp/{$salsa->id}/komentar", ['isi' => 'Tambahan'])->assertSessionHasErrors('isi');
+        $bab = $salsa->reportChapters()->first();
+        $bab->update(['status' => 'revisi']);
+        $this->actingAs($salsa->student)->post("/dokumen/laporan/{$bab->id}", ['berkas' => $this->pdf()])->assertSessionHasErrors('berkas');
     }
 
     public function test_pengesahan_ditolak_bila_nilai_dosen_belum_ada(): void

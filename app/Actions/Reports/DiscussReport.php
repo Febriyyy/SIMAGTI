@@ -40,6 +40,12 @@ class DiscussReport
         return $user->role === 'mahasiswa' || $chapter->canBeReadBy($user);
     }
 
+    /** Setelah kaprodi mengesahkan nilai sidang, laporan KP menjadi arsip hanya-baca. */
+    public static function isLocked(Internship $internship): bool
+    {
+        return $internship->defenseScore()->whereNotNull('lecturer_score')->exists();
+    }
+
     /** Laporan akhir dibuka setelah semua bab disetujui dosen pembimbing. */
     public static function chaptersApproved(Internship $internship): bool
     {
@@ -53,6 +59,9 @@ class DiscussReport
         abort_unless(self::canDiscuss($user, $internship), 403);
         if ($chapter && ((int) $chapter->internship_id !== (int) $internship->id || ! self::canDiscussChapter($user, $chapter->setRelation('internship', $internship)))) {
             abort(403);
+        }
+        if (self::isLocked($internship)) {
+            throw ValidationException::withMessages(['isi' => 'Nilai sidang sudah disahkan; laporan KP kini hanya bisa dibaca.']);
         }
         $body = filled($body) ? trim($body) : null;
         if ($body === null && ! $file) {

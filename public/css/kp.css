@@ -6048,3 +6048,8 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .doc-report-link b { color: var(--text); }
 .doc-report-link .ikon { color: var(--primary); }
 .doc-report-link:hover { border-color: var(--primary); background: var(--primary-tint); color: var(--text); }
+
+/* Laporan KP arsip (nilai sidang sudah disahkan) */
+.rd-archive { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 20px; background: var(--primary-tint); color: var(--primary); }
+.rd-archive p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text); }
+.rd-archive b { color: var(--primary); }

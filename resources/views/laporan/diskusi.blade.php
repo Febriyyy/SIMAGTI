@@ -36,7 +36,15 @@
         @endunless
     </div>
 
-    @if ($isStudent)
+    @if ($locked)
+        {{-- Arsip: setelah nilai sidang disahkan, semua isian ditutup --}}
+        <div class="rd-archive" role="status">
+            <x-ikon name="lock" :size="18" />
+            <p><b>Nilai sidang sudah disahkan.</b> Laporan KP ini kini arsip dan hanya bisa dibaca.@if ($internship->defenseScore) Nilai sidang {{ \App\Support\Num::short($internship->defenseScore->score) }} ({{ $internship->defenseScore->letter_grade }}).@endif</p>
+        </div>
+    @endif
+
+    @if ($isStudent && ! $locked)
         {{-- Tiga langkah laporan: yang selesai bertanda centang, langkah berikutnya disorot --}}
         <?php
             $steps = [
@@ -130,7 +138,7 @@
 
                         @include('laporan._thread', ['thread' => $thread])
 
-                        @if ($canChat && ($chapter->file || $thread->isNotEmpty()))
+                        @if ($canChat && ! $locked && ($chapter->file || $thread->isNotEmpty()))
                             @include('laporan._compose', ['chapterId' => $chapter->id, 'label' => $chapter->label()])
                         @endif
                     </div>
@@ -170,7 +178,7 @@
                     @endif
 
                     @include('laporan._thread', ['thread' => $thread])
-                    @if ($final?->file || $thread->isNotEmpty())
+                    @if (! $locked && ($final?->file || $thread->isNotEmpty()))
                         @include('laporan._compose', ['chapterId' => null, 'label' => 'laporan akhir'])
                     @endif
                 </div>
