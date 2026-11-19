@@ -7,31 +7,44 @@
         <div>
             <a href="{{ route('validasi.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke validasi penilaian</a>
             <h1 class="page-title">Penilaian {{ $internship->student->name }}</h1>
-            <p class="page-sub">
-                Dinilai {{ $assessment?->assessor?->name ?? 'penilai' }}
-                @if ($assessment?->submitted_at) · dikirim {{ $assessment->submitted_at->locale('id')->translatedFormat('j M Y, H:i') }} @endif
-            </p>
+            <p class="page-sub">Dua penilaian terpisah: dosen pembimbing (A) dan Company Supervisor (B), masing-masing 50% nilai sidang.</p>
         </div>
     </div>
 
     <div class="layout">
         <div class="col">
-            <section class="card">
-                <div class="card-head">
-                    <div>
+            {{-- A. Penilaian dosen pembimbing: kartu sendiri, aksen lime --}}
+            <section class="card score-card is-lecturer">
+                <div class="card-head score-card-head">
+                    <span class="score-card-mark" aria-hidden="true">A</span>
+                    <div class="min0">
                         <h2 class="card-title">Nilai dosen pembimbing</h2>
                         <p class="card-sub">Laporan akhir · 50% nilai sidang</p>
                     </div>
+                    @if ($internship->lecturer)
+                        <span class="score-card-by">
+                            <x-avatar :user="$internship->lecturer" small />
+                            <span><b>{{ $internship->lecturer->listName() }}</b><small>Dosen pembimbing</small></span>
+                        </span>
+                    @endif
                 </div>
                 @include('penilaian._report-scores', ['report' => $internship->reportScore, 'canGrade' => (int) $internship->lecturer_id === (int) auth()->id()])
             </section>
 
-            <section class="card">
-                <div class="card-head">
-                    <div>
+            {{-- B. Penilaian Company Supervisor: kartu sendiri, aksen hijau; yang divalidasi di halaman ini --}}
+            <section class="card score-card is-supervisor">
+                <div class="card-head score-card-head">
+                    <span class="score-card-mark" aria-hidden="true">B</span>
+                    <div class="min0">
                         <h2 class="card-title">Nilai Company Supervisor</h2>
-                        <p class="card-sub">Hard skill, soft skill, attitude · 50% nilai sidang</p>
+                        <p class="card-sub">Hard skill, soft skill, attitude · 50% nilai sidang{{ $assessment?->submitted_at ? ' · dikirim '.$assessment->submitted_at->locale('id')->translatedFormat('j M Y') : '' }}</p>
                     </div>
+                    @if ($assessment?->assessor)
+                        <span class="score-card-by">
+                            <x-avatar :user="$assessment->assessor" small />
+                            <span><b>{{ $assessment->assessor->listName() }}</b><small>Company Supervisor</small></span>
+                        </span>
+                    @endif
                 </div>
                 @if ($assessment && $rubric)
                     @include('penilaian._scores')

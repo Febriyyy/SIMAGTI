@@ -6131,3 +6131,22 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 @media (prefers-reduced-motion: reduce) {
     .rate-fold > summary, .rate-chev { transition: none; }
 }
+
+/* Validasi penilaian: dua kartu nilai yang jelas terpisah (A dosen pembimbing, B Company Supervisor) */
+.score-card { position: relative; overflow: hidden; }
+.score-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+.score-card.is-lecturer::before { background: var(--lime, #c9f065); }
+.score-card.is-supervisor::before { background: var(--primary); }
+.score-card-head { display: flex; align-items: center; gap: 14px; }
+.score-card-head > .min0 { flex: 1; }
+.score-card-mark { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; font-size: 16px; font-weight: 800; }
+.is-lecturer .score-card-mark { background: var(--lime, #c9f065); color: var(--ink, #10231d); }
+.is-supervisor .score-card-mark { background: var(--primary); color: #fff; }
+.score-card-by { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--surface-2); }
+.score-card-by > span:not(.avatar) { display: flex; flex-direction: column; line-height: 1.2; }
+.score-card-by b { font-size: 13px; font-weight: 650; }
+.score-card-by small { font-size: 11.5px; color: var(--muted); }
+@media (max-width: 640px) {
+    .score-card-head { flex-wrap: wrap; }
+    .score-card-by { order: 3; margin-left: 52px; }
+}

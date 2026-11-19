@@ -37,7 +37,7 @@ class AssessmentReviewController extends Controller
     {
         Gate::authorize('view', $internship);
 
-        $internship->load(['student', 'company', 'supervisor', 'assessment.scores', 'assessment.assessor', 'assessment.validator', 'reportScore']);
+        $internship->load(['student', 'company', 'supervisor', 'assessment.scores', 'assessment.assessor', 'assessment.validator', 'reportScore', 'lecturer']);
         $assessment = $internship->assessment;
         $rubric = Assessment::rubricFor($internship);
         $canReview = $request->user()->can('validateAssessment', $internship);
