@@ -1,7 +1,7 @@
 {{--
-    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Satu baris tenang per sesi:
-    tanggal | topik + mahasiswa, jam, cara | waktu relatif | aksi. Pesan dosen tampil satu baris di bawah keterangan.
-    Setelah sesi berlangsung, baris catatan hasil dan "Tandai selesai" muncul di bawahnya.
+    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Setiap sesi hanya satu baris dua tingkat:
+    tanggal | topik, lalu mahasiswa · jam · cara | waktu relatif | aksi.
+    Setelah sesi berlangsung, "Tandai selesai" membuka dialog untuk catatan hasil (tidak menumpuk di daftar).
     Variabel: $sessions
 --}}
 <ul class="gsch">
@@ -24,41 +24,57 @@
 
             <div class="gsch-main min0">
                 <h3 class="gsch-topic" title="{{ $s->topic }}">{{ $s->topic }}</h3>
-                <p class="gsch-meta">
+                <p class="gsch-meta" @if ($s->notes) title="Pesan: {{ $s->notes }}" @endif>
                     <span>{{ $s->internship->student->listName() }}</span>
                     <span>{{ $s->timeLabel() }}</span>
                     <span>{{ $s->modeLabel() }}</span>
                 </p>
-                @if ($s->notes)<p class="gsch-note" title="{{ $s->notes }}">“{{ $s->notes }}”</p>@endif
             </div>
 
             <span @class(['gsch-rel', 'is-now' => $held])>{{ $when }}</span>
 
             <div class="gsch-actions">
-                @if ($s->canJoin())
+                @if ($held)
+                    <button type="button" class="btn btn-sm btn-primary" data-open="dlg-gdone-{{ $s->id }}"><x-ikon name="check" :size="16" /> <span class="gsch-long">Tandai selesai</span><span class="gsch-short">Selesai</span></button>
+                @elseif ($s->canJoin())
                     <a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"><x-ikon name="video" :size="16" /> Gabung</a>
                 @endif
                 <a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer" class="gsch-icon" title="Tambah ke Google Calendar" aria-label="Tambah {{ $s->topic }} ke Google Calendar"><x-ikon name="calendar" :size="18" /></a>
-                @unless ($held)
-                    <form method="POST" action="{{ route('bimbingan.decide', $s) }}" onsubmit="return confirm('Batalkan jadwal bimbingan ini? Mahasiswa akan diberi tahu.')">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" name="keputusan" value="tolak" class="gsch-icon is-danger" title="Batalkan jadwal" aria-label="Batalkan jadwal {{ $s->topic }}"><x-ikon name="close" :size="18" /></button>
-                    </form>
-                @endunless
-            </div>
-
-            @if ($held)
-                {{-- Setelah berlangsung: catat hasil lalu tandai selesai agar terhitung --}}
-                <form method="POST" action="{{ route('bimbingan.decide', $s) }}" class="gsch-done">
+                <form method="POST" action="{{ route('bimbingan.decide', $s) }}" onsubmit="return confirm('Batalkan jadwal bimbingan ini? Mahasiswa akan diberi tahu.')">
                     @csrf
                     @method('PATCH')
-                    <label class="sr-only" for="gsch-note-{{ $s->id }}">Catatan hasil {{ $s->topic }}</label>
-                    <input id="gsch-note-{{ $s->id }}" type="text" name="catatan" class="input" maxlength="500" placeholder="Catatan hasil bimbingan (opsional)">
-                    <button type="submit" name="keputusan" value="tolak" class="btn btn-sm btn-ghost" onclick="return confirm('Batalkan jadwal bimbingan ini?')">Batalkan</button>
-                    <button type="submit" name="keputusan" value="konfirmasi" class="btn btn-sm btn-primary"><x-ikon name="check" :size="16" /> Tandai selesai</button>
+                    <button type="submit" name="keputusan" value="tolak" class="gsch-icon is-danger" title="Batalkan jadwal" aria-label="Batalkan jadwal {{ $s->topic }}"><x-ikon name="close" :size="18" /></button>
                 </form>
-            @endif
+            </div>
         </li>
     @endforeach
 </ul>
+
+{{-- Catatan hasil bimbingan sebelum ditandai selesai --}}
+@foreach ($sessions->filter(fn ($s) => ! $s->held_on->isFuture()) as $s)
+    <dialog id="dlg-gdone-{{ $s->id }}" class="dialog">
+        <form method="POST" action="{{ route('bimbingan.decide', $s) }}" class="dialog-body">
+            @csrf
+            @method('PATCH')
+            <div class="dialog-head">
+                <div>
+                    <h2 class="card-title">Tandai bimbingan selesai</h2>
+                    <p class="card-sub">{{ $s->topic }} · {{ $s->internship->student->name }}</p>
+                </div>
+                <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
+            </div>
+            @if ($s->notes)
+                <p class="gsch-msg"><b>Pesan Anda</b> {{ $s->notes }}</p>
+            @endif
+            <div class="field">
+                <label class="label" for="gdone-note-{{ $s->id }}">Catatan hasil <span class="label-opt">(opsional)</span></label>
+                <textarea id="gdone-note-{{ $s->id }}" name="catatan" class="textarea" rows="3" maxlength="500" placeholder="Contoh: Bab 3 sudah sesuai, lanjut ke bab 4."></textarea>
+            </div>
+            <p class="hint">Sesi yang selesai terhitung untuk syarat minimal bimbingan mahasiswa.</p>
+            <div class="dialog-foot row-actions">
+                <button type="button" class="btn" data-close>Batal</button>
+                <button type="submit" name="keputusan" value="konfirmasi" class="btn btn-primary"><x-ikon name="check" :size="16" /> Tandai selesai</button>
+            </div>
+        </form>
+    </dialog>
+@endforeach
