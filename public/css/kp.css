@@ -6024,3 +6024,33 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .gnext-actions { flex: 1 1 100%; }
     .gnext-actions .btn { flex: 1 1 auto; justify-content: center; }
 }
+
+/* Jadwal bimbingan dari dosen (halaman Bimbingan dosen): tanggal | isi | aksi */
+.gsch { margin: 0; padding: 0; list-style: none; }
+.gsch-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; column-gap: 16px; row-gap: 12px; align-items: start; padding: 18px var(--card-x, 24px); }
+.gsch-row + .gsch-row { border-top: 1px solid var(--line); }
+.gsch-date { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 56px; height: 60px; border-radius: 16px; background: var(--primary-tint); color: var(--primary); line-height: 1; }
+.gsch-date b { font-size: 22px; font-weight: 750; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.gsch-date span { margin-top: 4px; font-size: 12px; font-weight: 600; }
+.gsch-row.is-due .gsch-date { background: var(--primary); color: #fff; }
+.gsch-main { display: flex; flex-direction: column; gap: 4px; }
+.gsch-when { margin: 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gsch-rel { margin-right: 4px; font-weight: 650; color: var(--text); }
+.gsch-rel.is-now { color: var(--primary); }
+.gsch-topic { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.3; }
+.gsch-who { display: flex; align-items: center; gap: 8px; margin: 2px 0 0; font-size: 13.5px; color: var(--muted); }
+.gsch-note { margin: 6px 0 0; padding: 8px 12px; border-radius: 12px; background: var(--surface-2); font-size: 13.5px; line-height: 1.5; color: var(--text); }
+.gsch-actions { display: flex; align-items: center; gap: 8px; }
+.gsch-actions form { margin: 0; }
+.gsch-cancel { color: var(--muted); }
+.gsch-cancel:hover { color: var(--red, #d23c3c); }
+.gsch-done { grid-column: 2 / -1; display: flex; align-items: center; gap: 8px; margin: 0; }
+.gsch-done .input { flex: 1; min-width: 0; }
+@media (max-width: 640px) {
+    .gsch-row { grid-template-columns: 48px minmax(0, 1fr); column-gap: 12px; }
+    .gsch-date { width: 48px; height: 52px; }
+    .gsch-actions, .gsch-done { grid-column: 2; flex-wrap: wrap; }
+    .gsch-actions .btn-primary { flex: 1; justify-content: center; }
+    .gsch-done .input { flex: 1 1 100%; }
+    .gsch-done .btn-primary { flex: 1; justify-content: center; }
+}

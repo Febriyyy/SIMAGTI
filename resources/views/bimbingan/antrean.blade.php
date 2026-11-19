@@ -26,7 +26,7 @@
                             <p class="card-sub">Tandai selesai setelah berlangsung agar terhitung</p>
                         </div>
                     </div>
-                    @include('bimbingan._list', ['sessions' => $scheduled, 'canDecide' => true, 'showStudent' => true])
+                    @include('bimbingan._scheduled', ['sessions' => $scheduled])
                 </section>
             @endif
             <section class="card">
