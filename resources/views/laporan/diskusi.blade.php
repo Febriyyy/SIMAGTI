@@ -117,20 +117,21 @@
                     <form method="POST" action="{{ route('laporan.nilai', $internship) }}" class="card-body rd-grade-form" data-rd-grade>
                         @csrf
                         @method('PUT')
-                        @foreach (\App\Models\ReportScore::ASPECTS as $key => [$label, $max])
-                            <div class="rd-aspect">
-                                <label for="nilai-{{ $key }}">{{ $label }}</label>
-                                <span class="rd-aspect-in">
-                                    <input id="nilai-{{ $key }}" type="number" name="{{ $key }}" class="input" min="0" max="{{ $max }}" step="1" inputmode="numeric" required value="{{ old($key, $score?->{$key}) }}" @disabled(! $final?->file)>
-                                    <small>/ {{ $max }}</small>
-                                </span>
-                                @error($key)<p class="field-error">{{ $message }}</p>@enderror
-                            </div>
-                        @endforeach
+                        <div class="rd-aspects">
+                            @foreach (\App\Models\ReportScore::ASPECTS as $key => [$label, $max])
+                                <div class="rd-aspect">
+                                    <label for="nilai-{{ $key }}">{{ $label }}</label>
+                                    <span class="rd-pts">
+                                        <input id="nilai-{{ $key }}" type="number" name="{{ $key }}" min="0" max="{{ $max }}" step="1" inputmode="numeric" placeholder="0" required value="{{ old($key, $score?->{$key}) }}" @disabled(! $final?->file)>
+                                        <small aria-hidden="true">/{{ $max }}</small>
+                                    </span>
+                                    @error($key)<p class="field-error">{{ $message }}</p>@enderror
+                                </div>
+                            @endforeach
+                        </div>
                         <div class="rd-total">
                             <span>Total</span>
-                            <b data-rd-total>{{ $score?->total ?? 0 }}</b>
-                            <small>/ 100</small>
+                            <span class="rd-total-val"><b data-rd-total>{{ $score?->total ?? 0 }}</b><small>/100</small></span>
                         </div>
                         <div class="field">
                             <label class="label" for="nilai-note">Catatan <span class="label-opt">(opsional)</span></label>
@@ -149,7 +150,7 @@
                                 <div><dt>{{ $label }}</dt><dd><b>{{ $score->{$key} }}</b> / {{ $max }}</dd></div>
                             @endforeach
                         </dl>
-                        <div class="rd-total"><span>Total</span><b>{{ $score->total }}</b><small>/ 100</small></div>
+                        <div class="rd-total"><span>Total</span><span class="rd-total-val"><b>{{ $score->total }}</b><small>/100</small></span></div>
                         @if ($score->note)<p class="rd-note">{{ $score->note }}</p>@endif
                     </div>
                 @else
