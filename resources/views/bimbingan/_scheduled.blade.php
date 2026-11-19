@@ -1,6 +1,7 @@
 {{--
-    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Satu baris per sesi:
-    tanggal | topik dan keterangan | aksi. Catatan hasil dan "Tandai selesai" baru muncul setelah sesi berlangsung.
+    Jadwal bimbingan yang dibuat dosen (halaman Bimbingan dosen). Satu baris tenang per sesi:
+    tanggal | topik + mahasiswa, jam, cara | waktu relatif | aksi. Pesan dosen tampil satu baris di bawah keterangan.
+    Setelah sesi berlangsung, baris catatan hasil dan "Tandai selesai" muncul di bawahnya.
     Variabel: $sessions
 --}}
 <ul class="gsch">
@@ -8,7 +9,7 @@
         <?php
             $days = (int) today()->diffInDays($s->held_on, false);
             $when = match (true) {
-                $days < 0 => 'Sudah berlangsung',
+                $days < 0 => 'Sudah lewat',
                 $days === 0 => 'Hari ini',
                 $days === 1 => 'Besok',
                 default => $days.' hari lagi',
@@ -22,25 +23,27 @@
             </time>
 
             <div class="gsch-main min0">
-                <p class="gsch-when"><span @class(['gsch-rel', 'is-now' => $days <= 0])>{{ $when }}</span> {{ $s->timeLabel() }} · {{ $s->modeLabel() }}</p>
-                <h3 class="gsch-topic">{{ $s->topic }}</h3>
-                <p class="gsch-who">
-                    <x-avatar :user="$s->internship->student" small />
+                <h3 class="gsch-topic" title="{{ $s->topic }}">{{ $s->topic }}</h3>
+                <p class="gsch-meta">
                     <span>{{ $s->internship->student->listName() }}</span>
+                    <span>{{ $s->timeLabel() }}</span>
+                    <span>{{ $s->modeLabel() }}</span>
                 </p>
-                @if ($s->notes)<p class="gsch-note">{{ $s->notes }}</p>@endif
+                @if ($s->notes)<p class="gsch-note" title="{{ $s->notes }}">“{{ $s->notes }}”</p>@endif
             </div>
+
+            <span @class(['gsch-rel', 'is-now' => $held])>{{ $when }}</span>
 
             <div class="gsch-actions">
                 @if ($s->canJoin())
                     <a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"><x-ikon name="video" :size="16" /> Gabung</a>
                 @endif
-                <a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-icon" title="Tambah ke Google Calendar" aria-label="Tambah {{ $s->topic }} ke Google Calendar"><x-ikon name="calendar" :size="16" /></a>
+                <a href="{{ \App\Support\CalendarLink::guidance($s) }}" target="_blank" rel="noopener noreferrer" class="gsch-icon" title="Tambah ke Google Calendar" aria-label="Tambah {{ $s->topic }} ke Google Calendar"><x-ikon name="calendar" :size="18" /></a>
                 @unless ($held)
                     <form method="POST" action="{{ route('bimbingan.decide', $s) }}" onsubmit="return confirm('Batalkan jadwal bimbingan ini? Mahasiswa akan diberi tahu.')">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" name="keputusan" value="tolak" class="btn btn-sm btn-ghost gsch-cancel">Batalkan</button>
+                        <button type="submit" name="keputusan" value="tolak" class="gsch-icon is-danger" title="Batalkan jadwal" aria-label="Batalkan jadwal {{ $s->topic }}"><x-ikon name="close" :size="18" /></button>
                     </form>
                 @endunless
             </div>
@@ -52,7 +55,7 @@
                     @method('PATCH')
                     <label class="sr-only" for="gsch-note-{{ $s->id }}">Catatan hasil {{ $s->topic }}</label>
                     <input id="gsch-note-{{ $s->id }}" type="text" name="catatan" class="input" maxlength="500" placeholder="Catatan hasil bimbingan (opsional)">
-                    <button type="submit" name="keputusan" value="tolak" class="btn btn-sm btn-ghost gsch-cancel" onclick="return confirm('Batalkan jadwal bimbingan ini?')">Batalkan</button>
+                    <button type="submit" name="keputusan" value="tolak" class="btn btn-sm btn-ghost" onclick="return confirm('Batalkan jadwal bimbingan ini?')">Batalkan</button>
                     <button type="submit" name="keputusan" value="konfirmasi" class="btn btn-sm btn-primary"><x-ikon name="check" :size="16" /> Tandai selesai</button>
                 </form>
             @endif
