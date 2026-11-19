@@ -11,6 +11,8 @@ class DefenseScore extends Model
     protected $fillable = [
         'internship_id',
         'score',
+        'lecturer_score',
+        'industry_score',
         'letter_grade',
         'grade_scale_version',
         'defended_at',
@@ -22,6 +24,8 @@ class DefenseScore extends Model
     {
         return [
             'score' => 'decimal:2',
+            'lecturer_score' => 'decimal:2',
+            'industry_score' => 'decimal:2',
             'defended_at' => 'date',
         ];
     }

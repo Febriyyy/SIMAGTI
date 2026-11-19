@@ -46,6 +46,24 @@
             </ol>
         </section>
 
+        @php($next = $sessions->where('status', 'scheduled')->filter(fn ($s) => $s->held_on->gte(today()))->sortBy(fn ($s) => $s->startsAt())->first())
+        @if ($next)
+            <section class="gnext" aria-label="Bimbingan berikutnya">
+                <time class="gnext-date" datetime="{{ $next->startsAt()->toIso8601String() }}">
+                    <b>{{ $next->held_on->format('j') }}</b>
+                    <span>{{ $next->held_on->locale('id')->translatedFormat('M') }}</span>
+                </time>
+                <div class="gnext-text min0">
+                    <p class="gnext-kicker">{{ $next->held_on->isToday() ? 'Hari ini' : $next->held_on->locale('id')->translatedFormat('l') }}{{ $next->timeLabel() ? ', '.$next->timeLabel() : '' }} · {{ $next->modeLabel() }}</p>
+                    <h2 class="gnext-title">{{ $next->topic }}</h2>
+                    <p class="gnext-sub">Dijadwalkan {{ $internship->lecturer?->listName() ?? 'dosen pembimbing' }}</p>
+                </div>
+                @if ($next->canJoin())
+                    <a href="{{ $next->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary gnext-join"><x-ikon name="video" :size="18" /> Gabung</a>
+                @endif
+            </section>
+        @endif
+
         <div class="layout gbim">
             <div class="col">
                 <section class="card">

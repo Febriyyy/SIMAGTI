@@ -5843,3 +5843,107 @@ body { background: var(--page); }
     .jb-head .jb-tools { margin: 4px -8px -6px; padding: 16px 8px 0; }
 }
 .jb-head-orgs { gap: 6px; padding-left: 0; } .jb-head-org { margin-left: 0; box-shadow: none; }
+
+/* =====================================================================
+   Laporan KP bersama (mahasiswa dan dosen pembimbing): utas per bab, laporan akhir, nilai 4 aspek
+   ===================================================================== */
+.rd { align-items: start; }
+.rd > .col:first-child { gap: 14px; }
+.rd-sec { padding: 0; overflow: hidden; }
+.rd-head { display: flex; align-items: center; gap: 14px; padding: 16px 20px; list-style: none; cursor: default; }
+summary.rd-head { cursor: pointer; }
+summary.rd-head::-webkit-details-marker { display: none; }
+summary.rd-head:hover { background: var(--surface-2); }
+summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.rd-num { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: var(--primary-tint, var(--surface-2)); color: var(--primary); font-weight: 750; font-variant-numeric: tabular-nums; }
+.rd-title { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.rd-title b { font-size: 15px; font-weight: 680; letter-spacing: -0.01em; color: var(--text); }
+.rd-title small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--muted); }
+.rd-body { display: flex; flex-direction: column; gap: 16px; padding: 4px 20px 20px; }
+.rd-sec[open] > .rd-body, .rd-final > .rd-body { border-top: 1px solid var(--line); padding-top: 16px; }
+.rd-empty { margin: 0; font-size: 14px; color: var(--muted); }
+
+.rd-file { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; color: var(--text); text-decoration: none; transition: border-color 160ms, background-color 160ms; }
+.rd-file:hover { border-color: var(--primary); background: var(--primary-tint, var(--surface-2)); }
+.rd-file > .ikon:first-child { color: var(--primary); }
+.rd-file > .min0 { flex: 1; display: flex; flex-direction: column; }
+.rd-file b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rd-file small { font-size: 12.5px; color: var(--muted); }
+
+.rd-thread { gap: 12px; }
+.rd-msg.is-mine .thread-body { background: var(--surface); }
+.rd-msg .prewrap { margin: 4px 0 0; font-size: 14px; line-height: 1.55; }
+.rd-attach { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin-top: 8px; padding: 6px 10px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--text); text-decoration: none; }
+.rd-attach:hover { border-color: var(--primary); }
+.rd-attach .min0 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rd-attach em { flex: none; font-style: normal; font-size: 11.5px; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--lime-soft, #eef8d6); color: var(--lime-ink, #3d5200); }
+.rd-attach.is-fix { border-color: var(--lime, #c9f065); }
+
+.rd-compose { display: flex; flex-direction: column; gap: 8px; }
+.rd-compose .textarea { min-height: 64px; resize: vertical; }
+.rd-compose-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rd-pick { display: inline-flex; align-items: center; gap: 6px; min-width: 0; min-height: 34px; font-size: 13px; font-weight: 550; color: var(--muted); cursor: pointer; }
+.rd-pick span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rd-pick:hover, .rd-pick:focus-within { color: var(--primary); }
+
+.rd-grade { position: sticky; top: 84px; }
+.rd-grade-form { display: flex; flex-direction: column; gap: 14px; }
+.rd-aspect { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; }
+.rd-aspect label { font-size: 14px; line-height: 1.35; color: var(--text); }
+.rd-aspect-in { display: inline-flex; align-items: center; gap: 6px; }
+.rd-aspect-in .input { width: 72px; text-align: right; font-variant-numeric: tabular-nums; }
+.rd-aspect-in small { width: 30px; font-size: 13px; color: var(--muted); }
+.rd-aspect .field-error { grid-column: 1 / -1; margin: 0; }
+.rd-total { display: flex; align-items: baseline; gap: 6px; padding: 14px 0 2px; border-top: 1px solid var(--line); }
+.rd-total span { flex: 1; font-size: 14px; font-weight: 600; color: var(--muted); }
+.rd-total b { font-size: 34px; font-weight: 750; letter-spacing: -0.04em; color: var(--primary); font-variant-numeric: tabular-nums; }
+.rd-total small { font-size: 14px; color: var(--muted); }
+.rd-scores { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.rd-scores > div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.rd-scores dt { color: var(--text); }
+.rd-scores dd { margin: 0; color: var(--muted); white-space: nowrap; }
+.rd-scores dd b { color: var(--text); }
+.rd-note { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
+
+@media (max-width: 960px) {
+    .rd-grade { position: static; }
+}
+@media (max-width: 720px) {
+    .rd-head { padding: 14px 16px; }
+    .rd-body { padding-left: 16px; padding-right: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rd-sec > summary::after { transition: none; }
+}
+
+.rtl-foot:has(a + a) { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+/* Pengesahan nilai sidang: rincian dosen 50% + industri 50% */
+.ds-calc { margin: 4px 0 14px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.ds-calc > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; }
+.ds-calc > div + div { border-top: 1px solid var(--line); }
+.ds-calc dt { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; color: var(--text); }
+.ds-calc dt small { font-size: 12.5px; font-weight: 400; color: var(--muted); }
+.ds-calc dd { margin: 0; display: flex; align-items: baseline; gap: 6px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ds-calc dd b { font-size: 18px; font-weight: 700; color: var(--text); }
+.ds-calc dd small { font-size: 13px; color: var(--muted); }
+.ds-calc .ds-calc-total { background: var(--primary-tint); }
+.ds-calc .ds-calc-total dd b { font-size: 26px; letter-spacing: -0.03em; color: var(--primary); }
+.ds-calc .ds-calc-total dd small { font-size: 15px; font-weight: 700; color: var(--primary); }
+.ds-miss { font-size: 13px; font-weight: 600; color: var(--amber-ink, #9a6200); }
+
+/* Bimbingan berikutnya yang dijadwalkan dosen (halaman Bimbingan mahasiswa) */
+.gnext { display: flex; align-items: center; gap: 18px; padding: 18px 22px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 4px 0 0 var(--primary); }
+.gnext-date { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 64px; border-radius: 16px; background: var(--primary); color: #fff; line-height: 1; }
+.gnext-date b { font-size: 26px; font-weight: 750; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.gnext-date span { margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--lime, #c9f065); }
+.gnext-text { flex: 1; }
+.gnext-kicker { margin: 0; font-size: 13px; font-weight: 600; color: var(--primary); }
+.gnext-title { margin: 2px 0 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
+.gnext-sub { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.gnext-join { flex: none; }
+.gtl-top > .btn { flex: none; }
+@media (max-width: 640px) {
+    .gnext { flex-wrap: wrap; padding: 16px; gap: 14px; }
+    .gnext-join { flex: 1 1 100%; justify-content: center; }
+}

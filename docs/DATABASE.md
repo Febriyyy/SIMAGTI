@@ -169,7 +169,7 @@ Dihapus di v3: `syllabus_items`, `monthly_reviews`, `credit_recognitions`, kuesi
 | Tabel / kolom | Isi | Kolom penting |
 |---|---|---|
 | `internships` (tambahan) | Konfirmasi supervisor, hasil akhir | `supervisor_confirmation` (confirmed, disputed), `supervisor_confirmation_note`, `supervisor_confirmed_at`, `result` (diterima, tidak), `result_note`, `final_score`, `final_grade` (dari penilaian tervalidasi), `result_by`, `result_at`; status `dibatalkan`, `pindah` |
-| `guidance_sessions` | Log bimbingan dosen | `held_on`, `mode` (daring, luring), `topic`, `status` (pending, confirmed, rejected) |
+| `guidance_sessions` | Log bimbingan dosen | `held_on`, `start_time`, `mode` (daring, luring), `meeting_link`, `topic`, `status` (scheduled, pending, confirmed, rejected) |
 | `internship_documents` | Surat pengantar dan surat balasan (diproses TU Fakultas) | unik (`internship_id`, `type`), `status` (diminta, terbit, menunggu, diunggah, diterima, ditolak), `number` unik, `file_id`, `due_on` |
 | `change_requests` | Pengajuan perubahan | `type` (extend, transfer, withdraw, replace_supervisor), `status`, `step` (supervisor, kaprodi, tu), `payload` (json) |
 
@@ -296,3 +296,42 @@ Tabel yang sudah ada dan kini dipakai UI: `task_templates` + `task_template_item
 ### links pada portfolio_projects dan portfolio_certificates (18 November 2026)
 
 Kolom `links` (json, null): sampai 5 tautan http/https per proyek atau sertifikat (repo, demo, Figma, video, dokumen, kredensial). Label tampil dikenali otomatis oleh `App\Support\LinkLabel` (GitHub, Figma, YouTube, Google Drive, LinkedIn, Credly, dll; selain itu nama domain). Kolom lama `url`/`credential_url` diisi tautan pertama untuk kompatibilitas. `portfolios.interests` kini juga menyimpan minat yang ditulis sendiri mahasiswa (total maks. 5).
+
+### Peran dosen pembimbing pada laporan dan sidang (19 November 2026)
+
+Migrasi `2026_11_19_100000_add_lecturer_report_review`.
+
+**final_reports**: laporan akhir utuh, satu per KP.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| internship_id | FK internships, unik | hapus berantai |
+| file_id | FK files, null | berkas terbaru; berkas lama dihapus saat diganti |
+| version | int | naik tiap unggah |
+| submitted_at | timestamp, null | |
+
+**report_comments**: diskusi mahasiswa dan dosen pembimbing.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| internship_id | FK internships | hapus berantai |
+| report_chapter_id | FK report_chapters, null | kosong = diskusi laporan akhir |
+| user_id | FK users | penulis |
+| body | text, null | isi; boleh kosong bila ada berkas |
+| file_id | FK files, null | lampiran; dari dosen = berkas koreksi |
+
+**report_scores**: nilai laporan akhir dari dosen pembimbing (yang juga penguji), sekali per KP.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| internship_id | FK internships, unik | |
+| writing | tinyint | tata penulisan laporan, 0–35 |
+| analysis | tinyint | pengamatan dan pembahasan, 0–25 |
+| explaining | tinyint | menjelaskan laporan, 0–25 |
+| conduct | tinyint | penampilan dan sikap, 0–15 |
+| total | tinyint | jumlah, 0–100 |
+| note, graded_by, graded_at | | |
+
+**defense_scores** (kolom baru): `lecturer_score`, `industry_score` (decimal, null). Nilai sidang = nilai dosen × 50% + nilai akhir penilaian Company Supervisor yang tervalidasi × 50%, dihitung saat kaprodi menekan **Sahkan**. Baris lama tanpa rincian (kedua kolom kosong) tetap disimpan apa adanya. Setelah disahkan, nilai laporan dan laporan akhir terkunci.
+
+**guidance_sessions** (kolom baru): `start_time` (time, null) dan `meeting_link` (string 300, null). Status `scheduled` = jadwal dari dosen; mahasiswa melihat tombol Gabung sampai tanggalnya lewat, dosen menandai selesai (menjadi `confirmed`) atau membatalkan (`rejected`).

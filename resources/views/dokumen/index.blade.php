@@ -79,7 +79,7 @@
         @endforelse
 
         @if ($chapters->isNotEmpty())
-            @include('dokumen._laporan', ['chapters' => $chapters, 'canUpload' => in_array($internship->status, ['berjalan', 'selesai'], true)])
+            @include('dokumen._laporan', ['chapters' => $chapters, 'internship' => $internship, 'canUpload' => in_array($internship->status, ['berjalan', 'selesai'], true)])
         @endif
     @endif
 @endsection

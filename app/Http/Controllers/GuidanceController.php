@@ -49,7 +49,7 @@ class GuidanceController extends Controller
     public function destroy(Request $request, GuidanceSession $session): RedirectResponse
     {
         $internship = $session->internship;
-        abort_unless((int) $internship->student_id === (int) $request->user()->id && $session->status !== 'confirmed', 403);
+        abort_unless((int) $internship->student_id === (int) $request->user()->id && in_array($session->status, ['pending', 'rejected'], true), 403);
         Gate::authorize('manageActivities', $internship);
         $session->delete();
 
@@ -66,8 +66,39 @@ class GuidanceController extends Controller
 
         $pending = GuidanceSession::with('internship.student')->whereIn('internship_id', $internships->pluck('id'))
             ->where('status', 'pending')->orderBy('held_on')->get();
+        $scheduled = GuidanceSession::with('internship.student')->whereIn('internship_id', $internships->pluck('id'))
+            ->where('status', 'scheduled')->orderBy('held_on')->orderBy('start_time')->get();
 
-        return view('bimbingan.antrean', ['internships' => $internships, 'pending' => $pending, 'min' => (int) Campus::rule('min_guidance')]);
+        return view('bimbingan.antrean', [
+            'internships' => $internships,
+            'pending' => $pending,
+            'scheduled' => $scheduled,
+            'min' => (int) Campus::rule('min_guidance'),
+        ]);
+    }
+
+    /** Dosen pembimbing menjadwalkan bimbingan untuk satu mahasiswa, dengan tautan Zoom atau Google Meet bila daring. */
+    public function schedule(Request $request, LogGuidance $log): RedirectResponse
+    {
+        $data = $request->validateWithBag('jadwal', [
+            'internship_id' => ['required', 'integer'],
+            'held_on' => ['required', 'date', 'after_or_equal:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'mode' => ['required', Rule::in(array_keys(GuidanceSession::MODES))],
+            'meeting_link' => ['nullable', 'required_if:mode,daring', 'url:https', 'max:300'],
+            'topic' => ['required', 'string', 'max:200'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ], [
+            'held_on.after_or_equal' => 'Tanggal bimbingan tidak boleh di masa lalu.',
+            'meeting_link.required_if' => 'Isi tautan Zoom atau Google Meet untuk bimbingan daring.',
+            'meeting_link.url' => 'Tautan rapat harus diawali https://.',
+        ], ['held_on' => 'tanggal', 'start_time' => 'jam', 'topic' => 'topik', 'meeting_link' => 'tautan rapat', 'notes' => 'catatan']);
+
+        $internship = Internship::with('student')->where('lecturer_id', $request->user()->id)
+            ->whereIn('status', ['berjalan', 'selesai'])->findOrFail($data['internship_id']);
+        $log->schedule($request->user(), $internship, $data);
+
+        return back()->with('status', 'Jadwal bimbingan dikirim ke '.rtrim($internship->student->listName(), '.').'.');
     }
 
     public function decide(Request $request, GuidanceSession $session, LogGuidance $log): RedirectResponse
@@ -78,8 +109,12 @@ class GuidanceController extends Controller
             'catatan' => ['nullable', 'string', 'max:500'],
         ]);
 
+        $was = $session->status;
         $log->decide($request->user(), $session, $data['keputusan'] === 'konfirmasi', $data['catatan'] ?? null);
 
-        return back()->with('status', $data['keputusan'] === 'konfirmasi' ? 'Bimbingan dikonfirmasi.' : 'Bimbingan ditolak.');
+        return back()->with('status', match (true) {
+            $data['keputusan'] === 'konfirmasi' => $was === 'scheduled' ? 'Bimbingan ditandai selesai.' : 'Bimbingan dikonfirmasi.',
+            default => $was === 'scheduled' ? 'Jadwal bimbingan dibatalkan.' : 'Bimbingan ditolak.',
+        });
     }
 }

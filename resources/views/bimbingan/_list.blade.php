@@ -8,9 +8,12 @@
                 <span class="item-icon tone-bg-{{ \App\Models\GuidanceSession::STATUSES[$s->status][1] ?? 'blue' }}"><x-ikon name="chat" :size="18" /></span>
                 <div class="grow min0">
                     <div class="cell-title" title="{{ $s->topic }}">{{ \Illuminate\Support\Str::limit($s->topic, 40) }}</div>
-                    <div class="cell-sub">{{ $s->held_on->locale('id')->translatedFormat('j M Y') }}@isset($showStudent) · {{ $s->internship->student->listName() }}@endisset</div>
+                    <div class="cell-sub">{{ $s->held_on->locale('id')->translatedFormat('j M Y') }}{{ $s->timeLabel() ? ', '.$s->timeLabel() : '' }}@isset($showStudent) · {{ $s->internship->student->listName() }}@endisset</div>
                 </div>
                 <div class="guidance-actions">
+                    @if ($s->canJoin())
+                        <a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost"><x-ikon name="video" :size="16" /> Gabung</a>
+                    @endif
                     <x-chip :tone="\App\Models\GuidanceSession::STATUSES[$s->status][1] ?? 'gray'">{{ \App\Models\GuidanceSession::STATUSES[$s->status][0] ?? $s->status }}</x-chip>
                     @if (($canDelete ?? false) && $s->status !== 'confirmed')
                         <form method="POST" action="{{ route('bimbingan.destroy', $s) }}" onsubmit="return confirm('Hapus catatan bimbingan ini?')">
@@ -24,12 +27,23 @@
                     <dl>
                         @isset($showStudent)<div><dt>Mahasiswa</dt><dd>{{ $s->internship->student->name }}</dd></div>@endisset
                         <div><dt>Topik</dt><dd>{{ $s->topic }}</dd></div>
-                        <div><dt>Waktu</dt><dd>{{ $s->held_on->locale('id')->translatedFormat('l, j F Y') }} · {{ \App\Models\GuidanceSession::MODES[$s->mode] ?? $s->mode }}</dd></div>
+                        <div><dt>Waktu</dt><dd>{{ $s->held_on->locale('id')->translatedFormat('l, j F Y') }}{{ $s->timeLabel() ? ', '.$s->timeLabel() : '' }} · {{ \App\Models\GuidanceSession::MODES[$s->mode] ?? $s->mode }}</dd></div>
+                        @if ($s->meeting_link)<div><dt>Tautan rapat</dt><dd><a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer">{{ $s->meeting_link }}</a></dd></div>@endif
                         @if ($s->notes)<div><dt>Catatan mahasiswa</dt><dd>{{ $s->notes }}</dd></div>@endif
                         @if ($s->lecturer_note)<div><dt>Catatan dosen</dt><dd>{{ $s->lecturer_note }}</dd></div>@endif
                     </dl>
                 </x-detail>
-                @if (($canDecide ?? false) && $s->status === 'pending')
+                @if (($canDecide ?? false) && $s->status === 'scheduled')
+                    <form method="POST" action="{{ route('bimbingan.decide', $s) }}" class="inline-form guidance-decide">
+                        @csrf
+                        @method('PATCH')
+                        <input type="text" name="catatan" class="input input-sm" maxlength="500" placeholder="Catatan hasil (opsional)" aria-label="Catatan untuk {{ $s->topic }}">
+                        <button type="submit" name="keputusan" value="tolak" class="btn btn-sm" onclick="return confirm('Batalkan jadwal bimbingan ini?')">Batalkan</button>
+                        @unless ($s->held_on->isFuture())
+                            <button type="submit" name="keputusan" value="konfirmasi" class="btn btn-sm btn-primary"><x-ikon name="check" :size="16" /> Tandai selesai</button>
+                        @endunless
+                    </form>
+                @elseif (($canDecide ?? false) && $s->status === 'pending')
                     <form method="POST" action="{{ route('bimbingan.decide', $s) }}" class="inline-form guidance-decide">
                         @csrf
                         @method('PATCH')

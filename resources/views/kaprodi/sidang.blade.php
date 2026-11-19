@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Sidang KP</h1>
-            <p class="page-sub">Jadwalkan sidang, lalu isi nilainya. Nilai sidang dicatat terpisah dari nilai akhir.</p>
+            <p class="page-sub">Jadwalkan sidang, lalu sahkan nilainya: dosen pembimbing 50% dan industri 50%.</p>
         </div>
     </div>
 
@@ -35,7 +35,7 @@
                         </div>
                         <div class="defense-actions">
                             @if (\App\Actions\Results\RecordDefense::eligible($i))
-                                <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-score-{{ $i->id }}">Isi nilai</button>
+                                <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-score-{{ $i->id }}">Sahkan nilai</button>
                             @endif
                             <button type="button" class="btn btn-sm btn-primary" data-open="dlg-sch-{{ $i->id }}"><x-ikon name="calendar" :size="16" /> Jadwalkan</button>
                         </div>
@@ -51,7 +51,7 @@
             <div class="card-head">
                 <div>
                     <h2 class="card-title">Jadwal sidang</h2>
-                    <p class="card-sub">Beri nilai setelah sidang berlangsung</p>
+                    <p class="card-sub">Sahkan nilai setelah sidang berlangsung</p>
                 </div>
             </div>
             <ul class="item-list">
@@ -73,7 +73,7 @@
                         <div class="defense-actions">
                             @if ($s->hasPassed())
                                 <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-sch-{{ $i->id }}">Ubah jadwal</button>
-                                <button type="button" class="btn btn-sm btn-primary" data-open="dlg-score-{{ $i->id }}">Beri nilai</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-open="dlg-score-{{ $i->id }}">Sahkan nilai</button>
                             @else
                                 <span class="defense-soon">{{ ($d = (int) today()->diffInDays($s->scheduled_at->copy()->startOfDay())) === 0 ? 'Hari ini' : $d.' hari lagi' }}</span>
                                 <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-sch-{{ $i->id }}">Ubah jadwal</button>
@@ -101,10 +101,10 @@
                         <x-avatar :user="$i->student" />
                         <div class="grow min0">
                             <div class="cell-title" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
-                            <div class="cell-sub">Sidang {{ $d->defended_at?->locale('id')->translatedFormat('j M Y') }}@if ($i->assessment?->isValidated()) · nilai akhir {{ $i->assessment->letter_grade }}@endif</div>
+                            <div class="cell-sub">Sidang {{ $d->defended_at?->locale('id')->translatedFormat('j M Y') }}@if ($d->lecturer_score !== null) · dosen {{ \App\Support\Num::short($d->lecturer_score) }}, industri {{ \App\Support\Num::short($d->industry_score) }}@endif</div>
                         </div>
                         <span class="sidang-score"><b>{{ $d->letter_grade }}</b>{{ \App\Support\Num::short($d->score) }}</span>
-                        <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-score-{{ $i->id }}">Ubah</button>
+                        <button type="button" class="btn btn-sm btn-ghost" data-open="dlg-score-{{ $i->id }}">Periksa</button>
                     </li>
                 @endforeach
             </ul>
@@ -166,37 +166,64 @@
         </dialog>
     @endforeach
 
-    {{-- Dialog nilai --}}
+    {{-- Dialog pengesahan nilai: dosen pembimbing 50% + industri 50% --}}
     @foreach ($unscheduled->filter(fn ($i) => \App\Actions\Results\RecordDefense::eligible($i))->concat($scheduled->filter(fn ($i) => $i->defenseSchedule->hasPassed()))->concat($done) as $i)
-        <?php $d = $i->defenseScore; $s = $i->defenseSchedule; ?>
+        <?php
+            $d = $i->defenseScore;
+            $s = $i->defenseSchedule;
+            $parts = \App\Actions\Results\RecordDefense::components($i);
+            $ready = $parts['score'] !== null;
+        ?>
         <dialog id="dlg-score-{{ $i->id }}" class="dialog">
             <form method="POST" action="{{ route('kaprodi.sidang.simpan', $i) }}" class="dialog-body">
                 @csrf
                 @method('PUT')
                 <div class="dialog-head">
                     <div>
-                        <h2 class="card-title">Nilai sidang</h2>
+                        <h2 class="card-title">{{ $d && $d->lecturer_score !== null ? 'Nilai sidang disahkan' : 'Sahkan nilai sidang' }}</h2>
                         <p class="card-sub">{{ $i->student->name }}</p>
                     </div>
                     <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                 </div>
-                <div class="form-grid">
+
+                <dl class="ds-calc">
                     <div>
-                        <label class="label" for="sc-val-{{ $i->id }}">Nilai (0–100)</label>
-                        <input id="sc-val-{{ $i->id }}" type="number" name="score" class="input" min="0" max="100" step="0.01" required value="{{ $d ? (float) $d->score : '' }}">
+                        <dt>Nilai laporan akhir<small>Dosen pembimbing{{ $i->lecturer ? ' · '.$i->lecturer->listName() : '' }}</small></dt>
+                        <dd>@if ($parts['lecturer'] !== null)<b>{{ \App\Support\Num::short($parts['lecturer']) }}</b><small>× 50%</small>@else<span class="ds-miss">Belum dinilai</span>@endif</dd>
                     </div>
                     <div>
-                        <label class="label" for="sc-date-{{ $i->id }}">Tanggal sidang</label>
-                        <input id="sc-date-{{ $i->id }}" type="date" name="defended_at" class="input" required max="{{ today()->toDateString() }}" value="{{ $d?->defended_at?->toDateString() ?? $s?->scheduled_at->toDateString() ?? today()->toDateString() }}">
+                        <dt>Nilai industri<small>Penilaian Company Supervisor tervalidasi</small></dt>
+                        <dd>@if ($parts['industry'] !== null)<b>{{ \App\Support\Num::short($parts['industry']) }}</b><small>× 50%</small>@else<span class="ds-miss">Belum divalidasi</span>@endif</dd>
                     </div>
-                    <div class="span-all">
-                        <label class="label" for="sc-note-{{ $i->id }}">Catatan <span class="muted">(opsional)</span></label>
-                        <input id="sc-note-{{ $i->id }}" type="text" name="note" class="input" maxlength="500" value="{{ $d?->note }}">
+                    <div class="ds-calc-total">
+                        <dt>Nilai sidang</dt>
+                        <dd>@if ($ready)<b>{{ \App\Support\Num::short($parts['score']) }}</b><small>{{ \App\Support\Grading::letterFor($parts['score']) }}</small>@else<span class="ds-miss">–</span>@endif</dd>
                     </div>
-                </div>
+                </dl>
+                @if ($d && $d->lecturer_score === null)
+                    <p class="hint">Tercatat sebelumnya: {{ \App\Support\Num::short($d->score) }} ({{ $d->letter_grade }}), diisi langsung tanpa rincian.</p>
+                @endif
+                @if ($i->finalReport?->file_id)
+                    <p class="hint"><a href="{{ route('laporan.akhir.berkas', $i) }}" target="_blank" rel="noopener"><x-ikon name="file" :size="15" /> Buka laporan akhir</a></p>
+                @endif
+
+                @if ($ready)
+                    <div class="form-grid">
+                        <div>
+                            <label class="label" for="sc-date-{{ $i->id }}">Tanggal sidang</label>
+                            <input id="sc-date-{{ $i->id }}" type="date" name="defended_at" class="input" required max="{{ today()->toDateString() }}" value="{{ $d?->defended_at?->toDateString() ?? $s?->scheduled_at->toDateString() ?? today()->toDateString() }}">
+                        </div>
+                        <div>
+                            <label class="label" for="sc-note-{{ $i->id }}">Catatan <span class="muted">(opsional)</span></label>
+                            <input id="sc-note-{{ $i->id }}" type="text" name="note" class="input" maxlength="500" value="{{ $d?->note }}">
+                        </div>
+                    </div>
+                @endif
                 <div class="dialog-foot row-actions">
-                    <button type="button" class="btn" data-close>Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan nilai</button>
+                    <button type="button" class="btn" data-close>{{ $ready ? 'Batal' : 'Tutup' }}</button>
+                    @if ($ready)
+                        <button type="submit" class="btn btn-primary"><x-ikon name="check" :size="16" /> {{ $d && $d->lecturer_score !== null ? 'Sahkan ulang' : 'Sahkan' }}</button>
+                    @endif
                 </div>
             </form>
         </dialog>

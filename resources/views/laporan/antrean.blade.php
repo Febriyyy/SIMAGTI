@@ -34,6 +34,9 @@
                         </div>
                         <x-waiting :since="$chapter->submitted_at" />
                         <a href="{{ route('laporan.berkas', $chapter) }}" target="_blank" rel="noopener" class="btn btn-sm btn-ghost"><x-ikon name="paperclip" :size="16" /> Buka</a>
+                        @unless ($isSupervisor)
+                            <a href="{{ route('laporan.diskusi', $chapter->internship).'#bab-'.$chapter->position }}" class="btn btn-sm btn-ghost" title="Komentar dan berkas koreksi"><x-ikon name="chat" :size="16" /><span class="sr-only">Diskusi {{ $chapter->label() }}</span></a>
+                        @endunless
                         <form method="POST" action="{{ route('laporan.tinjau', $chapter) }}" class="review-form">
                             @csrf
                             @method('PATCH')
@@ -66,6 +69,9 @@
                             <div class="cell-title" title="{{ $i->student->name }}">{{ $i->student->listName() }}</div>
                             <div class="cell-sub">{{ $chapters->isEmpty() ? 'Belum mulai' : $chapters->where('status', 'disetujui')->count().' dari '.$chapters->count().' bab disetujui' }}</div>
                         </div>
+                        @if (! $isSupervisor)
+                            <a href="{{ route('laporan.diskusi', $i) }}" class="btn btn-sm btn-ghost"><x-ikon name="chat" :size="16" /> Buka laporan</a>
+                        @endif
                         @if ($chapters->isNotEmpty())
                             <ol class="chapter-dots" aria-label="Status per bab">
                                 @foreach ($chapters as $chapter)

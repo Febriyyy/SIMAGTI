@@ -37,6 +37,7 @@ use App\Http\Controllers\PortfolioItemController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReportChapterController;
+use App\Http\Controllers\ReportDiscussionController;
 use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\StudentController;
@@ -121,6 +122,12 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     // Berkas laporan per bab (dicek ReportChapter::canBeReadBy)
     Route::get('/laporan-bab/{chapter}/berkas', [ReportChapterController::class, 'file'])->whereNumber('chapter')->name('laporan.berkas');
 
+    // Laporan KP bersama mahasiswa dan dosen pembimbing: diskusi per bab, berkas koreksi, laporan akhir (dicek DiscussReport)
+    Route::get('/laporan-kp/{internship}', [ReportDiscussionController::class, 'show'])->whereNumber('internship')->name('laporan.diskusi');
+    Route::post('/laporan-kp/{internship}/komentar', [ReportDiscussionController::class, 'comment'])->whereNumber('internship')->middleware('throttle:30,1')->name('laporan.komentar');
+    Route::get('/laporan-kp/komentar/{comment}/berkas', [ReportDiscussionController::class, 'commentFile'])->whereNumber('comment')->name('laporan.komentar.berkas');
+    Route::get('/laporan-kp/{internship}/akhir/berkas', [ReportDiscussionController::class, 'finalFile'])->whereNumber('internship')->name('laporan.akhir.berkas');
+
     // ---------- Mahasiswa ----------
     Route::middleware(EnsureRole::class.':mahasiswa')->group(function () {
         // Status KP (dulu "Pengajuan KP"): pengajuan dan kemajuannya langkah demi langkah
@@ -187,6 +194,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::post('/dokumen/surat-pengantar', [DocumentController::class, 'requestLetter'])->name('dokumen.minta');
         Route::post('/dokumen/laporan/{chapter}', [ReportChapterController::class, 'upload'])
             ->whereNumber('chapter')->middleware('throttle:20,1')->name('laporan.unggah');
+        Route::post('/laporan-kp/{internship}/akhir', [ReportDiscussionController::class, 'uploadFinal'])
+            ->whereNumber('internship')->middleware('throttle:20,1')->name('laporan.akhir');
         Route::post('/dokumen/unggah/{type}', [DocumentController::class, 'upload'])
             ->whereIn('type', ['surat_balasan'])->middleware('throttle:20,1')->name('dokumen.unggah');
 
@@ -249,7 +258,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
             ->whereNumber('internship')->middleware('throttle:30,1')->name('validasi.update');
 
         Route::get('/antrean-bimbingan', [GuidanceController::class, 'queue'])->name('bimbingan.antrean');
+        Route::post('/antrean-bimbingan/jadwal', [GuidanceController::class, 'schedule'])->middleware('throttle:30,1')->name('bimbingan.jadwal');
         Route::patch('/antrean-bimbingan/{session}', [GuidanceController::class, 'decide'])->whereNumber('session')->name('bimbingan.decide');
+        Route::put('/laporan-kp/{internship}/nilai', [ReportDiscussionController::class, 'grade'])->whereNumber('internship')->middleware('throttle:30,1')->name('laporan.nilai');
 
         // Hasil akhir KP
         Route::get('/hasil', [ResultController::class, 'index'])->name('hasil.index');

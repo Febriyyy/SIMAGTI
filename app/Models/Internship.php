@@ -223,6 +223,22 @@ class Internship extends Model
         return $this->hasMany(ReportChapter::class)->orderBy('position');
     }
 
+    public function finalReport(): HasOne
+    {
+        return $this->hasOne(FinalReport::class);
+    }
+
+    public function reportComments(): HasMany
+    {
+        return $this->hasMany(ReportComment::class)->orderBy('created_at')->orderBy('id');
+    }
+
+    /** Nilai laporan akhir dari dosen pembimbing. */
+    public function reportScore(): HasOne
+    {
+        return $this->hasOne(ReportScore::class);
+    }
+
     /** Pasang Company Supervisor pada penempatan ini. */
     public function assignSupervisor(User|int $user): InternshipStaff
     {

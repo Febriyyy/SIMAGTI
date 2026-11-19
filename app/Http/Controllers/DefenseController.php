@@ -13,14 +13,14 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Sidang KP oleh kaprodi: jadwalkan sidang (waktu, tempat, penguji), lalu isi nilainya.
- * Nilai sidang dicatat terpisah dari nilai akhir penilaian Company Supervisor.
+ * Sidang KP oleh kaprodi: jadwalkan sidang (waktu, tempat, penguji), lalu sahkan nilainya
+ * (dosen pembimbing 50% + industri 50%). Nilai sidang dicatat terpisah dari nilai akhir penilaian Company Supervisor.
  */
 class DefenseController extends Controller
 {
     public function index(Request $request): View
     {
-        $internships = Internship::with(['student', 'lecturer', 'company', 'assessment', 'defenseScore', 'defenseSchedule.examiner'])
+        $internships = Internship::with(['student', 'lecturer', 'company', 'assessment', 'reportScore', 'finalReport', 'defenseScore', 'defenseSchedule.examiner'])
             ->where(fn ($q) => $q->where('status', 'selesai')
                 ->orWhere(fn ($q) => $q->where('status', 'berjalan')->whereDate('end_date', '<=', today()->addDays(30))))
             ->orderBy('end_date')
@@ -60,21 +60,19 @@ class DefenseController extends Controller
         return redirect()->route('kaprodi.sidang')->with('status', 'Jadwal sidang '.rtrim($internship->student->listName(), '.').' tersimpan dan sudah diberitahukan.');
     }
 
+    /** Kaprodi mengesahkan nilai sidang: dihitung dari nilai dosen pembimbing dan nilai industri. */
     public function update(Request $request, Internship $internship, RecordDefense $record): RedirectResponse
     {
         $data = $request->validate([
-            'score' => ['required', 'numeric', 'between:0,100'],
             'defended_at' => ['required', 'date', 'before_or_equal:today'],
             'note' => ['nullable', 'string', 'max:500'],
         ], [
-            'score.required' => 'Isi nilai sidang.',
-            'score.between' => 'Nilai sidang harus di antara 0 dan 100.',
             'defended_at.required' => 'Isi tanggal sidang.',
             'defended_at.before_or_equal' => 'Tanggal sidang tidak boleh di masa depan.',
         ]);
 
-        $record->handle($request->user(), $internship->loadMissing('student'), $data);
+        $record->handle($request->user(), $internship->loadMissing(['student', 'lecturer', 'reportScore', 'assessment']), $data);
 
-        return redirect()->route('kaprodi.sidang')->with('status', 'Nilai sidang '.rtrim($internship->student->listName(), '.').' tersimpan.');
+        return redirect()->route('kaprodi.sidang')->with('status', 'Nilai sidang '.rtrim($internship->student->listName(), '.').' disahkan.');
     }
 }

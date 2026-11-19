@@ -19,7 +19,9 @@
                 <div class="gtl-body">
                     <div class="gtl-top">
                         <h3 class="gtl-title">{{ $s->topic }}</h3>
-                        @if (($canDelete ?? false) && $s->status !== 'confirmed')
+                        @if ($s->canJoin())
+                            <a href="{{ $s->meeting_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"><x-ikon name="video" :size="16" /> Gabung</a>
+                        @elseif (($canDelete ?? false) && in_array($s->status, ['pending', 'rejected'], true))
                             <form method="POST" action="{{ route('bimbingan.destroy', $s) }}" onsubmit="return confirm('Hapus catatan bimbingan ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -29,12 +31,15 @@
                     </div>
                     <div class="gtl-meta">
                         <x-chip :tone="$tone">{{ $s->statusLabel() }}</x-chip>
-                        <span>{{ $s->modeLabel() }}</span>
+                        <span>{{ $s->timeLabel() ? $s->timeLabel().' · ' : '' }}{{ $s->modeLabel() }}</span>
+                        @if ($s->status === 'scheduled')<span>Dijadwalkan dosen</span>@endif
                     </div>
                     @if ($s->lecturer_note)
                         <p class="gtl-note"><strong>Catatan dosen:</strong> {{ $s->lecturer_note }}</p>
                     @endif
-                    @if ($s->notes)
+                    @if ($s->notes && $s->status === 'scheduled')
+                        <p class="gtl-note"><strong>Pesan dosen:</strong> {{ $s->notes }}</p>
+                    @elseif ($s->notes)
                         <x-detail>
                             <dl>
                                 <div><dt>Catatan Anda</dt><dd>{{ $s->notes }}</dd></div>
