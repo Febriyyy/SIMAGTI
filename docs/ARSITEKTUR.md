@@ -113,3 +113,12 @@ Perintah `php artisan kp:pengingat` (aksi `App\Actions\Reminders\SendReminders`,
 Pengingat yang sama tidak dikirim ulang: setiap pengingat menyimpan kunci (`data.key`) di tabel `notifications` dan dicek sebelum kirim.
 
 **Saat hosting:** tambahkan cron `* * * * * cd /path/proyek && php artisan schedule:run >> /dev/null 2>&1` dan setel SMTP di `.env` (`MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`). Uji manual kapan saja dengan `php artisan kp:pengingat`.
+
+## Pengingat jadwal, email kabar penting, dan Google Calendar (19 November 2026)
+
+- **Pengingat jadwal**: `php artisan kp:pengingat-jadwal` (`SendReminders::upcoming`) jalan tiap 15 menit. Bimbingan terjadwal dari dosen dan sidang KP diingatkan sekali dalam 24 jam sebelum mulai dan sekali lagi sekitar 1 jam sebelumnya (lonceng + email). Penerima: mahasiswa; dosen pembimbing (dan penguji untuk sidang) juga mendapat pengingat.
+- **Email kabar penting**: `Notify::send(..., email: true)` mengirim salinan email (`App\Notifications\KpEmail`) untuk keputusan pengajuan KP, jadwal bimbingan dari dosen, jadwal sidang, permintaan revisi bab, berkas koreksi dari dosen, dan nilai sidang yang disahkan. Kegagalan SMTP dicatat di log dan tidak menggagalkan aksi pengguna.
+- **Google Calendar**: `App\Support\CalendarLink` membuat tautan "Tambah ke Google Calendar" (formulir acara yang sudah terisi; tanpa API, tanpa kunci, tanpa biaya). Muncul di kartu bimbingan berikutnya, detail jadwal bimbingan dosen, dan jadwal sidang di Status KP.
+- **Riwayat versi laporan**: setiap unggahan bab disimpan di `report_chapter_versions`; berkas lama tidak lagi dihapus.
+
+**Pilihan SMTP saat hosting** (pilih satu, isi di `.env`): email bawaan hosting cPanel (biasanya sudah termasuk paket), Gmail dengan App Password (cocok untuk uji coba, ada batas kirim harian), atau layanan email transaksional seperti Brevo, Resend, Mailgun, atau Amazon SES (punya paket gratis dengan kuota; cek harga terbaru di situs masing-masing). Setel `MAIL_FROM_ADDRESS` ke alamat domain sendiri agar tidak masuk spam.

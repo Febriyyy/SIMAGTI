@@ -335,3 +335,14 @@ Migrasi `2026_11_19_100000_add_lecturer_report_review`.
 **defense_scores** (kolom baru): `lecturer_score`, `industry_score` (decimal, null). Nilai sidang = nilai dosen × 50% + nilai akhir penilaian Company Supervisor yang tervalidasi × 50%, dihitung saat kaprodi menekan **Sahkan**. Baris lama tanpa rincian (kedua kolom kosong) tetap disimpan apa adanya. Setelah disahkan, nilai laporan dan laporan akhir terkunci.
 
 **guidance_sessions** (kolom baru): `start_time` (time, null) dan `meeting_link` (string 300, null). Status `scheduled` = jadwal dari dosen; mahasiswa melihat tombol Gabung sampai tanggalnya lewat, dosen menandai selesai (menjadi `confirmed`) atau membatalkan (`rejected`).
+
+### report_chapter_versions (19 November 2026)
+
+Riwayat berkas bab laporan; setiap unggahan menjadi satu versi dan berkas lama tidak dihapus. `report_chapters.file_id` tetap menunjuk versi terbaru. Migrasi mengisi versi terakhir untuk bab yang sudah punya berkas.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| report_chapter_id | FK report_chapters | hapus berantai |
+| file_id | FK files | berkas versi ini |
+| version | int | unik per bab |
+| submitted_at | timestamp, null | |
