@@ -194,6 +194,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::post('/dokumen/surat-pengantar', [DocumentController::class, 'requestLetter'])->name('dokumen.minta');
         Route::post('/dokumen/laporan/{chapter}', [ReportChapterController::class, 'upload'])
             ->whereNumber('chapter')->middleware('throttle:20,1')->name('laporan.unggah');
+        Route::get('/laporan-kp', [ReportDiscussionController::class, 'mine'])->name('laporan.saya');
         Route::post('/laporan-kp/{internship}/akhir', [ReportDiscussionController::class, 'uploadFinal'])
             ->whereNumber('internship')->middleware('throttle:20,1')->name('laporan.akhir');
         Route::post('/dokumen/unggah/{type}', [DocumentController::class, 'upload'])

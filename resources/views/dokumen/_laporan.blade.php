@@ -76,7 +76,7 @@
 
     <div class="card-foot rtl-foot">
         @isset($internship)
-            <a href="{{ route('laporan.diskusi', $internship) }}"><x-ikon name="chat" :size="16" /> Diskusi dengan dosen dan laporan akhir</a>
+            <a href="{{ route('laporan.diskusi', $internship) }}"><x-ikon name="syllabus" :size="16" /> Buka halaman Laporan KP</a>
         @endisset
         <a href="{{ route('laporan.draf') }}"><x-ikon name="file" :size="16" /> Butuh kerangka? Buka draf laporan otomatis</a>
     </div>

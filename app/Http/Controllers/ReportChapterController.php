@@ -28,8 +28,11 @@ class ReportChapterController extends Controller
 
         $chapter = $reports->submit($request->user(), $chapter->load('internship.student'), $request->file('berkas'));
         $to = $chapter->needs_supervisor ? 'Company Supervisor' : 'dosen pembimbing';
+        $back = $request->input('kembali') === 'laporan'
+            ? route('laporan.diskusi', $chapter->internship_id).'#bab-'.$chapter->position
+            : route('dokumen.index').'#laporan';
 
-        return redirect()->to(route('dokumen.index').'#laporan')->with('status', "{$chapter->label()} terunggah dan menunggu tinjauan {$to}.");
+        return redirect()->to($back)->with('status', "{$chapter->label()} terunggah dan menunggu tinjauan {$to}.");
     }
 
     /** Antrean tinjauan untuk Company Supervisor dan dosen pembimbing, plus progres laporan tiap mahasiswa. */

@@ -9,6 +9,7 @@ use App\Models\ReportChapter;
 use App\Models\ReportComment;
 use App\Models\ReportScore;
 use App\Models\StoredFile;
+use App\Support\ActiveInternship;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -27,12 +28,22 @@ class ReportDiscussionController extends Controller
         'berkas.mimetypes' => 'Isi berkas harus PDF atau Word (.docx).',
     ];
 
+    /** Menu "Laporan KP" mahasiswa: langsung ke laporan KP yang sedang berjalan. */
+    public function mine(Request $request): View|RedirectResponse
+    {
+        $internship = ActiveInternship::for($request->user());
+
+        return $internship
+            ? redirect()->route('laporan.diskusi', $internship)
+            : view('laporan.belum');
+    }
+
     public function show(Request $request, Internship $internship): View
     {
         $user = $request->user();
         abort_unless(DiscussReport::canDiscuss($user, $internship), 403);
 
-        $chapters = ManageReportChapters::ensureFor($internship);
+        $chapters = ManageReportChapters::ensureFor($internship)->load('reviser');
         $chapters->each->setRelation('internship', $internship);
         $internship->load(['student', 'lecturer', 'finalReport.file', 'reportScore', 'defenseScore', 'reportComments.user', 'reportComments.file']);
         $threads = $internship->reportComments->groupBy(fn (ReportComment $c) => $c->report_chapter_id ?? 'akhir');

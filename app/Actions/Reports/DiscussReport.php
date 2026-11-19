@@ -40,6 +40,14 @@ class DiscussReport
         return $user->role === 'mahasiswa' || $chapter->canBeReadBy($user);
     }
 
+    /** Laporan akhir dibuka setelah semua bab disetujui dosen pembimbing. */
+    public static function chaptersApproved(Internship $internship): bool
+    {
+        $chapters = $internship->reportChapters()->get(['status']);
+
+        return $chapters->isNotEmpty() && $chapters->every(fn ($c) => $c->status === 'disetujui');
+    }
+
     public function comment(User $user, Internship $internship, ?ReportChapter $chapter, ?string $body, ?UploadedFile $file): ReportComment
     {
         abort_unless(self::canDiscuss($user, $internship), 403);
@@ -83,6 +91,9 @@ class DiscussReport
         }
         if ($internship->defenseScore?->lecturer_score !== null) {
             throw ValidationException::withMessages(['berkas' => 'Nilai sidang sudah disahkan; laporan akhir tidak bisa diganti.']);
+        }
+        if (! self::chaptersApproved($internship)) {
+            throw ValidationException::withMessages(['berkas' => 'Laporan akhir bisa diunggah setelah semua bab disetujui dosen pembimbing.']);
         }
 
         return DB::transaction(function () use ($student, $internship, $file) {

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Reports\ManageReportChapters;
 use App\Models\GuidanceSession;
 use App\Models\Internship;
 use App\Models\ReportComment;
@@ -45,9 +46,12 @@ class DospemReportTest extends TestCase
         $student = $rina->student;
         $lecturer = $rina->lecturer;
 
-        $this->actingAs($student)->get("/laporan-kp/{$rina->id}")->assertOk()->assertSee('Laporan akhir');
+        // Menu Laporan KP mengarah ke laporan KP yang berjalan, lengkap dengan langkah dan draf otomatis
+        $this->actingAs($student)->get('/laporan-kp')->assertRedirect("/laporan-kp/{$rina->id}");
+        $this->actingAs($student)->get("/laporan-kp/{$rina->id}")->assertOk()->assertSee('Laporan akhir')->assertSee('Buka draf')->assertSee('Terbuka setelah semua bab disetujui');
         $chapter = $rina->fresh()->reportChapters()->where('needs_supervisor', false)->firstOrFail();
-        $this->actingAs($student)->post("/dokumen/laporan/{$chapter->id}", ['berkas' => $this->pdf('bab1.pdf')])->assertRedirect();
+        $this->actingAs($student)->post("/dokumen/laporan/{$chapter->id}", ['berkas' => $this->pdf('bab1.pdf'), 'kembali' => 'laporan'])
+            ->assertRedirect("/laporan-kp/{$rina->id}#bab-{$chapter->position}");
 
         // Dosen memberi komentar dan berkas koreksi
         $this->actingAs($lecturer)->post("/laporan-kp/{$rina->id}/komentar", ['bab' => $chapter->id, 'isi' => 'Perjelas tujuan penelitian.', 'berkas' => $this->pdf('koreksi-bab1.pdf')])
@@ -80,6 +84,12 @@ class DospemReportTest extends TestCase
         // Belum ada laporan akhir: nilai ditolak
         $points = ['writing' => 27, 'analysis' => 20, 'explaining' => 20, 'conduct' => 15];
         $this->actingAs($lecturer)->put("/laporan-kp/{$salsa->id}/nilai", $points)->assertSessionHasErrors('writing');
+
+        // Laporan akhir terkunci sampai semua bab disetujui dosen
+        ManageReportChapters::ensureFor($salsa);
+        $salsa->reportChapters()->update(['status' => 'revisi']);
+        $this->actingAs($salsa->student)->post("/laporan-kp/{$salsa->id}/akhir", ['berkas' => $this->pdf()])->assertSessionHasErrors('berkas');
+        $salsa->reportChapters()->update(['status' => 'disetujui']);
 
         $this->actingAs($salsa->student)->post("/laporan-kp/{$salsa->id}/akhir", ['berkas' => $this->pdf('laporan-akhir.pdf')])->assertRedirect();
         $this->assertSame(1, $lecturer->notifications()->where('data', 'like', '%laporan akhir%')->count());
