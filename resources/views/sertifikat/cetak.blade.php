@@ -108,6 +108,9 @@
                     @else
                         <img class="simagti" src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI">
                     @endif
+                    @if ($facultyLogo)
+                        <img src="{{ route('logo.fakultas') }}?v={{ $facultyLogo->id }}" alt="Logo {{ $campus['faculty'] }}">
+                    @endif
                     @if ($internship->company?->logo_file_id)
                         <span class="divider" aria-hidden="true"></span>
                         <img src="{{ route('logo.perusahaan', $internship->company) }}?v={{ $internship->company->logo_file_id }}" alt="Logo {{ $internship->company->name }}">
@@ -162,7 +165,11 @@
                     </div>
                     <div class="sign">
                         <div>{{ $template?->signer_title ?? 'Ketua Program Studi' }}</div>
-                        <div class="space" aria-hidden="true"></div>
+                        @if ($kaprodiSignature)
+                            <div class="space signed"><img src="{{ $kaprodiSignature }}" alt="Tanda tangan {{ $template?->signer_title ?? 'Ketua Program Studi' }}"></div>
+                        @else
+                            <div class="space" aria-hidden="true"></div>
+                        @endif
                         <strong>{{ $template?->signer_name ?? '……………………………' }}</strong>
                         <small>{{ $campus['program'] }}</small>
                     </div>

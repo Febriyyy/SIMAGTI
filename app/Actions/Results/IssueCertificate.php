@@ -26,11 +26,7 @@ class IssueCertificate
         }
 
         return DB::transaction(function () use ($internship, $issuer) {
-            $kaprodi = User::where('role', 'kaprodi')->where('is_active', true)->orderBy('id')->first();
-            $template = CertificateTemplate::firstOrCreate(
-                ['scope' => 'kampus', 'name' => 'Sertifikat KP kampus'],
-                ['signer_name' => $kaprodi?->name, 'signer_title' => 'Ketua Program Studi', 'created_by' => $kaprodi?->id]
-            );
+            $template = CertificateTemplate::campus();
 
             $certificate = Certificate::create([
                 'internship_id' => $internship->id,

@@ -9,13 +9,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Admin: identitas kampus yang tampil di sertifikat KP, termasuk logo kampus. */
+/** Admin: identitas kampus yang tampil di sertifikat KP, termasuk logo kampus dan logo fakultas. */
 class AdminCampusController extends Controller
 {
     public function edit(): View
     {
         return view('admin.kampus', [
-            'logo' => Logos::campus(),
+            'logos' => collect(Logos::INSTITUTIONS)->mapWithKeys(fn ($v, $kind) => [$kind => Logos::institution($kind)]),
             'campus' => [
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),
@@ -25,27 +25,30 @@ class AdminCampusController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request, string $kind): RedirectResponse
     {
-        $request->validate(['logo' => ['required', ...Logos::RULES]], [
-            'logo.required' => 'Pilih berkas logo kampus.',
+        abort_unless(isset(Logos::INSTITUTIONS[$kind]), 404);
+        $label = Logos::INSTITUTIONS[$kind][1];
+        $request->validateWithBag('logo_'.$kind, ['logo' => ['required', ...Logos::RULES]], [
+            'logo.required' => 'Pilih berkas '.mb_strtolower($label).'.',
             'logo.mimes' => 'Logo harus PNG, JPG, atau WebP.',
             'logo.max' => 'Ukuran logo maksimal 1 MB.',
             'logo.image' => 'Berkas harus berupa gambar.',
         ]);
 
-        $file = Logos::store($request->file('logo'), $request->user(), 'kampus');
-        Logos::setCampus($file, $request->user());
-        ActivityLog::record('kampus.logo', 'Mengganti logo kampus');
+        $file = Logos::store($request->file('logo'), $request->user(), $kind);
+        Logos::setInstitution($kind, $file, $request->user());
+        ActivityLog::record($kind.'.logo', 'Mengganti '.mb_strtolower($label));
 
-        return back()->with('status', 'Logo kampus tersimpan dan langsung dipakai di sertifikat.');
+        return back()->with('status', $label.' tersimpan dan langsung dipakai di sertifikat.');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, string $kind): RedirectResponse
     {
-        Logos::setCampus(null, $request->user());
-        ActivityLog::record('kampus.logo', 'Menghapus logo kampus');
+        abort_unless(isset(Logos::INSTITUTIONS[$kind]), 404);
+        Logos::setInstitution($kind, null, $request->user());
+        ActivityLog::record($kind.'.logo', 'Menghapus '.mb_strtolower(Logos::INSTITUTIONS[$kind][1]));
 
-        return back()->with('status', 'Logo kampus dihapus.');
+        return back()->with('status', Logos::INSTITUTIONS[$kind][1].' dihapus.');
     }
 }

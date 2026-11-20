@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Companies;
 
 use App\Models\Company;
-use App\Support\Logos;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -46,26 +45,16 @@ class SaveCompanyRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'website' => ['nullable', 'url:http,https', 'max:200'],
             'divisions' => ['nullable', 'string', 'max:2000'],
-            // Logo perusahaan diunggah manual (sertifikat KP); PNG/JPG/WebP saja
-            'logo' => ['nullable', ...Logos::RULES],
-            'remove_logo' => ['nullable', 'boolean'],
-            // Nama ketua divisi per divisi yang sudah ada: division_heads[id] => nama
-            'division_heads' => ['nullable', 'array'],
-            'division_heads.*' => ['nullable', 'string', 'max:150'],
         ];
     }
 
     public function attributes(): array
     {
-        return ['name' => 'nama perusahaan', 'logo' => 'logo perusahaan'];
+        return ['name' => 'nama perusahaan'];
     }
 
     public function messages(): array
     {
-        return [
-            'name.unique' => 'Perusahaan dengan nama ini sudah terdaftar.',
-            'logo.mimes' => 'Logo harus PNG, JPG, atau WebP.',
-            'logo.max' => 'Ukuran logo maksimal 1 MB.',
-        ];
+        return ['name.unique' => 'Perusahaan dengan nama ini sudah terdaftar.'];
     }
 }

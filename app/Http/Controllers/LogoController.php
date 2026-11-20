@@ -19,6 +19,11 @@ class LogoController extends Controller
         return $this->stream(Logos::campus());
     }
 
+    public function faculty(): StreamedResponse
+    {
+        return $this->stream(Logos::faculty());
+    }
+
     public function company(Company $company): StreamedResponse
     {
         return $this->stream($company->logo);

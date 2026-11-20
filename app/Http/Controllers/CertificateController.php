@@ -34,6 +34,8 @@ class CertificateController extends Controller
             'verifyUrl' => $verifyUrl,
             'qr' => Qr::svg($verifyUrl),
             'campusLogo' => Logos::campus(),
+            'facultyLogo' => Logos::faculty(),
+            'kaprodiSignature' => Logos::dataUri($certificate->template?->signature),
             'divisionSignature' => Logos::dataUri($internship->division?->headSignature),
             'campus' => [
                 'university' => Campus::university(),

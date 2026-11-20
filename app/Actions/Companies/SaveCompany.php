@@ -5,8 +5,6 @@ namespace App\Actions\Companies;
 use App\Models\ActivityLog;
 use App\Models\Company;
 use App\Models\User;
-use App\Support\Logos;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 /** TU Fakultas menambah perusahaan mitra baru, atau mengubah data perusahaan yang ada. */
@@ -41,19 +39,6 @@ class SaveCompany
                 ]);
                 $action = 'perusahaan.tambah';
                 $verb = 'Menambah';
-            }
-
-            // Logo perusahaan untuk sertifikat: unggah baru menggantikan yang lama, atau hapus
-            if (($data['logo'] ?? null) instanceof UploadedFile || ! empty($data['remove_logo'])) {
-                $old = $company->logo;
-                $new = ($data['logo'] ?? null) instanceof UploadedFile ? Logos::store($data['logo'], $actor, 'perusahaan') : null;
-                $company->update(['logo_file_id' => $new?->id]);
-                Logos::discard($old);
-            }
-
-            // Nama ketua divisi (tanda tangan sertifikat), hanya untuk divisi milik perusahaan ini
-            foreach ($data['division_heads'] ?? [] as $divisionId => $head) {
-                $company->divisions()->whereKey((int) $divisionId)->update(['head_name' => filled($head) ? trim($head) : null]);
             }
 
             // Divisi diisi satu per baris. Divisi yang sudah dipakai penempatan tidak pernah dihapus.

@@ -1,21 +1,59 @@
 @extends('layouts.app')
 
-@section('title', 'Ketua Divisi')
+@section('title', 'Data Sertifikat')
 
-{{-- Company Supervisor: nama dan tanda tangan ketua divisi untuk sertifikat KP. Variabel: divisions, signatures --}}
+{{-- Company Supervisor: logo perusahaan, nama dan tanda tangan ketua divisi untuk sertifikat KP. Variabel: companies, divisions, signatures --}}
 @section('content')
     <div class="page-head">
         <div>
-            <h1 class="page-title">Ketua Divisi</h1>
-            <p class="page-sub">Nama dan tanda tangan ketua divisi tampil di sertifikat KP mahasiswa divisi tersebut.</p>
+            <h1 class="page-title">Data Sertifikat</h1>
+            <p class="page-sub">Logo perusahaan serta nama dan tanda tangan ketua divisi tampil di sertifikat KP mahasiswa magang Anda.</p>
         </div>
     </div>
+
+    @foreach ($companies as $company)
+        <?php $bag = $errors->getBag('logo'.$company->id); ?>
+        <section class="card" id="perusahaan-{{ $company->id }}">
+            <div class="card-head">
+                <div>
+                    <h2 class="card-title">Logo {{ $company->name }}</h2>
+                    <p class="card-sub">PNG, JPG, atau WebP, maksimal 1 MB. Latar transparan paling rapi.</p>
+                </div>
+                <x-chip :tone="$company->logo_file_id ? 'green' : 'amber'">{{ $company->logo_file_id ? 'Lengkap' : 'Belum ada logo' }}</x-chip>
+            </div>
+            <div class="card-body logo-edit">
+                <div class="logo-preview">
+                    @if ($company->logo_file_id)
+                        <img src="{{ route('logo.perusahaan', $company) }}?v={{ $company->logo_file_id }}" alt="Logo {{ $company->name }}">
+                    @else
+                        <span>Belum ada logo</span>
+                    @endif
+                </div>
+                <form method="POST" action="{{ route('sertifikat.data.logo', $company) }}" enctype="multipart/form-data" class="logo-form">
+                    @csrf
+                    @method('PUT')
+                    <label class="btn btn-primary">
+                        <x-ikon name="upload" :size="16" /> {{ $company->logo_file_id ? 'Ganti logo' : 'Unggah logo' }}
+                        <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required class="sr-only" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()" aria-label="Unggah logo {{ $company->name }}">
+                    </label>
+                    @if ($bag->has('logo'))<p class="field-error">{{ $bag->first('logo') }}</p>@endif
+                </form>
+                @if ($company->logo_file_id)
+                    <form method="POST" action="{{ route('sertifikat.data.logo.destroy', $company) }}" onsubmit="return confirm('Hapus logo {{ $company->name }}?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-ghost">Hapus logo</button>
+                    </form>
+                @endif
+            </div>
+        </section>
+    @endforeach
 
     @if ($divisions->isEmpty())
         <section class="card">
             <div class="empty">
                 <strong>Belum ada divisi</strong>
-                Divisi muncul di sini setelah ada mahasiswa magang yang Anda supervisi di sebuah divisi.
+                Ketua divisi bisa diisi setelah ada mahasiswa magang yang Anda supervisi di sebuah divisi.
             </div>
         </section>
     @else
@@ -34,7 +72,7 @@
                             <x-chip tone="amber">{{ $division->head_name ? 'Tanda tangan belum ada' : 'Belum diisi' }}</x-chip>
                         @endif
                     </div>
-                    <form method="POST" action="{{ route('divisi.ketua.update', $division) }}" enctype="multipart/form-data" class="card-body dh-form">
+                    <form method="POST" action="{{ route('sertifikat.data.divisi', $division) }}" enctype="multipart/form-data" class="card-body dh-form">
                         @csrf
                         @method('PUT')
                         <div class="field">

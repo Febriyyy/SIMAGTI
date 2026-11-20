@@ -363,9 +363,16 @@ Ulasan tempat magang dari mahasiswa setelah masa magang berakhir (status `selesa
 
 Tampil tanpa nama di halaman Lowongan (rating per perusahaan, rincian aspek, 3 komentar terbaru).
 
-### Logo dan ketua divisi untuk sertifikat (20 November 2026)
+### Logo dan tanda tangan untuk sertifikat (20 November 2026)
 
-- `company_divisions.head_name` (string 150, null) dan `company_divisions.head_signature_file_id` (FK files, null): nama dan tanda tangan ketua divisi, **diisi Company Supervisor** di menu Ketua Divisi untuk divisi mahasiswa yang ia supervisi. Tampil sebagai penanda tangan kiri di sertifikat KP.
-- `companies.logo_file_id` (sudah ada): logo perusahaan, kini diunggah TU Fakultas di formulir ubah perusahaan.
-- Logo kampus: pengaturan `simagti.campus.logo_file_id` di tabel `settings`, diunggah admin di menu Identitas Kampus.
-- Semua gambar hanya PNG, JPG, atau WebP (maks. 1 MB; SVG ditolak). Logo disajikan lewat `/logo/kampus` dan `/logo/perusahaan/{id}`; tanda tangan tidak punya tautan publik dan disematkan langsung (data URI) di halaman sertifikat.
+Siapa mengisi apa:
+
+| Elemen sertifikat | Diisi oleh | Tempat | Disimpan di |
+|---|---|---|---|
+| Logo kampus | Admin | Identitas Kampus | `settings` kunci `simagti.campus.logo_file_id` |
+| Logo fakultas | Admin | Identitas Kampus | `settings` kunci `simagti.campus.faculty_logo_file_id` |
+| Logo perusahaan | Company Supervisor | Data Sertifikat | `companies.logo_file_id` (kolom lama) |
+| Nama dan tanda tangan ketua divisi | Company Supervisor | Data Sertifikat | `company_divisions.head_name`, `company_divisions.head_signature_file_id` (baru) |
+| Nama, jabatan, tanda tangan kaprodi | Kaprodi | Tanda Tangan Sertifikat | `certificate_templates` (template kampus): `signer_name`, `signer_title`, `signature_file_id` |
+
+Company Supervisor hanya bisa mengubah perusahaan dan divisi tempat mahasiswa yang ia supervisi (atau yang tercatat di profil stafnya). Semua gambar hanya PNG, JPG, atau WebP (maks. 1 MB; SVG ditolak). Logo disajikan lewat `/logo/kampus`, `/logo/fakultas`, `/logo/perusahaan/{id}`; tanda tangan tidak punya tautan publik dan disematkan langsung (data URI) di halaman sertifikat. Perubahan template kampus berlaku untuk semua sertifikat, termasuk yang sudah terbit.

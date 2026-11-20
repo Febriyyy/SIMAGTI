@@ -31,6 +31,17 @@ class CertificateTemplate extends Model
         ];
     }
 
+    /** Template sertifikat kampus (penanda tangan kaprodi); dibuat sekali bila belum ada. */
+    public static function campus(?User $kaprodi = null): self
+    {
+        $kaprodi ??= User::where('role', 'kaprodi')->where('is_active', true)->orderBy('id')->first();
+
+        return self::firstOrCreate(
+            ['scope' => 'kampus', 'name' => 'Sertifikat KP kampus'],
+            ['signer_name' => $kaprodi?->name, 'signer_title' => 'Ketua Program Studi', 'created_by' => $kaprodi?->id]
+        );
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);

@@ -109,61 +109,66 @@ class CertificateTest extends TestCase
         $this->get('/sertifikat/verifikasi/'.str_repeat('x', 48))->assertNotFound()->assertSee('Sertifikat tidak ditemukan');
     }
 
-    public function test_logo_kampus_logo_perusahaan_dan_ketua_divisi_tampil_di_sertifikat(): void
+    public function test_logo_tanda_tangan_dan_penanda_tangan_lengkap_di_sertifikat(): void
     {
         Storage::fake('local');
         $salsa = $this->internshipOf('salsa@kp.test');
         $company = $salsa->company;
         $division = $salsa->division ?? $company->divisions()->firstOrCreate(['name' => 'Data']);
         $salsa->update(['division_id' => $division->id]);
+        $png = fn (string $name, int $w = 300, int $h = 160) => UploadedFile::fake()->image($name, $w, $h);
 
-        // Tanpa logo: sertifikat memakai logo SIMAGTI dan titik-titik untuk ketua divisi
+        // Tanpa data: logo SIMAGTI dan garis kosong
         $this->actingAs($salsa->student)->get("/sertifikat/{$salsa->id}")->assertOk()
-            ->assertSee('logo-simagti.svg', false)->assertSee('Ketua Divisi '.$division->name)->assertDontSee(route('logo.kampus'));
+            ->assertSee('logo-simagti.svg', false)->assertSee('Ketua Divisi '.$division->name)
+            ->assertDontSee(route('logo.kampus'))->assertDontSee('data:image', false);
 
-        // Admin mengunggah logo kampus (SVG ditolak demi keamanan)
+        // Admin: logo kampus dan logo fakultas (SVG ditolak)
         $admin = $this->user('admin@kp.test');
-        $this->actingAs($admin)->get('/admin/kampus')->assertOk()->assertSee('Logo kampus');
-        $this->actingAs($admin)->put('/admin/kampus', ['logo' => UploadedFile::fake()->create('logo.svg', 5, 'image/svg+xml')])->assertSessionHasErrors('logo');
-        $this->actingAs($admin)->put('/admin/kampus', ['logo' => UploadedFile::fake()->image('kampus.png', 300, 300)])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->get('/admin/kampus')->assertOk()->assertSee('Logo kampus')->assertSee('Logo fakultas');
+        $this->actingAs($admin)->put('/admin/kampus/kampus', ['logo' => UploadedFile::fake()->create('logo.svg', 5, 'image/svg+xml')])->assertSessionHasErrorsIn('logo_kampus', 'logo');
+        $this->actingAs($admin)->put('/admin/kampus/kampus', ['logo' => $png('kampus.png')])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->put('/admin/kampus/fakultas', ['logo' => $png('fakultas.png')])->assertSessionHasNoErrors();
         $this->get('/logo/kampus')->assertOk()->assertHeader('Content-Type', 'image/png');
-        $this->actingAs($salsa->student)->put('/admin/kampus', ['logo' => UploadedFile::fake()->image('x.png')])->assertForbidden();
+        $this->get('/logo/fakultas')->assertOk();
+        $this->actingAs($salsa->student)->put('/admin/kampus/kampus', ['logo' => $png('x.png')])->assertForbidden();
 
-        // TU mengunggah logo perusahaan
-        $this->actingAs($this->user('tu@kp.test'))->patch("/perusahaan/{$company->id}", [
-            'name' => $company->name,
-            'logo' => UploadedFile::fake()->image('perusahaan.png', 400, 200),
-        ])->assertSessionHasNoErrors();
-        $this->assertNotNull($company->fresh()->logo_file_id);
-        $this->get("/logo/perusahaan/{$company->id}")->assertOk();
-
-        // Company Supervisor mengisi nama dan tanda tangan ketua divisi
+        // Company Supervisor: logo perusahaan, nama dan tanda tangan ketua divisi
         $supervisor = $salsa->supervisor;
-        $this->actingAs($supervisor)->get('/ketua-divisi')->assertOk()->assertSee('Divisi '.$division->name);
-        $this->actingAs($supervisor)->put("/ketua-divisi/{$division->id}", ['head_name' => ''])->assertSessionHasErrorsIn('divisi'.$division->id, 'head_name');
-        $this->actingAs($supervisor)->put("/ketua-divisi/{$division->id}", [
-            'head_name' => 'Rahmat Hidayat',
-            'signature' => UploadedFile::fake()->image('ttd.png', 400, 160),
-        ])->assertSessionHasNoErrors();
+        $this->actingAs($supervisor)->get('/data-sertifikat')->assertOk()->assertSee('Logo '.$company->name)->assertSee('Divisi '.$division->name);
+        $this->actingAs($supervisor)->put("/data-sertifikat/perusahaan/{$company->id}", ['logo' => $png('perusahaan.png', 400, 200)])->assertSessionHasNoErrors();
+        $this->assertNotNull($company->fresh()->logo_file_id);
+        $this->actingAs($supervisor)->put("/data-sertifikat/divisi/{$division->id}", ['head_name' => ''])->assertSessionHasErrorsIn('divisi'.$division->id, 'head_name');
+        $this->actingAs($supervisor)->put("/data-sertifikat/divisi/{$division->id}", ['head_name' => 'Rahmat Hidayat', 'signature' => $png('ttd.png')])->assertSessionHasNoErrors();
         $this->assertSame('Rahmat Hidayat', $division->fresh()->head_name);
-        $this->assertNotNull($division->fresh()->head_signature_file_id);
 
-        // Supervisor perusahaan lain dan TU tidak bisa mengubah divisi ini
-        $other = User::where('role', 'supervisor')->where('id', '!=', $supervisor->id)->first();
-        if ($other && ! DivisionHeadController::divisionsFor($other)->contains('id', $division->id)) {
-            $this->actingAs($other)->put("/ketua-divisi/{$division->id}", ['head_name' => 'Orang lain'])->assertForbidden();
+        // TU tidak lagi mengunggah logo perusahaan; supervisor lain tidak bisa mengubah
+        $this->actingAs($this->user('tu@kp.test'))->get('/data-sertifikat')->assertForbidden();
+        $this->actingAs($this->user('tu@kp.test'))->get("/perusahaan/{$company->id}/ubah")->assertOk()->assertDontSee('Logo perusahaan');
+        $other = User::where('role', 'supervisor')->where('id', '!=', $supervisor->id)->get()
+            ->first(fn (User $u) => ! DivisionHeadController::companiesFor($u)->contains('id', $company->id));
+        if ($other) {
+            $this->actingAs($other)->put("/data-sertifikat/perusahaan/{$company->id}", ['logo' => $png('x.png')])->assertForbidden();
+            $this->actingAs($other)->put("/data-sertifikat/divisi/{$division->id}", ['head_name' => 'Orang lain'])->assertForbidden();
         }
-        $this->actingAs($this->user('tu@kp.test'))->get('/ketua-divisi')->assertForbidden();
 
-        $this->actingAs($salsa->student)->get("/sertifikat/{$salsa->id}")->assertOk()
+        // Kaprodi: nama, jabatan, dan tanda tangan sendiri
+        $kaprodi = $this->user('kaprodi@kp.test');
+        $this->actingAs($kaprodi)->get('/kaprodi/tanda-tangan')->assertOk()->assertSee('Penanda tangan kampus');
+        $this->actingAs($kaprodi)->put('/kaprodi/tanda-tangan', ['signer_name' => 'Dr. Kaprodi Uji, M.Kom.', 'signer_title' => 'Ketua Program Studi', 'signature' => $png('ttd-kaprodi.png')])->assertSessionHasNoErrors();
+        $this->actingAs($supervisor)->get('/kaprodi/tanda-tangan')->assertForbidden();
+
+        // Semuanya tampil di sertifikat: tiga logo dan dua tanda tangan
+        $page = $this->actingAs($salsa->student)->get("/sertifikat/{$salsa->id}")->assertOk()
             ->assertSee(route('logo.kampus'), false)
+            ->assertSee(route('logo.fakultas'), false)
             ->assertSee(route('logo.perusahaan', $company), false)
             ->assertSee('Rahmat Hidayat')
-            ->assertSee('data:image/png;base64,', false)
-            ->assertSee('Ketua Program Studi');
+            ->assertSee('Dr. Kaprodi Uji, M.Kom.');
+        $this->assertSame(2, substr_count($page->getContent(), 'data:image/png;base64,'));
 
-        // Hapus logo perusahaan
-        $this->actingAs($this->user('tu@kp.test'))->patch("/perusahaan/{$company->id}", ['name' => $company->name, 'remove_logo' => 1])->assertSessionHasNoErrors();
+        // Logo perusahaan bisa dihapus supervisor
+        $this->actingAs($supervisor)->delete("/data-sertifikat/perusahaan/{$company->id}")->assertRedirect();
         $this->assertNull($company->fresh()->logo_file_id);
         $this->get("/logo/perusahaan/{$company->id}")->assertNotFound();
     }

@@ -30,6 +30,7 @@ use App\Http\Controllers\InternshipApplicationController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\KaprodiApprovalController;
+use App\Http\Controllers\KaprodiSignatureController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LogoController;
 use App\Http\Controllers\MeetingController;
@@ -80,6 +81,7 @@ Route::post('/undangan/{token}', [InvitationController::class, 'store'])->middle
 // Verifikasi sertifikat KP lewat QR: publik, tidak menampilkan NIM.
 // Logo kampus dan perusahaan untuk sertifikat (bukan data pribadi; dipakai juga halaman verifikasi tanpa login)
 Route::get('/logo/kampus', [LogoController::class, 'campus'])->middleware('throttle:120,1')->name('logo.kampus');
+Route::get('/logo/fakultas', [LogoController::class, 'faculty'])->middleware('throttle:120,1')->name('logo.fakultas');
 Route::get('/logo/perusahaan/{company}', [LogoController::class, 'company'])->whereNumber('company')->middleware('throttle:120,1')->name('logo.perusahaan');
 
 Route::get('/sertifikat/verifikasi/{token}', [CertificateController::class, 'verify'])
@@ -239,9 +241,11 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         // Meeting mingguan diatur Company Supervisor
         Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
 
-        // Nama dan tanda tangan ketua divisi untuk sertifikat KP
-        Route::get('/ketua-divisi', [DivisionHeadController::class, 'index'])->name('divisi.ketua');
-        Route::put('/ketua-divisi/{division}', [DivisionHeadController::class, 'update'])->whereNumber('division')->middleware('throttle:30,1')->name('divisi.ketua.update');
+        // Data Sertifikat: logo perusahaan, nama dan tanda tangan ketua divisi
+        Route::get('/data-sertifikat', [DivisionHeadController::class, 'index'])->name('sertifikat.data');
+        Route::put('/data-sertifikat/divisi/{division}', [DivisionHeadController::class, 'update'])->whereNumber('division')->middleware('throttle:30,1')->name('sertifikat.data.divisi');
+        Route::put('/data-sertifikat/perusahaan/{company}', [DivisionHeadController::class, 'logo'])->whereNumber('company')->middleware('throttle:20,1')->name('sertifikat.data.logo');
+        Route::delete('/data-sertifikat/perusahaan/{company}', [DivisionHeadController::class, 'destroyLogo'])->whereNumber('company')->name('sertifikat.data.logo.destroy');
 
         // Template task: kumpulan task baku yang diterapkan ke mahasiswa magang sekali klik
         Route::get('/template-task', [TaskTemplateController::class, 'index'])->name('template.index');
@@ -347,6 +351,9 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
         // Nilai sidang KP (dicatat terpisah dari nilai akhir)
         Route::get('/kaprodi/sidang', [DefenseController::class, 'index'])->name('kaprodi.sidang');
+        // Nama, jabatan, dan tanda tangan kaprodi untuk sertifikat KP
+        Route::get('/kaprodi/tanda-tangan', [KaprodiSignatureController::class, 'edit'])->name('kaprodi.ttd');
+        Route::put('/kaprodi/tanda-tangan', [KaprodiSignatureController::class, 'update'])->middleware('throttle:20,1')->name('kaprodi.ttd.update');
         Route::put('/kaprodi/sidang/{internship}/jadwal', [DefenseController::class, 'schedule'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.jadwal');
         Route::put('/kaprodi/sidang/{internship}', [DefenseController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.simpan');
 
@@ -368,8 +375,8 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
         // Identitas kampus: logo kampus untuk sertifikat
         Route::get('/kampus', [AdminCampusController::class, 'edit'])->name('admin.kampus');
-        Route::put('/kampus', [AdminCampusController::class, 'update'])->middleware('throttle:20,1')->name('admin.kampus.update');
-        Route::delete('/kampus', [AdminCampusController::class, 'destroy'])->name('admin.kampus.destroy');
+        Route::put('/kampus/{kind}', [AdminCampusController::class, 'update'])->whereIn('kind', ['kampus', 'fakultas'])->middleware('throttle:20,1')->name('admin.kampus.update');
+        Route::delete('/kampus/{kind}', [AdminCampusController::class, 'destroy'])->whereIn('kind', ['kampus', 'fakultas'])->name('admin.kampus.destroy');
         Route::get('/penilaian', [AssessmentStandardController::class, 'index'])->name('admin.penilaian');
         Route::post('/penilaian/pertanyaan', [AssessmentStandardController::class, 'storeQuestion'])->name('admin.penilaian.pertanyaan.store');
         Route::patch('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'updateQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.update');

@@ -23,6 +23,12 @@ class Logos
 
     public const CAMPUS_KEY = 'simagti.campus.logo_file_id';
 
+    /** Logo institusi yang diunggah admin: jenis => [kunci pengaturan, label] */
+    public const INSTITUTIONS = [
+        'kampus' => [self::CAMPUS_KEY, 'Logo kampus'],
+        'fakultas' => ['simagti.campus.faculty_logo_file_id', 'Logo fakultas'],
+    ];
+
     public static function store(UploadedFile $file, User $user, string $folder): StoredFile
     {
         $path = $file->storeAs('logo/'.$folder, Str::uuid().'.'.strtolower($file->extension()), self::DISK);
@@ -57,19 +63,35 @@ class Logos
         return 'data:'.$file->mime_type.';base64,'.base64_encode(Storage::disk($file->disk)->get($file->path));
     }
 
-    public static function campus(): ?StoredFile
+    public static function institution(string $kind): ?StoredFile
     {
-        $id = Setting::get(self::CAMPUS_KEY);
+        $id = Setting::get(self::INSTITUTIONS[$kind][0]);
 
         return $id ? StoredFile::find($id) : null;
     }
 
-    public static function setCampus(?StoredFile $file, User $user): void
+    public static function setInstitution(string $kind, ?StoredFile $file, User $user): void
     {
-        $old = self::campus();
-        Setting::put(self::CAMPUS_KEY, $file?->id, 'Logo kampus untuk sertifikat KP', $user->id);
+        [$key, $label] = self::INSTITUTIONS[$kind];
+        $old = self::institution($kind);
+        Setting::put($key, $file?->id, $label.' untuk sertifikat KP', $user->id);
         if ($old && $old->id !== $file?->id) {
             self::discard($old);
         }
+    }
+
+    public static function campus(): ?StoredFile
+    {
+        return self::institution('kampus');
+    }
+
+    public static function faculty(): ?StoredFile
+    {
+        return self::institution('fakultas');
+    }
+
+    public static function setCampus(?StoredFile $file, User $user): void
+    {
+        self::setInstitution('kampus', $file, $user);
     }
 }

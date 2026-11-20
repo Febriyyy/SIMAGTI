@@ -37,7 +37,7 @@ class Menu
                 ['label' => 'Lowongan Magang', 'route' => 'lowongan.kelola', 'icon' => 'search', 'active' => 'lowongan.*'],
                 ['label' => 'Laporan KP', 'route' => 'laporan.antrean', 'icon' => 'syllabus', 'active' => 'laporan.*'],
                 ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
-                ['label' => 'Ketua Divisi', 'route' => 'divisi.ketua', 'icon' => 'edit', 'active' => 'divisi.*'],
+                ['label' => 'Data Sertifikat', 'route' => 'sertifikat.data', 'icon' => 'award', 'active' => 'sertifikat.data*'],
                 ['label' => 'Pengajuan Perubahan', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],
             ],
             'dospem' => [
@@ -72,6 +72,7 @@ class Menu
                 ['label' => 'Perusahaan', 'route' => 'perusahaan.index', 'icon' => 'building', 'active' => 'perusahaan.*'],
                 ['label' => 'Rekap KP', 'route' => 'rekap.index', 'icon' => 'chart', 'active' => 'rekap.*'],
                 ['label' => 'Sidang KP', 'route' => 'kaprodi.sidang', 'icon' => 'school', 'active' => 'kaprodi.sidang*'],
+                ['label' => 'Tanda Tangan Sertifikat', 'route' => 'kaprodi.ttd', 'icon' => 'edit', 'active' => 'kaprodi.ttd*'],
                 ['label' => 'Bobot Penilaian', 'route' => 'kaprodi.bobot', 'icon' => 'grade', 'active' => 'kaprodi.bobot*'],
             ],
             'admin' => [
