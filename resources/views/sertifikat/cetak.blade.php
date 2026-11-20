@@ -47,21 +47,26 @@
 
         /* ---------- Pita kiri ---------- */
         .band { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 16mm 12mm 14mm; overflow: hidden; color: #fff;
-            background: linear-gradient(165deg, #0b8f78 0%, var(--primary) 38%, var(--ink) 78%, var(--deep) 100%); }
+            background: linear-gradient(165deg, #0fa585 0%, #079079 22%, var(--primary) 45%, var(--ink) 80%, var(--deep) 100%); }
         /* Pola garis halus seperti pengaman dokumen resmi */
         .band-pattern { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .16; pointer-events: none; }
         .band > *:not(.band-pattern) { position: relative; }
         .band-label { display: block; font-size: 3mm; color: rgba(255, 255, 255, .7); }
         .band-number { display: block; margin-top: 1mm; font-size: 4.4mm; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 
-        /* Nilai akhir: murni tipografi. Huruf mutu besar, garis lime pendek, angka, keterangan. Tanpa kotak. */
-        .grade { display: flex; flex-direction: column; align-items: flex-start; }
-        .grade-label { font-size: 3mm; color: rgba(255, 255, 255, .68); }
-        .grade-letter { margin-top: 2mm; font-size: 30mm; font-weight: 500; line-height: .8; letter-spacing: -.06em; color: #fff; }
-        .grade-rule { width: 12mm; height: .5mm; margin: 6mm 0 4mm; background: var(--lime); }
-        .grade-score { font-size: 5mm; font-weight: 600; letter-spacing: -.01em; color: #fff; font-variant-numeric: tabular-nums; }
-        .grade-score small { margin-left: 1.2mm; font-size: 3mm; font-weight: 400; color: rgba(255, 255, 255, .62); }
-        .grade-note { margin: 1.6mm 0 0; font-size: 3mm; line-height: 1.45; color: rgba(255, 255, 255, .68); }
+        /* Nilai akhir: huruf mutu lime besar dengan cahaya lembut, angka, dan lencana "Diterima" */
+        .grade { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+        .grade::before { content: ""; position: absolute; left: -10mm; top: 2mm; width: 52mm; height: 52mm; border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 240, 101, .32) 0%, rgba(201, 240, 101, .1) 42%, rgba(201, 240, 101, 0) 70%); pointer-events: none; }
+        .grade > * { position: relative; }
+        .grade-label { font-size: 3mm; color: rgba(255, 255, 255, .75); }
+        .grade-letter { margin-top: 2.5mm; font-size: 36mm; font-weight: 800; line-height: .78; letter-spacing: -.06em; color: var(--lime);
+            text-shadow: 0 1mm 6mm rgba(201, 240, 101, .35); }
+        .grade-score { margin-top: 5mm; font-size: 6mm; font-weight: 700; letter-spacing: -.02em; color: #fff; font-variant-numeric: tabular-nums; }
+        .grade-score small { margin-left: 1.4mm; font-size: 3.1mm; font-weight: 400; color: rgba(255, 255, 255, .7); }
+        .grade-badge { display: inline-flex; align-items: center; gap: 1.4mm; margin-top: 4mm; padding: 1.4mm 3.6mm 1.4mm 2.6mm; border-radius: 999px;
+            background: var(--lime); color: var(--ink); font-size: 3.1mm; font-weight: 700; }
+        .grade-badge svg { width: 3.4mm; height: 3.4mm; }
 
         .verify { display: flex; align-items: flex-end; gap: 3.5mm; }
         .verify .qr { flex: none; display: block; width: 24mm; height: 24mm; padding: 1.8mm; border-radius: 2.5mm; background: #fff; }
@@ -148,11 +153,13 @@
                 @if ($internship->final_grade)
                     <b class="grade-letter">{{ $internship->final_grade }}</b>
                 @endif
-                <span class="grade-rule" aria-hidden="true"></span>
                 @if ($internship->final_score !== null)
                     <span class="grade-score">{{ \App\Support\Num::short((float) $internship->final_score) }}<small>dari 100</small></span>
                 @endif
-                <p class="grade-note">Kerja Praktik dinyatakan diterima</p>
+                <span class="grade-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                    Kerja Praktik diterima
+                </span>
             </div>
 
             <div class="verify">
