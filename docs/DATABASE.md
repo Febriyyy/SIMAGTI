@@ -362,3 +362,10 @@ Ulasan tempat magang dari mahasiswa setelah masa magang berakhir (status `selesa
 | comment | text, null | |
 
 Tampil tanpa nama di halaman Lowongan (rating per perusahaan, rincian aspek, 3 komentar terbaru).
+
+### Logo dan ketua divisi untuk sertifikat (20 November 2026)
+
+- `company_divisions.head_name` (string 150, null) dan `company_divisions.head_signature_file_id` (FK files, null): nama dan tanda tangan ketua divisi, **diisi Company Supervisor** di menu Ketua Divisi untuk divisi mahasiswa yang ia supervisi. Tampil sebagai penanda tangan kiri di sertifikat KP.
+- `companies.logo_file_id` (sudah ada): logo perusahaan, kini diunggah TU Fakultas di formulir ubah perusahaan.
+- Logo kampus: pengaturan `simagti.campus.logo_file_id` di tabel `settings`, diunggah admin di menu Identitas Kampus.
+- Semua gambar hanya PNG, JPG, atau WebP (maks. 1 MB; SVG ditolak). Logo disajikan lewat `/logo/kampus` dan `/logo/perusahaan/{id}`; tanda tangan tidak punya tautan publik dan disematkan langsung (data URI) di halaman sertifikat.

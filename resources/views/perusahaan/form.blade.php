@@ -12,7 +12,7 @@
 
     <section class="card">
         <div class="card-body">
-            <form method="POST" action="{{ $company ? route('perusahaan.update', $company) : route('perusahaan.store') }}" class="form-grid">
+            <form method="POST" action="{{ $company ? route('perusahaan.update', $company) : route('perusahaan.store') }}" class="form-grid" enctype="multipart/form-data">
                 @csrf
                 @if ($company)
                     @method('PATCH')
@@ -42,6 +42,26 @@
                 <div class="span-all">
                     <label for="website" class="label">Website <span class="label-opt">(opsional)</span></label>
                     <input id="website" name="website" type="text" inputmode="url" class="input" value="{{ old('website', $company?->website) }}" maxlength="200" placeholder="perusahaan.co.id">
+                </div>
+                <div class="span-all">
+                    <span class="label">Logo perusahaan <span class="label-opt">(opsional, tampil di sertifikat KP)</span></span>
+                    <div class="logo-edit">
+                        <div class="logo-preview is-sm">
+                            @if ($company?->logo_file_id)
+                                <img src="{{ route('logo.perusahaan', $company) }}?v={{ $company->logo_file_id }}" alt="Logo {{ $company->name }}">
+                            @else
+                                <span>Belum ada logo</span>
+                            @endif
+                        </div>
+                        <div class="logo-form">
+                            <input id="logo" name="logo" type="file" class="input" accept="image/png,image/jpeg,image/webp" aria-describedby="logo-hint">
+                            <p class="hint" id="logo-hint">PNG, JPG, atau WebP, maksimal 1 MB.</p>
+                            @if ($company?->logo_file_id)
+                                <label class="check"><input type="checkbox" name="remove_logo" value="1"> Hapus logo saat disimpan</label>
+                            @endif
+                            @error('logo')<p class="field-error">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
                 </div>
                 <div class="span-all">
                     <label for="divisions" class="label">Tambah divisi</label>

@@ -37,6 +37,7 @@ class Menu
                 ['label' => 'Lowongan Magang', 'route' => 'lowongan.kelola', 'icon' => 'search', 'active' => 'lowongan.*'],
                 ['label' => 'Laporan KP', 'route' => 'laporan.antrean', 'icon' => 'syllabus', 'active' => 'laporan.*'],
                 ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
+                ['label' => 'Ketua Divisi', 'route' => 'divisi.ketua', 'icon' => 'edit', 'active' => 'divisi.*'],
                 ['label' => 'Pengajuan Perubahan', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],
             ],
             'dospem' => [
@@ -77,6 +78,7 @@ class Menu
                 $dashboard,
                 ['label' => 'Akun', 'route' => 'admin.akun', 'icon' => 'users', 'active' => 'admin.akun*'],
                 ['label' => 'Standar Penilaian', 'route' => 'admin.penilaian', 'icon' => 'award', 'active' => 'admin.penilaian*'],
+                ['label' => 'Identitas Kampus', 'route' => 'admin.kampus', 'icon' => 'school', 'active' => 'admin.kampus*'],
                 ['label' => 'Log Aktivitas', 'route' => 'log.index', 'icon' => 'history', 'active' => 'log.*'],
             ],
             default => [$dashboard],

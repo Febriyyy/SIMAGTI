@@ -7,6 +7,7 @@ use App\Models\Certificate;
 use App\Models\Internship;
 use App\Support\AssessmentStandard;
 use App\Support\Campus;
+use App\Support\Logos;
 use App\Support\Qr;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,7 +23,7 @@ class CertificateController extends Controller
         abort_unless($internship->result === 'diterima', 404, 'Sertifikat hanya tersedia untuk KP yang diterima.');
 
         // KP yang diputuskan sebelum fitur sertifikat ada: terbitkan saat pertama kali dibuka.
-        $certificate = $issue->handle($internship->loadMissing('student', 'company', 'lecturer'), $request->user());
+        $certificate = $issue->handle($internship->loadMissing('student', 'company', 'division', 'lecturer'), $request->user());
         abort_unless($certificate?->isValid(), 404, 'Sertifikat ini tidak berlaku.');
 
         $verifyUrl = route('sertifikat.verifikasi', $certificate->verification_token);
@@ -32,6 +33,8 @@ class CertificateController extends Controller
             'internship' => $internship,
             'verifyUrl' => $verifyUrl,
             'qr' => Qr::svg($verifyUrl),
+            'campusLogo' => Logos::campus(),
+            'divisionSignature' => Logos::dataUri($internship->division?->headSignature),
             'campus' => [
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),

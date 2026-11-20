@@ -45,7 +45,10 @@
 
         .content { position: absolute; inset: 20mm 24mm 18mm; display: grid; grid-template-rows: auto 1fr auto; z-index: 1; }
         .head { display: flex; align-items: center; justify-content: space-between; gap: 8mm; }
-        .head img { height: 14mm; }
+        .head-logos { display: flex; align-items: center; gap: 5mm; }
+        .head-logos img { display: block; height: 16mm; max-width: 60mm; object-fit: contain; }
+        .head-logos .simagti { height: 12mm; }
+        .head-logos .divider { width: .3mm; height: 13mm; background: var(--line); }
         .head-campus { text-align: right; font-size: 3.2mm; line-height: 1.45; color: var(--muted); }
         .head-campus strong { display: block; color: var(--brand-ink); font-size: 3.8mm; }
 
@@ -60,7 +63,9 @@
         .desc strong { color: var(--brand-ink); }
         .grade { display: inline-flex; align-items: center; gap: 2mm; margin-top: 4mm; padding: 1.5mm 5mm; border-radius: 999px; background: var(--primary-soft); color: var(--brand-ink); font-size: 3.6mm; font-weight: 700; }
 
-        .foot { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 8mm; }
+        .foot { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10mm; }
+        .signs { display: grid; grid-template-columns: repeat(2, 62mm); column-gap: 10mm; }
+        .signs .date { grid-column: 1 / -1; margin-bottom: 2mm; text-align: right; }
         .verify { display: flex; align-items: center; gap: 3mm; font-size: 2.8mm; line-height: 1.45; color: var(--muted); }
         .verify .qr { flex: none; width: 24mm; height: 24mm; }
         .verify .qr svg { display: block; width: 100%; height: 100%; }
@@ -71,6 +76,8 @@
         .sign { text-align: center; font-size: 3.4mm; }
         .sign .space { height: 16mm; }
         .sign strong { display: block; padding-top: 1.5mm; border-top: .3mm solid var(--text); }
+        .sign .space.signed { display: flex; align-items: flex-end; justify-content: center; }
+        .sign .space.signed img { display: block; max-width: 48mm; max-height: 16mm; object-fit: contain; mix-blend-mode: multiply; }
         .sign small { color: var(--muted); font-size: 3mm; }
 
         @media print {
@@ -95,7 +102,17 @@
 
         <div class="content">
             <header class="head">
-                <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI">
+                <div class="head-logos">
+                    @if ($campusLogo)
+                        <img src="{{ route('logo.kampus') }}?v={{ $campusLogo->id }}" alt="Logo {{ $campus['university'] }}">
+                    @else
+                        <img class="simagti" src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI">
+                    @endif
+                    @if ($internship->company?->logo_file_id)
+                        <span class="divider" aria-hidden="true"></span>
+                        <img src="{{ route('logo.perusahaan', $internship->company) }}?v={{ $internship->company->logo_file_id }}" alt="Logo {{ $internship->company->name }}">
+                    @endif
+                </div>
                 <div class="head-campus">
                     <strong>{{ $campus['university'] }}</strong>
                     {{ $campus['faculty'] }}<br>{{ $campus['program'] }}
@@ -131,12 +148,24 @@
                         <span>{{ $verifyUrl }}</span>
                     </div>
                 </div>
-                <div class="date">{{ $campus['city'] }}, {{ $issued->translatedFormat('j F Y') }}</div>
-                <div class="sign">
-                    <div>{{ $template?->signer_title ?? 'Ketua Program Studi' }}</div>
-                    <div class="space" aria-hidden="true"></div>
-                    <strong>{{ $template?->signer_name ?? '……………………………' }}</strong>
-                    <small>{{ $campus['program'] }}</small>
+                <div class="signs">
+                    <div class="date">{{ $campus['city'] }}, {{ $issued->translatedFormat('j F Y') }}</div>
+                    <div class="sign">
+                        <div>{{ $internship->division ? 'Ketua Divisi '.$internship->division->name : 'Pimpinan perusahaan' }}</div>
+                        @if ($divisionSignature)
+                            <div class="space signed"><img src="{{ $divisionSignature }}" alt="Tanda tangan ketua divisi"></div>
+                        @else
+                            <div class="space" aria-hidden="true"></div>
+                        @endif
+                        <strong>{{ $internship->division?->head_name ?? '……………………………' }}</strong>
+                        <small>{{ $internship->company?->name }}</small>
+                    </div>
+                    <div class="sign">
+                        <div>{{ $template?->signer_title ?? 'Ketua Program Studi' }}</div>
+                        <div class="space" aria-hidden="true"></div>
+                        <strong>{{ $template?->signer_name ?? '……………………………' }}</strong>
+                        <small>{{ $campus['program'] }}</small>
+                    </div>
                 </div>
             </footer>
         </div>

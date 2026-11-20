@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ActivityMonitorController;
 use App\Http\Controllers\ActivityPlanController;
+use App\Http\Controllers\AdminCampusController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentReviewController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DefenseController;
 use App\Http\Controllers\DefenseMinutesController;
+use App\Http\Controllers\DivisionHeadController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentQueueController;
 use App\Http\Controllers\ExportController;
@@ -29,6 +31,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\KaprodiApprovalController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LogoController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\NotificationController;
@@ -75,6 +78,10 @@ Route::get('/undangan/{token}', [InvitationController::class, 'show'])->name('un
 Route::post('/undangan/{token}', [InvitationController::class, 'store'])->middleware('throttle:10,1')->name('undangan.store');
 
 // Verifikasi sertifikat KP lewat QR: publik, tidak menampilkan NIM.
+// Logo kampus dan perusahaan untuk sertifikat (bukan data pribadi; dipakai juga halaman verifikasi tanpa login)
+Route::get('/logo/kampus', [LogoController::class, 'campus'])->middleware('throttle:120,1')->name('logo.kampus');
+Route::get('/logo/perusahaan/{company}', [LogoController::class, 'company'])->whereNumber('company')->middleware('throttle:120,1')->name('logo.perusahaan');
+
 Route::get('/sertifikat/verifikasi/{token}', [CertificateController::class, 'verify'])
     ->where('token', '[A-Za-z0-9]{20,64}')->middleware('throttle:60,1')->name('sertifikat.verifikasi');
 
@@ -232,6 +239,10 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         // Meeting mingguan diatur Company Supervisor
         Route::post('/meeting', [MeetingController::class, 'store'])->name('meeting.store');
 
+        // Nama dan tanda tangan ketua divisi untuk sertifikat KP
+        Route::get('/ketua-divisi', [DivisionHeadController::class, 'index'])->name('divisi.ketua');
+        Route::put('/ketua-divisi/{division}', [DivisionHeadController::class, 'update'])->whereNumber('division')->middleware('throttle:30,1')->name('divisi.ketua.update');
+
         // Template task: kumpulan task baku yang diterapkan ke mahasiswa magang sekali klik
         Route::get('/template-task', [TaskTemplateController::class, 'index'])->name('template.index');
         Route::post('/template-task', [TaskTemplateController::class, 'store'])->middleware('throttle:30,1')->name('template.store');
@@ -355,6 +366,10 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
 
         // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
+        // Identitas kampus: logo kampus untuk sertifikat
+        Route::get('/kampus', [AdminCampusController::class, 'edit'])->name('admin.kampus');
+        Route::put('/kampus', [AdminCampusController::class, 'update'])->middleware('throttle:20,1')->name('admin.kampus.update');
+        Route::delete('/kampus', [AdminCampusController::class, 'destroy'])->name('admin.kampus.destroy');
         Route::get('/penilaian', [AssessmentStandardController::class, 'index'])->name('admin.penilaian');
         Route::post('/penilaian/pertanyaan', [AssessmentStandardController::class, 'storeQuestion'])->name('admin.penilaian.pertanyaan.store');
         Route::patch('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'updateQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.update');
