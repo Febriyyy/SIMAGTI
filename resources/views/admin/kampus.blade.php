@@ -2,7 +2,7 @@
 
 @section('title', 'Identitas Kampus')
 
-{{-- Admin: logo kampus dan logo fakultas untuk sertifikat KP. Nama kampus, fakultas, prodi, dan kota diambil dari konfigurasi. --}}
+{{-- Admin: logo kampus dan logo fakultas untuk sertifikat KP, ditampilkan di atas lembar sertifikat kecil. --}}
 @section('content')
     <div class="page-head">
         <div>
@@ -11,62 +11,53 @@
         </div>
     </div>
 
-    <div class="cs">
-        <section class="card cs-card">
-            <div class="cs-pair">
-            @foreach (\App\Support\Logos::INSTITUTIONS as $kind => [$key, $label])
-                <?php $logo = $logos[$kind]; $bag = $errors->getBag('logo_'.$kind); ?>
-                <div class="cs-row" id="logo-{{ $kind }}">
-                    <div class="cs-label">
-                        <h2>{{ $label }}</h2>
-                        <p>{{ $kind === 'kampus' ? $campus['university'] : $campus['faculty'] }}</p>
-                        <span @class(['cs-state', 'is-ok' => $logo])>{{ $logo ? 'Terpasang' : 'Belum ada' }}</span>
-                    </div>
-                    <div class="cs-field">
-                        <form method="POST" action="{{ route('admin.kampus.update', $kind) }}" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <label @class(['cs-tile', 'has-file' => $logo])>
-                                @if ($logo)
-                                    <img src="{{ route('logo.'.$kind) }}?v={{ $logo->id }}" alt="{{ $label }} saat ini">
-                                    <span class="cs-tile-hover"><x-ikon name="upload" :size="16" /> Ganti</span>
-                                @else
-                                    <x-ikon name="image" :size="22" />
-                                    <b>Unggah {{ mb_strtolower($label) }}</b>
-                                @endif
-                                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required class="sr-only" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()" aria-label="Unggah {{ mb_strtolower($label) }}">
-                            </label>
-                        </form>
-                        <div class="cs-meta">
-                            <small>Disarankan 500 × 500 px (persegi) atau 900 × 300 px (melebar). PNG/JPG, maks. 1 MB.</small>
-                            @if ($logo)
-                                <form method="POST" action="{{ route('admin.kampus.destroy', $kind) }}" onsubmit="return confirm('Hapus {{ mb_strtolower($label) }}?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="cs-link">Hapus</button>
-                                </form>
-                            @endif
+    <div class="ca-grid">
+        @foreach (\App\Support\Logos::INSTITUTIONS as $kind => [$key, $label])
+            <?php $logo = $logos[$kind]; $bag = $errors->getBag('logo_'.$kind); ?>
+            <section class="card ca" id="logo-{{ $kind }}">
+                <form method="POST" action="{{ route('admin.kampus.update', $kind) }}" enctype="multipart/form-data" class="ca-paper">
+                    @csrf
+                    @method('PUT')
+                    <label class="ca-sheet">
+                        @if ($logo)
+                            <img class="ca-logo" src="{{ route('logo.'.$kind) }}?v={{ $logo->id }}" alt="{{ $label }} saat ini">
+                        @else
+                            <span class="ca-empty"><span class="ca-empty-icon"><x-ikon name="image" :size="20" /></span>Belum ada {{ mb_strtolower($label) }}</span>
+                        @endif
+                        <span class="ca-hint"><x-ikon name="upload" :size="14" /> {{ $logo ? 'Ganti logo' : 'Unggah logo' }}</span>
+                        <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required class="sr-only" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()" aria-label="Unggah {{ mb_strtolower($label) }}">
+                    </label>
+                </form>
+                <div class="ca-body">
+                    <div class="ca-title">
+                        <div>
+                            <h2>{{ $label }}</h2>
+                            <p>{{ $kind === 'kampus' ? $campus['university'] : $campus['faculty'] }}</p>
                         </div>
-                        @if ($bag->has('logo'))<p class="field-error">{{ $bag->first('logo') }}</p>@endif
+                        <span @class(['ca-state', 'is-ok' => $logo])>{{ $logo ? 'Terpasang' : 'Belum ada' }}</span>
                     </div>
+                    <p class="ca-help">Klik lembar di atas untuk mengunggah. Disarankan 500 × 500 px (persegi) atau 900 × 300 px (melebar), PNG atau JPG maks. 1 MB.</p>
+                    @if ($bag->has('logo'))<p class="field-error">{{ $bag->first('logo') }}</p>@endif
+                    @if ($logo)
+                        <div class="ca-actions">
+                            <span></span>
+                            <form method="POST" action="{{ route('admin.kampus.destroy', $kind) }}" onsubmit="return confirm('Hapus {{ mb_strtolower($label) }}?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="ca-link">Hapus logo</button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
-            @endforeach
-            </div>
-
-            <div class="cs-row">
-                <div class="cs-label">
-                    <h2>Teks identitas</h2>
-                    <p>Diambil dari konfigurasi aplikasi</p>
-                </div>
-                <div class="cs-field">
-                    <dl class="cs-facts">
-                        <div><dt>Universitas</dt><dd>{{ $campus['university'] }}</dd></div>
-                        <div><dt>Fakultas</dt><dd>{{ $campus['faculty'] }}</dd></div>
-                        <div><dt>Program studi</dt><dd>{{ $campus['program'] }}</dd></div>
-                        <div><dt>Kota</dt><dd>{{ $campus['city'] }}</dd></div>
-                    </dl>
-                </div>
-            </div>
-        </section>
+            </section>
+        @endforeach
     </div>
+
+    <dl class="card ca-strip">
+        <div><dt>Universitas</dt><dd>{{ $campus['university'] }}</dd></div>
+        <div><dt>Fakultas</dt><dd>{{ $campus['faculty'] }}</dd></div>
+        <div><dt>Program studi</dt><dd>{{ $campus['program'] }}</dd></div>
+        <div><dt>Kota</dt><dd>{{ $campus['city'] }}</dd></div>
+        <p class="ca-strip-note">Teks identitas diambil dari konfigurasi aplikasi. Tanda tangan Ketua Program Studi diisi kaprodi, logo perusahaan dan ketua divisi diisi Company Supervisor.</p>
+    </dl>
 @endsection
