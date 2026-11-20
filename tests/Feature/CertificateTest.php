@@ -120,7 +120,7 @@ class CertificateTest extends TestCase
 
         // Tanpa data: logo SIMAGTI dan garis kosong
         $this->actingAs($salsa->student)->get("/sertifikat/{$salsa->id}")->assertOk()
-            ->assertSee('logo-simagti.svg', false)->assertSee('Ketua Divisi '.$division->name)
+            ->assertSee('Unggah logo')->assertSee('Ketua Divisi '.$division->name)
             ->assertDontSee(route('logo.kampus'))->assertDontSee('data:image', false);
 
         // Admin: logo kampus dan logo fakultas (SVG ditolak)

@@ -73,12 +73,19 @@
         .main::before { content: ""; position: absolute; top: 0; left: 0; width: 1.4mm; height: 100%; background: var(--lime); }
 
         .head { display: flex; align-items: center; justify-content: space-between; gap: 8mm; padding-bottom: 6mm; border-bottom: .3mm solid var(--line); }
-        .head-logos { display: flex; align-items: center; gap: 4.5mm; min-width: 0; }
-        .head-logos img { display: block; height: 15mm; max-width: 52mm; object-fit: contain; }
-        .head-logos .simagti { height: 11mm; }
+        .head-logos { display: flex; align-items: center; gap: 3.5mm; min-width: 0; }
+        .head-logos img { display: block; height: 15mm; max-width: 40mm; object-fit: contain; }
         .head-logos .divider { flex: none; width: .3mm; height: 12mm; background: var(--line); }
-        .head-campus { flex: none; text-align: right; font-size: 3mm; line-height: 1.5; color: var(--muted); }
-        .head-campus strong { display: block; color: var(--ink); font-size: 3.7mm; }
+        /* Logo yang belum diunggah: kotak seukuran logo. Hanya tampil di layar, tidak ikut tercetak. */
+        .logo-slot { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6mm;
+            width: 22mm; height: 15mm; border: .35mm dashed #b7c7c2; border-radius: 2.5mm; background: var(--tint);
+            color: var(--muted); font-size: 2.5mm; line-height: 1.2; text-align: center; }
+        .logo-slot b { color: var(--primary); font-size: 2.8mm; font-weight: 650; }
+        /* Identitas kampus: nama universitas, lalu fakultas | prodi dalam satu baris */
+        .head-campus { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1.4mm; text-align: right; }
+        .head-campus strong { color: var(--ink); font-size: 4mm; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+        .head-campus span { display: flex; align-items: center; gap: 2.2mm; color: var(--muted); font-size: 2.8mm; line-height: 1.3; white-space: nowrap; }
+        .head-campus span i { width: .3mm; height: 3mm; background: var(--line); }
 
         .body { align-self: center; padding: 4mm 0; }
         .title { margin: 0; color: var(--ink); font-size: 8.4mm; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
@@ -105,6 +112,7 @@
             .toolbar { display: none; }
             .sheet-wrap { padding: 0; overflow: visible; }
             .sheet { box-shadow: none; }
+            .logo-slot { display: none; }
         }
     </style>
 </head>
@@ -157,19 +165,23 @@
                     @if ($campusLogo)
                         <img src="{{ route('logo.kampus') }}?v={{ $campusLogo->id }}" alt="Logo {{ $campus['university'] }}">
                     @else
-                        <img class="simagti" src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI">
+                        <span class="logo-slot"><b>Unggah logo</b>kampus</span>
                     @endif
                     @if ($facultyLogo)
                         <img src="{{ route('logo.fakultas') }}?v={{ $facultyLogo->id }}" alt="Logo {{ $campus['faculty'] }}">
+                    @else
+                        <span class="logo-slot"><b>Unggah logo</b>fakultas</span>
                     @endif
+                    <span class="divider" aria-hidden="true"></span>
                     @if ($internship->company?->logo_file_id)
-                        <span class="divider" aria-hidden="true"></span>
                         <img src="{{ route('logo.perusahaan', $internship->company) }}?v={{ $internship->company->logo_file_id }}" alt="Logo {{ $internship->company->name }}">
+                    @else
+                        <span class="logo-slot"><b>Unggah logo</b>perusahaan</span>
                     @endif
                 </div>
                 <div class="head-campus">
                     <strong>{{ $campus['university'] }}</strong>
-                    {{ $campus['faculty'] }}<br>{{ $campus['program'] }}
+                    <span>{{ $campus['faculty'] }}<i aria-hidden="true"></i>{{ $campus['program'] }}</span>
                 </div>
             </header>
 
