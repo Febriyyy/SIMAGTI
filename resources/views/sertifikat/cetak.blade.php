@@ -56,10 +56,10 @@
 
         /* Nilai akhir sebagai segel resmi: cincin lime dengan tulisan melingkar, huruf mutu dan angka di tengah */
         .grade { display: flex; justify-content: center; }
-        .seal { display: block; width: 52mm; height: 52mm; }
-        .seal-ring-text { font-family: "Geist", system-ui, sans-serif; font-size: 8.2px; font-weight: 600; letter-spacing: 2.6px; fill: #c9f065; }
-        .seal-letter { font-family: "Geist", system-ui, sans-serif; font-size: 62px; font-weight: 700; letter-spacing: -2px; fill: #fff; }
-        .seal-score { font-family: "Geist", system-ui, sans-serif; font-size: 10.5px; font-weight: 600; fill: rgba(255, 255, 255, .85); }
+        .seal { display: block; width: 58mm; height: 58mm; filter: drop-shadow(0 1.5mm 4mm rgba(2, 30, 26, .35)); }
+        .seal-ring-text { font-family: "Geist", system-ui, sans-serif; font-size: 11px; font-weight: 700; fill: #c9f065; }
+        .seal-letter { font-family: "Geist", system-ui, sans-serif; font-size: 78px; font-weight: 800; letter-spacing: -3px; fill: #fff; }
+        .seal-score { font-family: "Geist", system-ui, sans-serif; font-size: 14px; font-weight: 700; fill: #fff; }
 
         .verify { display: flex; align-items: flex-end; gap: 3.5mm; }
         .verify .qr { flex: none; display: block; width: 24mm; height: 24mm; padding: 1.8mm; border-radius: 2.5mm; background: #fff; }
@@ -145,14 +145,14 @@
                 @php($score = $internship->final_score !== null ? \App\Support\Num::short((float) $internship->final_score) : null)
                 <svg class="seal" viewBox="0 0 200 200" role="img" aria-label="Nilai akhir {{ $internship->final_grade ?? '' }}{{ $score ? ', '.$score.' dari 100' : '' }}">
                     <defs>
-                        <path id="seal-arc" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+                        <path id="seal-arc" d="M100,100 m-77,0 a77,77 0 1,1 154,0 a77,77 0 1,1 -154,0" />
                     </defs>
-                    <circle cx="100" cy="100" r="96" fill="rgba(255,255,255,.06)" stroke="#c9f065" stroke-width="1.6" />
-                    <circle cx="100" cy="100" r="66" fill="none" stroke="rgba(201,240,101,.55)" stroke-width="1" stroke-dasharray="2 3" />
-                    <text class="seal-ring-text"><textPath href="#seal-arc" startOffset="0" textLength="486" lengthAdjust="spacing">NILAI AKHIR  •  KERJA PRAKTIK  •  DITERIMA  •</textPath></text>
-                    <text class="seal-letter" x="100" y="{{ $score ? 114 : 122 }}" text-anchor="middle">{{ $internship->final_grade ?? '✓' }}</text>
+                    <circle cx="100" cy="100" r="97" fill="rgba(2,40,34,.55)" stroke="#c9f065" stroke-width="3" />
+                    <circle cx="100" cy="100" r="64" fill="rgba(255,255,255,.08)" stroke="#c9f065" stroke-width="1.4" stroke-dasharray="3 3" />
+                    <text class="seal-ring-text"><textPath href="#seal-arc" startOffset="0" textLength="480" lengthAdjust="spacing">NILAI AKHIR  •  KERJA PRAKTIK  •  DITERIMA  •</textPath></text>
+                    <text class="seal-letter" x="100" y="{{ $score ? 118 : 127 }}" text-anchor="middle">{{ $internship->final_grade ?? '✓' }}</text>
                     @if ($score)
-                        <text class="seal-score" x="100" y="138" text-anchor="middle">{{ $score }} / 100</text>
+                        <text class="seal-score" x="100" y="145" text-anchor="middle">{{ $score }} / 100</text>
                     @endif
                 </svg>
             </div>
