@@ -79,7 +79,15 @@
         .desc { max-width: 190mm; margin: 5mm auto 0; font-size: 4mm; line-height: 1.7; color: var(--text); }
         .desc strong { color: var(--ink); font-weight: 600; }
         .desc .nowrap { white-space: nowrap; }
-        .desc .grade { display: inline-block; padding: 0 2mm; border-radius: 1.2mm; background: var(--ink); color: #fff; font-weight: 700; }
+        /* Nilai akhir: kapsul bergaris tipis, huruf mutu serif di tengah */
+        .grade-pill { display: inline-flex; align-items: stretch; margin: 5mm 0 0; border: .3mm solid var(--primary); border-radius: 999px; background: var(--paper); overflow: hidden; }
+        .grade-pill > span { display: flex; align-items: center; padding: 0 5mm; }
+        .grade-pill > span + span { border-left: .3mm solid var(--line); }
+        .gp-label { font-size: 3mm; color: var(--muted); }
+        .gp-letter { font-family: var(--serif); font-size: 8mm; font-weight: 600; line-height: 1; color: var(--ink); padding-top: 1.8mm !important; padding-bottom: 1.8mm !important;
+            background: linear-gradient(180deg, rgba(201, 240, 101, .35), rgba(201, 240, 101, .12)); }
+        .gp-score { gap: 1.2mm; font-size: 4.2mm; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .gp-score small { font-size: 2.9mm; font-weight: 400; color: var(--muted); }
 
         /* Kaki: tanda tangan | QR | tanda tangan */
         .foot { display: grid; grid-template-columns: 1fr 44mm 1fr; align-items: end; gap: 10mm; }
@@ -154,11 +162,16 @@
                     atas penyelesaian Kerja Praktik
                     @if ($internship->position) sebagai <strong>{{ $internship->position }}</strong>@endif
                     di <strong>{{ $internship->placeName() }}</strong>
-                    pada <span class="nowrap">{{ $start->translatedFormat('j F Y') }}</span> sampai <span class="nowrap">{{ $end->translatedFormat('j F Y') }}</span>{{ $internship->final_grade ? ',' : '.' }}
-                    @if ($internship->final_grade)
-                        dengan nilai akhir <span class="grade">{{ $internship->final_grade }}</span>{{ $score ? ' ('.$score.')' : '' }}.
-                    @endif
+                    pada <span class="nowrap">{{ $start->translatedFormat('j F Y') }}</span> sampai <span class="nowrap">{{ $end->translatedFormat('j F Y') }}</span>.
                 </p>
+
+                @if ($internship->final_grade)
+                    <p class="grade-pill" aria-label="Nilai akhir {{ $internship->final_grade }}{{ $score ? ', '.$score.' dari 100' : '' }}">
+                        <span class="gp-label">Nilai akhir</span>
+                        <span class="gp-letter">{{ $internship->final_grade }}</span>
+                        @if ($score)<span class="gp-score">{{ $score }}<small>/ 100</small></span>@endif
+                    </p>
+                @endif
             </section>
 
             <footer class="foot">
