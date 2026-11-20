@@ -54,12 +54,11 @@
         .band-label { display: block; font-size: 3mm; color: rgba(255, 255, 255, .7); }
         .band-number { display: block; margin-top: 1mm; font-size: 4.4mm; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 
-        /* Nilai akhir sebagai segel resmi: cincin lime dengan tulisan melingkar, huruf mutu dan angka di tengah */
-        .grade { display: flex; justify-content: center; }
-        .seal { display: block; width: 58mm; height: 58mm; filter: drop-shadow(0 1.5mm 4mm rgba(2, 30, 26, .35)); }
-        .seal-ring-text { font-family: "Geist", system-ui, sans-serif; font-size: 11px; font-weight: 700; fill: #c9f065; }
-        .seal-letter { font-family: "Geist", system-ui, sans-serif; font-size: 78px; font-weight: 800; letter-spacing: -3px; fill: #fff; }
-        .seal-score { font-family: "Geist", system-ui, sans-serif; font-size: 14px; font-weight: 700; fill: #fff; }
+        /* Judul di pita: besar, putih, dengan garis lime pendek */
+        .band-title { margin: 0; }
+        .band-title span { display: block; font-size: 4.2mm; font-weight: 500; color: rgba(255, 255, 255, .75); }
+        .band-title strong { display: block; margin-top: 1mm; font-size: 11mm; font-weight: 800; line-height: 1.02; letter-spacing: -.03em; color: #fff; }
+        .band-title i { display: block; width: 14mm; height: 1.2mm; margin-top: 5mm; border-radius: 1mm; background: var(--lime); }
 
         .verify { display: flex; align-items: flex-end; gap: 3.5mm; }
         .verify .qr { flex: none; display: block; width: 24mm; height: 24mm; padding: 1.8mm; border-radius: 2.5mm; background: #fff; }
@@ -89,14 +88,21 @@
         .head-campus span i { width: .3mm; height: 3mm; background: var(--line); }
 
         .body { align-self: center; padding: 4mm 0; }
-        .title { margin: 0; color: var(--ink); font-size: 8.4mm; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
-        .title span { display: block; font-size: 4mm; font-weight: 500; letter-spacing: 0; color: var(--muted); margin-bottom: 1.5mm; }
-        .given { margin: 8mm 0 0; color: var(--muted); font-size: 3.6mm; }
+        .given { margin: 0; color: var(--muted); font-size: 3.6mm; }
         .name { margin: 1.5mm 0 0; color: var(--text); font-size: 12.5mm; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
         .name-bar { display: block; width: 26mm; height: 1.4mm; margin-top: 4mm; border-radius: 1mm; background: var(--lime); }
         .nim { margin: 3mm 0 0; color: var(--muted); font-size: 3.4mm; font-variant-numeric: tabular-nums; }
         .desc { max-width: 165mm; margin: 6mm 0 0; font-size: 3.9mm; line-height: 1.65; color: var(--text); }
         .desc strong { color: var(--ink); }
+        /* Baris keterangan: Posisi | Periode | Nilai akhir, label kecil dan isi tebal dipisah garis tipis */
+        .facts { display: flex; margin: 6mm 0 0; padding: 0; }
+        .facts > div { padding: 0 7mm; border-left: .3mm solid var(--line); }
+        .facts > div:first-child { padding-left: 0; border-left: 0; }
+        .facts dt { font-size: 2.9mm; color: var(--muted); }
+        .facts dd { margin: 1mm 0 0; font-size: 4mm; font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .facts dd small { margin-left: 1.2mm; font-size: 3mm; font-weight: 500; color: var(--muted); }
+        .facts .grade-value { display: inline-flex; align-items: center; gap: 2mm; }
+        .facts .grade-value b { display: inline-grid; place-items: center; min-width: 7.5mm; height: 7.5mm; padding: 0 1.6mm; border-radius: 1.6mm; background: var(--primary); color: #fff; font-size: 4.2mm; }
 
         .foot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12mm; align-items: end; }
         .foot .date { grid-column: 1 / -1; margin-bottom: 1mm; font-size: 3.3mm; color: var(--muted); }
@@ -126,7 +132,7 @@
 
 <div class="sheet-wrap">
     <article class="sheet" aria-label="Sertifikat Kerja Praktik">
-        {{-- Pita kiri: nomor, nilai, verifikasi --}}
+        {{-- Pita kiri: nomor, judul, verifikasi --}}
         <aside class="band">
             <svg class="band-pattern" viewBox="0 0 310 794" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
                 <g fill="none" stroke="#c9f065" stroke-width="1">
@@ -141,21 +147,7 @@
                 <span class="band-number">{{ $certificate->number }}</span>
             </div>
 
-            <div class="grade">
-                @php($score = $internship->final_score !== null ? \App\Support\Num::short((float) $internship->final_score) : null)
-                <svg class="seal" viewBox="0 0 200 200" role="img" aria-label="Nilai akhir {{ $internship->final_grade ?? '' }}{{ $score ? ', '.$score.' dari 100' : '' }}">
-                    <defs>
-                        <path id="seal-arc" d="M100,100 m-77,0 a77,77 0 1,1 154,0 a77,77 0 1,1 -154,0" />
-                    </defs>
-                    <circle cx="100" cy="100" r="97" fill="rgba(2,40,34,.55)" stroke="#c9f065" stroke-width="3" />
-                    <circle cx="100" cy="100" r="64" fill="rgba(255,255,255,.08)" stroke="#c9f065" stroke-width="1.4" stroke-dasharray="3 3" />
-                    <text class="seal-ring-text"><textPath href="#seal-arc" startOffset="0" textLength="480" lengthAdjust="spacing">NILAI AKHIR  •  KERJA PRAKTIK  •  DITERIMA  •</textPath></text>
-                    <text class="seal-letter" x="100" y="{{ $score ? 118 : 127 }}" text-anchor="middle">{{ $internship->final_grade ?? '✓' }}</text>
-                    @if ($score)
-                        <text class="seal-score" x="100" y="145" text-anchor="middle">{{ $score }} / 100</text>
-                    @endif
-                </svg>
-            </div>
+            <h1 class="band-title"><span>Sertifikat</span><strong>Kerja Praktik</strong><i aria-hidden="true"></i></h1>
 
             <div class="verify">
                 <a class="qr" href="{{ $verifyUrl }}" aria-label="Kode QR verifikasi sertifikat, buka halaman verifikasi">{!! $qr !!}</a>
@@ -194,19 +186,25 @@
             </header>
 
             <div class="body">
-                <h1 class="title"><span>Sertifikat</span>Kerja Praktik</h1>
-
                 <p class="given">Diberikan kepada</p>
                 <p class="name">{{ $student->name }}</p>
                 <span class="name-bar" aria-hidden="true"></span>
                 @if ($student->nim)<p class="nim">NIM {{ $student->nim }}</p>@endif
 
-                <p class="desc">
-                    atas penyelesaian Kerja Praktik
-                    @if ($internship->position) sebagai <strong>{{ $internship->position }}</strong>@endif
-                    di <strong>{{ $internship->placeName() }}</strong>
-                    selama {{ $months }} bulan, {{ $start->translatedFormat('j F Y') }} sampai {{ $end->translatedFormat('j F Y') }}.
-                </p>
+                <p class="desc">atas penyelesaian Kerja Praktik di <strong>{{ $internship->placeName() }}</strong> dan dinyatakan <strong>diterima</strong>.</p>
+
+                <dl class="facts">
+                    @if ($internship->position)
+                        <div><dt>Posisi</dt><dd>{{ $internship->position }}</dd></div>
+                    @endif
+                    <div><dt>Periode</dt><dd>{{ $start->translatedFormat('j M Y') }} – {{ $end->translatedFormat('j M Y') }}<small>{{ $months }} bulan</small></dd></div>
+                    @if ($internship->final_grade)
+                        <div>
+                            <dt>Nilai akhir</dt>
+                            <dd class="grade-value"><b>{{ $internship->final_grade }}</b>@if ($internship->final_score !== null){{ \App\Support\Num::short((float) $internship->final_score) }}<small>dari 100</small>@endif</dd>
+                        </div>
+                    @endif
+                </dl>
             </div>
 
             <footer class="foot">
