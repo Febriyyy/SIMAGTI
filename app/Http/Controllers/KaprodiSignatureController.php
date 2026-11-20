@@ -18,10 +18,11 @@ class KaprodiSignatureController extends Controller
     public function edit(Request $request): View
     {
         $template = CertificateTemplate::campus($request->user());
+        $signature = Logos::dataUri($template->signature);
 
         return view('kaprodi.tanda-tangan', [
             'template' => $template,
-            'signature' => Logos::dataUri($template->signature),
+            'signature' => $signature,
         ]);
     }
 

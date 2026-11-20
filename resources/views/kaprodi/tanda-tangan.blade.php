@@ -7,59 +7,60 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Tanda Tangan Sertifikat</h1>
-            <p class="page-sub">Tampil sebagai penanda tangan kampus di semua sertifikat KP.</p>
+            <p class="page-sub">Diisi sekali, berlaku untuk semua sertifikat KP termasuk yang sudah terbit.</p>
         </div>
     </div>
 
-    <section class="card dh-card">
-        <div class="card-head">
-            <div>
-                <h2 class="card-title">Penanda tangan kampus</h2>
-                <p class="card-sub">Perubahan langsung berlaku, termasuk untuk sertifikat yang sudah terbit.</p>
-            </div>
-            <x-chip :tone="$signature ? 'green' : 'amber'">{{ $signature ? 'Lengkap' : 'Tanda tangan belum ada' }}</x-chip>
-        </div>
-        <form method="POST" action="{{ route('kaprodi.ttd.update') }}" enctype="multipart/form-data" class="card-body dh-form">
+    <div class="cs">
+        <form method="POST" action="{{ route('kaprodi.ttd.update') }}" enctype="multipart/form-data" class="card cs-card">
             @csrf
             @method('PUT')
-            <div class="form-grid">
-                <div class="field">
-                    <label class="label" for="signer_name">Nama</label>
+
+            <div class="cs-row">
+                <div class="cs-label">
+                    <h2>Nama</h2>
+                    <p>Ditulis di bawah garis tanda tangan</p>
+                </div>
+                <div class="cs-field">
+                    <label class="sr-only" for="signer_name">Nama</label>
                     <input id="signer_name" type="text" name="signer_name" class="input" maxlength="150" required placeholder="Nama lengkap beserta gelar" value="{{ old('signer_name', $template->signer_name) }}">
                     @error('signer_name')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
-                <div class="field">
-                    <label class="label" for="signer_title">Jabatan</label>
+            </div>
+
+            <div class="cs-row">
+                <div class="cs-label">
+                    <h2>Jabatan</h2>
+                    <p>Ditulis di atas tanda tangan</p>
+                </div>
+                <div class="cs-field">
+                    <label class="sr-only" for="signer_title">Jabatan</label>
                     <input id="signer_title" type="text" name="signer_title" class="input" maxlength="100" required value="{{ old('signer_title', $template->signer_title ?? 'Ketua Program Studi') }}">
                     @error('signer_title')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
             </div>
 
-            <div class="field">
-                <span class="label">Tanda tangan</span>
-                <div class="dh-sign">
-                    <div class="dh-sign-pad">
+            <div class="cs-row">
+                <div class="cs-label">
+                    <h2>Tanda tangan</h2>
+                    <p>Foto atau pindai di kertas putih</p>
+                    <span @class(['cs-state', 'is-ok' => $signature])>{{ $signature ? 'Terpasang' : 'Belum ada' }}</span>
+                </div>
+                <div class="cs-field">
+                    @include('sertifikat._sign-pad', ['sign' => $signature, 'label' => 'Tanda tangan kaprodi'])
+                    <div class="cs-meta">
+                        <small>Disarankan 600 × 200 px, PNG berlatar transparan. Maks. 1 MB.</small>
                         @if ($signature)
-                            <img src="{{ $signature }}" alt="Tanda tangan {{ $template->signer_name }}">
-                        @else
-                            <span>Belum ada tanda tangan</span>
+                            <label class="cs-check"><input type="checkbox" name="remove_signature" value="1"> Hapus tanda tangan</label>
                         @endif
-                        <i aria-hidden="true"></i>
                     </div>
-                    <div class="dh-sign-input">
-                        <input type="file" name="signature" class="input" accept="image/png,image/jpeg,image/webp" aria-label="Berkas tanda tangan">
-                        <p class="hint">Foto atau pindai tanda tangan di kertas putih. PNG berlatar transparan paling rapi. Maksimal 1 MB.</p>
-                        @if ($signature)
-                            <label class="check"><input type="checkbox" name="remove_signature" value="1"> Hapus tanda tangan saat disimpan</label>
-                        @endif
-                        @error('signature')<p class="field-error">{{ $message }}</p>@enderror
-                    </div>
+                    @error('signature')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
             </div>
 
-            <div class="row-actions">
+            <div class="cs-foot">
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </form>
-    </section>
+    </div>
 @endsection

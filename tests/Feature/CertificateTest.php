@@ -135,7 +135,7 @@ class CertificateTest extends TestCase
 
         // Company Supervisor: logo perusahaan, nama dan tanda tangan ketua divisi
         $supervisor = $salsa->supervisor;
-        $this->actingAs($supervisor)->get('/data-sertifikat')->assertOk()->assertSee('Logo '.$company->name)->assertSee('Divisi '.$division->name);
+        $this->actingAs($supervisor)->get('/data-sertifikat')->assertOk()->assertSee('Logo perusahaan')->assertSee($company->name)->assertSee('Divisi '.$division->name);
         $this->actingAs($supervisor)->put("/data-sertifikat/perusahaan/{$company->id}", ['logo' => $png('perusahaan.png', 400, 200)])->assertSessionHasNoErrors();
         $this->assertNotNull($company->fresh()->logo_file_id);
         $this->actingAs($supervisor)->put("/data-sertifikat/divisi/{$division->id}", ['head_name' => ''])->assertSessionHasErrorsIn('divisi'.$division->id, 'head_name');
@@ -154,7 +154,7 @@ class CertificateTest extends TestCase
 
         // Kaprodi: nama, jabatan, dan tanda tangan sendiri
         $kaprodi = $this->user('kaprodi@kp.test');
-        $this->actingAs($kaprodi)->get('/kaprodi/tanda-tangan')->assertOk()->assertSee('Penanda tangan kampus');
+        $this->actingAs($kaprodi)->get('/kaprodi/tanda-tangan')->assertOk()->assertSee('Tanda tangan');
         $this->actingAs($kaprodi)->put('/kaprodi/tanda-tangan', ['signer_name' => 'Dr. Kaprodi Uji, M.Kom.', 'signer_title' => 'Ketua Program Studi', 'signature' => $png('ttd-kaprodi.png')])->assertSessionHasNoErrors();
         $this->actingAs($supervisor)->get('/kaprodi/tanda-tangan')->assertForbidden();
 

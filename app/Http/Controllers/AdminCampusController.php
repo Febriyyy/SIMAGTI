@@ -14,14 +14,17 @@ class AdminCampusController extends Controller
 {
     public function edit(): View
     {
+        $logos = collect(Logos::INSTITUTIONS)->mapWithKeys(fn ($v, $kind) => [$kind => Logos::institution($kind)]);
+        $campus = [
+            'university' => Campus::university(),
+            'faculty' => Campus::faculty(),
+            'program' => (string) Campus::get('campus.program'),
+            'city' => Campus::city(),
+        ];
+
         return view('admin.kampus', [
-            'logos' => collect(Logos::INSTITUTIONS)->mapWithKeys(fn ($v, $kind) => [$kind => Logos::institution($kind)]),
-            'campus' => [
-                'university' => Campus::university(),
-                'faculty' => Campus::faculty(),
-                'program' => (string) Campus::get('campus.program'),
-                'city' => Campus::city(),
-            ],
+            'logos' => $logos,
+            'campus' => $campus,
         ]);
     }
 

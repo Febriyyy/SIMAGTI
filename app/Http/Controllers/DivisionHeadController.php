@@ -43,11 +43,13 @@ class DivisionHeadController extends Controller
     public function index(Request $request): View
     {
         $divisions = self::divisionsFor($request->user());
+        $companies = self::companiesFor($request->user());
+        $signatures = $divisions->mapWithKeys(fn (CompanyDivision $d) => [$d->id => Logos::dataUri($d->headSignature)]);
 
         return view('divisi.ketua', [
-            'companies' => self::companiesFor($request->user()),
+            'companies' => $companies,
             'divisions' => $divisions,
-            'signatures' => $divisions->mapWithKeys(fn (CompanyDivision $d) => [$d->id => Logos::dataUri($d->headSignature)]),
+            'signatures' => $signatures,
         ]);
     }
 

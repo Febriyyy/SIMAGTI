@@ -6151,99 +6151,57 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .score-card-by { order: 3; margin-left: 52px; }
 }
 
-/* Unggah logo (Identitas Kampus, formulir perusahaan) dan nama ketua divisi */
-.logo-edit { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 20px; }
-.logo-preview { display: grid; place-items: center; width: 180px; height: 110px; padding: 14px; border: 1.5px dashed var(--line-strong); border-radius: 18px; background: var(--surface-2); }
-.logo-preview.is-sm { width: 140px; height: 88px; }
-.logo-preview { overflow: hidden; }
-.logo-preview img { display: block; width: auto; height: auto; max-width: 100%; max-height: 82px; object-fit: contain; }
-.logo-preview.is-sm img { max-height: 58px; }
-.logo-preview span { font-size: 13px; color: var(--muted); }
-.logo-form { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1 1 220px; margin: 0; }
-.logo-form label.btn { width: fit-content; cursor: pointer; }
-.logo-form .check { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; }
-.div-heads { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
-.div-head { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px 14px; }
-.div-head + .div-head { border-top: 1px solid var(--line); }
-.div-head > span { font-size: 14px; font-weight: 600; }
-@media (max-width: 560px) {
-    .div-head { grid-template-columns: 1fr; gap: 6px; }
-}
-
-/* Company Supervisor: ketua divisi (nama dan tanda tangan) */
-.dh-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 20px; align-items: start; }
-.dh-form { display: flex; flex-direction: column; gap: 14px; }
-.dh-sign { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-start; }
-.dh-sign-pad { position: relative; flex: none; display: grid; place-items: center; width: 200px; height: 96px; padding: 10px 14px 18px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
-.dh-sign-pad img { display: block; max-width: 100%; max-height: 64px; object-fit: contain; mix-blend-mode: multiply; }
-.dh-sign-pad span { font-size: 13px; color: var(--muted); }
-/* Garis tempat tanda tangan, seperti di kertas */
-.dh-sign-pad i { position: absolute; left: 16px; right: 16px; bottom: 14px; border-top: 1px dashed var(--line-strong); }
-.dh-sign-input { flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.dh-sign-input .check { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; }
-
 /* =====================================================================
-   Data Sertifikat (Company Supervisor): unggah logo dan tanda tangan, pratinjau sertifikat
+   Pengaturan sertifikat (Identitas Kampus, Tanda Tangan Sertifikat, Data Sertifikat)
+   Satu kolom yang tenang: tiap bagian berisi judul + status, keterangan singkat, lalu isian.
    ===================================================================== */
-.ds { align-items: start; }
-.ds > .col:first-child { gap: 20px; }
+.cs { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 760px; }
+.cs-main { display: flex; flex-direction: column; gap: 20px; }
+.cs-card { padding: 0; overflow: hidden; }
+.cs-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 28px; border-bottom: 1px solid var(--line); }
+.cs-head h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.cs-row { display: flex; flex-direction: column; gap: 14px; padding: 24px 28px; }
+.cs-row + .cs-row { border-top: 1px solid var(--line); }
+.cs-label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.cs-label h2, .cs-label h3 { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -0.01em; color: var(--text); }
+.cs-label p { flex-basis: 100%; order: 3; margin: 0; font-size: 13px; color: var(--muted); }
+.cs-state { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--amber, #b7791f); }
+.cs-state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.cs-state.is-ok { color: var(--primary); }
+.cs-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cs-field form { margin: 0; }
+.cs-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; }
+.cs-meta small { font-size: 12.5px; color: var(--muted); }
+.cs-meta form { margin: 0; }
+.cs-link { padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.cs-link:hover { color: var(--red, #d23c3c); }
+.cs-check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.cs-foot { display: flex; justify-content: flex-end; padding: 16px 28px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.cs-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin: 0; }
+.cs-facts dt { font-size: 12.5px; color: var(--muted); }
+.cs-facts dd { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: var(--text); }
 
-/* Area unggah logo: kotak besar yang bisa diklik */
-.ds-drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 150px; padding: 22px; border: 1.5px dashed var(--line-strong); border-radius: 20px; background: var(--surface-2); text-align: center; cursor: pointer; transition: border-color 160ms, background-color 160ms; }
-.ds-drop:hover, .ds-drop:focus-within { border-color: var(--primary); background: var(--primary-tint); }
-.ds-drop b { font-size: 14.5px; font-weight: 650; color: var(--text); }
-.ds-drop small { max-width: 300px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
-.ds-drop-icon { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 4px; border-radius: 14px; background: var(--surface); color: var(--primary); box-shadow: 0 1px 2px rgba(15, 31, 27, .06); }
-.ds-drop.has-file { border-style: solid; border-color: var(--line); background: var(--surface); }
-.ds-drop.has-file img { display: block; max-width: 70%; max-height: 104px; object-fit: contain; }
-.ds-drop-hover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: inherit; background: rgba(3, 66, 62, .72); color: #fff; font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 160ms; }
-.ds-drop.has-file:hover .ds-drop-hover, .ds-drop.has-file:focus-within .ds-drop-hover { opacity: 1; }
-.ds-drop:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
-.ds-remove { margin: 10px 0 0; }
+/* Bingkai logo dan kertas tanda tangan: diklik untuk mengunggah */
+.cs-tile, .cs-sign { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; border-radius: 16px; cursor: pointer; overflow: hidden; transition: border-color 160ms, background-color 160ms, box-shadow 160ms; }
+.cs-tile { height: 140px; border: 1.5px dashed var(--line-strong); background: var(--surface-2); color: var(--primary); }
+.cs-tile b, .cs-sign-empty b { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.cs-tile:hover, .cs-tile:focus-within { border-color: var(--primary); background: var(--primary-tint); }
+.cs-tile.has-file { border: 1px solid var(--line); background: #fff; }
+.cs-tile.has-file img { display: block; max-width: 60%; max-height: 100px; object-fit: contain; }
+.cs-tile-hover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(3, 66, 62, .72); color: #fff; font-size: 13.5px; font-weight: 600; opacity: 0; transition: opacity 160ms; }
+.cs-tile.has-file:hover .cs-tile-hover, .cs-tile.has-file:focus-within .cs-tile-hover { opacity: 1; }
+.cs-sign { height: 150px; padding: 16px 24px 40px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+.cs-sign:hover, .cs-sign:focus-within { box-shadow: inset 0 0 0 1.5px var(--primary); }
+.cs-sign img { position: relative; z-index: 1; display: block; max-width: 60%; max-height: 90px; object-fit: contain; mix-blend-mode: multiply; }
+.cs-sign-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--primary); }
+.cs-sign-line { position: absolute; left: 28px; right: 28px; bottom: 30px; border-top: 1px solid var(--line-strong); }
+.cs-sign-line i { position: absolute; left: 0; bottom: 4px; font-style: normal; font-size: 15px; line-height: 1; color: var(--line-strong); }
+.cs-tile:focus-within, .cs-sign:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-/* Formulir ketua divisi */
-.ds-form { display: flex; flex-direction: column; gap: 16px; }
-/* Area tanda tangan seperti kertas: garis tempat tanda tangan dan tanda silang */
-.ds-sign { position: relative; display: flex; align-items: center; justify-content: center; height: 150px; padding: 18px 24px 40px; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; overflow: hidden; transition: box-shadow 160ms; }
-.ds-sign:hover, .ds-sign:focus-within { box-shadow: inset 0 0 0 1.5px var(--primary); }
-.ds-sign img { position: relative; z-index: 1; display: block; max-width: 70%; max-height: 92px; object-fit: contain; mix-blend-mode: multiply; }
-.ds-sign-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; color: var(--muted); }
-.ds-sign-empty .ikon { color: var(--primary); }
-.ds-sign-empty b { font-size: 14px; font-weight: 650; color: var(--text); }
-.ds-sign-empty small { font-size: 12.5px; }
-.ds-sign-line { position: absolute; left: 28px; right: 28px; bottom: 30px; border-top: 1px solid var(--line-strong); }
-.ds-sign-line i { position: absolute; left: 0; bottom: 4px; font-style: normal; font-size: 16px; line-height: 1; color: var(--line-strong); }
-.ds-sign-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; margin-top: 8px; }
-.ds-sign-meta small { font-size: 12.5px; color: var(--muted); }
-.ds-sign-meta .check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
-.ds-actions { display: flex; justify-content: flex-end; }
-
-/* Pratinjau potongan sertifikat */
-.ds-preview { position: sticky; top: 84px; }
-.ds-paper { position: relative; padding: 20px 18px 18px; border-radius: 14px; background: #fff; text-align: center; box-shadow: 0 0 0 1px var(--line), 0 10px 24px rgba(15, 31, 27, .06); }
-.ds-paper::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(3, 122, 104, .35); border-radius: 9px; pointer-events: none; }
-.ds-paper-logos { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.ds-paper-logos > i { width: 1px; height: 22px; background: var(--line); }
-.ds-paper-logos img { display: block; height: 30px; max-width: 80px; object-fit: contain; }
-.ds-slot { display: grid; place-items: center; width: 52px; height: 30px; border: 1px dashed var(--line-strong); border-radius: 6px; font-size: 10px; color: var(--muted); }
-.ds-slot.is-mine { border-color: var(--primary); color: var(--primary); background: var(--primary-tint); }
-.ds-paper-title { margin: 14px 0 0; font-size: 11px; font-weight: 600; color: var(--primary); }
-.ds-paper-name { margin: 2px 0 0; font-family: Georgia, serif; font-size: 20px; font-weight: 600; color: var(--ink, #03423e); }
-.ds-paper-signs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
-.ds-paper-sign { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; padding: 6px 4px; border-radius: 8px; }
-.ds-paper-sign.is-mine { background: var(--primary-tint); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .25); }
-.ds-paper-sign small { font-size: 9.5px; line-height: 1.3; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ds-paper-ink { display: flex; align-items: flex-end; justify-content: center; height: 34px; }
-.ds-paper-ink img { display: block; max-width: 100px; max-height: 32px; object-fit: contain; mix-blend-mode: multiply; }
-.ds-paper-sign b { display: block; width: 100%; padding-top: 3px; border-top: 1px solid var(--text); font-size: 11px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ds-checklist { display: flex; flex-direction: column; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
-.ds-checklist li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--muted); }
-.ds-checklist li > span:first-child { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong); color: #fff; }
-.ds-checklist li.is-ok { color: var(--text); }
-.ds-checklist li.is-ok > span:first-child { background: var(--primary); box-shadow: none; }
-@media (max-width: 960px) {
-    .ds-preview { position: static; }
+@media (max-width: 640px) {
+    .cs-row, .cs-head, .cs-foot { padding-left: 20px; padding-right: 20px; }
+    .cs-facts { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .ds-drop, .ds-drop-hover, .ds-sign { transition: none; }
+    .cs-tile, .cs-tile-hover, .cs-sign { transition: none; }
 }
