@@ -54,11 +54,17 @@
         .band-label { display: block; font-size: 3mm; color: rgba(255, 255, 255, .7); }
         .band-number { display: block; margin-top: 1mm; font-size: 4.4mm; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 
-        .grade { display: flex; flex-direction: column; align-items: flex-start; gap: 3mm; }
-        .grade-ring { display: grid; place-items: center; width: 34mm; height: 34mm; border-radius: 50%; border: 1.2mm solid var(--lime); }
-        .grade-ring b { font-size: 16mm; font-weight: 800; line-height: 1; letter-spacing: -.03em; color: #fff; }
-        .grade-text { font-size: 3.4mm; line-height: 1.45; color: rgba(255, 255, 255, .85); }
-        .grade-text strong { display: block; color: #fff; font-size: 4mm; }
+        /* Nilai akhir: plakat tipis dengan huruf mutu besar, angka, dan batang capaian */
+        .grade { padding: 5.5mm 6mm 6mm; border-radius: 4mm; background: rgba(255, 255, 255, .07); box-shadow: inset 0 0 0 .3mm rgba(201, 240, 101, .35); }
+        .grade-label { display: block; font-size: 3mm; color: rgba(255, 255, 255, .7); }
+        .grade-row { display: flex; align-items: flex-end; gap: 4mm; margin-top: 1.5mm; }
+        .grade-letter { font-size: 22mm; font-weight: 800; line-height: .82; letter-spacing: -.05em; color: var(--lime); }
+        .grade-score { display: flex; flex-direction: column; padding-bottom: .8mm; line-height: 1.1; }
+        .grade-score strong { font-size: 6.2mm; font-weight: 700; letter-spacing: -.02em; color: #fff; font-variant-numeric: tabular-nums; }
+        .grade-score small { font-size: 2.8mm; color: rgba(255, 255, 255, .7); }
+        .grade-meter { display: block; height: 1.3mm; margin-top: 4.5mm; border-radius: 1mm; background: rgba(255, 255, 255, .16); overflow: hidden; }
+        .grade-meter i { display: block; height: 100%; border-radius: inherit; background: var(--lime); }
+        .grade-note { margin: 3mm 0 0; font-size: 3mm; line-height: 1.4; color: rgba(255, 255, 255, .85); }
 
         .verify { display: flex; align-items: flex-end; gap: 3.5mm; }
         .verify .qr { flex: none; display: block; width: 24mm; height: 24mm; padding: 1.8mm; border-radius: 2.5mm; background: #fff; }
@@ -104,7 +110,7 @@
         .sign .space { height: 17mm; }
         .sign .space.signed { display: flex; align-items: flex-end; }
         .sign .space.signed img { display: block; max-width: 46mm; max-height: 16mm; object-fit: contain; mix-blend-mode: multiply; }
-        .sign strong { display: block; padding-top: 1.6mm; border-top: .3mm solid var(--text); font-size: 3.5mm; font-weight: 650; }
+        .sign strong { display: inline-block; min-width: 46mm; max-width: 100%; padding-top: 1.6mm; border-top: .3mm solid var(--text); font-size: 3.5mm; font-weight: 650; }
         .sign small { display: block; margin-top: .6mm; color: var(--muted); font-size: 2.9mm; }
 
         @media print {
@@ -141,12 +147,19 @@
             </div>
 
             <div class="grade">
+                <span class="grade-label">Nilai akhir</span>
                 @if ($internship->final_grade)
-                    <span class="grade-ring"><b>{{ $internship->final_grade }}</b></span>
-                    <p class="grade-text"><strong>Nilai akhir {{ $internship->final_grade }}</strong>Kerja Praktik dinyatakan diterima</p>
-                @else
-                    <p class="grade-text"><strong>Dinyatakan diterima</strong>Kerja Praktik</p>
+                    <div class="grade-row">
+                        <b class="grade-letter">{{ $internship->final_grade }}</b>
+                        @if ($internship->final_score !== null)
+                            <span class="grade-score"><strong>{{ \App\Support\Num::short((float) $internship->final_score) }}</strong><small>dari 100</small></span>
+                        @endif
+                    </div>
+                    @if ($internship->final_score !== null)
+                        <span class="grade-meter" aria-hidden="true"><i style="width: {{ min(100, max(0, (float) $internship->final_score)) }}%"></i></span>
+                    @endif
                 @endif
+                <p class="grade-note">Kerja Praktik dinyatakan diterima</p>
             </div>
 
             <div class="verify">
