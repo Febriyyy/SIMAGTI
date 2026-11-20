@@ -47,26 +47,19 @@
 
         /* ---------- Pita kiri ---------- */
         .band { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 16mm 12mm 14mm; overflow: hidden; color: #fff;
-            background: linear-gradient(165deg, #0fa585 0%, #079079 22%, var(--primary) 45%, var(--ink) 80%, var(--deep) 100%); }
+            background: linear-gradient(165deg, #0b8f78 0%, var(--primary) 38%, var(--ink) 78%, var(--deep) 100%); }
         /* Pola garis halus seperti pengaman dokumen resmi */
         .band-pattern { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .16; pointer-events: none; }
         .band > *:not(.band-pattern) { position: relative; }
         .band-label { display: block; font-size: 3mm; color: rgba(255, 255, 255, .7); }
         .band-number { display: block; margin-top: 1mm; font-size: 4.4mm; font-weight: 700; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 
-        /* Nilai akhir: huruf mutu lime besar dengan cahaya lembut, angka, dan lencana "Diterima" */
-        .grade { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
-        .grade::before { content: ""; position: absolute; left: -10mm; top: 2mm; width: 52mm; height: 52mm; border-radius: 50%;
-            background: radial-gradient(circle, rgba(201, 240, 101, .32) 0%, rgba(201, 240, 101, .1) 42%, rgba(201, 240, 101, 0) 70%); pointer-events: none; }
-        .grade > * { position: relative; }
-        .grade-label { font-size: 3mm; color: rgba(255, 255, 255, .75); }
-        .grade-letter { margin-top: 2.5mm; font-size: 36mm; font-weight: 800; line-height: .78; letter-spacing: -.06em; color: var(--lime);
-            text-shadow: 0 1mm 6mm rgba(201, 240, 101, .35); }
-        .grade-score { margin-top: 5mm; font-size: 6mm; font-weight: 700; letter-spacing: -.02em; color: #fff; font-variant-numeric: tabular-nums; }
-        .grade-score small { margin-left: 1.4mm; font-size: 3.1mm; font-weight: 400; color: rgba(255, 255, 255, .7); }
-        .grade-badge { display: inline-flex; align-items: center; gap: 1.4mm; margin-top: 4mm; padding: 1.4mm 3.6mm 1.4mm 2.6mm; border-radius: 999px;
-            background: var(--lime); color: var(--ink); font-size: 3.1mm; font-weight: 700; }
-        .grade-badge svg { width: 3.4mm; height: 3.4mm; }
+        /* Nilai akhir sebagai segel resmi: cincin lime dengan tulisan melingkar, huruf mutu dan angka di tengah */
+        .grade { display: flex; justify-content: center; }
+        .seal { display: block; width: 52mm; height: 52mm; }
+        .seal-ring-text { font-family: "Geist", system-ui, sans-serif; font-size: 8.2px; font-weight: 600; letter-spacing: 2.6px; fill: #c9f065; }
+        .seal-letter { font-family: "Geist", system-ui, sans-serif; font-size: 62px; font-weight: 700; letter-spacing: -2px; fill: #fff; }
+        .seal-score { font-family: "Geist", system-ui, sans-serif; font-size: 10.5px; font-weight: 600; fill: rgba(255, 255, 255, .85); }
 
         .verify { display: flex; align-items: flex-end; gap: 3.5mm; }
         .verify .qr { flex: none; display: block; width: 24mm; height: 24mm; padding: 1.8mm; border-radius: 2.5mm; background: #fff; }
@@ -149,17 +142,19 @@
             </div>
 
             <div class="grade">
-                <span class="grade-label">Nilai akhir</span>
-                @if ($internship->final_grade)
-                    <b class="grade-letter">{{ $internship->final_grade }}</b>
-                @endif
-                @if ($internship->final_score !== null)
-                    <span class="grade-score">{{ \App\Support\Num::short((float) $internship->final_score) }}<small>dari 100</small></span>
-                @endif
-                <span class="grade-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-                    Kerja Praktik diterima
-                </span>
+                @php($score = $internship->final_score !== null ? \App\Support\Num::short((float) $internship->final_score) : null)
+                <svg class="seal" viewBox="0 0 200 200" role="img" aria-label="Nilai akhir {{ $internship->final_grade ?? '' }}{{ $score ? ', '.$score.' dari 100' : '' }}">
+                    <defs>
+                        <path id="seal-arc" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+                    </defs>
+                    <circle cx="100" cy="100" r="96" fill="rgba(255,255,255,.06)" stroke="#c9f065" stroke-width="1.6" />
+                    <circle cx="100" cy="100" r="66" fill="none" stroke="rgba(201,240,101,.55)" stroke-width="1" stroke-dasharray="2 3" />
+                    <text class="seal-ring-text"><textPath href="#seal-arc" startOffset="0" textLength="486" lengthAdjust="spacing">NILAI AKHIR  •  KERJA PRAKTIK  •  DITERIMA  •</textPath></text>
+                    <text class="seal-letter" x="100" y="{{ $score ? 114 : 122 }}" text-anchor="middle">{{ $internship->final_grade ?? '✓' }}</text>
+                    @if ($score)
+                        <text class="seal-score" x="100" y="138" text-anchor="middle">{{ $score }} / 100</text>
+                    @endif
+                </svg>
             </div>
 
             <div class="verify">
