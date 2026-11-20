@@ -13,6 +13,7 @@
 
     <div class="cs">
         <section class="card cs-card">
+            <div class="cs-pair">
             @foreach (\App\Support\Logos::INSTITUTIONS as $kind => [$key, $label])
                 <?php $logo = $logos[$kind]; $bag = $errors->getBag('logo_'.$kind); ?>
                 <div class="cs-row" id="logo-{{ $kind }}">
@@ -50,6 +51,7 @@
                     </div>
                 </div>
             @endforeach
+            </div>
 
             <div class="cs-row">
                 <div class="cs-label">

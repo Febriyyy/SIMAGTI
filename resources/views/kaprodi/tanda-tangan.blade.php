@@ -16,6 +16,7 @@
             @csrf
             @method('PUT')
 
+            <div class="cs-pair">
             <div class="cs-row">
                 <div class="cs-label">
                     <h2>Nama</h2>
@@ -38,6 +39,7 @@
                     <input id="signer_title" type="text" name="signer_title" class="input" maxlength="100" required value="{{ old('signer_title', $template->signer_title ?? 'Ketua Program Studi') }}">
                     @error('signer_title')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
+            </div>
             </div>
 
             <div class="cs-row">
