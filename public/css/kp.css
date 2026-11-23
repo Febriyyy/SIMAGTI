@@ -6760,3 +6760,16 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
     .recruit .recruit-steps li:last-child { align-items: flex-end; text-align: right; }
     .recruit .recruit-dot { position: relative; }
 }
+
+/* Rekap KP: lebar kolom dijumlah pas (termasuk kolom ikon Portofolio), Rekrutmen cukup untuk "Direkomendasikan" */
+.recap-table th:nth-child(1) { width: 20%; }
+.recap-table th:nth-child(2) { width: 19%; }
+.recap-table th:nth-child(3) { width: 11%; }
+.recap-table th:nth-child(4) { width: 10%; }
+.recap-table th:nth-child(5) { width: 9%; }
+.recap-table th:nth-child(6) { width: 8%; }
+.recap-table th:nth-child(7) { width: 18%; }
+.recap-table th:nth-child(8) { width: 64px; }
+.recap-table td:nth-child(7) { overflow: hidden; }
+.recap-table .recap-recruit { max-width: 100%; }
+.recap-table td.cell-action { padding-left: 0; padding-right: 16px; overflow: visible; text-overflow: clip; text-align: right; }

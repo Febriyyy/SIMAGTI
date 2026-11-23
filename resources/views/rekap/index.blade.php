@@ -65,7 +65,7 @@
                                 <td class="num">@if ($score !== null)<span class="recap-grade"><b>{{ \App\Support\ProdiRecap::finalGrade($i) }}</b>{{ \App\Support\Num::short($score) }}</span>@else<span class="muted">–</span>@endif</td>
                                 <td class="num">@if ($i->defenseScore)<span class="recap-grade"><b>{{ $i->defenseScore->letter_grade }}</b>{{ \App\Support\Num::short($i->defenseScore->score) }}</span>@else<span class="muted">–</span>@endif</td>
                                 <td class="num">@if ($report)<span @class(['recap-report', 'is-done' => str_starts_with($report, (string) $i->reportChapters->count().'/')])>{{ $report }}</span>@else<span class="muted">–</span>@endif</td>
-                                <td>@if ($c)<span class="recap-recruit tone-{{ $c->statusTone() }}">{{ $c->statusLabel() }}</span>@if ($c->offered_position && $c->status !== 'direkomendasikan')<span class="recap-sub">{{ $c->offered_position }}</span>@endif @else<span class="muted">–</span>@endif</td>
+                                <td>@if ($c)<span class="recap-recruit tone-{{ $c->statusTone() }}" title="{{ $c->statusLabel() }}">{{ $c->statusLabel() }}</span>@if ($c->offered_position && $c->status !== 'direkomendasikan')<span class="recap-sub">{{ $c->offered_position }}</span>@endif @else<span class="muted">–</span>@endif</td>
                                 <td class="cell-action"><a href="{{ route('portofolio.lihat', $i->student_id) }}" class="btn btn-sm btn-icon btn-ghost" title="Portofolio {{ $i->student->name }}" aria-label="Portofolio {{ $i->student->name }}"><x-ikon name="star" :size="16" /></a></td>
                             </tr>
                         @endforeach
