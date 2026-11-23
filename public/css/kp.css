@@ -6554,53 +6554,50 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .cpl-row.is-complete .cpl-who strong { color: var(--gray); }
 
 /* =====================================================================
-   Aktivasi akun (tautan undangan Company Supervisor)
+   Aktivasi akun (tautan undangan Company Supervisor), senada dengan halaman masuk (gl-*)
    ===================================================================== */
-.act-card { max-width: 460px; }
-.act-card .auth-title { font-size: 28px; }
-.act-card .auth-sub { margin-top: 8px; font-size: 14px; line-height: 1.6; color: var(--muted); }
-
-/* Ringkasan undangan */
-.act-sum {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px;
-    margin: 22px 0 0; padding: 16px 18px;
-    border: 1px solid #d8ebe5; border-radius: 16px;
-    background: linear-gradient(160deg, var(--primary-tint), #fff 85%);
+.act .gl-form-box { padding: 18px 0; }
+.act-sub { margin-bottom: 24px !important; }
+.act .gl-form { gap: 16px; }
+.act-label { display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px; font-weight: 600; }
+.act-mail {
+    display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px; border-radius: 14px;
+    background: rgba(3, 122, 104, .06); border: 1px dashed rgba(3, 122, 104, .28);
+    color: var(--primary-dark); font-size: 14.5px; font-weight: 600; overflow: hidden;
 }
-.act-sum > div { min-width: 0; }
-.act-sum > .act-wide, .act-sum > div:has(.act-mail) { grid-column: 1 / -1; }
-.act-sum dt { font-size: 12px; color: var(--muted); }
-.act-sum dd { margin: 3px 0 0; font-size: 14px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
-.act-mail { font-weight: 500 !important; font-variant-numeric: tabular-nums; }
-.act-students { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; }
-.act-students li { display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px 3px 3px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; font-weight: 500; }
-.act-students .avatar { width: 26px; height: 26px; font-size: 10.5px; }
+.act-mail span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.act-mail svg { flex: none; color: var(--primary); }
 
-/* Form */
-.act-form { display: grid; gap: 16px; margin-top: 22px; }
-.act-field .label { margin-bottom: 6px; }
-.act-pass { position: relative; }
-.act-pass .input { padding-right: 48px; }
-.act-eye {
-    position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
-    display: grid; place-items: center; width: 36px; height: 36px; padding: 0;
-    border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer;
-    transition: background-color .15s, color .15s;
-}
-.act-eye:hover { background: var(--gray-soft); color: var(--text); }
-.act-eye:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-.act-eye .eye-closed { display: none; }
-.act-eye.is-open .eye-open { display: none; }
-.act-eye.is-open .eye-closed { display: block; }
-.act-rule { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 12.5px; color: var(--muted); transition: color .15s; }
-.act-dot { flex: none; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong); transition: background-color .15s, box-shadow .15s; }
+/* Tanda syarat kata sandi */
+.act-rule { display: flex; align-items: center; gap: 8px; margin: 9px 0 0; font-size: 12.5px; color: var(--muted); transition: color .15s; }
+.act-dot { flex: none; width: 15px; height: 15px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(15, 27, 25, .18); transition: background-color .15s, box-shadow .15s; }
 .act-rule.is-ok { color: var(--primary-dark); }
 .act-rule.is-ok .act-dot { box-shadow: none; background: var(--primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 10px no-repeat; }
 .act-rule.is-bad { color: var(--red); }
 .act-rule.is-bad .act-dot { box-shadow: inset 0 0 0 1.5px var(--red); }
-.act-submit { min-height: 46px; margin-top: 4px; }
-.act-foot { margin: 0; text-align: center; font-size: 12.5px; color: var(--muted); }
+.act .gl-submit { margin-top: 8px; }
+a.gl-submit.act-link { display: grid; place-items: center; width: 100%; max-width: 220px; text-decoration: none; }
 
-@media (max-width: 480px) {
-    .act-sum { grid-template-columns: 1fr; padding: 14px; }
+/* Panel kanan: kartu kaca ringkasan undangan */
+.act-card .act-card-role {
+    display: inline-flex; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px;
+    background: var(--primary-soft); color: var(--primary-dark); font-size: 12px; font-weight: 650;
+}
+.act-card strong { max-width: none !important; padding-right: 52px; }
+.act-card p { margin-top: 12px !important; font-size: 12.5px !important; color: var(--muted) !important; }
+.act-students { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.act-students li {
+    display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px 3px 3px; border-radius: 999px;
+    background: #fff; box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(3, 66, 62, .05);
+    font-size: 13px; font-weight: 600; color: var(--text);
+}
+.act-students .avatar { width: 26px; height: 26px; font-size: 10.5px; }
+.act .gl-flow li:not(:first-child) .gl-flow-dot { background: rgba(255, 255, 255, .18); }
+/* HP: panel hijau ringkas di bawah formulir, hanya kartu ringkasan undangan (judul dan alur disembunyikan) */
+@media (max-width: 920px) {
+    .act .gl-panel { display: flex; padding: 18px 14px 14px; -webkit-mask: none; mask: none; }
+    .act .gl-panel-title, .act .gl-flow { display: none; }
+    .act .gl-panel .gl-card { margin-top: 0; padding: 18px 18px 16px; }
+    .act .gl-spark { display: none; }
+    .act-card strong { padding-right: 0; }
 }
