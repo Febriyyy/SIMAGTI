@@ -47,7 +47,7 @@
                                     <span class="c-main c-plain">{{ $internship->end_date->locale('id')->translatedFormat('j M Y') }}</span>
                                     <span class="c-sub">{{ $internship->status === 'berjalan' ? 'Sisa '.$internship->daysLeft().' hari' : 'KP selesai' }}</span>
                                 </td>
-                                <td class="hide-md"><x-progress :value="$internship->percent()" /></td>
+                                <td class="hide-md"><x-progress :value="$internship->percent()" inside /></td>
                                 <td class="num">
                                     @if ($a?->final_score !== null)
                                         <span class="c-main">{{ $a->letter() }}</span>

@@ -63,7 +63,7 @@
                                     <span class="c-main c-plain" title="{{ $internship->lecturer?->name }}">{{ $internship->lecturer?->listName() ?? '–' }}</span>
                                     <span class="c-sub">{{ $internship->track === 'mandiri' ? 'Pengajuan mandiri' : 'Penempatan kampus' }}</span>
                                 </td>
-                                <td><x-progress :value="$internship->percent()" /></td>
+                                <td><x-progress :value="$internship->percent()" inside /></td>
                                 <td><x-chip :tone="$internship->statusTone()">{{ $internship->statusLabel() }}</x-chip></td>
                             </tr>
                         @endforeach

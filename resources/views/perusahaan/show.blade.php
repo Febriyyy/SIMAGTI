@@ -67,7 +67,7 @@
                                         <span class="muted">· sisa {{ $row['days_left'] }} hari</span>
                                     @endif
                                 </td>
-                                <td><x-progress :value="$row['progress_percent']" /></td>
+                                <td><x-progress :value="$row['progress_percent']" inside /></td>
                                 <td>
                                     @if ($row['letter_grade'])
                                         <span class="cell-title">{{ $row['letter_grade'] }}</span>

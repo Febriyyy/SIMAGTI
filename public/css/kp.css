@@ -6394,3 +6394,83 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .cst-legend { display: grid; gap: 14px; }
     .cst-legend ul { display: grid; gap: 12px; }
 }
+
+/* =====================================================================
+   Tabel data dan daftar "Perlu perhatian": gaya tenang dan premium
+   - kepala tabel tanpa pita warna, cukup teks abu kecil dan garis tipis
+   - baris lega, pemisah tipis yang menjorok, sorotan halus saat diarahkan
+   - status dan nilai berupa teks berwarna dengan titik (bukan kapsul berisi)
+   - progres berupa garis tipis; alasan perhatian berupa tag bergaris tipis
+   Selektor memakai .card .table.dt agar mengalahkan theme-landing.css.
+   ===================================================================== */
+.card .table.dt { border-collapse: separate; border-spacing: 0; }
+.card .table.dt th {
+    height: 42px;
+    background: transparent;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted-2, #8a9895);
+    font-size: 12.5px; font-weight: 500; letter-spacing: 0;
+}
+.card .table.dt td {
+    height: 72px;
+    border-bottom: 0;
+    background-image: linear-gradient(var(--line), var(--line));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: 0 100%;
+}
+/* Garis pemisah menjorok: mulai dari teks, bukan dari tepi kartu */
+.card .table.dt td:first-child { background-size: calc(100% - var(--card-x)) 1px; background-position: 100% 100%; }
+.card .table.dt td:last-child { background-size: calc(100% - var(--card-x)) 1px; background-position: 0 100%; }
+.card .table.dt tbody tr:last-child td { background-image: none; }
+.card .table.dt tbody tr { transition: background-color .18s ease; }
+.card .table.dt tbody tr:hover { background: linear-gradient(90deg, var(--primary-tint), rgba(241, 249, 246, 0) 85%); }
+.card .table.dt tbody tr:hover td:first-child { box-shadow: inset 2px 0 0 var(--primary); }
+
+.card .table.dt .c-main { font-size: 14.5px; font-weight: 600; letter-spacing: -.005em; }
+.card .table.dt .c-sub { margin-top: 3px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card .table.dt .ident { gap: 14px; }
+.card .table.dt .ident .avatar { width: 38px; height: 38px; box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line); }
+
+/* Status dan nilai: teks berwarna dengan titik */
+.card .table.dt .chip { padding: 0; background: none; font-size: 13px; font-weight: 600; gap: 8px; }
+.card .table.dt .chip::before { width: 7px; height: 7px; opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent); }
+
+/* Progres: garis tipis dengan angka di kanan */
+.card .table.dt .progress-cell { gap: 12px; }
+.card .table.dt .progress { height: 4px; background: #e9efed; }
+.card .table.dt .progress-label { width: auto; min-width: 34px; color: var(--text); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Perlu perhatian ---------- */
+.attn .attn-icon { width: 38px; height: 38px; border-radius: 12px; background: var(--red-soft); color: var(--red); }
+.attn .attn-icon.is-calm { background: var(--primary-soft); color: var(--primary); }
+.attn .attn-count {
+    min-width: 0; height: auto; padding: 4px 12px;
+    background: var(--red-soft); color: var(--red);
+    font-size: 13px; font-weight: 600;
+}
+.attn .attn-row { gap: 18px; padding-block: 16px; }
+.attn .attn-row .avatar { width: 38px; height: 38px; box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line); }
+.attn .attn-row + .attn-row::before { left: calc(var(--card-x) + 56px); }
+.attn .attn-row:hover { background: linear-gradient(90deg, var(--primary-tint), rgba(241, 249, 246, 0) 85%); box-shadow: inset 2px 0 0 var(--primary); }
+.attn .attn-name { font-size: 14.5px; letter-spacing: -.005em; }
+.attn .attn-place { margin-top: 2px; font-size: 13px; }
+.attn .attn-chips { gap: 8px; }
+.attn .attn-chip {
+    height: 30px; padding: 0 12px 0 10px;
+    border: 1px solid var(--line); background: #fff;
+    color: var(--text); font-size: 13px; font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+.attn .attn-chip .icon, .attn .attn-chip .ikon { flex: none; }
+.attn .attn-chip.is-idle .ikon { color: var(--red); }
+.attn .attn-chip.is-low .ikon { color: var(--amber); }
+.attn .attn-chip.is-end .ikon { color: #6d4bd0; }
+.attn .attn-go { color: #b6c2bf; }
+
+/* Progres di tabel: angka di dalam batang (mis. "55%"), keterangan "6/11 selesai" di bawahnya */
+.card .table.dt .progress-in { height: 22px; max-width: 184px; background: #e9efed; }
+.card .table.dt .progress-in > span { min-width: 0; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .06); }
+.card .table.dt .progress-in b { padding: 0 10px; font-size: 12.5px; letter-spacing: .01em; }
+.card .table.dt .progress-in b.is-out { padding-left: 8px; color: var(--text); }
+.card .table.dt .progress-in + .c-sub { margin-top: 6px; }
