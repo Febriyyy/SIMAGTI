@@ -6518,3 +6518,7 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .card .table.dt .progress-in b.is-out { padding-left: 6px; }
 .card .table.dt .progress-in + .c-sub { margin-top: 5px; }
 @media (min-width: 1360px) { .card .table.dt .progress-in { max-width: 140px; } }
+/* Ikon bintang Portofolio: koreksi optis (ujung bawah bintang membuatnya tampak lebih rendah dari teks) */
+.prof-actions .prof-porto .ikon { transform: translateY(-1px); }
+/* Kepala profil di atas baris info, supaya menu Unduh (Excel/PDF) tidak tertutup baris info */
+.prof-top > .prof-head { z-index: 3; }
