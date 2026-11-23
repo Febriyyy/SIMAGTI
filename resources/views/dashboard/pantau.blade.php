@@ -183,7 +183,7 @@
                         <thead>
                             <tr>
                                 <th>Perusahaan</th>
-                                <th>Magang aktif</th>
+                                <th class="num">Magang aktif</th>
                                 <th>Progres task</th>
                                 <th>Nilai rata-rata</th>
                                 <th></th>
@@ -193,7 +193,7 @@
                             @foreach ($companies as $row)
                                 <tr>
                                     <td class="cell-title">{{ $row['company']->name }}</td>
-                                    <td>{{ $row['active'] }}</td>
+                                    <td class="num">{{ $row['active'] }}</td>
                                     <td>
                                         @if ($row['average'] !== null)
                                             <x-progress :value="$row['average']" inside />
