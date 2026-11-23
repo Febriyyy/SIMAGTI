@@ -3310,9 +3310,9 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .stat-grid .stat-value.is-empty { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stat-grid .stat-value small { white-space: nowrap; }
 
-/* Dua kolom (.layout): kolom sama tinggi, kartu terakhir tiap kolom mengisi sisa ruang (tepi bawah sejajar) */
-.layout, .split { align-items: stretch; }
-.layout > .col:not(.gform-aside):not(.work-aside) > .card:last-child, .split > .col > .card:last-child { flex-grow: 1; }
+/* Dua kolom (.layout, .split): setiap kartu setinggi isinya. Dulu kartu terakhir tiap kolom dipanjangkan agar
+   tepi bawah sejajar, tetapi itu menyisakan ruang kosong besar bila isi kolom tidak seimbang (23 Nov 2026). */
+.layout, .split { align-items: start; }
 .card > .empty:last-child { flex: 1; }
 .card:has(> .empty:last-child) { display: flex; flex-direction: column; }
 
