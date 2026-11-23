@@ -5311,24 +5311,34 @@ body { background: var(--page); }
 .motion .plan-card-segs i:nth-child(2) { animation-delay: 40ms; } .motion .plan-card-segs i:nth-child(3) { animation-delay: 80ms; }
 .motion .plan-card-segs i:nth-child(4) { animation-delay: 120ms; } .motion .plan-card-segs i:nth-child(n+5) { animation-delay: 160ms; }
 
-/* Sorotan: rencana yang sedang berjalan menjadi kartu hijau penuh */
-.plan-cards .plan-card[data-state="active"] { background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); color: #fff; box-shadow: 0 14px 30px rgba(3, 122, 104, .22); }
-.plan-cards .plan-card[data-state="active"]::after { background: radial-gradient(closest-side, rgba(201, 240, 101, .35), transparent); }
-.plan-cards .plan-card[data-state="active"] .plan-card-mark { background: rgba(255, 255, 255, .16); color: var(--lime); }
-.plan-cards .plan-card[data-state="active"] .plan-card-state { box-shadow: none; background: var(--lime); color: var(--ink); }
-.plan-cards .plan-card[data-state="active"] .plan-card-go { background: rgba(255, 255, 255, .16); color: #fff; }
-.plan-cards .plan-card[data-state="active"] .plan-card-sub { color: rgba(255, 255, 255, .8); }
-.plan-cards .plan-card[data-state="active"] .plan-card-sub .ikon { color: var(--lime); }
-.plan-cards .plan-card[data-state="active"] .plan-card-days { background: rgba(255, 255, 255, .14); color: #fff; }
-.plan-cards .plan-card[data-state="active"] .plan-card-segs i { background: rgba(255, 255, 255, .22); }
-.plan-cards .plan-card[data-state="active"] .plan-card-segs i.is-on { background: var(--lime); }
-.plan-cards .plan-card[data-state="active"] .plan-card-bar { background: rgba(255, 255, 255, .22); }
-.plan-cards .plan-card[data-state="active"] .plan-card-bar > span { background: var(--lime); }
-.plan-cards .plan-card[data-state="active"] .plan-card-empty { border-color: rgba(255, 255, 255, .4); color: rgba(255, 255, 255, .85); }
+/* Semua kartu putih; kartu yang diarahkan (atau difokus) berubah hijau penuh.
+   Lapisan hijau ada di ::before dan memudar masuk, ::after (cahaya) tetap di atasnya. */
+.plan-cards .plan-card[data-state]::before {
+    content: ""; display: block; position: absolute; inset: 0; height: auto; z-index: -1; border-radius: inherit;
+    background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%);
+    opacity: 0; transition: opacity 280ms var(--ease-premium);
+}
+.plan-cards .plan-card[data-state] :is(.plan-card-title, .plan-card-sub, .plan-card-days, .plan-card-mark, .plan-card-state, .plan-card-go, .plan-card-foot b) {
+    transition: color 220ms, background-color 220ms, box-shadow 220ms, transform 220ms var(--ease-premium);
+}
+.plan-cards .plan-card[data-state="active"] .plan-card-state { box-shadow: none; background: var(--primary-soft); color: var(--primary-dark); }
+
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) { color: #fff; }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within)::before { opacity: 1; }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within)::after { background: radial-gradient(closest-side, rgba(201, 240, 101, .35), transparent); opacity: 1; }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-mark { background: rgba(255, 255, 255, .16); color: var(--lime); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-state { box-shadow: none; background: var(--lime); color: var(--ink); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-sub { color: rgba(255, 255, 255, .8); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-sub .ikon { color: var(--lime); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-days { background: rgba(255, 255, 255, .14); color: #fff; }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-segs i { background: rgba(255, 255, 255, .22); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-segs i.is-on { background: var(--lime); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-bar { background: rgba(255, 255, 255, .22); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-bar > span { background: var(--lime); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-empty { border-color: rgba(255, 255, 255, .4); color: rgba(255, 255, 255, .85); }
 
 /* Saat diarahkan: kartu terangkat, panah berubah lime dan berputar */
-.plan-cards .plan-card[data-state]:has(.plan-card-open):hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .3), 0 16px 32px rgba(15, 31, 27, .08); }
-.plan-cards .plan-card[data-state="active"]:has(.plan-card-open):hover { box-shadow: 0 18px 36px rgba(3, 122, 104, .3); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(3, 122, 104, .28); }
 .plan-cards .plan-card[data-state]:has(.plan-card-open):hover .plan-card-go { background: var(--lime); color: var(--ink); transform: rotate(45deg); }
 @media (prefers-reduced-motion: reduce) {
     .plan-cards .plan-card[data-state], .plan-cards .plan-card[data-state] .plan-card-go { transition: none; }
