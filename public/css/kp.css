@@ -6511,3 +6511,10 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 @media (max-width: 700px) {
     .prof-actions { margin-left: 60px; }
 }
+
+/* Progres di tabel: ukuran normal (tidak terlalu besar) */
+.card .table.dt .progress-in { height: 16px; max-width: 132px; }
+.card .table.dt .progress-in b { padding: 0 7px; font-size: 11px; font-weight: 700; }
+.card .table.dt .progress-in b.is-out { padding-left: 6px; }
+.card .table.dt .progress-in + .c-sub { margin-top: 5px; }
+@media (min-width: 1360px) { .card .table.dt .progress-in { max-width: 140px; } }
