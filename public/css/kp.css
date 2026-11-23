@@ -6677,3 +6677,13 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
     .recruit .recruit-steps li:not(:last-child)::after { display: block; top: 26px; bottom: 2px; left: 8px; right: auto; width: 1.5px; height: auto; }
     .recruit .recruit-steps li.is-done:not(:last-child)::after { background: var(--primary); }
 }
+
+/* Sidebar: hanya daftar menu yang bisa digulir; logo dan profil di bawah tetap di tempat */
+.sidebar { overflow: hidden; }
+.sidebar .nav {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    margin: 0 -8px; padding: 2px 8px 10px; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+}
+.sidebar .nav::-webkit-scrollbar { width: 6px; }
+.sidebar .nav::-webkit-scrollbar-thumb { border-radius: 6px; background: var(--line-strong); }
+.sidebar .sidebar-foot { flex: none; }
