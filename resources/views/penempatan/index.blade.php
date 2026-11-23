@@ -43,17 +43,24 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php($canOpen = auth()->user()->hasRole('supervisor', 'dospem', 'kaprodi'))
                         @foreach ($internships as $internship)
                             @php($student = $internship->student)
-                            <tr>
+                            {{-- Kaprodi: seluruh baris bisa diklik ke detail mahasiswa (tautan nama direntangkan, .tr-link).
+                                 TU Fakultas tidak punya akses halaman pemantauan, jadi barisnya tetap biasa. --}}
+                            <tr @class(['tr-link' => $canOpen])>
                                 <td>
-                                    <span class="ident">
+                                    @if ($canOpen)
+                                        <a href="{{ route('pantau.show', $internship) }}" class="ident tr-link-a" aria-label="Lihat detail {{ $student->name }}">
+                                    @else
+                                        <span class="ident">
+                                    @endif
                                         <x-avatar :user="$student" />
                                         <span>
                                             <span class="c-main" title="{{ $student->name }}">{{ $student->listName() }}</span>
                                             <span class="c-sub">{{ $student->nim }}</span>
                                         </span>
-                                    </span>
+                                    @if ($canOpen)</a>@else</span>@endif
                                 </td>
                                 <td>
                                     <span class="c-main" title="{{ $internship->placeName() }}">{{ $internship->placeName() }}</span>

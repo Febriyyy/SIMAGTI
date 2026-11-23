@@ -6640,3 +6640,11 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
     .av { padding: 28px 22px 24px; border-radius: 22px; }
     .av-title { margin-top: 26px; font-size: 25px; }
 }
+
+/* Baris tabel yang bisa diklik (.tr-link): tautan di sel pertama direntangkan ke seluruh baris */
+.card .table.dt tr.tr-link { position: relative; cursor: pointer; }
+.card .table.dt tr.tr-link .tr-link-a { position: static; color: inherit; text-decoration: none; }
+.card .table.dt tr.tr-link .tr-link-a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.card .table.dt tr.tr-link:hover .tr-link-a .c-main { color: var(--primary); }
+.card .table.dt tr.tr-link .tr-link-a:focus-visible { outline: none; }
+.card .table.dt tr.tr-link:has(.tr-link-a:focus-visible) { box-shadow: inset 0 0 0 2px var(--primary); }
