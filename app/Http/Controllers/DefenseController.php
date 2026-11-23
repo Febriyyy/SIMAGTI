@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Results\RecordDefense;
-use App\Actions\Results\ScheduleDefense;
-use App\Models\DefenseSchedule;
 use App\Models\Internship;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Sidang KP oleh kaprodi: jadwalkan sidang (waktu, tempat, penguji), lalu sahkan nilainya
- * (dosen pembimbing 50% + industri 50%). Nilai sidang dicatat terpisah dari nilai akhir penilaian Company Supervisor.
+ * Pengesahan Nilai KP oleh kaprodi: melihat jadwal sidang (diatur dosen pembimbing, lihat DefenseScheduleController)
+ * lalu mengesahkan nilainya (dosen pembimbing 50% + industri 50%).
+ * Nilai sidang dicatat terpisah dari nilai akhir penilaian Company Supervisor.
  */
 class DefenseController extends Controller
 {
@@ -35,29 +32,7 @@ class DefenseController extends Controller
             'unscheduled' => $unscheduled,
             'scheduled' => $scheduled,
             'done' => $done->sortByDesc(fn ($i) => $i->defenseScore->defended_at)->values(),
-            'examiners' => User::where('role', 'dospem')->where('is_active', true)->orderBy('name')->get(['id', 'name']),
         ]);
-    }
-
-    public function schedule(Request $request, Internship $internship, ScheduleDefense $schedule): RedirectResponse
-    {
-        $data = $request->validateWithBag('jadwal'.$internship->id, [
-            'tanggal' => ['required', 'date', 'after_or_equal:today'],
-            'jam' => ['required', 'date_format:H:i'],
-            'cara' => ['required', Rule::in(array_keys(DefenseSchedule::MODES))],
-            'tempat' => ['required', 'string', 'max:200'],
-            'penguji' => ['nullable', Rule::exists('users', 'id')->where('role', 'dospem')],
-            'catatan' => ['nullable', 'string', 'max:500'],
-        ], [
-            'tanggal.required' => 'Isi tanggal sidang.',
-            'tanggal.after_or_equal' => 'Tanggal sidang tidak boleh di masa lalu.',
-            'jam.required' => 'Isi jam sidang.',
-            'tempat.required' => 'Isi ruang atau tautan rapat daring.',
-        ]);
-
-        $schedule->handle($request->user(), $internship->loadMissing(['student', 'lecturer', 'defenseScore', 'defenseSchedule']), $data);
-
-        return redirect()->route('kaprodi.sidang')->with('status', 'Jadwal sidang '.rtrim($internship->student->listName(), '.').' tersimpan dan sudah diberitahukan.');
     }
 
     /** Kaprodi mengesahkan nilai sidang: dihitung dari nilai dosen pembimbing dan nilai industri. */

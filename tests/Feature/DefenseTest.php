@@ -48,7 +48,7 @@ class DefenseTest extends TestCase
         $finalBefore = $salsa->final_score;
         $this->gradeReport($salsa);
 
-        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertOk()->assertSee('Perlu dijadwalkan')->assertSee('Salsa');
+        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertOk()->assertSee('Pengesahan Nilai KP')->assertSee('Belum dijadwalkan')->assertSee('Salsa')->assertDontSee('dlg-sch-', false);
 
         $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}", ['defended_at' => today()->toDateString()])
             ->assertRedirect('/kaprodi/sidang');
@@ -85,32 +85,52 @@ class DefenseTest extends TestCase
             ->assertSessionHasErrors(['defended_at']);
     }
 
-    public function test_kaprodi_menjadwalkan_sidang_dan_pihak_terkait_diberi_tahu(): void
+    public function test_dosen_pembimbing_menjadwalkan_sidang_dan_pihak_terkait_diberi_tahu(): void
     {
         $kaprodi = $this->user('kaprodi@kp.test');
         $salsa = $this->internshipOf('salsa@kp.test');
         $salsa->defenseScore()->delete();
-        $examiner = User::where('role', 'dospem')->where('id', '!=', $salsa->lecturer_id)->first() ?? $salsa->lecturer;
+        $lecturer = $salsa->lecturer;
+        $examiner = User::where('role', 'dospem')->where('id', '!=', $lecturer->id)->first();
         $date = today()->addDays(3)->toDateString();
 
-        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '09:30', 'cara' => 'luring', 'tempat' => 'Ruang B2.04', 'penguji' => $examiner->id])
-            ->assertRedirect('/kaprodi/sidang');
+        // Menu: Jadwal Sidang hanya untuk dosen pembimbing; kaprodi melihat Pengesahan Nilai KP
+        $this->actingAs($lecturer)->get('/dashboard')->assertSee('Jadwal Sidang');
+        $this->actingAs($salsa->supervisor)->get('/dashboard')->assertDontSee('Jadwal Sidang');
+        $this->actingAs($kaprodi)->get('/dashboard')->assertSee('Pengesahan Nilai KP')->assertDontSee('>Sidang KP<', false);
+
+        // Halaman dosen pembimbing: mahasiswa bimbingan yang perlu dijadwalkan
+        $this->actingAs($lecturer)->get('/jadwal-sidang')->assertOk()->assertSee('Perlu dijadwalkan')->assertSee('Salsa');
+
+        $this->actingAs($lecturer)->put("/jadwal-sidang/{$salsa->id}", ['tanggal' => $date, 'jam' => '09:30', 'cara' => 'luring', 'tempat' => 'Ruang B2.04', 'penguji' => $examiner?->id])
+            ->assertRedirect('/jadwal-sidang');
 
         $schedule = $salsa->fresh()->defenseSchedule;
         $this->assertSame($date.' 09:30', $schedule->scheduled_at->format('Y-m-d H:i'));
+        $this->assertSame($lecturer->id, $schedule->created_by);
         $this->assertSame(1, $this->user('salsa@kp.test')->notifications()->where('data', 'like', '%Sidang KP dijadwalkan%')->count());
-        $this->assertSame(1, $examiner->notifications()->where('data', 'like', '%Sidang KP%')->count());
+        if ($examiner) {
+            $this->assertSame(1, $examiner->notifications()->where('data', 'like', '%Sidang KP%')->count());
+        }
 
-        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertSee('Jadwal sidang')->assertSee('Ruang B2.04');
+        // Kaprodi hanya melihat jadwal (tanpa form jadwal) dan mahasiswa melihatnya di Status KP
+        $this->actingAs($kaprodi)->get('/kaprodi/sidang')->assertSee('Jadwal sidang')->assertSee('Ruang B2.04')->assertDontSee('Ubah jadwal');
         $this->actingAs($this->user('salsa@kp.test'))->get('/status-kp')->assertSee('Ruang B2.04');
 
-        // Ubah jadwal: tetap satu jadwal, tanggal lampau ditolak
-        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => today()->subDay()->toDateString(), 'jam' => '09:30', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])
+        // Ubah jadwal: tetap satu jadwal, tanggal lampau ditolak, penguji tidak boleh pembimbing sendiri
+        $this->actingAs($lecturer)->put("/jadwal-sidang/{$salsa->id}", ['tanggal' => today()->subDay()->toDateString(), 'jam' => '09:30', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])
             ->assertSessionHasErrorsIn('jadwal'.$salsa->id, 'tanggal');
-        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '13:00', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])->assertRedirect();
+        $this->actingAs($lecturer)->put("/jadwal-sidang/{$salsa->id}", ['tanggal' => $date, 'jam' => '13:00', 'cara' => 'daring', 'tempat' => 'https://meet.example/x', 'penguji' => $lecturer->id])
+            ->assertSessionHasErrorsIn('jadwal'.$salsa->id, 'penguji');
+        $this->actingAs($lecturer)->put("/jadwal-sidang/{$salsa->id}", ['tanggal' => $date, 'jam' => '13:00', 'cara' => 'daring', 'tempat' => 'https://meet.example/x'])->assertRedirect();
         $this->assertSame('daring', $salsa->fresh()->defenseSchedule->mode);
         $this->assertSame(1, DefenseSchedule::where('internship_id', $salsa->id)->count());
 
-        $this->actingAs($this->user('dospem@kp.test'))->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '09:00', 'cara' => 'luring', 'tempat' => 'R1'])->assertForbidden();
+        // Hanya dosen pembimbingnya: dosen lain dan kaprodi tidak bisa menjadwalkan
+        if ($examiner) {
+            $this->actingAs($examiner)->put("/jadwal-sidang/{$salsa->id}", ['tanggal' => $date, 'jam' => '09:00', 'cara' => 'luring', 'tempat' => 'R1'])->assertForbidden();
+        }
+        $this->actingAs($kaprodi)->get('/jadwal-sidang')->assertForbidden();
+        $this->actingAs($kaprodi)->put("/kaprodi/sidang/{$salsa->id}/jadwal", ['tanggal' => $date, 'jam' => '09:00', 'cara' => 'luring', 'tempat' => 'R1'])->assertNotFound();
     }
 }

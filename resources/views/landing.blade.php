@@ -163,7 +163,7 @@
                 <ol class="ld-steps">
                     <li data-reveal style="--i: 1"><span class="ld-step-n">1</span><div><b>Pengajuan KP</b><p>Pilih lowongan mitra atau ajukan tempat sendiri, lalu tunggu persetujuan kaprodi.</p></div></li>
                     <li data-reveal style="--i: 2"><span class="ld-step-n">2</span><div><b>Task dan catatan harian</b><p>Kerjakan task dari supervisor dan catat kegiatan setiap hari.</p></div></li>
-                    <li data-reveal style="--i: 3"><span class="ld-step-n">3</span><div><b>Bimbingan dan penilaian</b><p>Dosen membimbing, supervisor menilai, kaprodi menjadwalkan sidang.</p></div></li>
+                    <li data-reveal style="--i: 3"><span class="ld-step-n">3</span><div><b>Bimbingan dan penilaian</b><p>Dosen membimbing dan menjadwalkan sidang, supervisor menilai, kaprodi mengesahkan nilai.</p></div></li>
                     <li data-reveal style="--i: 4"><span class="ld-step-n">4</span><div><b>Sertifikat</b><p>Terbit otomatis setelah hasil KP diputuskan.</p></div></li>
                 </ol>
             </div>

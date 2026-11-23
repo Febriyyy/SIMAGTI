@@ -140,6 +140,7 @@ Prinsipnya: pihak perusahaan sesedikit mungkin direpotkan. Supervisor hanya konf
 ### Tambahan 18 November 2026
 - **Rekap KP** (kaprodi, TU): satu halaman semua mahasiswa KP (status, nilai akhir, nilai sidang, laporan per bab, rekrutmen) dengan filter status, pencarian, ringkasan angka, dan unduh Excel.
 - **Jadwal sidang** (kaprodi, menu Sidang KP): jadwalkan waktu, cara (luring/daring), ruang atau tautan, dan dosen penguji; mahasiswa, dosen pembimbing, dan penguji diberi tahu; jadwal tampil di Status KP mahasiswa; nilai diisi setelah sidang lewat.
+- **Pembagian sidang (revisi November 2026)**: jadwal sidang dipindah ke dosen pembimbing (menu Jadwal Sidang, hanya mahasiswa bimbingannya, penguji harus dosen lain); menu kaprodi berganti nama menjadi Pengesahan Nilai KP dan hanya melihat jadwal lalu mengesahkan nilai.
 - **Template task** (Company Supervisor): kumpulan task baku per minggu dan hari yang diterapkan ke mahasiswa magang terpilih sekali klik (minggu 1 = minggu KP saat diterapkan).
 - **Lowongan magang**: TU (semua perusahaan) dan Company Supervisor (perusahaannya) memasang, membuka, dan menutup lowongan; mahasiswa tanpa KP aktif diberi tahu saat lowongan dibuka, melihatnya di menu Lowongan, dan "Ajukan KP di sini" mengisi formulir pengajuan otomatis.
 
