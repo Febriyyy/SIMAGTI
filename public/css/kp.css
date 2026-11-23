@@ -6648,3 +6648,32 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .card .table.dt tr.tr-link:hover .tr-link-a .c-main { color: var(--primary); }
 .card .table.dt tr.tr-link .tr-link-a:focus-visible { outline: none; }
 .card .table.dt tr.tr-link:has(.tr-link-a:focus-visible) { box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* =====================================================================
+   Stepper Rekrutmen (detail mahasiswa): titik kecil di atas garis rambut, label tegas, tanggal halus
+   ===================================================================== */
+.recruit .recruit-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 6px 0 2px; }
+.recruit .recruit-steps li { gap: 0; padding: 0 16px 0 0; color: var(--muted); }
+/* Garis: dari titik ini ke titik berikutnya, tepat di tengah titik */
+.recruit .recruit-steps li:not(:last-child)::after {
+    top: 8px; left: 26px; right: 10px; height: 1.5px; border-radius: 2px; background: var(--line-strong);
+}
+.recruit .recruit-steps li.is-done:not(:last-child)::after { background: linear-gradient(90deg, var(--primary), #2bb98a); }
+.recruit .recruit-dot {
+    width: 18px; height: 18px; margin-bottom: 14px;
+    background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line-strong); color: #fff;
+}
+.recruit .recruit-dot .ikon { --ikon: 12px; width: 12px; height: 12px; }
+.recruit .recruit-dot .ikon .ms { font-size: 14px; font-weight: 700; }
+.recruit .recruit-steps li.is-done .recruit-dot { background: var(--primary); box-shadow: 0 0 0 5px var(--primary-soft); }
+.recruit .recruit-steps li.is-no .recruit-dot { background: var(--gray); box-shadow: 0 0 0 5px var(--gray-soft); }
+.recruit .recruit-label { font-size: 14px; font-weight: 500; letter-spacing: -0.005em; color: var(--muted); }
+.recruit .recruit-steps li.is-done .recruit-label { color: var(--text); font-weight: 600; }
+.recruit .recruit-steps small { margin-top: 4px; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+    .recruit .recruit-steps { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .recruit .recruit-steps li { display: grid; grid-template-columns: 18px minmax(0, 1fr); column-gap: 14px; padding: 0 0 18px; }
+    .recruit .recruit-dot { grid-row: 1 / span 2; margin: 1px 0 0; }
+    .recruit .recruit-steps li:not(:last-child)::after { display: block; top: 26px; bottom: 2px; left: 8px; right: auto; width: 1.5px; height: auto; }
+    .recruit .recruit-steps li.is-done:not(:last-child)::after { background: var(--primary); }
+}
