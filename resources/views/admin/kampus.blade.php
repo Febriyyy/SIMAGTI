@@ -24,6 +24,7 @@
             'company' => null,
             'left' => ['role' => 'Ketua Divisi', 'owner' => 'Diisi perusahaan', 'sub' => 'Perusahaan'],
             'right' => ['role' => 'Ketua Program Studi', 'owner' => 'Diisi kaprodi', 'sub' => $campus['program']],
+            'shapes' => ['square', 'wide'],
         ])
 
         <div class="cst-bar">
@@ -38,7 +39,6 @@
                     ])
                 @endforeach
             </div>
-            @include('sertifikat._bar-spec', ['rows' => ['Persegi' => '500 × 500 px', 'Melebar' => '900 × 300 px']])
         </div>
     </section>
 @endsection

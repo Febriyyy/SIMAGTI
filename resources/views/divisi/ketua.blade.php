@@ -54,6 +54,7 @@
                     'live' => 'divisi'.$division->id,
                 ],
                 'right' => $right,
+                'shapes' => ['square', 'wide', 'sign'],
             ])
 
             <div class="cst-bar">
@@ -75,7 +76,6 @@
                         'deleteLabel' => 'Hapus tanda tangan', 'confirm' => 'Hapus tanda tangan ketua divisi '.$division->name.'?',
                     ])
                 </div>
-                @include('sertifikat._bar-spec', ['rows' => ['Logo' => '500 × 500 atau 900 × 300 px', 'Tanda tangan' => '600 × 200 px, latar transparan']])
                 <button type="submit" form="f-div-{{ $division->id }}" class="btn btn-primary cst-save">Simpan</button>
             </div>
         </section>
@@ -88,6 +88,7 @@
                     'company' => $company,
                     'left' => ['role' => 'Ketua Divisi', 'owner' => 'Belum ada divisi', 'sub' => $company->name],
                     'right' => $right,
+                    'shapes' => ['square', 'wide'],
                 ])
                 <div class="cst-bar">
                     <div class="cst-items">

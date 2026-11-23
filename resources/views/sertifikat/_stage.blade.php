@@ -87,6 +87,9 @@
         </div>
     </div>
     </div>
+    @if (! empty($shapes))
+        @include('sertifikat._legend', ['shapes' => $shapes])
+    @endif
 </div>
 
 @once

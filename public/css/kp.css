@@ -6290,7 +6290,7 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     outline: none;
     transition: background-color .2s ease, box-shadow .2s ease;
 }
-.cst-inline.cst-signer { font-size: max(calc(var(--u) * 3.5), 13px); padding-top: calc(var(--u) * 1.6); border-top: calc(var(--u) * .3) solid var(--c-text); border-radius: 0; font-weight: 600; color: var(--c-text); }
+.cst-inline.cst-signer { width: 100%; min-width: calc(var(--u) * 58); field-sizing: content; font-size: max(calc(var(--u) * 3.5), 13px); padding-top: calc(var(--u) * 1.6); border-top: calc(var(--u) * .3) solid var(--c-text); border-radius: 0; font-weight: 600; color: var(--c-text); }
 .cst-inline::placeholder { color: var(--c-primary); font-weight: 500; font-style: italic; opacity: .8; }
 .cst-inline:hover { background: rgba(201, 240, 101, .2); }
 .cst-inline:focus-visible { background: rgba(201, 240, 101, .3); box-shadow: 0 0 0 2px var(--c-primary); }
@@ -6316,18 +6316,40 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .cst-slot.is-mine:hover .cst-tip, .cst-ink.is-mine:hover .cst-tip,
 .cst-slot.is-mine:focus-within .cst-tip, .cst-ink.is-mine:focus-within .cst-tip { opacity: 1; transform: translate(-50%, 0); }
 
-/* Bilah bawah: kartu status per aset | panduan ukuran | simpan */
-.cst-studio { container-type: inline-size; }
+/* Legenda ukuran di panggung: bentuk digambar sesuai proporsi ukuran yang disarankan */
+.cst-legend {
+    position: relative;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 32px;
+    max-width: 1040px; min-width: 0;
+    margin: clamp(22px, 3vw, 32px) auto 0;
+    padding-top: clamp(18px, 2.4vw, 24px);
+    border-top: 1px solid rgba(255, 255, 255, .12);
+}
+.cst-legend ul { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 30px; margin: 0; padding: 0; list-style: none; }
+.cst-legend li { display: flex; align-items: center; gap: 12px; }
+.cst-glyph {
+    flex: none; display: grid; place-items: center;
+    height: 26px;
+    border: 1.5px dashed rgba(201, 240, 101, .75);
+    border-radius: 5px;
+    background: rgba(201, 240, 101, .07);
+}
+.cst-glyph.is-square { width: 26px; }
+.cst-glyph.is-wide { width: 54px; height: 18px; }
+.cst-glyph.is-sign { width: 54px; height: 18px; border-style: none; border-bottom: 1.5px solid rgba(255, 255, 255, .55); border-radius: 0; background: none; }
+.cst-glyph svg { width: 100%; height: 100%; fill: none; stroke: #c9f065; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cst-legend-text { display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; color: rgba(255, 255, 255, .62); }
+.cst-legend-text b { font-size: 14px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.cst-legend p { margin: 0; font-size: 12.5px; line-height: 1.5; color: rgba(255, 255, 255, .55); }
+
+/* Bilah bawah: kartu status per aset dan tombol simpan */
 .cst-bar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "items items" "spec save";
-    align-items: center; gap: 14px 20px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px;
     padding: 18px 24px;
     border-top: 1px solid var(--line);
     background: linear-gradient(180deg, #fbfcfc, var(--surface));
 }
-.cst-items { grid-area: items; display: flex; flex-wrap: wrap; gap: 12px; }
+.cst-items { display: flex; flex-wrap: wrap; gap: 12px; flex: 1 1 auto; }
 .cst-item {
     display: flex; align-items: center; gap: 12px;
     min-width: 260px;
@@ -6360,35 +6382,15 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 }
 .cst-del:hover { background: var(--red-soft); color: var(--red); }
 .cst-del:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
-
-.cst-spec {
-    grid-area: spec; align-self: stretch;
-    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 24px;
-    margin: 0; padding: 10px 16px;
-    border: 1px solid var(--line); border-radius: 14px;
-    background: #f6f9f8;
-    font-size: 13px; line-height: 1.4;
-}
-.cst-spec > div { display: flex; gap: 8px; }
-.cst-spec dt { color: var(--muted); }
-.cst-spec dd { margin: 0; color: var(--text); font-variant-numeric: tabular-nums; }
-.cst-note { grid-area: spec; margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
-.cst-save { grid-area: save; justify-self: end; min-width: 140px; }
-@container (min-width: 1180px) {
-    .cst-bar { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "items spec save"; }
-    .cst-spec { justify-self: end; display: grid; grid-template-columns: auto auto; gap: 5px 18px; }
-    .cst-spec > div { display: contents; }
-}
-@container (max-width: 560px) {
-    .cst-bar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "items" "spec" "save"; }
-    .cst-spec { display: grid; grid-template-columns: auto 1fr; gap: 5px 16px; }
-    .cst-spec > div { display: contents; }
-    .cst-save { justify-self: stretch; }
-}
+.cst-note { flex: 1 1 280px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.cst-save { flex: none; min-width: 148px; margin-left: auto; box-shadow: 0 10px 24px -10px var(--primary-shadow); }
 .cst-anchor { display: block; position: relative; top: -88px; }
 
 @media (max-width: 640px) {
     .cst-studio { border-radius: 16px; }
     .cst-bar { padding: 16px; }
     .cst-items, .cst-item { width: 100%; min-width: 0; }
+    .cst-save { width: 100%; }
+    .cst-legend { display: grid; gap: 14px; }
+    .cst-legend ul { display: grid; gap: 12px; }
 }

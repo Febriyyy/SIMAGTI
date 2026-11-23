@@ -34,6 +34,7 @@
                 'titleField' => 'signer_title',
                 'live' => 'kaprodi',
             ],
+            'shapes' => ['sign'],
         ])
 
         <div class="cst-bar">
@@ -46,7 +47,6 @@
                     'deleteLabel' => 'Hapus tanda tangan', 'confirm' => 'Hapus tanda tangan kaprodi?',
                 ])
             </div>
-            @include('sertifikat._bar-spec', ['rows' => ['Tanda tangan' => '600 × 200 px, latar transparan']])
             <button type="submit" form="f-ttd" class="btn btn-primary cst-save">Simpan</button>
         </div>
     </section>
