@@ -29,15 +29,17 @@
                 </div>
                 <div class="prof-sub">{{ $student->nim }} · {{ $id['program'] ?? 'Prodi belum diisi' }}@if ($id['entry_year']) · Angkatan {{ $id['entry_year'] }}@endif</div>
             </div>
-            <a href="{{ route('portofolio.lihat', $student) }}" class="btn prof-glass prof-porto"><x-ikon name="star" :size="18" /> Portofolio</a>
-            <details class="menu prof-menu">
-                <summary class="btn prof-glass"><x-ikon name="download" :size="18" /> Unduh</summary>
-                <div class="menu-panel">
-                    <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
-                    <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
-                    <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
-                </div>
-            </details>
+            <div class="prof-actions">
+                <a href="{{ route('portofolio.lihat', $student) }}" class="btn prof-glass prof-porto"><x-ikon name="star" :size="18" /> Portofolio</a>
+                <details class="menu prof-menu">
+                    <summary class="btn prof-glass"><x-ikon name="download" :size="18" /> Unduh</summary>
+                    <div class="menu-panel">
+                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'xlsx'] + (isset($filter) ? $filter->query() : [])) }}" class="menu-item"><x-ikon name="excel" :size="16" /> Excel (.xlsx)</a>
+                        <a href="{{ route('pantau.unduh', [$internship, 'format' => 'pdf'] + (isset($filter) ? $filter->query() : [])) }}" target="_blank" rel="noopener" class="menu-item"><x-ikon name="print" :size="16" /> PDF (cetak)</a>
+                        <p class="menu-note">{{ isset($filter) && $filter->isActive() ? 'Mengikuti filter yang aktif.' : 'Seluruh periode KP.' }}</p>
+                    </div>
+                </details>
+            </div>
         </div>
 
         <dl class="prof-info">

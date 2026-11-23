@@ -6499,3 +6499,15 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     .card .table.dt .progress-in { max-width: 172px; }
     .card .table.dt th + th, .card .table.dt td + td { padding-left: 28px; }
 }
+
+/* Halaman pantau: tombol Portofolio dan Unduh satu grup, bentuk dan tinggi sama */
+.prof-actions { display: flex; flex: none; align-items: center; gap: 10px; }
+.prof-actions .prof-menu { align-self: center; margin: 0; }
+.prof-actions :is(.prof-porto, .prof-menu > summary).btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 44px; min-height: 44px; min-width: 132px; padding: 0 20px;
+    border-radius: 999px; font-size: 14.5px; line-height: 1;
+}
+@media (max-width: 700px) {
+    .prof-actions { margin-left: 60px; }
+}
