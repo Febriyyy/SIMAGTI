@@ -6522,3 +6522,33 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .prof-actions .prof-porto .ikon { transform: translateY(-1px); }
 /* Kepala profil di atas baris info, supaya menu Unduh (Excel/PDF) tidak tertutup baris info */
 .prof-top > .prof-head { z-index: 3; }
+
+/* Studio sertifikat: status tanda tangan pihak lain (hanya dibaca), tampil di ruang tanda tangan */
+.cst-sign-status {
+    align-self: center; display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    background: #fdf1dc; color: #8a4f00;
+    font-size: max(calc(var(--u) * 2.5), 11px); font-weight: 600; white-space: nowrap;
+}
+.cst-sign-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.cst-sign-status.is-ok { background: var(--primary-soft); color: var(--primary-dark); }
+.cst-sign.is-locked:has(.cst-sign-status) { opacity: 1; }
+.cst-sign.is-locked:has(.cst-sign-status) .cst-role,
+.cst-sign.is-locked:has(.cst-sign-status) .cst-sub { opacity: .6; }
+.cst-sign.is-locked .cst-signer:not(.is-placeholder) { border-top-style: solid; opacity: .75; }
+
+/* Halaman Tanda Tangan Sertifikat (kaprodi): kelengkapan data sertifikat dari perusahaan */
+.cpl .card-head { align-items: flex-start; }
+.cpl-count { flex: none; padding: 4px 12px; border-radius: 999px; background: #fdf1dc; color: #8a4f00; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cpl-count.is-ok { background: var(--primary-soft); color: var(--primary-dark); }
+.cpl-list { margin: 0; padding: 4px 0 8px; list-style: none; }
+.cpl-row { position: relative; display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; padding: 14px var(--card-x); }
+.cpl-row + .cpl-row::before { content: ""; position: absolute; top: 0; left: var(--card-x); right: var(--card-x); height: 1px; background: var(--line); }
+.cpl-who { flex: 1 1 260px; min-width: 0; }
+.cpl-who strong { display: block; font-size: 14.5px; font-weight: 600; color: var(--text); }
+.cpl-who span { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
+.cpl-checks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cpl-check { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px 0 9px; border-radius: 999px; border: 1px solid #f3d9b4; background: #fffaf0; color: #8a4f00; font-size: 12.5px; font-weight: 600; }
+.cpl-check.is-ok { border-color: var(--line); background: #fff; color: var(--text); font-weight: 500; }
+.cpl-check.is-ok .ikon { color: var(--primary); }
+.cpl-row.is-complete .cpl-who strong { color: var(--gray); }

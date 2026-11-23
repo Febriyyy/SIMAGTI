@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\CertificateTemplate;
 use App\Models\Company;
 use App\Models\CompanyDivision;
 use App\Models\CompanyStaffProfile;
@@ -46,10 +47,19 @@ class DivisionHeadController extends Controller
         $companies = self::companiesFor($request->user());
         $signatures = $divisions->mapWithKeys(fn (CompanyDivision $d) => [$d->id => Logos::dataUri($d->headSignature)]);
 
+        // Status penanda tangan kampus (kaprodi), hanya dibaca: nama dan sudah/belum ada tanda tangan.
+        // Gambar tanda tangan kaprodi sengaja tidak dikirim ke halaman ini.
+        $campus = CertificateTemplate::where('scope', 'kampus')->first();
+
         return view('divisi.ketua', [
             'companies' => $companies,
             'divisions' => $divisions,
             'signatures' => $signatures,
+            'campusSigner' => [
+                'title' => $campus?->signer_title ?: 'Ketua Program Studi',
+                'name' => $campus?->signer_name,
+                'signed' => (bool) $campus?->signature_file_id,
+            ],
         ]);
     }
 

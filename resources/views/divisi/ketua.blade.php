@@ -22,7 +22,16 @@
         </form>
     @endforeach
 
-    <?php $right = ['role' => 'Ketua Program Studi', 'owner' => 'Diisi kaprodi', 'sub' => \App\Support\Campus::get('campus.program')]; ?>
+    <?php
+        // Blok kaprodi hanya dibaca: nama dan status tanda tangan, tanpa gambar tanda tangannya
+        $right = [
+            'role' => $campusSigner['title'],
+            'name' => $campusSigner['name'],
+            'owner' => 'Diisi kaprodi',
+            'sub' => \App\Support\Campus::get('campus.program'),
+            'status' => [$campusSigner['signed'], $campusSigner['signed'] ? 'Sudah ditandatangani kaprodi' : 'Belum ditandatangani kaprodi'],
+        ];
+    ?>
 
     @forelse ($divisions as $division)
         <?php
