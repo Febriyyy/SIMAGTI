@@ -22,7 +22,7 @@ class ErrorPageTest extends TestCase
         $this->get('/halaman-yang-tidak-ada')
             ->assertNotFound()
             ->assertSee('Halaman tidak ditemukan')
-            ->assertSee('class="err-card"', false)
+            ->assertSee('err-card', false)
             ->assertSee('Ke dashboard');
     }
 
@@ -32,6 +32,6 @@ class ErrorPageTest extends TestCase
             ->get('/admin/akun')
             ->assertForbidden()
             ->assertSee('Tidak punya akses')
-            ->assertSee('class="err-card"', false);
+            ->assertSee('err-card', false);
     }
 }

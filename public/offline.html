@@ -6,25 +6,61 @@
     <meta name="theme-color" content="#037a68">
     <title>Tidak ada koneksi · SIMAGTI</title>
     <link rel="icon" type="image/svg+xml" href="/images/logo-simagti-mark.svg">
+    <!--
+        Halaman offline PWA (ditampilkan service worker saat jaringan putus). Harus berdiri sendiri:
+        gaya disalin dari halaman status (.st-* di kp.css), tanpa font atau CSS dari jaringan.
+        Otomatis memuat ulang begitu koneksi kembali.
+    -->
     <style>
-        :root { --primary: #037a68; --text: #142b29; --muted: #5d706d; --line: #d4dfdc; --page: #f3f5f0; --lime: #c9f065; }
+        :root { --primary: #037a68; --primary-dark: #03423e; --text: #12201e; --muted: #5b6b68; --muted-2: #647471; --gray: #44514f; --line: #e6eae8; }
         * { box-sizing: border-box; }
-        html, body { height: 100%; margin: 0; }
-        body { display: grid; place-items: center; padding: 24px; background: var(--page); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-        main { width: 100%; max-width: 380px; padding: 36px 28px; border-radius: 28px; background: #fff; box-shadow: 0 0 0 1px var(--line); text-align: center; }
-        img { width: 56px; height: 56px; }
-        h1 { margin: 18px 0 6px; font-size: 22px; letter-spacing: -0.02em; }
-        p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 15px; }
-        button { margin-top: 22px; min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--primary); color: #fff; font: 600 15px/1 inherit; cursor: pointer; }
-        button:focus-visible { outline: 3px solid var(--lime); outline-offset: 2px; }
+        html, body { min-height: 100%; margin: 0; }
+        body {
+            display: grid; place-items: center; min-height: 100vh; padding: 32px 16px;
+            color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(520px 520px at -5% -10%, #d6f3e8, transparent 70%),
+                radial-gradient(460px 460px at 105% 110%, #e1ebff, transparent 70%),
+                #f6faf8;
+        }
+        main {
+            width: 100%; max-width: 400px; padding: 36px 36px 28px; border-radius: 28px;
+            background: rgba(255, 255, 255, .94); border: 1px solid #fff;
+            box-shadow: 0 1px 2px rgba(3, 66, 62, .04), 0 24px 60px -18px rgba(3, 66, 62, .18);
+        }
+        .logo { display: block; height: 28px; width: auto; }
+        .icon { display: grid; place-items: center; width: 48px; height: 48px; margin-top: 32px; border-radius: 15px; background: #f3f8f6; color: var(--primary-dark); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .1); }
+        h1 { margin: 18px 0 0; font-size: 24px; font-weight: 750; letter-spacing: -0.03em; line-height: 1.2; }
+        p { margin: 8px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+        .actions { display: flex; align-items: center; gap: 18px; margin-top: 26px; }
+        button {
+            height: 44px; padding: 0 20px; border: 0; border-radius: 12px; cursor: pointer;
+            background: var(--primary-dark); color: #fff; font: inherit; font-size: 14.5px; font-weight: 650;
+            transition: background-color .15s;
+        }
+        button:hover { background: var(--primary); }
+        button:focus-visible { outline: 3px solid rgba(3, 122, 104, .35); outline-offset: 2px; }
+        .wait { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+        .wait::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #e2b866; box-shadow: 0 0 0 4px #fdf1dc; }
+        @media (max-width: 480px) { main { padding: 28px 22px 22px; border-radius: 22px; } h1 { font-size: 22px; } }
     </style>
 </head>
 <body>
 <main>
-    <img src="/images/logo-simagti-mark.svg" alt="">
+    <img class="logo" src="/images/logo-simagti.svg" alt="SIMAGTI">
+    <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5-2.7M19 13a10 10 0 0 0-2.2-1.6M2 9.5a15 15 0 0 1 4.3-2.8M22 9.5a15 15 0 0 0-11.3-3.9M12 20h.01"/></svg>
+    </span>
     <h1>Tidak ada koneksi</h1>
-    <p>SIMAGTI butuh internet untuk memuat data magangmu. Periksa koneksi, lalu coba lagi.</p>
-    <button type="button" onclick="location.reload()">Coba lagi</button>
+    <p>Periksa internet, lalu coba lagi.</p>
+    <div class="actions">
+        <button type="button" onclick="location.reload()">Coba lagi</button>
+        <span class="wait" aria-live="polite">Menunggu koneksi</span>
+    </div>
 </main>
+<script>
+    // Muat ulang otomatis begitu koneksi kembali
+    window.addEventListener('online', function () { location.reload(); });
+</script>
 </body>
 </html>
