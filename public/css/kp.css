@@ -6778,3 +6778,5 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .card .table .progress-in { height: 16px; max-width: 140px; background: #e9efed; }
 .card .table .progress-in b { padding: 0 7px; font-size: 11px; font-weight: 700; }
 .card .table .progress-in b.is-out { padding-left: 6px; color: var(--text); }
+/* Dashboard "Per perusahaan": kolom Magang aktif sedikit ke kiri, berjarak dari kolom Progres task */
+.card .table th.col-active, .card .table td.col-active { padding-right: 56px; }
