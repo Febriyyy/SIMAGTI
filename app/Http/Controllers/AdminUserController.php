@@ -21,20 +21,23 @@ class AdminUserController extends Controller
         $role = array_key_exists((string) $request->query('peran'), User::ROLE_LABELS) ? $request->query('peran') : null;
         $status = in_array($request->query('status'), ['aktif', 'nonaktif'], true) ? $request->query('status') : null;
         $term = mb_substr(trim((string) $request->query('cari')), 0, 60);
+        // Urutan: per peran (bawaan) atau terbaru dibuat, mis. untuk melihat akun hasil aktivasi
+        $sort = $request->query('urut') === 'terbaru' ? 'terbaru' : null;
 
         $users = User::query()
             ->when($role, fn ($q) => $q->where('role', $role))
             ->when($status, fn ($q) => $q->where('is_active', $status === 'aktif'))
             ->when($term !== '', fn ($q) => $q->where(fn ($w) => $w->where('name', 'like', "%{$term}%")
                 ->orWhere('email', 'like', "%{$term}%")->orWhere('nim', 'like', "%{$term}%")))
-            ->orderByRaw("CASE role WHEN 'admin' THEN 0 WHEN 'kaprodi' THEN 1 WHEN 'tu' THEN 2 WHEN 'dospem' THEN 3 WHEN 'supervisor' THEN 4 ELSE 5 END")
-            ->orderBy('name')
+            ->when($sort === 'terbaru', fn ($q) => $q->latest()->orderByDesc('id'), fn ($q) => $q
+                ->orderByRaw("CASE role WHEN 'admin' THEN 0 WHEN 'kaprodi' THEN 1 WHEN 'tu' THEN 2 WHEN 'dospem' THEN 3 WHEN 'supervisor' THEN 4 ELSE 5 END")
+                ->orderBy('name'))
             ->paginate(25)
             ->withQueryString();
 
         $counts = User::selectRaw('role, COUNT(*) as total')->groupBy('role')->pluck('total', 'role');
 
-        return view('admin.akun', compact('users', 'counts', 'role', 'status', 'term'));
+        return view('admin.akun', compact('users', 'counts', 'role', 'status', 'term', 'sort'));
     }
 
     public function update(Request $request, User $account): RedirectResponse
