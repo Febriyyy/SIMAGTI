@@ -37,7 +37,7 @@ class Menu
                 ['label' => 'Lowongan Magang', 'route' => 'lowongan.kelola', 'icon' => 'search', 'active' => 'lowongan.*'],
                 ['label' => 'Laporan KP', 'route' => 'laporan.antrean', 'icon' => 'syllabus', 'active' => 'laporan.*'],
                 ['label' => 'Penilaian Akhir', 'route' => 'penilaian.index', 'icon' => 'award', 'active' => 'penilaian.*'],
-                ['label' => 'Data Sertifikat', 'route' => 'sertifikat.data', 'icon' => 'award', 'active' => 'sertifikat.data*'],
+                ['label' => 'Data Sertifikat', 'route' => 'sertifikat.data', 'icon' => 'certificate', 'active' => 'sertifikat.data*'],
                 ['label' => 'Pengajuan Perubahan', 'route' => 'perubahan.antrean', 'icon' => 'swap', 'active' => 'perubahan.*'],
             ],
             'dospem' => [
