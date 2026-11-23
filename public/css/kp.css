@@ -6781,4 +6781,4 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 /* Dashboard "Per perusahaan": kolom Magang aktif sedikit ke kiri, berjarak dari kolom Progres task */
 .card .table th.col-active, .card .table td.col-active { padding-right: 56px; }
 /* Dashboard "Per perusahaan": kolom Nilai rata-rata berjarak dari batang progres */
-.card .table th.col-score, .card .table td.col-score { padding-left: 48px; }
+.card .table th.col-score, .card .table td.col-score { padding-left: 16px; text-align: center; }
