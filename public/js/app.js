@@ -553,11 +553,14 @@ setTimeout(function () {
     };
 
     var counters = [].slice.call(document.querySelectorAll('.stat-value, .kpp-fig strong'));
-    var bars = [].slice.call(document.querySelectorAll('.stat-bar > span, .progress > span, .progress-in > span'));
+    // Batang progres yang sudah terlihat saat halaman dibuka langsung tumbuh (animasi bawaan CSS);
+    // hanya yang di bawah layar menunggu digulir.
+    var vh = window.innerHeight;
+    var bars = [].slice.call(document.querySelectorAll('.stat-bar > span, .progress > span, .progress-in > span'))
+        .filter(function (b) { return b.parentElement.getBoundingClientRect().top > vh * 0.95; });
     bars.forEach(function (b) { b.classList.add('grow-wait'); });
 
     // Blok isi halaman yang awalnya di bawah layar: disembunyikan lalu muncul saat digulir.
-    var vh = window.innerHeight;
     var blocks = [].slice.call(document.querySelectorAll('.container > *, .container > .grid-2 > *, .container > .split > *'))
         .filter(function (el) { return el.getBoundingClientRect().top > vh * 0.95; });
     blocks.forEach(function (el) { el.classList.add('rv'); });
@@ -568,11 +571,13 @@ setTimeout(function () {
             var el = en.target;
             seen.unobserve(el);
             if (el.classList.contains('rv')) el.classList.add('is-in');
-            if (el.classList.contains('grow-wait')) { el.classList.remove('grow-wait'); el.classList.add('grow-go'); }
+            // Batang progres: yang diamati relnya (batang ber-scaleX(0) tidak pernah dianggap terlihat)
+            if (el.__bar) { el.__bar.classList.remove('grow-wait'); el.__bar.classList.add('grow-go'); }
             if (counters.indexOf(el) !== -1) setTimeout(function () { count(el); }, 120);
         });
     }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
-    blocks.concat(bars, counters).forEach(function (el) { seen.observe(el); });
+    var tracks = bars.map(function (b) { var t = b.parentElement; t.__bar = b; return t; });
+    blocks.concat(tracks, counters).forEach(function (el) { seen.observe(el); });
 
     // Cadangan: periksa posisi saat digulir untuk peramban yang menunda pengamat.
     var check = function () {
