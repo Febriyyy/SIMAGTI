@@ -6474,3 +6474,18 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .card .table.dt .progress-in b { padding: 0 10px; font-size: 12.5px; letter-spacing: .01em; }
 .card .table.dt .progress-in b.is-out { padding-left: 8px; color: var(--text); }
 .card .table.dt .progress-in + .c-sub { margin-top: 6px; }
+
+/* Jarak kolom kanan tabel (Progres, Nilai, Status) agar tidak berdempet */
+.card .table.dt .w-progress { width: 200px; }
+.card .table.dt .w-grade { width: 132px; }
+.card .table.dt .w-status { width: 136px; }
+.card .table.dt .progress-in { max-width: 160px; }
+.card .table.dt th + th, .card .table.dt td + td { padding-left: 22px; }
+@media (min-width: 1360px) {
+    .card .table.dt .w-progress { width: 228px; }
+    .card .table.dt .w-grade { width: 160px; }
+    .card .table.dt .w-status { width: 156px; }
+    .card .table.dt .w-num, .card .table.dt .w-date { width: 148px; }
+    .card .table.dt .progress-in { max-width: 172px; }
+    .card .table.dt th + th, .card .table.dt td + td { padding-left: 28px; }
+}
