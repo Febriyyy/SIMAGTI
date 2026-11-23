@@ -64,7 +64,7 @@
                                     <th class="w-person">Mahasiswa</th>
                                     <th>Tempat</th>
                                     <th class="w-progress">Progres</th>
-                                    <th class="w-grade hide-md">Nilai</th>
+                                    <th class="w-grade hide-md num">Nilai</th>
                                     <th class="w-status">Status</th>
                                 </tr>
                             </thead>
@@ -100,7 +100,7 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="hide-md">
+                                        <td class="hide-md num">
                                             @if ($a?->isValidated())
                                                 <span class="c-main">{{ $a->letter_grade }} <span class="muted">· {{ \App\Support\Num::short($a->final_score) }}</span></span>
                                             @elseif ($a)

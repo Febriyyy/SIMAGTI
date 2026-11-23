@@ -16,7 +16,7 @@
         @else
             <div class="table-wrap">
                 <table class="table">
-                    <thead><tr><th>Mahasiswa</th><th>Perusahaan</th><th>Selesai</th><th>Penilaian</th><th>Bimbingan</th><th>Hasil</th><th></th></tr></thead>
+                    <thead><tr><th>Mahasiswa</th><th>Perusahaan</th><th>Selesai</th><th>Penilaian</th><th class="num">Bimbingan</th><th>Hasil</th><th></th></tr></thead>
                     <tbody>
                         @foreach ($internships as $i)
                             @php($ready = $i->assessment?->isValidated() && $i->confirmed_count >= $min)
@@ -25,7 +25,7 @@
                                 <td class="col-place">{{ $i->placeName() }}</td>
                                 <td class="muted">{{ $i->end_date->locale('id')->translatedFormat('j M Y') }}</td>
                                 <td><x-chip :tone="$i->assessment?->isValidated() ? 'green' : 'gray'">{{ $i->assessment?->isValidated() ? 'Nilai '.$i->assessment->letter_grade : 'Belum' }}</x-chip></td>
-                                <td><x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip></td>
+                                <td class="num"><x-chip :tone="$i->confirmed_count >= $min ? 'green' : 'gray'">{{ $i->confirmed_count }} / {{ $min }}</x-chip></td>
                                 <td>
                                     @if ($i->result)
                                         <x-chip :tone="$i->resultTone()">{{ $i->resultLabel() }}</x-chip>

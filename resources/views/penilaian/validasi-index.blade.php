@@ -32,7 +32,7 @@
                         <tr>
                             <th>Mahasiswa</th>
                             <th>Penilai</th>
-                            <th>Nilai</th>
+                            <th class="num">Nilai</th>
                             <th>Status</th>
                             <th></th>
                         </tr>
@@ -46,7 +46,7 @@
                                     {{ $internship->supervisor?->listName() ?? '–' }}
                                     <div class="cell-sub">{{ $internship->placeName() }}</div>
                                 </td>
-                                <td>
+                                <td class="num">
                                     @if ($a?->final_score !== null)
                                         <span class="cell-title">{{ $a->letter() }}</span>
                                         <span class="muted">· {{ \App\Support\Num::short($a->final_score) }}</span>

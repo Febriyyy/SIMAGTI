@@ -6782,3 +6782,39 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .card .table th.col-active, .card .table td.col-active { padding-right: 56px; }
 /* Dashboard "Per perusahaan": kolom Nilai rata-rata berjarak dari batang progres */
 .card .table th.col-score, .card .table td.col-score { padding-left: 16px; text-align: center; }
+
+/* =====================================================================
+   Semua tabel: tidak ada teks terpotong dan tidak ada kolom berdempet (23 Nov 2026)
+   - nama, tempat, perusahaan boleh turun ke baris kedua (bukan dipotong "…")
+   - jarak antarkolom seragam; kolom aksi cukup lebar untuk tombolnya
+   - kolom angka (kelas .num) rata tengah
+   ===================================================================== */
+.card .table td { white-space: normal; }
+.card .table :is(.c-main, .c-sub, .person-name, .recap-sub, .cell-title, .cell-sub) {
+    white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: break-word;
+}
+.card .table.dt td { white-space: normal; }
+.card .table th + th, .card .table td + td { padding-left: 24px; }
+.card .table :is(.chip, .btn, .recap-recruit, .recap-grade, .progress-in) { white-space: nowrap; }
+.card .table th.num, .card .table td.num { text-align: center; }
+/* Kolom aksi: selebar tombolnya, tidak meluber */
+.card .table.dt th.w-action { width: 136px; }
+.card .table td:is(.act, .col-action, .cell-action) { white-space: nowrap; }
+/* Rekap: sel boleh dua baris */
+.recap-table td, .table.recap-table td.col-place { white-space: normal; overflow: visible; text-overflow: clip; }
+/* Rekap KP: kolom Status cukup untuk chip setelah jarak antarkolom bertambah */
+.recap-table th:nth-child(2) { width: 17%; }
+.recap-table th:nth-child(3) { width: 13%; }
+/* Dropdown di dalam sel tabel (mis. Peran di halaman Akun) mengikuti lebar sel */
+.card .table td select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+.card .table.dt th.w-role { width: 216px; }
+/* Rekap KP (8 kolom): nama mahasiswa tidak patah, kolom angka ramping */
+.recap-table th:nth-child(1) { width: 23%; }
+.recap-table th:nth-child(2) { width: 18%; }
+.recap-table th:nth-child(3) { width: 12%; }
+.recap-table th:nth-child(4) { width: 9%; }
+.recap-table th:nth-child(5) { width: 8%; }
+.recap-table th:nth-child(6) { width: 8%; }
+.recap-table th:nth-child(7) { width: 16%; }
+.card .table.recap-table th + th, .card .table.recap-table td + td { padding-left: 16px; }
+.recap-table .person-name { white-space: nowrap; }

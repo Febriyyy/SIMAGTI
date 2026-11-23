@@ -28,7 +28,7 @@
                         <tr>
                             <th>Mahasiswa</th>
                             <th>Program studi</th>
-                            <th>Angkatan</th>
+                            <th class="num">Angkatan</th>
                             <th>Status KP</th>
                             <th><span class="sr-only">Portofolio</span></th>
                         </tr>
@@ -39,7 +39,7 @@
                             <tr>
                                 <td><x-person :user="$student" /></td>
                                 <td>{{ $student->studentProfile?->studyProgram?->name ?? '–' }}</td>
-                                <td>{{ $student->studentProfile?->entry_year ?? '–' }}</td>
+                                <td class="num">{{ $student->studentProfile?->entry_year ?? '–' }}</td>
                                 <td>
                                     @if ($latest)
                                         <x-chip :tone="$latest->statusTone()">{{ $latest->statusLabel() }}</x-chip>

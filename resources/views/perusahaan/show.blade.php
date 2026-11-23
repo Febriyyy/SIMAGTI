@@ -42,9 +42,9 @@
                     <thead>
                         <tr>
                             <th>Mahasiswa</th>
-                            <th>Durasi</th>
+                            <th class="num">Durasi</th>
                             <th>Progres task</th>
-                            <th>Nilai akhir</th>
+                            <th class="num">Nilai akhir</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -61,14 +61,14 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="num">
                                     <span class="cell-title">{{ $row['duration_months'] }} bulan</span>
                                     @if ($row['status'] === 'berjalan')
                                         <span class="muted">· sisa {{ $row['days_left'] }} hari</span>
                                     @endif
                                 </td>
                                 <td><x-progress :value="$row['progress_percent']" inside /></td>
-                                <td>
+                                <td class="num">
                                     @if ($row['letter_grade'])
                                         <span class="cell-title">{{ $row['letter_grade'] }}</span>
                                         <span class="muted">· {{ \App\Support\Num::short($row['final_score']) }}</span>
