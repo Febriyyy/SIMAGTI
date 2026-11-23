@@ -5,7 +5,7 @@
  * - Aset statis (CSS, JS, gambar, ikon, font) disajikan dari cache lalu diperbarui di latar (stale-while-revalidate).
  * Naikkan VERSION setiap kali daftar PRECACHE berubah.
  */
-const VERSION = 'simagti-v3';
+const VERSION = 'simagti-v4';
 const PRECACHE = [
     '/offline.html',
     '/css/kp.css',

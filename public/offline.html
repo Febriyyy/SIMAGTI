@@ -37,7 +37,7 @@
         .big svg path { vector-effect: non-scaling-stroke; }
         h1 { margin: 18px 0 0; font-size: clamp(26px, 4vw, 34px); font-weight: 750; letter-spacing: -0.03em; line-height: 1.15; }
         p { margin: 10px auto 0; max-width: 40ch; color: rgba(255, 255, 255, .7); font-size: 15.5px; line-height: 1.6; }
-        .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; margin-top: 32px; }
+        .actions { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 28px; }
         button {
             height: 48px; padding: 0 26px; border: 0; border-radius: 999px; cursor: pointer;
             background: #c9f065; color: #03231f; font: inherit; font-size: 15px; font-weight: 700;
@@ -62,8 +62,8 @@
     <h1>Tidak ada koneksi</h1>
     <p>Periksa internet, lalu coba lagi.</p>
     <div class="actions">
-        <button type="button" onclick="location.reload()">Coba lagi</button>
         <span class="wait" aria-live="polite">Menunggu koneksi</span>
+        <button type="button" onclick="location.reload()">Coba lagi</button>
     </div>
 </main>
 <script>
