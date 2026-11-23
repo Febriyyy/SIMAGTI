@@ -6818,3 +6818,22 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .recap-table th:nth-child(7) { width: 16%; }
 .card .table.recap-table th + th, .card .table.recap-table td + td { padding-left: 16px; }
 .recap-table .person-name { white-space: nowrap; }
+
+/* Daftar mahasiswa (x-intern-list), versi dashboard dan halaman Mahasiswa Magang: senada dengan tabel data */
+.slist .srow-head {
+    background: transparent; color: var(--muted-2); font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none;
+}
+.srow { column-gap: 28px; }
+.srow.srow-compact { grid-template-columns: minmax(190px, 2fr) minmax(150px, 1.5fr) 96px auto; }
+.slist .progress-in { height: 16px; max-width: 140px; background: #e9efed; }
+.slist .progress-in b { padding: 0 7px; font-size: 11px; font-weight: 700; }
+.slist .progress-in b.is-out { padding-left: 6px; color: var(--text); }
+.srow-progress small { margin-top: 2px; font-size: 12.5px; }
+.srow-head .srow-num, .srow-cell.srow-num { text-align: center; }
+.srow-cell.srow-num { align-items: center; }
+.srow-cell.srow-num small { font-size: 12.5px; }
+.srow-name strong { font-size: 14.5px; font-weight: 600; overflow-wrap: break-word; }
+.srow-name small { font-size: 13px; }
+.srow .avatar { width: 38px; height: 38px; box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line); }
+.srow-actions .btn { white-space: nowrap; }
+.srow.srow-compact { grid-template-columns: minmax(140px, 2fr) minmax(124px, 1.4fr) 84px max-content; column-gap: 20px; }
