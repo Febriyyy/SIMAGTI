@@ -33,9 +33,9 @@
         <h1 class="av-title">Undangan tidak berlaku</h1>
         <p class="av-lead">
             @if ($invitation->isAccepted())
-                Undangan ini sudah dipakai untuk mengaktifkan akun. Silakan masuk dengan email dan kata sandi Anda.
+                Akun sudah aktif. Silakan masuk.
             @else
-                Undangan ini sudah kedaluwarsa. Minta TU Fakultas kampus mengirim undangan baru.
+                Undangan kedaluwarsa. Minta TU Fakultas mengirim ulang.
             @endif
         </p>
         @if ($invitation->isAccepted())
@@ -43,14 +43,14 @@
         @endif
     @else
         <h1 class="av-title">Aktivasi akun</h1>
-        <p class="av-lead">Anda diundang sebagai <b>{{ $role }}</b> di <b>{{ $invitation->company->name }}</b>.</p>
+        <p class="av-lead">{{ $role }} di <b>{{ $invitation->company->name }}</b></p>
 
         @if ($students->isNotEmpty())
             <div class="av-students">
                 <span class="av-stack" aria-hidden="true">
                     @foreach ($students->take(4) as $student)<x-avatar :user="$student" small />@endforeach
                 </span>
-                <span>Membimbing {{ $students->pluck('name')->join(', ', ' dan ') }}</span>
+                <span>{{ $students->pluck('name')->join(', ') }}</span>
             </div>
         @endif
 
@@ -71,7 +71,7 @@
 
             <div class="av-field">
                 <label for="name" class="av-label">Nama lengkap</label>
-                <input id="name" name="name" type="text" class="av-input" value="{{ old('name') }}" maxlength="100" required autofocus autocomplete="name" placeholder="Nama beserta gelar, bila ada">
+                <input id="name" name="name" type="text" class="av-input" value="{{ old('name') }}" maxlength="100" required autofocus autocomplete="name" placeholder="Beserta gelar">
             </div>
 
             <div class="av-field">
@@ -83,7 +83,7 @@
             </div>
 
             <div class="av-field">
-                <label for="password_confirmation" class="av-label">Ulangi kata sandi</label>
+                <label for="password_confirmation" class="av-label">Ulangi sandi</label>
                 <div class="av-pass">
                     <input id="password_confirmation" name="password_confirmation" type="password" class="av-input" required autocomplete="new-password" aria-describedby="av-rules">
                     <button type="button" class="av-eye" data-toggle-password="password_confirmation" aria-label="Tampilkan kata sandi" aria-pressed="false">{!! $eye !!}</button>
@@ -91,15 +91,15 @@
             </div>
 
             <ul class="av-rules" id="av-rules" aria-live="polite">
-                <li data-rule="length">Minimal 8 karakter</li>
-                <li data-rule="match">Kedua kata sandi sama</li>
+                <li data-rule="length">8+ karakter</li>
+                <li data-rule="match">Sama</li>
             </ul>
 
-            <button type="submit" class="av-submit">Aktifkan akun</button>
+            <button type="submit" class="av-submit">Aktifkan</button>
         </form>
 
         @if ($invitation->expires_at)
-            <p class="av-foot">Undangan berlaku sampai {{ $invitation->expires_at->locale('id')->translatedFormat('j F Y') }}</p>
+            <p class="av-foot">Berlaku s.d. {{ $invitation->expires_at->locale('id')->translatedFormat('j M Y') }}</p>
         @endif
     @endif
 </main>
