@@ -8,6 +8,7 @@
       $left    : blok tanda tangan kiri (ketua divisi)
       $right   : blok tanda tangan kanan (kaprodi)
         tiap blok: role, name, sub, sign (data URI|null), owner (teks "Diisi …"),
+                   status ([bool sudah diisi, teks], opsional, untuk blok milik pihak lain),
                    form (id form bila bisa diedit), nameField, titleField (opsional), live (kunci pratinjau)
     Isian memakai atribut form="…" sehingga bisa berada di dalam sertifikat walau form-nya di luar.
 --}}
@@ -19,7 +20,7 @@
         'fakultas' => ['Logo fakultas', $facultyLogo ? route('logo.fakultas').'?v='.$facultyLogo->id : null],
         'perusahaan' => ['Logo perusahaan', $company?->logo_file_id ? route('logo.perusahaan', $company).'?v='.$company->logo_file_id : null],
     ];
-    $owners = ['kampus' => 'Diisi admin', 'fakultas' => 'Diisi admin', 'perusahaan' => 'Diisi perusahaan'];
+    $owners = ['kampus' => 'Diisi kaprodi', 'fakultas' => 'Diisi kaprodi', 'perusahaan' => 'Diisi perusahaan'];
 ?>
 <div class="cst">
     <div class="cst-paper">
@@ -78,8 +79,12 @@
                         </label>
                         <input class="cst-inline cst-signer" type="text" name="{{ $s['nameField'] }}" form="{{ $s['form'] }}" value="{{ old($s['nameField'], $s['name']) }}" maxlength="150" required placeholder="Ketik nama beserta gelar" aria-label="Nama penanda tangan">
                     @else
-                        <span class="cst-ink"></span>
-                        <span class="cst-signer is-placeholder">{{ $s['owner'] }}</span>
+                        <span class="cst-ink">
+                            @isset($s['status'])
+                                <span @class(['cst-sign-status', 'is-ok' => $s['status'][0]])>{{ $s['status'][1] }}</span>
+                            @endisset
+                        </span>
+                        <span @class(['cst-signer', 'is-placeholder' => empty($s['name'])])>{{ $s['name'] ?? '' ?: $s['owner'] }}</span>
                     @endif
                     <span class="cst-sub">{{ $s['sub'] }}</span>
                 </div>

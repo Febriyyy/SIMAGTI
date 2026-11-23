@@ -5,13 +5,13 @@
               deleteLabel, confirm (teks konfirmasi)
 --}}
 <div @class(['cst-item', 'is-ok' => $ok])>
-    <span class="cst-item-icon"><x-ikon :name="$ok ? 'tick' : $icon" :size="18" /></span>
+    <span class="cst-item-icon"><x-ikon :name="$ok ? 'tick' : $icon" :size="16" /></span>
     <div class="cst-item-body">
-        <div class="cst-item-head">
-            <strong>{{ $title }}</strong>
-            <span class="cst-pill">{{ $ok ? $okLabel : $todoLabel }}</span>
-        </div>
-        <span class="cst-item-sub">{{ $sub }}</span>
+        <strong>{{ $title }}</strong>
+        <span class="cst-item-meta">
+            <span @class(['cst-state', 'is-ok' => $ok])>{{ $ok ? $okLabel : $todoLabel }}</span>
+            <span class="cst-item-sub">{{ $sub }}</span>
+        </span>
         @foreach (array_filter($messages ?? []) as $message)
             <p class="field-error">{{ $message }}</p>
         @endforeach

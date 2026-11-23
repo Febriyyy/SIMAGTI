@@ -25,9 +25,9 @@
     @endif
 
     <div class="chip-filters">
-        <a href="{{ route('admin.akun', array_filter(['status' => $status, 'cari' => $term ?: null])) }}" @class(['seg-chip', 'is-active' => ! $role])>Semua <span>{{ $counts->sum() }}</span></a>
+        <a href="{{ route('admin.akun', array_filter(['status' => $status, 'cari' => $term ?: null, 'urut' => $sort])) }}" @class(['seg-chip', 'is-active' => ! $role])>Semua <span>{{ $counts->sum() }}</span></a>
         @foreach (\App\Models\User::ROLE_LABELS as $key => $label)
-            <a href="{{ route('admin.akun', array_filter(['peran' => $key, 'status' => $status, 'cari' => $term ?: null])) }}" @class(['seg-chip', 'is-active' => $role === $key])>{{ $label }} <span>{{ $counts[$key] ?? 0 }}</span></a>
+            <a href="{{ route('admin.akun', array_filter(['peran' => $key, 'status' => $status, 'cari' => $term ?: null, 'urut' => $sort])) }}" @class(['seg-chip', 'is-active' => $role === $key])>{{ $label }} <span>{{ $counts[$key] ?? 0 }}</span></a>
         @endforeach
     </div>
 
@@ -40,6 +40,10 @@
             <option value="">Semua status</option>
             <option value="aktif" @selected($status === 'aktif')>Aktif</option>
             <option value="nonaktif" @selected($status === 'nonaktif')>Nonaktif</option>
+        </select>
+        <select name="urut" class="select select-sm" aria-label="Urutan akun">
+            <option value="">Urut per peran</option>
+            <option value="terbaru" @selected($sort === 'terbaru')>Terbaru dibuat</option>
         </select>
         @if ($role)<input type="hidden" name="peran" value="{{ $role }}">@endif
     </form>
@@ -68,6 +72,9 @@
                                         <span>
                                             <span class="c-main" title="{{ $account->name }}">{{ $account->listName() }}@if ($self) <span class="muted">(Anda)</span>@endif</span>
                                             <span class="c-sub" title="{{ $account->email }}">{{ $account->nim ? $account->nim.' · ' : '' }}{{ $account->email }}</span>
+                                            @if ($sort === 'terbaru' && $account->created_at)
+                                                <span class="c-sub" title="{{ $account->created_at->locale('id')->translatedFormat('j F Y, H.i') }}">Dibuat {{ $account->created_at->locale('id')->diffForHumans() }}</span>
+                                            @endif
                                         </span>
                                     </span>
                                 </td>

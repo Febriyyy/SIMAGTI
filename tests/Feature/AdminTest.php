@@ -48,6 +48,18 @@ class AdminTest extends TestCase
         }
     }
 
+    public function test_akun_terbaru_tampil_paling_atas(): void
+    {
+        // Mis. Company Supervisor yang baru saja mengaktifkan akun lewat undangan
+        User::factory()->create(['name' => 'Zaki Supervisor Baru', 'role' => 'supervisor', 'created_at' => now()->addMinute()]);
+
+        $this->actingAs($this->user('admin@kp.test'))->get('/admin/akun?urut=terbaru')->assertOk()
+            ->assertSeeInOrder(['Zaki Supervisor Baru', 'Rina Putri'])
+            ->assertSee('Dibuat');
+        // Urutan bawaan: per peran lalu nama, tanpa keterangan waktu dibuat
+        $this->get('/admin/akun?peran=supervisor')->assertOk()->assertSeeInOrder(['Anita Wulandari', 'Zaki Supervisor Baru'])->assertDontSee('Dibuat');
+    }
+
     public function test_admin_mengubah_peran_akun_yang_belum_terhubung_data_kp(): void
     {
         $account = $this->fresh();

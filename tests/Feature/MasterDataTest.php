@@ -221,7 +221,10 @@ class MasterDataTest extends TestCase
         $tu = $this->user('tu@kp.test');
         $student = $this->freeStudent();
 
-        $this->actingAs($tu)->get('/penempatan')->assertOk();
+        // TU melihat daftar tanpa tautan ke halaman pemantauan (bukan aksesnya); kaprodi bisa membuka detail per baris
+        $this->actingAs($tu)->get('/penempatan')->assertOk()->assertDontSee('tr-link-a', false);
+        $first = Internship::latest('id')->first();
+        $this->actingAs($this->user('kaprodi@kp.test'))->get('/penempatan')->assertOk()->assertSee(route('pantau.show', $first), false);
         $this->actingAs($tu)->get('/penempatan/tambah')->assertForbidden();
         $this->actingAs($tu)->post('/penempatan', $this->placementPayload($student))->assertForbidden();
 

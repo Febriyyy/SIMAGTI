@@ -90,9 +90,13 @@
                                             @if ($internship->status === 'diajukan')
                                                 <span class="c-plain">Belum mulai</span>
                                             @else
-                                                <x-progress :value="$internship->percent()" />
-                                                <span class="c-sub" @if ($internship->last_activity_at) title="{{ $internship->last_activity_at->locale('id')->translatedFormat('j F Y, H:i') }}" @endif>
-                                                    {{ $internship->last_activity_at ? 'Aktif '.mb_strtolower(\App\Support\Relative::label($internship->last_activity_at)) : 'Belum ada kegiatan' }}
+                                                <?php
+                                                    $taskTotal = $internship->tasks_count ?? $internship->tasks()->count();
+                                                    $taskDone = $internship->completed_tasks_count ?? $internship->tasks()->where('status', 'completed')->count();
+                                                ?>
+                                                <x-progress :value="$internship->percent()" inside />
+                                                <span class="c-sub" title="{{ $internship->last_activity_at ? 'Aktif '.mb_strtolower(\App\Support\Relative::label($internship->last_activity_at)) : 'Belum ada kegiatan' }}">
+                                                    {{ $taskTotal ? $taskDone.'/'.$taskTotal.' selesai' : 'Belum ada task' }}
                                                 </span>
                                             @endif
                                         </td>
@@ -192,7 +196,7 @@
                                     <td>{{ $row['active'] }}</td>
                                     <td>
                                         @if ($row['average'] !== null)
-                                            <x-progress :value="$row['average']" />
+                                            <x-progress :value="$row['average']" inside />
                                         @else
                                             <span class="muted">–</span>
                                         @endif

@@ -39,9 +39,9 @@
                             <?php
                                 [$kind, $icon, $short] = match (true) {
                                     str_starts_with($reason, 'Belum pernah') => ['idle', 'clock', 'Belum mencatat'],
-                                    (bool) preg_match('/kegiatan baru (\d+) hari/', $reason, $m) => ['idle', 'clock', $m[1].' hari sepi'],
+                                    (bool) preg_match('/kegiatan baru (\d+) hari/', $reason, $m) => ['idle', 'clock', $m[1].' hari tanpa kegiatan'],
                                     (bool) preg_match('/Progres task (\d+)%/', $reason, $m) => ['low', 'chart', 'Progres '.$m[1].'%'],
-                                    (bool) preg_match('/berakhir (\d+) hari/', $reason, $m) => ['end', 'timer', 'Berakhir '.$m[1].' hari'],
+                                    (bool) preg_match('/berakhir (\d+) hari/', $reason, $m) => ['end', 'timer', $m[1] === '0' ? 'Berakhir hari ini' : 'Berakhir '.$m[1].' hari lagi'],
                                     default => ['idle', 'alert', $reason],
                                 };
                             ?>

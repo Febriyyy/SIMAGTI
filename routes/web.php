@@ -3,7 +3,6 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ActivityMonitorController;
 use App\Http\Controllers\ActivityPlanController;
-use App\Http\Controllers\AdminCampusController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentReviewController;
@@ -20,6 +19,7 @@ use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DefenseController;
 use App\Http\Controllers\DefenseMinutesController;
+use App\Http\Controllers\DefenseScheduleController;
 use App\Http\Controllers\DivisionHeadController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentQueueController;
@@ -286,6 +286,10 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::patch('/antrean-bimbingan/{session}', [GuidanceController::class, 'decide'])->whereNumber('session')->name('bimbingan.decide');
         Route::put('/laporan-kp/{internship}/nilai', [ReportDiscussionController::class, 'grade'])->whereNumber('internship')->middleware('throttle:30,1')->name('laporan.nilai');
 
+        // Jadwal sidang KP mahasiswa bimbingan (nilainya disahkan kaprodi)
+        Route::get('/jadwal-sidang', [DefenseScheduleController::class, 'index'])->name('dospem.sidang');
+        Route::put('/jadwal-sidang/{internship}', [DefenseScheduleController::class, 'schedule'])->whereNumber('internship')->middleware('throttle:30,1')->name('dospem.sidang.jadwal');
+
         // Hasil akhir KP
         Route::get('/hasil', [ResultController::class, 'index'])->name('hasil.index');
         Route::get('/hasil/{internship}', [ResultController::class, 'edit'])->whereNumber('internship')->name('hasil.edit');
@@ -349,12 +353,14 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::patch('/kaprodi/persetujuan/{internship}', [KaprodiApprovalController::class, 'update'])->whereNumber('internship')->name('kaprodi.persetujuan.update');
         Route::get('/kaprodi/bobot', [AssessmentWeightController::class, 'edit'])->name('kaprodi.bobot');
         Route::put('/kaprodi/bobot', [AssessmentWeightController::class, 'update'])->name('kaprodi.bobot.update');
-        // Nilai sidang KP (dicatat terpisah dari nilai akhir)
+        // Pengesahan Nilai KP: nilai sidang (dicatat terpisah dari nilai akhir); jadwal sidang diatur dosen pembimbing
         Route::get('/kaprodi/sidang', [DefenseController::class, 'index'])->name('kaprodi.sidang');
         // Nama, jabatan, dan tanda tangan kaprodi untuk sertifikat KP
         Route::get('/kaprodi/tanda-tangan', [KaprodiSignatureController::class, 'edit'])->name('kaprodi.ttd');
         Route::put('/kaprodi/tanda-tangan', [KaprodiSignatureController::class, 'update'])->middleware('throttle:20,1')->name('kaprodi.ttd.update');
-        Route::put('/kaprodi/sidang/{internship}/jadwal', [DefenseController::class, 'schedule'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.jadwal');
+        // Logo kampus dan logo fakultas di sertifikat KP
+        Route::put('/kaprodi/tanda-tangan/logo/{kind}', [KaprodiSignatureController::class, 'logo'])->whereIn('kind', ['kampus', 'fakultas'])->middleware('throttle:20,1')->name('kaprodi.logo');
+        Route::delete('/kaprodi/tanda-tangan/logo/{kind}', [KaprodiSignatureController::class, 'destroyLogo'])->whereIn('kind', ['kampus', 'fakultas'])->name('kaprodi.logo.destroy');
         Route::put('/kaprodi/sidang/{internship}', [DefenseController::class, 'update'])->whereNumber('internship')->middleware('throttle:30,1')->name('kaprodi.sidang.simpan');
 
         Route::get('/mahasiswa', [StudentController::class, 'index'])->name('mahasiswa.index');
@@ -374,9 +380,6 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
         // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
         // Identitas kampus: logo kampus untuk sertifikat
-        Route::get('/kampus', [AdminCampusController::class, 'edit'])->name('admin.kampus');
-        Route::put('/kampus/{kind}', [AdminCampusController::class, 'update'])->whereIn('kind', ['kampus', 'fakultas'])->middleware('throttle:20,1')->name('admin.kampus.update');
-        Route::delete('/kampus/{kind}', [AdminCampusController::class, 'destroy'])->whereIn('kind', ['kampus', 'fakultas'])->name('admin.kampus.destroy');
         Route::get('/penilaian', [AssessmentStandardController::class, 'index'])->name('admin.penilaian');
         Route::post('/penilaian/pertanyaan', [AssessmentStandardController::class, 'storeQuestion'])->name('admin.penilaian.pertanyaan.store');
         Route::patch('/penilaian/pertanyaan/{aspect}', [AssessmentStandardController::class, 'updateQuestion'])->whereNumber('aspect')->name('admin.penilaian.pertanyaan.update');

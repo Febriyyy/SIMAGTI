@@ -9,9 +9,9 @@
     $last = match ($c?->status) {
         'ditolak' => ['ditolak', 'Menolak', 'close'],
         'kedaluwarsa' => ['kedaluwarsa', 'Kedaluwarsa', 'clock'],
-        default => ['diterima', 'Diterima', 'check'],
+        default => ['diterima', 'Diterima', 'tick'],
     };
-    $steps = [['direkomendasikan', 'Direkomendasikan', 'check'], ['ditawari', 'Ditawari kerja', 'check'], $last];
+    $steps = [['direkomendasikan', 'Direkomendasikan', 'tick'], ['ditawari', 'Ditawari kerja', 'tick'], $last];
     $order = ['direkomendasikan' => 0, 'ditawari' => 1, 'diterima' => 2, 'ditolak' => 2, 'kedaluwarsa' => 2];
     $reached = $c ? $order[$c->status] : -1;
     $left = $c?->daysLeft();
