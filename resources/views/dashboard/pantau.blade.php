@@ -185,7 +185,7 @@
                                 <th>Perusahaan</th>
                                 <th class="num col-active">Magang aktif</th>
                                 <th>Progres task</th>
-                                <th>Nilai rata-rata</th>
+                                <th class="col-score">Nilai rata-rata</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -201,7 +201,7 @@
                                             <span class="muted">–</span>
                                         @endif
                                     </td>
-                                    <td>{{ \App\Support\Num::short($row['score']) }}</td>
+                                    <td class="col-score">{{ \App\Support\Num::short($row['score']) }}</td>
                                     <td class="col-action"><a href="{{ route('perusahaan.show', $row['company']) }}" class="btn btn-sm">Statistik</a></td>
                                 </tr>
                             @endforeach
