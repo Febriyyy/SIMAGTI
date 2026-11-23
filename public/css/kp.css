@@ -6836,4 +6836,4 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .srow-name small { font-size: 13px; }
 .srow .avatar { width: 38px; height: 38px; box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line); }
 .srow-actions .btn { white-space: nowrap; }
-.srow.srow-compact { grid-template-columns: minmax(140px, 2fr) minmax(124px, 1.4fr) 84px max-content; column-gap: 20px; }
+.srow.srow-compact { grid-template-columns: minmax(140px, 2fr) minmax(124px, 1.4fr) 84px 92px; column-gap: 20px; }
