@@ -71,7 +71,7 @@
 
             <div class="av-field">
                 <label for="name" class="av-label">Nama lengkap</label>
-                <input id="name" name="name" type="text" class="av-input" value="{{ old('name') }}" maxlength="100" required autofocus autocomplete="name" placeholder="Beserta gelar">
+                <input id="name" name="name" type="text" class="av-input" value="{{ old('name') }}" maxlength="100" required autofocus autocomplete="name">
             </div>
 
             <div class="av-field">
