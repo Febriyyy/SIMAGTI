@@ -125,15 +125,19 @@ class CertificateTest extends TestCase
             ->assertSee('Unggah logo')->assertSee('Ketua Divisi '.$division->name)
             ->assertDontSee(route('logo.kampus'))->assertDontSee('data:image', false);
 
-        // Admin: logo kampus dan logo fakultas (SVG ditolak)
+        // Kaprodi: logo kampus dan logo fakultas (SVG ditolak); admin tidak lagi punya menu Identitas Kampus
         $admin = $this->user('admin@kp.test');
-        $this->actingAs($admin)->get('/admin/kampus')->assertOk()->assertSee('Logo kampus')->assertSee('Logo fakultas');
-        $this->actingAs($admin)->put('/admin/kampus/kampus', ['logo' => UploadedFile::fake()->create('logo.svg', 5, 'image/svg+xml')])->assertSessionHasErrorsIn('logo_kampus', 'logo');
-        $this->actingAs($admin)->put('/admin/kampus/kampus', ['logo' => $png('kampus.png')])->assertSessionHasNoErrors();
-        $this->actingAs($admin)->put('/admin/kampus/fakultas', ['logo' => $png('fakultas.png')])->assertSessionHasNoErrors();
+        $kaprodiLogo = $this->user('kaprodi@kp.test');
+        $this->actingAs($admin)->get('/dashboard')->assertOk()->assertDontSee('Identitas Kampus');
+        $this->actingAs($admin)->get('/admin/kampus')->assertNotFound();
+        $this->actingAs($admin)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => $png('x.png')])->assertForbidden();
+        $this->actingAs($kaprodiLogo)->get('/kaprodi/tanda-tangan')->assertOk()->assertSee('Logo kampus')->assertSee('Logo fakultas');
+        $this->actingAs($kaprodiLogo)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => UploadedFile::fake()->create('logo.svg', 5, 'image/svg+xml')])->assertSessionHasErrorsIn('logo_kampus', 'logo');
+        $this->actingAs($kaprodiLogo)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => $png('kampus.png')])->assertSessionHasNoErrors();
+        $this->actingAs($kaprodiLogo)->put('/kaprodi/tanda-tangan/logo/fakultas', ['logo' => $png('fakultas.png')])->assertSessionHasNoErrors();
         $this->get('/logo/kampus')->assertOk()->assertHeader('Content-Type', 'image/png');
         $this->get('/logo/fakultas')->assertOk();
-        $this->actingAs($salsa->student)->put('/admin/kampus/kampus', ['logo' => $png('x.png')])->assertForbidden();
+        $this->actingAs($salsa->student)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => $png('x.png')])->assertForbidden();
 
         // Company Supervisor: logo perusahaan, nama dan tanda tangan ketua divisi
         $supervisor = $salsa->supervisor;

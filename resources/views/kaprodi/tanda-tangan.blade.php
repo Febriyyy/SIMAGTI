@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Tanda Tangan Sertifikat')
+@section('title', 'Data Sertifikat')
 
 {{--
-    Kaprodi: nama, jabatan, dan tanda tangan, diisi langsung di blok kanan sertifikat ukuran penuh.
-    Variabel: template, signature (data URI)
+    Kaprodi: logo kampus, logo fakultas, serta nama, jabatan, dan tanda tangan, diisi langsung di sertifikat ukuran penuh.
+    Variabel: template, signature (data URI), logos (kampus/fakultas => StoredFile|null), divisions
 --}}
 @section('content')
     <div class="page-head">
         <div>
-            <h1 class="page-title">Tanda Tangan Sertifikat</h1>
-            <p class="page-sub">Klik blok tanda tangan di kanan sertifikat. Diisi sekali, berlaku untuk semua sertifikat KP.</p>
+            <h1 class="page-title">Data Sertifikat</h1>
+            <p class="page-sub">Klik logo atau blok tanda tangan di sertifikat. Diisi sekali, berlaku untuk semua sertifikat KP.</p>
         </div>
     </div>
 
@@ -18,11 +18,17 @@
         @csrf
         @method('PUT')
     </form>
+    @foreach (\App\Support\Logos::INSTITUTIONS as $kind => [$key, $label])
+        <form id="f-logo-{{ $kind }}" method="POST" action="{{ route('kaprodi.logo', $kind) }}" enctype="multipart/form-data" hidden>
+            @csrf
+            @method('PUT')
+        </form>
+    @endforeach
 
     <?php $complete = $divisions->where('complete', true)->count(); ?>
     <section class="cst-studio">
         @include('sertifikat._stage', [
-            'edit' => [],
+            'edit' => ['kampus' => 'f-logo-kampus', 'fakultas' => 'f-logo-fakultas'],
             'company' => null,
             'left' => [
                 'role' => 'Ketua Divisi', 'owner' => 'Diisi perusahaan', 'sub' => 'Perusahaan',
@@ -38,11 +44,20 @@
                 'titleField' => 'signer_title',
                 'live' => 'kaprodi',
             ],
-            'shapes' => ['sign'],
+            'shapes' => ['square', 'wide', 'sign'],
         ])
 
         <div class="cst-bar">
             <div class="cst-items">
+                @foreach (\App\Support\Logos::INSTITUTIONS as $kind => [$key, $label])
+                    @include('sertifikat._bar-item', [
+                        'icon' => 'image', 'title' => $label, 'sub' => $kind === 'kampus' ? \App\Support\Campus::university() : \App\Support\Campus::faculty(),
+                        'ok' => (bool) $logos[$kind], 'okLabel' => 'Terpasang', 'todoLabel' => 'Belum ada',
+                        'messages' => [$errors->getBag('logo_'.$kind)->first('logo')],
+                        'delete' => $logos[$kind] ? route('kaprodi.logo.destroy', $kind) : null,
+                        'deleteLabel' => 'Hapus '.mb_strtolower($label), 'confirm' => 'Hapus '.mb_strtolower($label).'?',
+                    ])
+                @endforeach
                 @include('sertifikat._bar-item', [
                     'icon' => 'edit', 'title' => 'Tanda tangan kampus', 'sub' => 'Ketua Program Studi',
                     'ok' => $signature && $template->signer_name, 'okLabel' => 'Lengkap', 'todoLabel' => 'Belum lengkap',

@@ -12,8 +12,8 @@ use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 /**
- * Kaprodi mengisi sendiri nama, jabatan, dan tanda tangannya untuk sertifikat KP
- * (template sertifikat kampus). Berlaku untuk semua sertifikat KP, termasuk yang sudah terbit.
+ * Kaprodi mengisi bagian kampus di sertifikat KP: logo kampus, logo fakultas, serta nama, jabatan,
+ * dan tanda tangannya (template sertifikat kampus). Berlaku untuk semua sertifikat KP, termasuk yang sudah terbit.
  */
 class KaprodiSignatureController extends Controller
 {
@@ -25,8 +25,37 @@ class KaprodiSignatureController extends Controller
         return view('kaprodi.tanda-tangan', [
             'template' => $template,
             'signature' => $signature,
+            'logos' => collect(Logos::INSTITUTIONS)->mapWithKeys(fn ($v, $kind) => [$kind => Logos::institution($kind)]),
             'divisions' => self::companyCompleteness(),
         ]);
+    }
+
+    /** Unggah logo kampus atau logo fakultas (dulu di menu admin Identitas Kampus). */
+    public function logo(Request $request, string $kind): RedirectResponse
+    {
+        abort_unless(isset(Logos::INSTITUTIONS[$kind]), 404);
+        $label = Logos::INSTITUTIONS[$kind][1];
+        $request->validateWithBag('logo_'.$kind, ['logo' => ['required', ...Logos::RULES]], [
+            'logo.required' => 'Pilih berkas '.mb_strtolower($label).'.',
+            'logo.mimes' => 'Logo harus PNG, JPG, atau WebP.',
+            'logo.max' => 'Ukuran logo maksimal 1 MB.',
+            'logo.image' => 'Berkas harus berupa gambar.',
+        ]);
+
+        $file = Logos::store($request->file('logo'), $request->user(), $kind);
+        Logos::setInstitution($kind, $file, $request->user());
+        ActivityLog::record($kind.'.logo', 'Mengganti '.mb_strtolower($label));
+
+        return back()->with('status', $label.' tersimpan dan langsung dipakai di sertifikat.');
+    }
+
+    public function destroyLogo(Request $request, string $kind): RedirectResponse
+    {
+        abort_unless(isset(Logos::INSTITUTIONS[$kind]), 404);
+        Logos::setInstitution($kind, null, $request->user());
+        ActivityLog::record($kind.'.logo', 'Menghapus '.mb_strtolower(Logos::INSTITUTIONS[$kind][1]));
+
+        return back()->with('status', Logos::INSTITUTIONS[$kind][1].' dihapus.');
     }
 
     /**

@@ -20,7 +20,7 @@
         'fakultas' => ['Logo fakultas', $facultyLogo ? route('logo.fakultas').'?v='.$facultyLogo->id : null],
         'perusahaan' => ['Logo perusahaan', $company?->logo_file_id ? route('logo.perusahaan', $company).'?v='.$company->logo_file_id : null],
     ];
-    $owners = ['kampus' => 'Diisi admin', 'fakultas' => 'Diisi admin', 'perusahaan' => 'Diisi perusahaan'];
+    $owners = ['kampus' => 'Diisi kaprodi', 'fakultas' => 'Diisi kaprodi', 'perusahaan' => 'Diisi perusahaan'];
 ?>
 <div class="cst">
     <div class="cst-paper">
