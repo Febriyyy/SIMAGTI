@@ -6745,3 +6745,18 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .st-wait::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #c9f065; box-shadow: 0 0 0 4px rgba(201, 240, 101, .18); animation: st-blink 1.6s ease-in-out infinite; }
 @keyframes st-blink { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .st-wait::before { animation: none; } .st-btn { transition: none; } }
+
+/* Stepper Rekrutmen memenuhi lebar kartu: titik di kiri, tengah, dan kanan; satu garis penuh di belakangnya */
+@media (min-width: 641px) {
+    .recruit .recruit-steps { position: relative; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .recruit .recruit-steps::before, .recruit .recruit-steps::after {
+        content: ""; position: absolute; top: 14px; left: 9px; height: 1.5px; border-radius: 2px;
+    }
+    .recruit .recruit-steps::before { right: 9px; background: var(--line-strong); }
+    .recruit .recruit-steps::after { width: calc((100% - 18px) * var(--fill, 0)); background: linear-gradient(90deg, var(--primary), #2bb98a); }
+    .recruit .recruit-steps li { position: relative; z-index: 1; padding: 0; }
+    .recruit .recruit-steps li:not(:last-child)::after { display: none; }
+    .recruit .recruit-steps li:nth-child(2) { align-items: center; text-align: center; }
+    .recruit .recruit-steps li:last-child { align-items: flex-end; text-align: right; }
+    .recruit .recruit-dot { position: relative; }
+}

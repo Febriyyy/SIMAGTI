@@ -26,7 +26,8 @@
             <x-chip :tone="$c->statusTone()">{{ $c->statusLabel() }}</x-chip>
         </div>
         <div class="card-body">
-            <ol class="recruit-steps">
+            {{-- Garis penuh dari titik pertama ke titik terakhir; bagian hijau sesuai tahap yang dicapai --}}
+            <ol class="recruit-steps" style="--fill: {{ max(0, $reached) / 2 }}">
                 @foreach ($steps as $n => [$key, $label, $icon])
                     <li @class(['is-done' => $n <= $reached, 'is-no' => in_array($key, ['ditolak', 'kedaluwarsa'], true) && $n <= $reached])>
                         <span class="recruit-dot" aria-hidden="true">@if ($n <= $reached)<x-ikon :name="$icon" :size="14" />@endif</span>
