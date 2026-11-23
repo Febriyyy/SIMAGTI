@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#037a68">
+    <meta name="theme-color" content="#022b26">
     <title>Tidak ada koneksi · SIMAGTI</title>
     <link rel="icon" type="image/svg+xml" href="/images/logo-simagti-mark.svg">
     <!--
@@ -12,44 +12,52 @@
         Otomatis memuat ulang begitu koneksi kembali.
     -->
     <style>
-        :root { --primary: #037a68; --primary-dark: #03423e; --text: #12201e; --muted: #5b6b68; --muted-2: #647471; --gray: #44514f; --line: #e6eae8; }
         * { box-sizing: border-box; }
-        html, body { min-height: 100%; margin: 0; }
+        html, body { margin: 0; }
         body {
-            display: grid; place-items: center; min-height: 100vh; padding: 32px 16px;
-            color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            position: relative; min-height: 100vh; min-height: 100dvh;
+            display: grid; grid-template-rows: auto 1fr; padding: 28px clamp(20px, 5vw, 56px) 40px;
+            color: #fff; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; overflow-x: hidden;
             background:
-                radial-gradient(520px 520px at -5% -10%, #d6f3e8, transparent 70%),
-                radial-gradient(460px 460px at 105% 110%, #e1ebff, transparent 70%),
-                #f6faf8;
+                radial-gradient(60% 55% at 50% 0%, rgba(201, 240, 101, .16), transparent 70%),
+                radial-gradient(45% 60% at 100% 100%, rgba(2, 168, 111, .25), transparent 70%),
+                linear-gradient(165deg, #03423e 0%, #022b26 100%);
         }
-        main {
-            width: 100%; max-width: 400px; padding: 36px 36px 28px; border-radius: 28px;
-            background: rgba(255, 255, 255, .94); border: 1px solid #fff;
-            box-shadow: 0 1px 2px rgba(3, 66, 62, .04), 0 24px 60px -18px rgba(3, 66, 62, .18);
+        body::before {
+            content: ""; position: fixed; inset: 0; pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, .07) 1px, transparent 1px); background-size: 24px 24px;
+            -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%); mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
         }
-        .logo { display: block; height: 28px; width: auto; }
-        .icon { display: grid; place-items: center; width: 48px; height: 48px; margin-top: 32px; border-radius: 15px; background: #f3f8f6; color: var(--primary-dark); box-shadow: inset 0 0 0 1px rgba(3, 122, 104, .1); }
-        h1 { margin: 18px 0 0; font-size: 24px; font-weight: 750; letter-spacing: -0.03em; line-height: 1.2; }
-        p { margin: 8px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
-        .actions { display: flex; align-items: center; gap: 18px; margin-top: 26px; }
+        header { position: relative; z-index: 1; }
+        .brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-size: 16px; font-weight: 750; letter-spacing: .01em; }
+        .brand img { display: block; width: 30px; height: 30px; padding: 5px; border-radius: 9px; background: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
+        main { position: relative; z-index: 1; align-self: center; justify-self: center; width: 100%; max-width: 560px; text-align: center; }
+        .big { display: inline-grid; place-items: center; width: 136px; height: 136px; color: rgba(201, 240, 101, .7); }
+        .big svg { width: 100%; height: 100%; }
+        .big svg path { vector-effect: non-scaling-stroke; }
+        h1 { margin: 18px 0 0; font-size: clamp(26px, 4vw, 34px); font-weight: 750; letter-spacing: -0.03em; line-height: 1.15; }
+        p { margin: 10px auto 0; max-width: 40ch; color: rgba(255, 255, 255, .7); font-size: 15.5px; line-height: 1.6; }
+        .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; margin-top: 32px; }
         button {
-            height: 44px; padding: 0 20px; border: 0; border-radius: 12px; cursor: pointer;
-            background: var(--primary-dark); color: #fff; font: inherit; font-size: 14.5px; font-weight: 650;
-            transition: background-color .15s;
+            height: 48px; padding: 0 26px; border: 0; border-radius: 999px; cursor: pointer;
+            background: #c9f065; color: #03231f; font: inherit; font-size: 15px; font-weight: 700;
+            box-shadow: 0 12px 30px -10px rgba(201, 240, 101, .55); transition: transform .15s, background-color .15s;
         }
-        button:hover { background: var(--primary); }
-        button:focus-visible { outline: 3px solid rgba(3, 122, 104, .35); outline-offset: 2px; }
-        .wait { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-        .wait::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #e2b866; box-shadow: 0 0 0 4px #fdf1dc; }
-        @media (max-width: 480px) { main { padding: 28px 22px 22px; border-radius: 22px; } h1 { font-size: 22px; } }
+        button:hover { background: #d6f582; transform: translateY(-1px); }
+        button:focus-visible { outline: 3px solid rgba(201, 240, 101, .6); outline-offset: 3px; }
+        .wait { display: inline-flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, .65); font-size: 13.5px; }
+        .wait::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #c9f065; box-shadow: 0 0 0 4px rgba(201, 240, 101, .18); animation: blink 1.6s ease-in-out infinite; }
+        @keyframes blink { 50% { opacity: .35; } }
+        @media (prefers-reduced-motion: reduce) { .wait::before { animation: none; } button { transition: none; } }
     </style>
 </head>
 <body>
+<header>
+    <span class="brand"><img src="/images/logo-simagti-mark.svg" alt="">SIMAGTI</span>
+</header>
 <main>
-    <img class="logo" src="/images/logo-simagti.svg" alt="SIMAGTI">
-    <span class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5-2.7M19 13a10 10 0 0 0-2.2-1.6M2 9.5a15 15 0 0 1 4.3-2.8M22 9.5a15 15 0 0 0-11.3-3.9M12 20h.01"/></svg>
+    <span class="big" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5-2.7M19 13a10 10 0 0 0-2.2-1.6M2 9.5a15 15 0 0 1 4.3-2.8M22 9.5a15 15 0 0 0-11.3-3.9M12 20h.01"/></svg>
     </span>
     <h1>Tidak ada koneksi</h1>
     <p>Periksa internet, lalu coba lagi.</p>
