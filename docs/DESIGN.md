@@ -40,8 +40,8 @@ Urutan di Form Request sengaja: hak akses dicek sebelum validasi, sehingga orang
 | Mahasiswa hanya mengirim bukti untuk task miliknya | `WeeklyTaskPolicy::submitEvidence` |
 | KP yang selesai menjadi hanya-baca | `InternshipPolicy` dan `WeeklyTask` (model menolak simpan) |
 | Satu mahasiswa hanya satu penempatan aktif | kolom unik `internships.active_student_id` + policy dan aturan validasi |
-| Kaprodi baru bisa setuju setelah biro memverifikasi | `ReviewKaprodiApproval` |
-| Pengajuan tidak diproses dua kali | `ReviewBiroVerification`, `ReviewKaprodiApproval` |
+| Kaprodi baru bisa setuju setelah TU Fakultas memverifikasi | `ReviewKaprodiApproval` |
+| Pengajuan tidak diproses dua kali | `ReviewVerification`, `ReviewKaprodiApproval` |
 | Undangan sekali pakai dan kedaluwarsa 14 hari | `AcceptInvitation`, `Invitation::isUsable` |
 | Mentor harus staf dari perusahaan yang dipilih | `StorePlacementRequest` |
 | Siapa melihat penempatan apa | `Internship::visibleTo` (dipakai web dan API) |
@@ -50,7 +50,7 @@ Urutan di Form Request sengaja: hak akses dicek sebelum validasi, sehingga orang
 | Semua aspek wajib dinilai sebelum dikirim, nilai 0 sampai 100 | `SaveAssessmentRequest` |
 | Total bobot rubrik harus 100%, nilai akhir dihitung dari bobot | `SaveAssessment`, `Assessment::computeFinalScore` |
 | Dikembalikan ke mentor wajib dengan catatan | `ReviewAssessmentRequest`, `ReviewAssessment` |
-| Lampiran task hanya PDF, PPT/PPTX, JPG/PNG/WEBP, maks. 10 MB, maks. 5 per task; isi berkas dicek, bukan hanya namanya | `TaskAttachment::rules`, `AttachTaskFiles` |
+| Lampiran task hanya PDF, PPT/PPTX, JPG/PNG/WEBP, maks. 10 MB, maks. 5 per task; isi berkas dicek, bukan hanya namanya | `TaskAttachment::rules`, `TaskAttachmentController` |
 | Lampiran hanya bisa diunduh mahasiswa pemilik task dan mentornya; berkas disimpan di disk privat | `WeeklyTaskPolicy::view`, `TaskAttachmentController`, rute dengan `scopeBindings` |
 | Hanya mentor (selama KP belum dikunci) yang menambah atau menghapus lampiran | `WeeklyTaskPolicy::update` |
 | Penilaian yang sudah divalidasi tidak bisa diubah | model `Assessment` |
@@ -120,8 +120,8 @@ REST berformat JSON di `/api/v1`, saat ini **baca-saja**. Memakai Action, Policy
 | GET | `/api/v1/internships` | sesuai peran (`?status=`, `?per_page=`) |
 | GET | `/api/v1/internships/{id}` | yang berhak (Policy) |
 | GET | `/api/v1/internships/{id}/tasks` | yang berhak |
-| GET | `/api/v1/companies` | biro, kaprodi |
-| GET | `/api/v1/companies/{id}/stats` | biro, kaprodi, staf perusahaan itu (durasi, skill %, performa) |
+| GET | `/api/v1/companies` | TU Fakultas, kaprodi |
+| GET | `/api/v1/companies/{id}/stats` | TU Fakultas, kaprodi, staf perusahaan itu (durasi, skill %, performa) |
 | GET | `/api/v1/certificates/{token}` | publik, verifikasi QR, tanpa NIM |
 
 Pengamanan: token Bearer (Sanctum), pembatasan laju pada login dan verifikasi, respons selalu JSON, token akun nonaktif ditolak, pesan gagal login sama untuk semua sebab.
@@ -158,7 +158,7 @@ PHPUnit dengan SQLite in-memory, data demo diisi ulang tiap tes. Tes dikelompokk
 - `AssessmentFlowTest`: penilaian mentor, validasi dan pengembalian oleh ketua divisi, kunci nilai
 - `DashboardDataTest`: data dashboard per peran, daftar perlu perhatian, statistik perusahaan
 - `TaskAttachmentTest`: lampiran lama hanya bisa dibuka yang berhak, tidak bisa ditambah lagi
-- `ActivityBoardTest`, `TimesheetTest`, `SyllabusTest`, `MonitorTest`: fitur KP v2 (board, timesheet, silabus, pemantauan per kloter, unduhan)
+- `ActivityBoardTest`, `TimesheetTest`, `MonitorTest`: fitur KP v2 (board, timesheet, pemantauan per kloter, unduhan)
 - `DataSeederTest`: data bawaan termuat, setiap peran bisa masuk, akun tidak tampil di login
 
 ## 8. Menjalankan
@@ -294,7 +294,7 @@ Hierarki teks: judul halaman `--text-4xl` (HP `--text-3xl`), judul banner `--tex
 
 **Timesheet.** Satu catatan = tanggal, jam (maks 16, total per hari maks 24), aktivitas, task opsional, foto opsional (disk privat `timesheet/{id}`). Menjadi Form Absensi dan Aktivitas KP / logbook MBKM.
 
-**Status KP.** Menu "Pengajuan KP" menjadi "Status KP" di bawah Dashboard, berisi langkah demi langkah (`App\Support\KpProgress`): pengajuan, biro, kaprodi, aktivasi supervisor, silabus, pelaksanaan, lalu laporan, presentasi, dan hasil (tahap berikutnya).
+**Status KP.** Menu "Pengajuan KP" menjadi "Status KP" di bawah Dashboard, berisi langkah demi langkah (`App\Support\KpProgress`): pengajuan, verifikasi TU Fakultas, kaprodi, aktivasi supervisor, pelaksanaan, bimbingan, penilaian akhir, Laporan KP (bab dan laporan akhir), sidang KP, dan hasil. Status laporan dan sidang dibaca dari data bab, laporan akhir, jadwal sidang, dan nilai sidang.
 
 **Pemantauan per kloter.** `/pantau` mengelompokkan mahasiswa per perusahaan + divisi + periode (`Internship::cohortKey`), diberi nomor kloter bila satu divisi punya lebih dari satu periode. Detail mahasiswa menampilkan universitas, fakultas, prodi, angkatan, dan semester (`<x-academic>`).
 

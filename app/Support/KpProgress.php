@@ -203,14 +203,48 @@ class KpProgress
             },
             'note' => null, 'url' => null, 'cta' => null];
 
-        // 10–11. Laporan per bab dan presentasi dikerjakan di tahap 3
-        $later = $internship->status !== 'selesai';
-        $steps[] = ['key' => 'report', 'title' => 'Laporan akhir per bab', 'actor' => 'Mahasiswa → Company Supervisor', 'state' => $later ? 'later' : 'done', 'date' => null, 'detail' => 'Bab yang memuat data perusahaan disetujui Company Supervisor', 'note' => null, 'url' => null, 'cta' => null];
-        $steps[] = ['key' => 'presentation', 'title' => 'Presentasi di depan dosen pembimbing', 'actor' => 'Dosen pembimbing', 'state' => $later ? 'later' : 'done', 'date' => null, 'detail' => 'Maksimal 10 menit, setelah disetujui maju presentasi', 'note' => null, 'url' => null, 'cta' => null];
+        // 10. Laporan KP: bab per bab, lalu laporan akhir (menu Laporan KP)
+        $finished = $internship->status === 'selesai';
+        $chapters = $internship->reportChapters;
+        $approved = $chapters->where('status', 'disetujui')->count();
+        $final = $internship->finalReport;
+        $allApproved = $chapters->isNotEmpty() && $approved === $chapters->count();
+        $steps[] = ['key' => 'report', 'title' => 'Laporan KP', 'actor' => 'Mahasiswa → Company Supervisor → Dosen pembimbing',
+            'state' => match (true) {
+                $finished || ($allApproved && $final) => 'done',
+                $chapters->contains('status', 'revisi') => 'attention',
+                $chapters->contains(fn ($c) => str_starts_with($c->status, 'menunggu')) => 'waiting',
+                $allApproved => 'current',
+                $running && $chapters->contains(fn ($c) => $c->status !== 'belum') => 'current',
+                default => 'upcoming',
+            },
+            'date' => $final?->submitted_at,
+            'detail' => $chapters->isEmpty()
+                ? 'Bab yang memuat data perusahaan disetujui Company Supervisor dulu'
+                : "{$approved} dari {$chapters->count()} bab disetujui".($final ? ' · laporan akhir terunggah' : ($allApproved ? ' · unggah laporan akhir' : '')),
+            'note' => null,
+            'url' => $running || $finished ? route('laporan.saya') : null, 'cta' => 'Buka Laporan KP'];
+
+        // 11. Sidang KP: dijadwalkan dosen pembimbing, nilai dospem + industri disahkan kaprodi
+        $defense = $internship->defenseSchedule;
+        $defenseScore = $internship->defenseScore;
+        $steps[] = ['key' => 'presentation', 'title' => 'Sidang KP', 'actor' => 'Dosen pembimbing',
+            'state' => match (true) {
+                $finished || $defenseScore !== null => 'done',
+                $defense !== null => 'waiting',
+                default => 'upcoming',
+            },
+            'date' => $defenseScore?->defended_at ?? $defense?->scheduled_at,
+            'detail' => match (true) {
+                $defenseScore !== null => 'Nilai sidang '.$defenseScore->letter_grade,
+                $defense !== null => $defense->whenLabel().($defense->place ? ' · '.$defense->place : ''),
+                default => 'Dijadwalkan dosen pembimbing setelah laporan disetujui',
+            },
+            'note' => null, 'url' => null, 'cta' => null];
 
         // 12. Hasil KP
         $steps[] = ['key' => 'result', 'title' => 'Hasil KP', 'actor' => 'Dosen pembimbing',
-            'state' => $internship->result ? ($internship->result === 'tidak' ? 'attention' : 'done') : ($later ? 'later' : 'done'),
+            'state' => $internship->result ? ($internship->result === 'tidak' ? 'attention' : 'done') : ($finished ? 'done' : 'upcoming'),
             'date' => $internship->result_at ?? ($internship->status === 'selesai' ? $internship->locked_at : null),
             'detail' => $internship->result ? 'Hasil: '.$internship->resultLabel().($internship->final_grade ? ' · nilai '.$internship->final_grade : '') : 'Diterima atau tidak diterima',
             'note' => $internship->result ? $internship->result_note : null, 'url' => null, 'cta' => null];
