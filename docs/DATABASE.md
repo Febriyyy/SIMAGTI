@@ -362,3 +362,17 @@ Ulasan tempat magang dari mahasiswa setelah masa magang berakhir (status `selesa
 | comment | text, null | |
 
 Tampil tanpa nama di halaman Lowongan (rating per perusahaan, rincian aspek, 3 komentar terbaru).
+
+### Logo dan tanda tangan untuk sertifikat (20 November 2026)
+
+Siapa mengisi apa:
+
+| Elemen sertifikat | Diisi oleh | Tempat | Disimpan di |
+|---|---|---|---|
+| Logo kampus | Admin | Identitas Kampus | `settings` kunci `simagti.campus.logo_file_id` |
+| Logo fakultas | Admin | Identitas Kampus | `settings` kunci `simagti.campus.faculty_logo_file_id` |
+| Logo perusahaan | Company Supervisor | Data Sertifikat | `companies.logo_file_id` (kolom lama) |
+| Nama dan tanda tangan ketua divisi | Company Supervisor | Data Sertifikat | `company_divisions.head_name`, `company_divisions.head_signature_file_id` (baru) |
+| Nama, jabatan, tanda tangan kaprodi | Kaprodi | Tanda Tangan Sertifikat | `certificate_templates` (template kampus): `signer_name`, `signer_title`, `signature_file_id` |
+
+Company Supervisor hanya bisa mengubah perusahaan dan divisi tempat mahasiswa yang ia supervisi (atau yang tercatat di profil stafnya). Semua gambar hanya PNG, JPG, atau WebP (maks. 1 MB; SVG ditolak). Logo disajikan lewat `/logo/kampus`, `/logo/fakultas`, `/logo/perusahaan/{id}`; tanda tangan tidak punya tautan publik dan disematkan langsung (data URI) di halaman sertifikat. Perubahan template kampus berlaku untuk semua sertifikat, termasuk yang sudah terbit.
