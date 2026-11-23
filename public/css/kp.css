@@ -6290,7 +6290,7 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
     outline: none;
     transition: background-color .2s ease, box-shadow .2s ease;
 }
-.cst-inline.cst-signer { font-size: max(calc(var(--u) * 3.5), 13px); padding-top: calc(var(--u) * 1.6); border-top: calc(var(--u) * .3) solid var(--c-text); border-radius: 0; font-weight: 600; color: var(--c-text); }
+.cst-inline.cst-signer { width: 100%; min-width: calc(var(--u) * 58); field-sizing: content; font-size: max(calc(var(--u) * 3.5), 13px); padding-top: calc(var(--u) * 1.6); border-top: calc(var(--u) * .3) solid var(--c-text); border-radius: 0; font-weight: 600; color: var(--c-text); }
 .cst-inline::placeholder { color: var(--c-primary); font-weight: 500; font-style: italic; opacity: .8; }
 .cst-inline:hover { background: rgba(201, 240, 101, .2); }
 .cst-inline:focus-visible { background: rgba(201, 240, 101, .3); box-shadow: 0 0 0 2px var(--c-primary); }
@@ -6316,23 +6316,81 @@ summary.rd-head:focus-visible { outline: 2px solid var(--primary); outline-offse
 .cst-slot.is-mine:hover .cst-tip, .cst-ink.is-mine:hover .cst-tip,
 .cst-slot.is-mine:focus-within .cst-tip, .cst-ink.is-mine:focus-within .cst-tip { opacity: 1; transform: translate(-50%, 0); }
 
-/* Bilah bawah: status, panduan ukuran, simpan */
-.cst-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; padding: 16px 24px; border-top: 1px solid var(--line); }
-.cst-item { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
-.cst-item strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); }
-.cst-item span { display: block; font-size: 13px; color: var(--muted); }
+/* Legenda ukuran di panggung: bentuk digambar sesuai proporsi ukuran yang disarankan */
+.cst-legend {
+    position: relative;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 32px;
+    max-width: 1040px; min-width: 0;
+    margin: clamp(22px, 3vw, 32px) auto 0;
+    padding-top: clamp(18px, 2.4vw, 24px);
+    border-top: 1px solid rgba(255, 255, 255, .12);
+}
+.cst-legend ul { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 30px; margin: 0; padding: 0; list-style: none; }
+.cst-legend li { display: flex; align-items: center; gap: 12px; }
+.cst-glyph {
+    flex: none; display: grid; place-items: center;
+    height: 26px;
+    border: 1.5px dashed rgba(201, 240, 101, .75);
+    border-radius: 5px;
+    background: rgba(201, 240, 101, .07);
+}
+.cst-glyph.is-square { width: 26px; }
+.cst-glyph.is-wide { width: 54px; height: 18px; }
+.cst-glyph.is-sign { width: 54px; height: 18px; border-style: none; border-bottom: 1.5px solid rgba(255, 255, 255, .55); border-radius: 0; background: none; }
+.cst-glyph svg { width: 100%; height: 100%; fill: none; stroke: #c9f065; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cst-legend-text { display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; color: rgba(255, 255, 255, .62); }
+.cst-legend-text b { font-size: 14px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.cst-legend p { margin: 0; font-size: 12.5px; line-height: 1.5; color: rgba(255, 255, 255, .55); }
+
+/* Bilah bawah: kartu status per aset dan tombol simpan */
+.cst-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px;
+    padding: 18px 24px;
+    border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, #fbfcfc, var(--surface));
+}
+.cst-items { display: flex; flex-wrap: wrap; gap: 12px; flex: 1 1 auto; }
+.cst-item {
+    display: flex; align-items: center; gap: 12px;
+    min-width: 260px;
+    padding: 10px 10px 10px 12px;
+    border: 1px solid #f0dfbd;
+    border-radius: 16px;
+    background: #fffaf0;
+}
+.cst-item.is-ok { border-color: #cfe9e1; background: var(--primary-tint); }
+.cst-item-icon {
+    flex: none; display: grid; place-items: center;
+    width: 38px; height: 38px; border-radius: 12px;
+    background: #fdecc8; color: #9a5800;
+}
+.cst-item.is-ok .cst-item-icon { background: var(--primary); color: #fff; }
+.cst-item-body { flex: 1; min-width: 0; }
+.cst-item-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cst-item-head strong { font-size: 14px; font-weight: 600; color: var(--text); }
+.cst-pill { padding: 2px 8px; border-radius: 999px; background: #fdecc8; color: #8a4f00; font-size: 12px; font-weight: 600; line-height: 1.5; }
+.cst-item.is-ok .cst-pill { background: var(--primary-soft); color: var(--primary); }
+.cst-item-sub { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cst-item .field-error { margin: 4px 0 0; }
-.cst-item form { margin: 0 0 0 4px; }
-.cst-dot { flex: none; width: 10px; height: 10px; margin-top: 5px; border-radius: 50%; background: #e7b14a; box-shadow: 0 0 0 4px #fdf1dc; }
-.cst-dot.is-ok { background: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
-.cst-guide { flex: 1 1 260px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
-.cst-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
-.cst-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
-.cst-link { padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--red); cursor: pointer; }
-.cst-link:hover { text-decoration: underline; }
+.cst-item form { margin: 0; }
+.cst-del {
+    flex: none; display: grid; place-items: center;
+    width: 36px; height: 36px; padding: 0;
+    border: 0; border-radius: 10px;
+    background: transparent; color: var(--muted);
+    cursor: pointer; transition: background-color .15s ease, color .15s ease;
+}
+.cst-del:hover { background: var(--red-soft); color: var(--red); }
+.cst-del:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.cst-note { flex: 1 1 280px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.cst-save { flex: none; min-width: 148px; margin-left: auto; box-shadow: 0 10px 24px -10px var(--primary-shadow); }
+.cst-anchor { display: block; position: relative; top: -88px; }
 
 @media (max-width: 640px) {
     .cst-studio { border-radius: 16px; }
-    .cst-bar { padding: 14px 16px; }
-    .cst-actions { width: 100%; justify-content: space-between; margin-left: 0; }
+    .cst-bar { padding: 16px; }
+    .cst-items, .cst-item { width: 100%; min-width: 0; }
+    .cst-save { width: 100%; }
+    .cst-legend { display: grid; gap: 14px; }
+    .cst-legend ul { display: grid; gap: 12px; }
 }
