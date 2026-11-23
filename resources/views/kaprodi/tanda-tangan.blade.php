@@ -37,23 +37,17 @@
         ])
 
         <div class="cst-bar">
-            <div class="cst-item">
-                <span @class(['cst-dot', 'is-ok' => $signature && $template->signer_name])></span>
-                <div>
-                    <strong>Tanda tangan kampus</strong>
-                    <span>{{ $signature && $template->signer_name ? 'Lengkap' : 'Ketik nama dan unggah tanda tangan' }}</span>
-                    @foreach (['signer_name', 'signer_title', 'signature'] as $f)
-                        @error($f)<p class="field-error">{{ $message }}</p>@enderror
-                    @endforeach
-                </div>
+            <div class="cst-items">
+                @include('sertifikat._bar-item', [
+                    'icon' => 'edit', 'title' => 'Tanda tangan kampus', 'sub' => 'Ketua Program Studi',
+                    'ok' => $signature && $template->signer_name, 'okLabel' => 'Lengkap', 'todoLabel' => 'Belum lengkap',
+                    'messages' => [$errors->first('signer_name'), $errors->first('signer_title'), $errors->first('signature')],
+                    'removeForm' => $signature ? 'f-ttd' : null, 'removeName' => 'remove_signature',
+                    'deleteLabel' => 'Hapus tanda tangan', 'confirm' => 'Hapus tanda tangan kaprodi?',
+                ])
             </div>
-            <p class="cst-guide">Disarankan 600 × 200 px, PNG berlatar transparan, maks. 1 MB.</p>
-            <div class="cst-actions">
-                @if ($signature)
-                    <label class="cst-check"><input type="checkbox" name="remove_signature" value="1" form="f-ttd"> Hapus tanda tangan</label>
-                @endif
-                <button type="submit" form="f-ttd" class="btn btn-primary">Simpan</button>
-            </div>
+            @include('sertifikat._bar-spec', ['rows' => ['Tanda tangan' => '600 × 200 px, latar transparan']])
+            <button type="submit" form="f-ttd" class="btn btn-primary cst-save">Simpan</button>
         </div>
     </section>
 @endsection

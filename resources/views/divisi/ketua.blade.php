@@ -36,6 +36,10 @@
             @method('PUT')
         </form>
 
+        @if ($company && ! isset($anchored[$company->id]))
+            <?php $anchored[$company->id] = true; ?>
+            <span id="perusahaan-{{ $company->id }}" class="cst-anchor"></span>
+        @endif
         <section class="cst-studio" id="divisi-{{ $division->id }}">
             @include('sertifikat._stage', [
                 'edit' => ['perusahaan' => $company ? 'f-logo-'.$company->id : null],
@@ -53,40 +57,26 @@
             ])
 
             <div class="cst-bar">
-                @if ($company)
-                    <div class="cst-item">
-                        <span @class(['cst-dot', 'is-ok' => $company->logo_file_id])></span>
-                        <div>
-                            <strong>Logo perusahaan</strong>
-                            <span>{{ $company->name }}</span>
-                            @if ($logoBag->has('logo'))<p class="field-error">{{ $logoBag->first('logo') }}</p>@endif
-                        </div>
-                        @if ($company->logo_file_id)
-                            <form method="POST" action="{{ route('sertifikat.data.logo.destroy', $company) }}" onsubmit="return confirm('Hapus logo {{ $company->name }}?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="cst-link">Hapus</button>
-                            </form>
-                        @endif
-                    </div>
-                @endif
-                <div class="cst-item">
-                    <span @class(['cst-dot', 'is-ok' => $division->head_name && $sig])></span>
-                    <div>
-                        <strong>Ketua divisi</strong>
-                        <span>Divisi {{ $division->name }}</span>
-                        @foreach (['head_name', 'signature'] as $f)
-                            @if ($bag->has($f))<p class="field-error">{{ $bag->first($f) }}</p>@endif
-                        @endforeach
-                    </div>
-                </div>
-                <p class="cst-guide">Logo 500 × 500 px atau 900 × 300 px. Tanda tangan 600 × 200 px, PNG berlatar transparan. Maks. 1 MB, otomatis dipaskan.</p>
-                <div class="cst-actions">
-                    @if ($sig)
-                        <label class="cst-check"><input type="checkbox" name="remove_signature" value="1" form="f-div-{{ $division->id }}"> Hapus tanda tangan</label>
+                <div class="cst-items">
+                    @if ($company)
+                        @include('sertifikat._bar-item', [
+                            'icon' => 'image', 'title' => 'Logo perusahaan', 'sub' => $company->name,
+                            'ok' => (bool) $company->logo_file_id, 'okLabel' => 'Terpasang', 'todoLabel' => 'Belum ada',
+                            'messages' => [$logoBag->first('logo')],
+                            'delete' => $company->logo_file_id ? route('sertifikat.data.logo.destroy', $company) : null,
+                            'deleteLabel' => 'Hapus logo perusahaan', 'confirm' => 'Hapus logo '.$company->name.'?',
+                        ])
                     @endif
-                    <button type="submit" form="f-div-{{ $division->id }}" class="btn btn-primary">Simpan</button>
+                    @include('sertifikat._bar-item', [
+                        'icon' => 'edit', 'title' => 'Ketua divisi', 'sub' => 'Divisi '.$division->name,
+                        'ok' => $division->head_name && $sig, 'okLabel' => 'Lengkap', 'todoLabel' => 'Belum lengkap',
+                        'messages' => [$bag->first('head_name'), $bag->first('signature')],
+                        'removeForm' => $sig ? 'f-div-'.$division->id : null, 'removeName' => 'remove_signature',
+                        'deleteLabel' => 'Hapus tanda tangan', 'confirm' => 'Hapus tanda tangan ketua divisi '.$division->name.'?',
+                    ])
                 </div>
+                @include('sertifikat._bar-spec', ['rows' => ['Logo' => '500 × 500 atau 900 × 300 px', 'Tanda tangan' => '600 × 200 px, latar transparan']])
+                <button type="submit" form="f-div-{{ $division->id }}" class="btn btn-primary cst-save">Simpan</button>
             </div>
         </section>
     @empty
@@ -100,15 +90,16 @@
                     'right' => $right,
                 ])
                 <div class="cst-bar">
-                    <div class="cst-item">
-                        <span @class(['cst-dot', 'is-ok' => $company->logo_file_id])></span>
-                        <div>
-                            <strong>Logo perusahaan</strong>
-                            <span>{{ $company->name }}</span>
-                            @if ($logoBag->has('logo'))<p class="field-error">{{ $logoBag->first('logo') }}</p>@endif
-                        </div>
+                    <div class="cst-items">
+                        @include('sertifikat._bar-item', [
+                            'icon' => 'image', 'title' => 'Logo perusahaan', 'sub' => $company->name,
+                            'ok' => (bool) $company->logo_file_id, 'okLabel' => 'Terpasang', 'todoLabel' => 'Belum ada',
+                            'messages' => [$logoBag->first('logo')],
+                            'delete' => $company->logo_file_id ? route('sertifikat.data.logo.destroy', $company) : null,
+                            'deleteLabel' => 'Hapus logo perusahaan', 'confirm' => 'Hapus logo '.$company->name.'?',
+                        ])
                     </div>
-                    <p class="cst-guide">Ketua divisi bisa diisi setelah ada mahasiswa magang yang Anda supervisi di sebuah divisi.</p>
+                    <p class="cst-note">Ketua divisi bisa diisi setelah ada mahasiswa magang yang Anda supervisi di sebuah divisi.</p>
                 </div>
             </section>
         @endforeach
