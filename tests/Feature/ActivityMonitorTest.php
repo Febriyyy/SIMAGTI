@@ -79,6 +79,10 @@ class ActivityMonitorTest extends TestCase
         $this->assertSame('waiting', $tari['documents']['state']); // sudah diunggah, menunggu diperiksa TU
         $this->assertSame('done', $steps['plans']['state']);
 
+        // Laporan dan sidang sudah berjalan: tidak lagi "Segera hadir"
+        $this->assertSame(route('laporan.saya'), $steps['report']['url']);
+        $this->assertFalse(collect($steps)->contains('state', 'later'));
+
         $this->actingAs($this->user('mahasiswa@kp.test'))->get('/status-kp')->assertOk()
             ->assertSee('class="step-title step-link"', false)
             ->assertSee('Rencana kegiatan')

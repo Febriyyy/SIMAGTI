@@ -58,7 +58,7 @@
                                         @else
                                             <span class="step-title">{{ $step['title'] }}</span>
                                         @endif
-                                        <span class="step-state">{{ ['done' => 'Selesai', 'current' => 'Berjalan', 'waiting' => 'Menunggu', 'attention' => ['supervisor' => 'Perlu dicek', 'result' => 'Tidak diterima', 'documents' => 'Perlu diunggah'][$step['key']] ?? 'Ditolak', 'upcoming' => 'Belum', 'later' => 'Segera hadir'][$step['state']] }}</span>
+                                        <span class="step-state">{{ ['done' => 'Selesai', 'current' => 'Berjalan', 'waiting' => 'Menunggu', 'attention' => ['supervisor' => 'Perlu dicek', 'result' => 'Tidak diterima', 'documents' => 'Perlu diunggah', 'report' => 'Perlu revisi'][$step['key']] ?? 'Ditolak', 'upcoming' => 'Belum', 'later' => 'Segera hadir'][$step['state']] }}</span>
                                     </div>
                                     <div class="step-meta">
                                         {{ $step['actor'] }}

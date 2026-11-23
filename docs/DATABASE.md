@@ -257,7 +257,7 @@ Sertifikat pelatihan (bootcamp, kursus, lomba), tanpa verifikasi kampus (maks. 2
 
 ### report_chapters (November 2026)
 
-Laporan KP per bab. Dibuat otomatis (4 bab bawaan, `ReportChapter::DEFAULTS`) saat mahasiswa membuka halaman Dokumen untuk KP yang berjalan atau selesai. Bab yang memuat informasi perusahaan (`needs_supervisor`) disetujui Company Supervisor dulu, baru diteruskan ke dosen pembimbing.
+Laporan KP per bab. Dibuat otomatis (4 bab bawaan, `ReportChapter::DEFAULTS`) saat halaman Laporan KP dibuka (`ManageReportChapters::ensureFor`) untuk KP yang berjalan atau selesai. Bab yang memuat informasi perusahaan (`needs_supervisor`) disetujui Company Supervisor dulu, baru diteruskan ke dosen pembimbing.
 
 | Kolom | Tipe | Keterangan |
 |---|---|---|
