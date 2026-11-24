@@ -152,7 +152,7 @@
         if (reduce || !(slide.classList.contains('wr-grade') || slide.classList.contains('wr-outro'))) return;
         var old = slide.querySelector('.wr-confetti'); if (old) old.remove();
         var box = document.createElement('div'); box.className = 'wr-confetti'; box.setAttribute('aria-hidden', 'true');
-        var colors = ['#d4f59a', '#ffffff', '#fde68a', '#93c5fd', '#f9a8d4', '#6ee7b7'];
+        var colors = ['#dff5b0', '#ffffff', '#fde68a', '#93c5fd', '#f9a8d4', '#6ee7b7'];
         for (var n = 0; n < 64; n++) {
             var p = document.createElement('i'), a = Math.random() * Math.PI * 2, dist = 90 + Math.random() * 220;
             if (n % 3 === 0) p.className = 'dot';
@@ -218,10 +218,10 @@
         var x = c.getContext('2d');
         var draw = function () {
             var g = x.createLinearGradient(0, 0, 1080, 1350);
-            g.addColorStop(0, '#0e3b33'); g.addColorStop(0.55, '#2e7d16'); g.addColorStop(1, '#6cc02a');
+            g.addColorStop(0, '#234635'); g.addColorStop(0.55, '#0a7c4e'); g.addColorStop(1, '#3fa66e');
             x.fillStyle = g; x.fillRect(0, 0, 1080, 1350);
             x.fillStyle = 'rgba(255,255,255,0.08)'; x.beginPath(); x.arc(940, 160, 260, 0, Math.PI * 2); x.fill();
-            x.fillStyle = '#d4f59a'; x.font = '700 40px Geist, sans-serif'; x.fillText('KP WRAPPED ' + d.year, 90, 170);
+            x.fillStyle = '#dff5b0'; x.font = '700 40px Geist, sans-serif'; x.fillText('KP WRAPPED ' + d.year, 90, 170);
             x.fillStyle = '#fff'; x.font = '800 84px Geist, sans-serif'; wrap(d.name, 90, 290, 900, 92);
             x.fillStyle = 'rgba(255,255,255,0.82)'; x.font = '500 36px Geist, sans-serif'; wrap(d.place, 90, 470, 900, 46);
             var items = [['Hari tercatat', d.days], ['Task selesai', d.done + '/' + d.tasks], ['Goal tercapai', d.goals], [d.lastLabel, d.last]];

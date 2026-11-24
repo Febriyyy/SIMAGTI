@@ -17,7 +17,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <style>
         /* Halaman cetak berdiri sendiri (A4 tegak). Warna mengikuti token merek di public/css/kp.css. */
-        :root { --ink: #0e3b33; --primary: #2e7d16; --green: #6cc02a; --soft: #eaf5dc; --tint: #f2f9f7; --text: #142b29; --muted: #5d706d; --line: #d4dfdc; --page: #e6eeec; }
+        :root { --ink: #234635; --primary: #0a7c4e; --green: #3fa66e; --soft: #e3f2e9; --tint: #f2f9f7; --text: #142b29; --muted: #5d706d; --line: #d4dfdc; --page: #e6eeec; }
         @page { size: A4 portrait; margin: 20mm 20mm 22mm; }
         * { box-sizing: border-box; }
         html, body { margin: 0; }
@@ -30,7 +30,7 @@
         .toast { position: fixed; left: 50%; bottom: 24px; z-index: 3; transform: translate(-50%, 20px); padding: 10px 18px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
         .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        .doc { width: 210mm; max-width: calc(100% - 32px); margin: 24px auto 48px; padding: 22mm 20mm; background: #fff; box-shadow: 0 12px 40px rgba(14, 59, 51, .14); }
+        .doc { width: 210mm; max-width: calc(100% - 32px); margin: 24px auto 48px; padding: 22mm 20mm; background: #fff; box-shadow: 0 12px 40px rgba(35, 70, 53, .14); }
         .cover { display: flex; flex-direction: column; align-items: center; min-height: 230mm; padding-top: 12mm; text-align: center; page-break-after: always; }
         .cover .kicker { margin: 0; color: var(--primary); font-size: 13px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; }
         .cover h1 { margin: 6mm 0 0; color: var(--ink); font-size: 30px; line-height: 1.2; }

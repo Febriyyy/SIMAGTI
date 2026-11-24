@@ -14,9 +14,9 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Times New Roman', Times, serif; font-size: 11.5pt; color: #000; background: #f2f2f2; }
         .sheet { width: 210mm; min-height: 297mm; margin: 12px auto; padding: 18mm 16mm; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
-        .toolbar { position: sticky; top: 0; display: flex; gap: 8px; justify-content: center; padding: 10px; background: #0e3b33; font-family: system-ui, sans-serif; }
+        .toolbar { position: sticky; top: 0; display: flex; gap: 8px; justify-content: center; padding: 10px; background: #234635; font-family: system-ui, sans-serif; }
         .toolbar button { padding: 8px 18px; border: 0; border-radius: 999px; font-weight: 600; cursor: pointer; }
-        .toolbar .primary { background: #6cc02a; color: #fff; }
+        .toolbar .primary { background: #3fa66e; color: #fff; }
         .kop { text-align: center; font-weight: bold; line-height: 1.35; text-transform: uppercase; }
         .kop small { display: block; font-weight: normal; text-transform: none; }
         h2 { margin: 22px 0 8px; font-size: 12pt; text-transform: uppercase; }
