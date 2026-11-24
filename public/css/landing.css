@@ -596,3 +596,13 @@ body.ld { overflow-x: clip; }
 /* Footer: putih dengan semburat hijau sangat muda di pojok */
 .ld-footer { background: radial-gradient(110% 130% at 100% 100%, rgba(11, 154, 127, .18) 0%, rgba(11, 154, 127, 0) 60%), linear-gradient(160deg, #ffffff 0%, #f8faf7 100%); }
 .ld-footer-rings circle { stroke: rgba(3, 122, 104, .06); }
+
+/* =====================================================================
+   Huruf elegan (25 Nov 2026, pilihan pemilik): judul berserif Fraunces, teks Plus Jakarta Sans.
+   ===================================================================== */
+body.ld, .ld-btn { font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+.ld-hero-title, .ld-h2, .ld-close-title, .ld-stat-num, .ld-jobs-count, .ld-progress-num {
+    font-family: "Fraunces", Georgia, "Times New Roman", serif;
+    font-weight: 600; letter-spacing: -0.015em;
+    font-optical-sizing: auto;
+}
