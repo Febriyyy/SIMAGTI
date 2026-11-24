@@ -6856,3 +6856,19 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .recap-search .select { flex: 0 0 200px; min-width: 0; }
 .recap-search .input { min-width: 140px; }
 @media (max-width: 700px) { .recap-search .select { flex: 1 1 100%; } .recap-search:has(select) { flex-wrap: wrap; } }
+/* Kampus dan Prodi: nama prodi dan kaprodi sama lebar dan sejajar */
+.prd-form { grid-template-columns: 60px minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; }
+.prd-code { align-self: end; flex-direction: column; gap: 1px; height: 46px; line-height: 1.1; }
+.prd-code small { font-size: 10.5px; font-weight: 600; color: var(--primary); opacity: .8; }
+.prd-field .input, .prd-field .select { width: 100%; height: 46px; box-sizing: border-box; }
+.prd-form > .btn { height: 46px; }
+@media (max-width: 640px) { .prd-form { grid-template-columns: 52px minmax(0, 1fr); } }
+.av-back { color: var(--primary-dark); font-weight: 600; text-decoration: none; }
+.av-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.av .alert-success { margin: 0; border-radius: 12px; }
+/* Kampus dan Prodi (perbaikan): kode dan jumlah mahasiswa sebagai baris keterangan di atas isian */
+.prd-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; row-gap: 10px; }
+.prd-meta { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+.prd-meta .prd-code { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; letter-spacing: .03em; }
+@media (max-width: 640px) { .prd-form { grid-template-columns: minmax(0, 1fr); } }
+.prd-meta .prd-code { flex-direction: row; justify-content: center; align-self: center; gap: 0; height: 24px; min-width: 40px; line-height: 1; }

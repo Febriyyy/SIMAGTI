@@ -144,8 +144,8 @@ class PasswordTest extends TestCase
         $this->get('/admin/akun')->assertSee('Atur ulang sandi');
     }
 
-    public function test_bantuan_lupa_kata_sandi_mengarahkan_ke_admin(): void
+    public function test_lupa_kata_sandi_mengarah_ke_halaman_atur_ulang_lewat_email(): void
     {
-        $this->get('/login')->assertOk()->assertSee('Lupa kata sandi?')->assertSee('Hubungi admin');
+        $this->get('/login')->assertOk()->assertSee('Lupa kata sandi?')->assertSee(route('password.request'), false);
     }
 }

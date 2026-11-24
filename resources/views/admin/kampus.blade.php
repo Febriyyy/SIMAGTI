@@ -36,11 +36,10 @@
                             <form method="POST" action="{{ route('admin.prodi.update', $program) }}" class="prd-form">
                                 @csrf
                                 @method('PUT')
-                                <span class="prd-code">{{ $program->code }}</span>
+                                <div class="prd-meta"><span class="prd-code">{{ $program->code }}</span><span>{{ $program->students_count }} mahasiswa</span></div>
                                 <div class="prd-field">
                                     <label class="label" for="prd-name-{{ $program->id }}">Nama prodi</label>
                                     <input id="prd-name-{{ $program->id }}" name="name" class="input" maxlength="100" required value="{{ old('name', $program->name) }}">
-                                    <small class="muted">{{ $program->students_count }} mahasiswa</small>
                                     @if ($bag->has('name'))<p class="field-error">{{ $bag->first('name') }}</p>@endif
                                 </div>
                                 <div class="prd-field">

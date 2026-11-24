@@ -10,6 +10,7 @@ use App\Http\Controllers\AssessmentReviewController;
 use App\Http\Controllers\AssessmentStandardController;
 use App\Http\Controllers\AssessmentWeightController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\BoardColumnController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ChangeRequestController;
@@ -91,6 +92,12 @@ Route::get('/sertifikat/verifikasi/{token}', [CertificateController::class, 'ver
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:10,1');
+
+    // Lupa kata sandi: tautan atur ulang lewat email
+    Route::get('/lupa-sandi', [PasswordResetController::class, 'request'])->name('password.request');
+    Route::post('/lupa-sandi', [PasswordResetController::class, 'email'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('/atur-sandi/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/atur-sandi', [PasswordResetController::class, 'update'])->middleware('throttle:10,1')->name('password.update');
 });
 
 Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::class])->group(function () {

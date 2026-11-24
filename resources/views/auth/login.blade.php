@@ -52,9 +52,8 @@
 
                 <div class="gl-row">
                     <label class="gl-check"><input type="checkbox" name="remember" value="1" @checked(old('remember'))> Ingat saya</label>
-                    <button type="button" class="gl-link" data-toggle-help aria-expanded="false" aria-controls="signin-help">Lupa kata sandi?</button>
+                    <a href="{{ route('password.request') }}" class="gl-link">Lupa kata sandi?</a>
                 </div>
-                <p id="signin-help" class="gl-help" hidden>Hubungi admin SIMAGTI untuk mengatur ulang kata sandi. Anda akan menerima kata sandi sementara yang wajib diganti saat masuk.</p>
 
                 <button type="submit" class="gl-submit"><span class="gl-submit-label">Masuk</span><span class="gl-spin" aria-hidden="true"></span></button>
             </form>
