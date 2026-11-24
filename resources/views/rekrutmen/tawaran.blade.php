@@ -22,16 +22,17 @@
         <div class="min0 grow">
             <p class="job-company">{{ $internship->placeName() }}</p>
             <h2 class="job-title">{{ $o->offered_position }}</h2>
-            <p class="job-meta">
-                @if ($o->unit)<span>{{ $o->unit }}</span>@endif
-                <span>{{ $o->work_location }}</span>
-                <span>{{ $o->workModeLabel() }}</span>
-            </p>
+            @php($meta = array_filter([$o->unit, $o->work_location, $o->workModeLabel()]))
+            @if ($meta)
+                <p class="job-meta">@foreach ($meta as $m)<span>{{ $m }}</span>@endforeach</p>
+            @endif
         </div>
         <div class="job-state">
-            @if ($o->status === 'ditawari' && $open)
+            @if ($o->status === 'ditawari' && $open && $left !== null)
                 <span class="job-due {{ $left <= 2 ? 'is-soon' : '' }}">{{ $left === 0 ? 'Hari ini terakhir' : $left.' hari lagi' }}</span>
-                <small>Jawab sebelum {{ $o->respond_by?->locale('id')->translatedFormat('j F Y') }}</small>
+                <small>Jawab sebelum {{ $o->respond_by->locale('id')->translatedFormat('j F Y') }}</small>
+            @elseif ($o->status === 'ditawari' && $open)
+                <x-chip tone="amber">Menunggu jawaban Anda</x-chip>
             @else
                 <x-chip :tone="$o->statusTone()">{{ $o->status === 'ditolak' ? 'Anda menolak' : ($o->status === 'diterima' ? 'Anda menerima' : $o->statusLabel()) }}</x-chip>
                 @if ($o->responded_at)<small>{{ $o->responded_at->locale('id')->translatedFormat('j F Y') }}</small>@endif
@@ -44,11 +45,14 @@
             <section class="card">
                 <div class="card-head"><h2 class="card-title">Detail pekerjaan</h2></div>
                 <div class="card-body">
+                    @php($none = '<span class="muted">Belum dilengkapi perusahaan</span>')
                     <dl class="job-facts">
-                        <div><dt>Hubungan kerja</dt><dd>{{ $o->employmentLabel() }}</dd></div>
+                        <div><dt>Posisi</dt><dd>{!! $o->offered_position ? e($o->offered_position) : $none !!}</dd></div>
+                        <div><dt>Divisi</dt><dd>{!! $o->unit ? e($o->unit) : $none !!}</dd></div>
+                        <div><dt>Lokasi penempatan</dt><dd>{!! $o->work_location ? e($o->work_location) : $none !!}</dd></div>
+                        <div><dt>Cara kerja</dt><dd>{!! $o->workModeLabel() ? e($o->workModeLabel()) : $none !!}</dd></div>
+                        <div><dt>Hubungan kerja</dt><dd>{!! $o->employmentLabel() ? e($o->employmentLabel()) : $none !!}</dd></div>
                         <div><dt>Perkiraan mulai</dt><dd>{{ $o->start_date?->locale('id')->translatedFormat('j F Y') ?? 'Disepakati kemudian' }}</dd></div>
-                        <div><dt>Penempatan</dt><dd>{{ $o->work_location }}</dd></div>
-                        <div><dt>Cara kerja</dt><dd>{{ $o->workModeLabel() }}</dd></div>
                         <div class="span-all"><dt>Kompensasi</dt><dd>{{ $o->compensation ?: 'Dibahas saat wawancara' }}</dd></div>
                     </dl>
                     @if ($points)
@@ -88,11 +92,13 @@
                         <p>Batas waktu lewat. Hubungi HR bila masih berminat.</p>
                     @endif
                 </div>
-                <div class="card-foot job-contact">
-                    <span class="job-contact-label">Kontak HR</span>
-                    <strong>{{ $o->hr_contact_name }}</strong>
-                    <a href="mailto:{{ $o->hr_contact_email }}">{{ $o->hr_contact_email }}</a>
-                </div>
+                @if ($o->hr_contact_name || $o->hr_contact_email)
+                    <div class="card-foot job-contact">
+                        <span class="job-contact-label">Kontak HR</span>
+                        @if ($o->hr_contact_name)<strong>{{ $o->hr_contact_name }}</strong>@endif
+                        @if ($o->hr_contact_email)<a href="mailto:{{ $o->hr_contact_email }}">{{ $o->hr_contact_email }}</a>@endif
+                    </div>
+                @endif
             </section>
         </div>
     </div>

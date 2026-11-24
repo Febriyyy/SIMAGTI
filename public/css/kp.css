@@ -6971,3 +6971,13 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
 /* Menu aktif: hijau hutan dengan ikon lime, kesan gelap-mewah */
 .nav-item.is-active, .nav-item.is-active:hover { background: var(--primary-dark); color: #fff; box-shadow: 0 8px 18px rgba(35, 70, 53, .22) !important; }
 .nav-item.is-active .ikon, .nav-item.is-active:hover .ikon { color: var(--lime); }
+
+/* Kartu tawaran kerja di dasbor mahasiswa: teks mengisi ruang, tombol rata kanan, latar krem-putih sesuai palet */
+.offer-card { flex-wrap: nowrap; background: linear-gradient(110deg, #f2f9dd 0%, #ffffff 60%) !important; box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(12, 29, 22, .04) !important; }
+.offer-card > .min0 { flex: 1 1 auto; }
+.offer-card .offer-actions { margin-left: auto; flex: none; }
+@media (max-width: 640px) {
+    .offer-card { flex-wrap: wrap; }
+    .offer-card .offer-actions { width: 100%; }
+    .offer-card .offer-actions .btn { width: 100%; justify-content: center; }
+}

@@ -18,7 +18,7 @@ class ConversionCandidate extends Model
         'kedaluwarsa' => ['Kedaluwarsa', 'gray'],
     ];
 
-    public const WORK_MODES = ['wfo' => 'Di kantor (WFO)', 'hybrid' => 'Hybrid', 'remote' => 'Jarak jauh (remote)'];
+    public const WORK_MODES = ['wfo' => 'Work From Office (WFO)', 'remote' => 'Work From Home (WFH)', 'hybrid' => 'Hybrid'];
 
     public const EMPLOYMENT_TYPES = ['tetap' => 'Karyawan tetap', 'kontrak' => 'Karyawan kontrak', 'magang' => 'Magang lanjutan'];
 
