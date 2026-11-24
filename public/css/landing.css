@@ -596,3 +596,154 @@ body.ld { overflow-x: clip; }
 /* Footer: putih dengan semburat hijau sangat muda di pojok */
 .ld-footer { background: radial-gradient(110% 130% at 100% 100%, rgba(11, 154, 127, .18) 0%, rgba(11, 154, 127, 0) 60%), linear-gradient(160deg, #ffffff 0%, #f8faf7 100%); }
 .ld-footer-rings circle { stroke: rgba(3, 122, 104, .06); }
+
+/* =====================================================================
+   Aturan desain pemilik (24 Nov 2026, design-rules.md), lapisan terakhir.
+   Terang, bersih, tenang: satu aksen hijau, warna polos tanpa gradasi mencolok, hiasan dibuang.
+   Teks #1F2937 / #6B7280, border #E5E7EB, tombol 40px radius 8, kartu radius 12, wadah besar radius 16.
+   Pengecualian yang disetujui pemilik: hanya judul hero yang besar (48px, tebal 700).
+   ===================================================================== */
+:root {
+    --ink: #1f2937;
+    --ink-2: #111827;
+    --paper: #f8fafc;
+    --panel: #eef6f2;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, .06);
+}
+body.ld { font-size: 15px; line-height: 1.6; letter-spacing: 0; }
+.ld :focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(3, 122, 104, .25); border-radius: 8px; }
+.ld-skip { border-radius: 8px; }
+
+/* Tombol: 40px, radius 8, 14/500, hover hanya ganti warna */
+.ld-btn, .ld-nav .ld-btn, .ld-hero-cta .ld-btn, .ld-footer-cta .ld-btn {
+    height: 40px; padding: 0 20px; border-radius: 8px;
+    font-size: 14px; font-weight: 500; letter-spacing: 0;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.ld-btn:hover { transform: none; box-shadow: none; }
+.ld-btn-primary { background: var(--green); color: #fff; }
+.ld-btn-primary:hover { background: #02695a; box-shadow: none; }
+.ld-btn-ghost { background: var(--card); border-color: var(--line); color: var(--ink); }
+.ld-btn-ghost:hover { background: var(--paper); border-color: #d1d5db; }
+.ld-btn-lime { background: #fff; color: var(--green); }
+.ld-btn-lime:hover { background: #f1f9f6; box-shadow: none; }
+
+/* Navigasi */
+.ld-links { gap: 4px; }
+.ld-links a { padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+.ld-nav::before { background: rgba(248, 250, 252, .85); }
+
+/* Hero: panel mint lembut tanpa hiasan */
+.ld-hero-panel { border-radius: 16px; background: var(--panel); border: 1px solid #dcebe4; }
+.ld-hero-panel::before { display: none; }
+.ld-hero-panel::after { opacity: .35; }
+.ld-hero-title { max-width: 18ch; font-size: 48px; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
+@media (min-width: 721px) { .ld-hero-title { font-size: 48px; } }
+.ld-hero-sub { max-width: 56ch; color: var(--muted); font-size: 18px; line-height: 1.6; }
+
+/* Kartu angka: radius 12, bayangan tipis, hijau polos */
+.ld-stats { gap: 16px; }
+.ld-stat { border-radius: 12px; box-shadow: var(--shadow-card); }
+.ld-stat-c1 { background: var(--green); }
+.ld-stat-c2, .ld-stat-c3 { box-shadow: var(--shadow-card), inset 0 0 0 1px var(--line); }
+.ld-stat-num { font-size: 28px; font-weight: 700; letter-spacing: 0; }
+.ld-stat-label { font-size: 13px; }
+@media (min-width: 721px) { .ld-stat-num { font-size: 28px; } .ld-stat-label { font-size: 13px; } }
+.ld-stat-faces i { font-size: 13px; font-weight: 600; }
+.ld-stat-notch, .ld-stat-notch:hover { position: absolute; right: 16px; bottom: 16px; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); font-size: 13px; font-weight: 500; }
+@media (min-width: 721px) { .ld-stat-notch { padding: 0 12px; font-size: 13px; } }
+.ld-stat-notch:hover { border-color: var(--green); color: var(--green); }
+.ld-stat-notch::before, .ld-stat-notch::after { display: none; }
+
+/* Judul seksi 22/600, catatan 15 */
+.ld-section { padding-top: 96px; }
+.ld-head { margin-bottom: 24px; }
+.ld-h2 { max-width: none; font-size: 22px; font-weight: 600; line-height: 1.3; letter-spacing: 0; }
+.ld-head-note { font-size: 15px; color: var(--muted); }
+
+/* Peran */
+.ld-roles { padding: 32px; border-radius: 16px; border-color: var(--line); box-shadow: var(--shadow-card); }
+.ld-role-grid { gap: 16px; }
+.ld-role { padding: 24px; border-radius: 12px; border: 1px solid var(--line); box-shadow: none; }
+.ld-role-head { border-bottom: 1px solid var(--line); }
+.ld-role-head h3 { font-size: 18px; font-weight: 600; line-height: 1.35; letter-spacing: 0; }
+.ld-role-icon { width: 40px; height: 40px; border-radius: 8px; }
+.ld-role > p { font-size: 15px; }
+.ld-mock { border-radius: 8px; font-size: 13px; background: var(--paper); }
+.ld-mock-tasks span, .ld-mock-rate b { font-weight: 500; }
+.ld-mock-rate b { font-size: 13px; }
+.ld-mock-rate small, .ld-mock-chart small { font-size: 13px; font-weight: 500; }
+.ld-mock-note span { border-radius: 8px; }
+/* Saat diarahkan: perubahan tipis saja (garis hijau), bukan berganti warna penuh */
+.ld-role:hover, .ld-js .ld-role.is-settled:hover { background: var(--card); color: var(--ink); border-color: var(--green); transform: none; box-shadow: var(--shadow-card); }
+.ld-role:hover .ld-role-head { border-color: var(--line); }
+.ld-role:hover .ld-role-icon { background: var(--green); color: #fff; transform: none; }
+.ld-role:hover > p { color: var(--muted); }
+.ld-role:hover .ld-mock { background: var(--paper); }
+.ld-role:hover .ld-mock-tasks .is-done { color: var(--muted); }
+.ld-role:hover .ld-mock-chart small { color: var(--muted); }
+.ld-role:hover .ld-mock-note .ld-note-out { background: var(--green); }
+
+/* Alur KP: pita mint tanpa tulisan raksasa, kartu progres hijau polos */
+.ld-flow { margin-top: 96px; padding: 80px 16px; background: var(--panel); }
+.ld-flow::before { display: none; }
+.ld-progress { padding: 24px; border-radius: 12px; background: var(--green); box-shadow: var(--shadow-card); }
+.ld-progress-week { padding: 4px 10px; font-size: 13px; letter-spacing: .02em; }
+.ld-progress-num { font-size: 28px; font-weight: 700; letter-spacing: 0; }
+.ld-progress-label, .ld-progress-rows small, .ld-progress-rows b { font-size: 13px; }
+.ld-progress-rows span { padding: 12px 16px; border-radius: 8px; }
+.ld-steps-wrap .ld-h2 { margin-bottom: 24px; }
+.ld-steps { gap: 24px; }
+.ld-steps li { grid-template-columns: 40px minmax(0, 1fr); gap: 16px; }
+.ld-step-n { width: 40px; height: 40px; font-size: 15px; font-weight: 600; }
+.ld-steps b { margin-top: 0; font-size: 18px; font-weight: 600; letter-spacing: 0; line-height: 1.35; }
+.ld-steps p { font-size: 15px; }
+
+/* Lowongan */
+.ld-jobs { gap: 16px; }
+.ld-jobs-lead { min-height: 0; justify-content: space-between; gap: 8px; padding: 24px; border-radius: 12px; background: var(--green); }
+.ld-jobs-count { font-size: 28px; font-weight: 700; letter-spacing: 0; color: #fff; }
+.ld-jobs-label { margin-bottom: auto; font-size: 15px; }
+.ld-job { padding: 24px; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow-card); }
+.ld-job:hover, .ld-js .ld-job.is-settled:hover { transform: none; border-color: var(--green); box-shadow: var(--shadow-card); }
+.ld-job-top { margin-bottom: 16px; }
+.ld-job-mark { width: 40px; height: 40px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+.ld-job-due { padding: 4px 10px; font-size: 13px; font-weight: 500; letter-spacing: .02em; }
+.ld-job-co { font-size: 13px; }
+.ld-job-title { font-size: 18px; font-weight: 600; letter-spacing: 0; line-height: 1.35; }
+.ld-job-desc { font-size: 13px; }
+.ld-job-skills li { padding: 4px 10px; font-size: 13px; font-weight: 500; letter-spacing: .02em; }
+.ld-job-meta { font-size: 13px; }
+.ld-job-go { width: 32px; height: 32px; border-radius: 8px; }
+.ld-job:hover .ld-job-go { transform: none; }
+
+/* Penutup: hijau polos, judul 28 */
+.ld-close { margin-top: 96px; padding: 64px 32px; border-radius: 16px; background: var(--green); }
+.ld-close-title { max-width: 26ch; font-size: 28px; font-weight: 700; line-height: 1.25; letter-spacing: 0; }
+.ld-close-sub { margin: 12px auto 24px; font-size: 15px; }
+
+/* Footer: putih bersih, tanpa cincin dan semburat */
+.ld-footer { margin: 48px auto 24px; padding: 32px 32px 16px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow-card), inset 0 0 0 1px var(--line); }
+.ld-footer h3 { margin-bottom: 8px; font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.ld-footer-brand p, .ld-footer-col a, .ld-footer-cta p { font-size: 13px; }
+.ld-footer-cta p { margin: 0 0 12px; }
+.ld-footer-bottom { font-size: 13px; border-top-color: var(--line); }
+.ld-footer-top-link span { border-radius: 8px; border-width: 1px; border-color: var(--line); }
+.ld-footer-top-link:hover span { background: var(--paper); color: var(--green); transform: none; }
+
+/* Gerak: muncul saat digulir dibuat lebih pendek dan halus */
+.ld-js [data-reveal] { transform: translateY(12px); transition-duration: 500ms; }
+
+@media (max-width: 720px) {
+    .ld-hero-title { font-size: 32px; }
+    .ld-hero-sub { font-size: 15px; }
+    .ld-section { padding-top: 64px; }
+    .ld-roles { padding: 16px; }
+    .ld-role { padding: 16px; }
+    .ld-flow { margin-top: 64px; padding: 48px 16px; }
+    .ld-close { margin-top: 64px; padding: 48px 16px; }
+    .ld-footer { padding: 24px 16px 16px; }
+}
