@@ -80,7 +80,7 @@
                     </tbody>
                 </table>
             </div>
-            <p class="card-foot">Penilaian dibuka {{ \App\Support\Campus::rule('assessment_open_days') }} hari sebelum KP berakhir. Pertanyaan dan skala nilai mengikuti standar kampus.</p>
+            <p class="card-foot">Dibuka {{ \App\Support\Campus::rule('assessment_open_days') }} hari sebelum KP berakhir.</p>
         @endif
     </section>
 @endsection

@@ -6882,3 +6882,48 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 /* Edge: kolom kata sandi yang sudah punya tombol mata sendiri tidak menampilkan ikon mata bawaan (agar tidak dobel) */
 :is(.av-pass, .lg-pass) input::-ms-reveal, :is(.av-pass, .lg-pass) input::-ms-clear { display: none; }
+
+/* =====================================================================
+   Label status di semua halaman (25 Nov 2026): titik berwarna berhalo + teks berwarna, tanpa latar pil.
+   Satu gaya untuk tabel, kartu, daftar, dialog, dan kepala halaman.
+   ===================================================================== */
+.chip, .watch-flag, .srow-flag, .icard-flag, .rv-norec, .waiting {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+    font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: 0; white-space: nowrap;
+}
+.chip::before, .watch-flag::before, .srow-flag::before, .icard-flag::before, .rv-norec::before {
+    content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor; opacity: 1;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
+}
+.watch-flag .ikon, .srow-flag .ikon, .icard-flag .ikon { display: none; }
+.srow-flag, .icard-flag { color: var(--amber); }
+.rv-norec { color: var(--red); }
+.waiting { gap: 4px; }
+/* Di atas latar hijau (kepala profil) teksnya tetap putih, titiknya hijau muda */
+.prof-top .prof-title .chip { color: #fff; }
+.prof-top .prof-title .chip::before { background: #a7f3d0; box-shadow: 0 0 0 3px rgba(167, 243, 208, .25); }
+/* Status langkah (Status KP, dasbor mahasiswa) memakai titik yang sama */
+.step-state, .mini-step-state { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.step-state::before, .mini-step-state::before {
+    content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
+}
+/* Info kecil (banner dasbor, kepala Kegiatan/Timesheet): ikon + teks, tanpa bingkai pil */
+.hero-meta { gap: 8px 20px !important; }
+.hero-tag, .pill {
+    height: auto !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important;
+    background: none !important; box-shadow: none !important; backdrop-filter: none !important;
+}
+.hero-tag { color: rgba(255, 255, 255, .92); }
+.pbanner-pills { column-gap: 20px !important; row-gap: 8px !important; }
+.pill-late { color: var(--red); }
+.pill-late .ikon { color: var(--red); }
+/* Prioritas task dan label Goal di kartu kanban: ikon bendera + teks berwarna, tanpa latar pil */
+.prio-pill, .gcard-tag {
+    height: auto !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important;
+    background: none !important; box-shadow: none !important;
+    font-size: 13px; font-weight: 600;
+}
+.gcard-tag { color: var(--amber); }
