@@ -3,7 +3,7 @@
     Variabel: $sessions, $canDelete
 --}}
 @if ($sessions->isEmpty())
-    <div class="empty"><strong>Belum ada bimbingan</strong> Catat setiap sesi bimbingan dengan dosen pembimbing setelah selesai.</div>
+    <div class="empty"><strong>Belum ada bimbingan</strong> Catat sesi setelah selesai.</div>
 @else
     <ol class="gtl">
         @foreach ($sessions as $s)

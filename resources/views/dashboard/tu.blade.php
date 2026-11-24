@@ -28,14 +28,14 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Antrean aktivasi</h2>
-                        <p class="card-sub">Dikelompokkan per perusahaan dan email supervisor dari formulir mahasiswa</p>
+                        <p class="card-sub">Per perusahaan dan email supervisor</p>
                     </div>
                     <a href="{{ route('tu.aktivasi') }}" class="btn btn-sm">Proses</a>
                 </div>
                 @if ($groups->isEmpty())
                     <div class="calm">
                         <span class="calm-icon"><x-ikon name="check" :size="20" /></span>
-                        <p>Tidak ada antrean. Pengajuan baru muncul di sini setelah disetujui kaprodi.</p>
+                        <p>Tidak ada antrean.</p>
                     </div>
                 @else
                     <ul class="item-list">
@@ -87,9 +87,9 @@
                 </div>
                 <div class="card-body">
                     <ol class="howto">
-                        <li><strong>Periksa data</strong> nama, jabatan, dan email supervisor dari formulir mahasiswa. Koreksi email bila salah ketik.</li>
-                        <li><strong>Sudah punya akun?</strong> Tautkan langsung, mahasiswa langsung terhubung.</li>
-                        <li><strong>Belum punya akun?</strong> Terbitkan undangan lalu kirim link-nya. Satu undangan berlaku untuk semua mahasiswa dengan email yang sama.</li>
+                        <li><strong>Periksa data</strong> nama dan email supervisor.</li>
+                        <li><strong>Sudah punya akun?</strong> Tautkan langsung.</li>
+                        <li><strong>Belum punya akun?</strong> Terbitkan undangan.</li>
                     </ol>
                 </div>
             </section>
@@ -99,7 +99,7 @@
         <div class="card-head">
             <div>
                 <h2 class="card-title">Perusahaan</h2>
-                <p class="card-sub">Urut dari yang paling banyak mahasiswa magang</p>
+                <p class="card-sub">Urut dari mahasiswa terbanyak</p>
             </div>
             <a href="{{ route('perusahaan.index') }}" class="btn btn-sm">Kelola perusahaan</a>
         </div>

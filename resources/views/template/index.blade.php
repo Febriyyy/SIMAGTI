@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Template Task</h1>
-            <p class="page-sub">Kumpulan task baku yang bisa diterapkan ke mahasiswa magang sekali klik.</p>
+            <p class="page-sub">Task baku, diterapkan sekali klik.</p>
         </div>
         <button type="button" class="btn btn-primary" data-open="tpl-new"><x-ikon name="plus" :size="18" /> Template baru</button>
     </div>
@@ -15,7 +15,7 @@
         <section class="card">
             <div class="empty">
                 <strong>Belum ada template</strong>
-                Buat template untuk tugas yang selalu sama, misalnya onboarding minggu pertama, lalu terapkan ke mahasiswa magang.
+                Untuk task yang selalu sama.
                 <div class="row-actions" style="justify-content:center; margin-top: var(--space-4)"><button type="button" class="btn btn-primary" data-open="tpl-new">Buat template</button></div>
             </div>
         </section>

@@ -29,11 +29,11 @@
                 <input id="{{ $id }}-date" name="issued_on" type="date" class="input" max="{{ today()->toDateString() }}" value="{{ $v('issued_on', $certificate?->issued_on?->toDateString()) }}">
                 @if ($e->has('issued_on'))<p class="field-error">{{ $e->first('issued_on') }}</p>@endif
             </div>
-            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($certificate?->linkList() ?? [], 'url'), 'hint' => 'Halaman kredensial, verifikasi, atau berkas daring sertifikat ini.'])
+            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($certificate?->linkList() ?? [], 'url'), 'hint' => 'Halaman kredensial atau verifikasi.'])
             <div class="span-all">
                 <label class="label" for="{{ $id }}-file">Berkas sertifikat</label>
                 <input id="{{ $id }}-file" name="file" type="file" class="input" accept="application/pdf,image/jpeg,image/png">
-                <p class="hint">{{ $certificate?->file ? 'Kosongkan bila tidak diganti. ' : '' }}PDF, JPG, atau PNG, paling besar 5 MB.</p>
+                <p class="hint">{{ $certificate?->file ? 'Kosongkan bila tidak diganti. ' : '' }}PDF, JPG, atau PNG, maks. 5 MB.</p>
                 @if ($e->has('file'))<p class="field-error">{{ $e->first('file') }}</p>@endif
             </div>
         </div>

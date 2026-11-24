@@ -11,7 +11,7 @@
         <div class="dialog-head">
             <div>
                 <h2 class="card-title">{{ $template ? 'Ubah template' : 'Template baru' }}</h2>
-                <p class="card-sub">Minggu 1 = minggu KP mahasiswa saat template diterapkan</p>
+                <p class="card-sub">Minggu 1 = minggu saat diterapkan</p>
             </div>
             <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
         </div>

@@ -11,7 +11,7 @@
         @endforeach
     </ul>
     <button type="button" class="btn btn-sm pf-links-add" data-pf-link-add><x-ikon name="plus" :size="16" /> Tambah tautan</button>
-    <p class="hint">{{ $hint }} Paling banyak 5 tautan.</p>
+    <p class="hint">{{ $hint }} Maks. 5 tautan.</p>
     @foreach (['links', 'links.*', 'url', 'credential_url'] as $key)
         @if ($e->has($key))<p class="field-error">{{ $e->first($key) }}</p>@break @endif
     @endforeach

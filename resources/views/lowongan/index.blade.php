@@ -15,7 +15,7 @@
     <section class="jb-head">
         <div class="jb-head-text">
             <h1 class="jb-head-title">Saatnya mulai magang.</h1>
-            <p class="jb-head-sub">Pilih lowongan dari perusahaan mitra kampus. Data perusahaan langsung terisi saat kamu mengajukan KP.</p>
+            <p class="jb-head-sub">Lowongan dari perusahaan mitra kampus.</p>
             @unless ($hasPortfolio)
                 <a href="{{ route('portofolio.edit') }}" class="jb-head-link">Lengkapi portofolio agar skillmu terlihat perusahaan <x-ikon name="arrow" :size="16" /></a>
             @endunless
@@ -47,11 +47,11 @@
     </section>
 
     @if (! $canApply)
-        <div class="alert alert-info" role="status">Anda sudah punya pengajuan atau KP yang berjalan. Lowongan tetap bisa dilihat sebagai referensi.</div>
+        <div class="alert alert-info" role="status">Anda sudah punya KP berjalan.</div>
     @endif
 
     @if ($postings->isEmpty())
-        <section class="card"><div class="empty"><strong>Belum ada lowongan dibuka</strong> Sambil menunggu, lengkapi portofolio agar siap saat lowongan dibuka.</div></section>
+        <section class="card"><div class="empty"><strong>Belum ada lowongan dibuka</strong> Sambil menunggu, lengkapi portofolio.</div></section>
     @else
         <ul class="jb-list">
             @foreach ($postings as $p)

@@ -156,7 +156,7 @@
                 <div class="dialog-head">
                     <div>
                         <h2 class="card-title">Rekomendasikan rekrut</h2>
-                        <p class="card-sub">Mahasiswa baru diberi tahu saat Anda menawarkan kerja</p>
+                        <p class="card-sub">Mahasiswa diberi tahu saat ditawari</p>
                     </div>
                     <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                 </div>
@@ -268,7 +268,7 @@
                 </div>
             </div>
             @if ($plans->isEmpty())
-                <div class="empty"><strong>Belum ada rencana</strong> Mahasiswa menyusun rencana kegiatan di timesheet sebelum membuat task.</div>
+                <div class="empty"><strong>Belum ada rencana</strong></div>
             @else
                 @include('timesheet._gantt', ['canEdit' => false])
             @endif
@@ -283,7 +283,7 @@
                 </div>
             </div>
             @if ($feed->isEmpty())
-                <div class="empty"><strong>Belum ada aktivitas</strong> Aktivitas muncul saat mahasiswa menyusun rencana, task, dan catatan.</div>
+                <div class="empty"><strong>Belum ada aktivitas</strong></div>
             @else
                 @include('aktivitas._feed', ['days' => \App\Support\ActivityFeed::byDay($feed), 'showStudent' => false])
             @endif
@@ -293,7 +293,7 @@
             <div class="card-head">
                 <div>
                     <h2 class="card-title">Log bimbingan</h2>
-                    <p class="card-sub">Dicatat mahasiswa, dikonfirmasi dosen pembimbing</p>
+                    <p class="card-sub">Dikonfirmasi dosen pembimbing</p>
                 </div>
                 <x-chip :tone="$sessions->where('status', 'confirmed')->count() >= $min ? 'green' : 'gray'">{{ $sessions->where('status', 'confirmed')->count() }} / {{ $min }} terkonfirmasi</x-chip>
             </div>

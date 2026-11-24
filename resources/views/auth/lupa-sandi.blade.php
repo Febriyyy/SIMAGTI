@@ -5,7 +5,7 @@
 {{-- Lupa kata sandi: isi email, tautan atur ulang dikirim ke email itu. --}}
 @section('card')
     <h1 class="av-title">Lupa kata sandi</h1>
-    <p class="av-lead">Masukkan email akun Anda. Kami kirim tautan untuk membuat kata sandi baru.</p>
+    <p class="av-lead">Kami kirim tautan ke email Anda.</p>
 
     <form method="POST" action="{{ route('password.email') }}" class="av-form" novalidate>
         @csrf

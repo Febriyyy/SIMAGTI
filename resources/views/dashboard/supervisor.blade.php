@@ -44,7 +44,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Mahasiswa magang</h2>
-                        <p class="card-sub">Rencana, task, dan catatan diisi mahasiswa</p>
+                        <p class="card-sub">Diisi mahasiswa</p>
                     </div>
                     <a href="{{ route('pantau.index') }}" class="btn btn-sm">Semua</a>
                 </div>
@@ -52,7 +52,7 @@
                 @if ($internships->isEmpty())
                     <div class="empty">
                         <strong>Belum ada mahasiswa magang</strong>
-                        Mahasiswa muncul setelah TU Fakultas mengaktifkan Anda sebagai Company Supervisor.
+                        Muncul setelah akun Anda diaktifkan TU.
                     </div>
                 @else
                     <x-intern-list compact>
@@ -68,7 +68,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Kegiatan terbaru</h2>
-                        <p class="card-sub">Catatan timesheet terakhir dari mahasiswa</p>
+                        <p class="card-sub">Catatan terakhir mahasiswa</p>
                     </div>
                     <a href="{{ route('aktivitas.index') }}" class="btn btn-sm">Aktivitas</a>
                 </div>

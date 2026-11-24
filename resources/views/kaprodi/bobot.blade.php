@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Bobot Penilaian</h1>
-            <p class="page-sub">Bobot tiap kategori dalam persen, total 100%. Berlaku untuk {{ $program }}.</p>
+            <p class="page-sub">Total 100%, untuk {{ $program }}.</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Bobot kategori</h2>
-                        <p class="card-sub">Dipakai untuk penilaian yang dikirim setelah disimpan</p>
+                        <p class="card-sub">Berlaku untuk penilaian berikutnya</p>
                     </div>
                     <x-chip :tone="abs(array_sum($weights) - 100) < 0.001 ? 'green' : 'red'" data-weight-total>{{ \App\Support\Num::short(array_sum($weights)) }}%</x-chip>
                 </div>
@@ -41,7 +41,7 @@
                         @endforeach
                     </ul>
                     <div class="form-actions">
-                        <p class="hint">Nilai kategori = rata-rata nilai pertanyaannya. Nilai akhir = jumlah nilai kategori × bobot.</p>
+                        <p class="hint">Nilai akhir = nilai kategori × bobot.</p>
                         <div class="row-actions"><button type="submit" class="btn btn-primary">Simpan</button></div>
                     </div>
                 </form>

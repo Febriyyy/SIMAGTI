@@ -18,7 +18,7 @@
                     <input id="invite-link" type="text" class="input" readonly value="{{ session('invitation_link') }}" onclick="this.select()">
                     <button type="button" class="btn" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('invite-link').value); this.textContent='Tersalin'">Salin</button>
                 </div>
-                <p class="hint">Pengiriman lewat email otomatis akan aktif setelah server email (SMTP) disiapkan.</p>
+                <p class="hint">Email otomatis aktif setelah SMTP disiapkan.</p>
             </div>
         </section>
     @endif
@@ -47,7 +47,7 @@
                                 <div><dt>Mahasiswa</dt><dd>{{ $internship->student->name }} · {{ $internship->student->nim }}</dd></div>
                                 <div><dt>Penempatan</dt><dd>{{ $internship->company?->name }}{{ $internship->division ? ' · Divisi '.$internship->division->name : '' }} · {{ $internship->position ?? '–' }} · {{ $internship->periodLabel() }}</dd></div>
                                 <div><dt>Company Supervisor</dt><dd>{{ $internship->supervisor?->name ?? '–' }}</dd></div>
-                                <div><dt>Langkah</dt><dd>Perbaiki bersama mahasiswa lalu minta konfirmasi ulang. Bila bukan pembimbingnya, lepas supervisor.</dd></div>
+                                <div><dt>Langkah</dt><dd>Minta konfirmasi ulang, atau lepas supervisor.</dd></div>
                             </dl>
                         </x-detail>
                         <div class="row-actions">
@@ -110,7 +110,7 @@
                                 <div><dt>Kontak</dt><dd>{{ $group['email'] }}@if ($group['phone']) · {{ $group['phone'] }}@endif</dd></div>
                                 <div><dt>Mahasiswa</dt><dd>@foreach ($group['internships'] as $internship){{ $internship->student->name }} · {{ $internship->position ?? '–' }} · {{ $internship->periodLabel() }}@if (! $loop->last)<br>@endif @endforeach</dd></div>
                                 @if ($group['user'] && $group['user']->role !== 'supervisor')
-                                    <div><dt>Catatan</dt><dd>Email ini sudah dipakai akun dengan peran lain. Koreksi emailnya.</dd></div>
+                                    <div><dt>Catatan</dt><dd>Email sudah dipakai peran lain.</dd></div>
                                 @endif
                                 @if ($group['invitation'])
                                     <div><dt>Link undangan (s.d. {{ $group['invitation']->expires_at->locale('id')->translatedFormat('j M') }})</dt>

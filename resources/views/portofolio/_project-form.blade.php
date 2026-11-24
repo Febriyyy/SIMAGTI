@@ -9,7 +9,7 @@
         <div class="dialog-head">
             <div>
                 <h2 class="card-title">{{ $project ? 'Ubah proyek' : 'Tambah proyek' }}</h2>
-                <p class="card-sub">Proyek yang pernah kamu kerjakan, di luar task magang</p>
+                <p class="card-sub">Di luar task magang</p>
             </div>
             <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
         </div>
@@ -37,11 +37,11 @@
                 <input id="{{ $id }}-tech" name="tech" class="input" maxlength="200" value="{{ $v('tech', $project?->tech) }}" placeholder="Laravel, MySQL, Tailwind">
                 <p class="hint">Pisahkan dengan koma.</p>
             </div>
-            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($project?->linkList() ?? [], 'url'), 'hint' => 'Repo, demo, desain Figma, video, dokumen, atau tautan lain tentang proyek ini.'])
+            @include('portofolio._links-field', ['id' => $id, 'e' => $e, 'links' => $e->any() ? array_values(array_filter((array) old('links', []))) : array_column($project?->linkList() ?? [], 'url'), 'hint' => 'Repo, demo, atau desain.'])
             <div class="span-all">
                 <label class="label" for="{{ $id }}-img">Gambar pratinjau</label>
                 <input id="{{ $id }}-img" name="image" type="file" class="input" accept="image/jpeg,image/png,image/webp">
-                <p class="hint">JPG, PNG, atau WEBP, paling besar 3 MB.</p>
+                <p class="hint">JPG, PNG, atau WEBP, maks. 3 MB.</p>
                 @if ($e->has('image'))<p class="field-error">{{ $e->first('image') }}</p>@endif
                 @if ($project?->image)
                     <label class="check pf-remove"><input type="checkbox" name="remove_image" value="1"> Hapus gambar saat ini</label>

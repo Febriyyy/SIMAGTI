@@ -18,7 +18,7 @@
                 <section class="card">
                     <div class="card-head"><h2 class="card-title">Riwayat pengajuan</h2></div>
                     @if ($history->isEmpty())
-                        <div class="empty"><strong>Belum ada pengajuan</strong> Ajukan perpanjangan, pindah, mundur, atau ganti supervisor lewat formulir di samping.</div>
+                        <div class="empty"><strong>Belum ada pengajuan</strong></div>
                     @else
                         <ul class="item-list">
                             @foreach ($history as $c)
@@ -68,19 +68,19 @@
                                         <input id="new_end_date" type="date" name="new_end_date" class="input" value="{{ old('new_end_date') }}"
                                                min="{{ $internship->end_date->copy()->addDay()->toDateString() }}" max="{{ $internship->end_date->copy()->addMonths(6)->toDateString() }}">
                                     </div>
-                                    <p class="hint">Sekarang selesai {{ $internship->end_date->locale('id')->translatedFormat('j F Y') }}. Company Supervisor menyatakan setuju, lalu diputuskan kaprodi.</p>
+                                    <p class="hint">Sekarang selesai {{ $internship->end_date->locale('id')->translatedFormat('j F Y') }}.</p>
                                 </div>
 
                                 <div data-show="transfer" class="stack">
                                     <div class="field">
                                         <label class="label" for="company_name">Tempat baru (bila sudah ada)</label>
                                         <input id="company_name" type="text" name="company_name" class="input" maxlength="150" value="{{ old('company_name') }}">
-                                        <p class="hint">Setelah disetujui kaprodi, KP ini ditutup dengan status "Pindah" dan Anda mengajukan KP baru dari Status KP.</p>
+                                        <p class="hint">KP ini ditutup, lalu ajukan KP baru.</p>
                                     </div>
                                 </div>
 
                                 <div data-show="withdraw">
-                                    <p class="hint">Setelah disetujui kaprodi, KP ini dibatalkan.</p>
+                                    <p class="hint">KP dibatalkan setelah disetujui.</p>
                                 </div>
 
                                     <div data-show="replace_supervisor" class="stack">
@@ -95,7 +95,7 @@
                                         <div class="field">
                                             <label class="label" for="supervisor_email">Email kantor</label>
                                             <input id="supervisor_email" type="email" name="supervisor_email" class="input" maxlength="150" value="{{ old('supervisor_email') }}">
-                                            <p class="hint">TU Fakultas memproses lalu mengaktifkan akun supervisor baru.</p>
+                                            <p class="hint">Diaktifkan TU Fakultas.</p>
                                         </div>
                                     </div>
 

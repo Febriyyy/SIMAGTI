@@ -6872,3 +6872,13 @@ a.av-submit.av-link { display: grid; place-items: center; margin-top: 24px; text
 .prd-meta .prd-code { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; letter-spacing: .03em; }
 @media (max-width: 640px) { .prd-form { grid-template-columns: minmax(0, 1fr); } }
 .prd-meta .prd-code { flex-direction: row; justify-content: center; align-self: center; gap: 0; height: 24px; min-width: 40px; line-height: 1; }
+
+/* Isian, bukan dropdown: tanpa ikon segitiga bawaan peramban di isian bersaran (<input list>)
+   dan tanpa panah naik-turun di isian angka. Saran tetap muncul saat mengetik; panah keyboard tetap berfungsi. */
+input[list]::-webkit-calendar-picker-indicator { display: none !important; }
+input[list]::-webkit-list-button { display: none !important; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* Edge: kolom kata sandi yang sudah punya tombol mata sendiri tidak menampilkan ikon mata bawaan (agar tidak dobel) */
+:is(.av-pass, .lg-pass) input::-ms-reveal, :is(.av-pass, .lg-pass) input::-ms-clear { display: none; }

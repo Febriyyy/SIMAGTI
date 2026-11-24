@@ -66,7 +66,7 @@
                             <option value="{{ $profile->user_id }}" @selected((string) old('supervisor_id') === (string) $profile->user_id)>{{ $profile->user->name }} · {{ $profile->company->name }}</option>
                         @endforeach
                     </select>
-                    <p class="hint">Belum ada akunnya? Minta TU Fakultas mengundang supervisor terlebih dahulu.</p>
+                    <p class="hint">Belum ada? Minta TU Fakultas mengundangnya.</p>
                 </div>
 
                 <div class="span-all">

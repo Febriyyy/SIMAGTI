@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Pengesahan Nilai KP</h1>
-            <p class="page-sub">Sahkan nilai sidang setelah sidang berlangsung: dosen pembimbing 50% dan industri 50%. Jadwal sidang diatur dosen pembimbing.</p>
+            <p class="page-sub">Dosen pembimbing 50%, industri 50%.</p>
         </div>
     </div>
 
@@ -15,14 +15,14 @@
         <div class="card-head">
             <div>
                 <h2 class="card-title">Belum dijadwalkan</h2>
-                <p class="card-sub">KP selesai atau berakhir dalam 30 hari, menunggu jadwal dari dosen pembimbing</p>
+                <p class="card-sub">Menunggu jadwal dari dosen pembimbing</p>
             </div>
             @if ($unscheduled->isNotEmpty())<x-chip tone="amber">{{ $unscheduled->count() }}</x-chip>@endif
         </div>
         @if ($unscheduled->isEmpty())
             <div class="calm">
                 <span class="calm-icon"><x-ikon name="check" :size="20" /></span>
-                <p>Semua mahasiswa yang perlu sidang sudah dijadwalkan dosen pembimbing.</p>
+                <p>Semua sudah dijadwalkan.</p>
             </div>
         @else
             <ul class="item-list">
@@ -52,7 +52,7 @@
             <div class="card-head">
                 <div>
                     <h2 class="card-title">Jadwal sidang</h2>
-                    <p class="card-sub">Dijadwalkan dosen pembimbing; sahkan nilai setelah sidang berlangsung</p>
+                    <p class="card-sub">Sahkan nilai setelah sidang</p>
                 </div>
             </div>
             <ul class="item-list">
@@ -139,7 +139,7 @@
                         <dd>@if ($parts['lecturer'] !== null)<b>{{ \App\Support\Num::short($parts['lecturer']) }}</b><small>× 50%</small>@else<span class="ds-miss">Belum dinilai</span>@endif</dd>
                     </div>
                     <div>
-                        <dt>Nilai industri<small>Penilaian Company Supervisor tervalidasi</small></dt>
+                        <dt>Nilai industri</dt>
                         <dd>@if ($parts['industry'] !== null)<b>{{ \App\Support\Num::short($parts['industry']) }}</b><small>× 50%</small>@else<span class="ds-miss">Belum divalidasi</span>@endif</dd>
                     </div>
                     <div class="ds-calc-total">
@@ -148,7 +148,7 @@
                     </div>
                 </dl>
                 @if ($d && $d->lecturer_score === null)
-                    <p class="hint">Tercatat sebelumnya: {{ \App\Support\Num::short($d->score) }} ({{ $d->letter_grade }}), diisi langsung tanpa rincian.</p>
+                    <p class="hint">Tercatat sebelumnya: {{ \App\Support\Num::short($d->score) }} ({{ $d->letter_grade }}).</p>
                 @endif
                 @if ($i->finalReport?->file_id)
                     <p class="hint"><a href="{{ route('laporan.akhir.berkas', $i) }}" target="_blank" rel="noopener"><x-ikon name="file" :size="15" /> Buka laporan akhir</a></p>

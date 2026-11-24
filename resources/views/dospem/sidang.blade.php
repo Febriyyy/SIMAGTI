@@ -10,7 +10,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Jadwal Sidang</h1>
-            <p class="page-sub">Jadwalkan sidang mahasiswa bimbingan Anda. Mahasiswa dan dosen penguji langsung diberi tahu; nilainya disahkan kaprodi setelah sidang.</p>
+            <p class="page-sub">Jadwalkan sidang mahasiswa bimbingan Anda.</p>
         </div>
     </div>
 
@@ -52,7 +52,7 @@
             <div class="card-head">
                 <div>
                     <h2 class="card-title">Terjadwal</h2>
-                    <p class="card-sub">Setelah sidang berlangsung, kaprodi mengesahkan nilainya</p>
+                    <p class="card-sub">Nilai disahkan kaprodi setelah sidang</p>
                 </div>
             </div>
             <ul class="item-list">

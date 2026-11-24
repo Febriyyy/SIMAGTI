@@ -13,7 +13,7 @@
     @if ($goals->isEmpty())
         <div class="empty">
             <strong>Belum ada goal</strong>
-            Tulis hal yang ingin dicapai selama KP, lalu kaitkan task ke goal tersebut.
+            Tulis target KP, lalu kaitkan task.
         </div>
     @else
         <ul class="goal-list">

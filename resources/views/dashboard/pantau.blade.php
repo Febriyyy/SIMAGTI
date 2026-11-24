@@ -47,7 +47,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Mahasiswa kerja praktik</h2>
-                        <p class="card-sub">Urut dari yang sedang magang, lalu yang paling dekat selesai</p>
+                        <p class="card-sub">Yang sedang magang di atas</p>
                     </div>
                 </div>
 
@@ -175,7 +175,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Per perusahaan</h2>
-                        <p class="card-sub">Buka untuk melihat durasi, sebaran skill, dan performa</p>
+                        <p class="card-sub">Durasi, skill, dan performa</p>
                     </div>
                 </div>
                 <div class="table-wrap">

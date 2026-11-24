@@ -11,7 +11,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Kampus dan Prodi</h1>
-            <p class="page-sub">Identitas kampus dan program studi. Tiap kaprodi hanya melihat mahasiswa prodinya.</p>
+            <p class="page-sub">Identitas kampus dan program studi.</p>
         </div>
     </div>
 
@@ -56,7 +56,7 @@
                         </li>
                     @endforeach
                 </ul>
-                <p class="card-foot">Kaprodi yang belum ditunjuk ke prodi mana pun melihat semua prodi (mis. ketua jurusan). Akun kaprodi dibuat di menu Akun.</p>
+                <p class="card-foot">Kaprodi tanpa prodi melihat semua prodi.</p>
             </section>
         </div>
 

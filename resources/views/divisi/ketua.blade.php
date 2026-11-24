@@ -11,7 +11,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Data Sertifikat</h1>
-            <p class="page-sub">Klik logo perusahaan dan blok tanda tangan di kiri sertifikat. Diisi sekali, dipakai di sertifikat semua mahasiswa magang Anda.</p>
+            <p class="page-sub">Klik logo atau tanda tangan di sertifikat.</p>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
                             'deleteLabel' => 'Hapus logo perusahaan', 'confirm' => 'Hapus logo '.$company->name.'?',
                         ])
                     </div>
-                    <p class="cst-note">Ketua divisi bisa diisi setelah ada mahasiswa magang yang Anda supervisi di sebuah divisi.</p>
+                    <p class="cst-note">Bisa diisi setelah ada mahasiswa di sebuah divisi.</p>
                 </div>
             </section>
         @endforeach

@@ -11,7 +11,7 @@
             </span>
             <div>
                 <h2 class="card-title">Perlu perhatian</h2>
-                <p class="card-sub">Ditandai otomatis jika tidak ada kegiatan {{ $rules::IDLE_DAYS }} hari, progres di bawah {{ $rules::LOW_PROGRESS }}%, atau KP tinggal {{ $rules::ENDING_DAYS }} hari tapi nilai belum divalidasi.</p>
+                <p class="card-sub">Sepi, progres rendah, atau hampir selesai</p>
             </div>
         </div>
         @if ($attention->isNotEmpty())

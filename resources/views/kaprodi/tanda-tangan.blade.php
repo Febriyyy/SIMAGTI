@@ -10,7 +10,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Data Sertifikat</h1>
-            <p class="page-sub">Klik logo atau blok tanda tangan di sertifikat. Diisi sekali, berlaku untuk semua sertifikat KP.</p>
+            <p class="page-sub">Klik logo atau tanda tangan di sertifikat.</p>
         </div>
     </div>
 
@@ -75,7 +75,7 @@
         <div class="card-head">
             <div>
                 <h2 class="card-title" id="cpl-title">Kelengkapan dari perusahaan</h2>
-                <p class="card-sub">Logo perusahaan, nama, dan tanda tangan ketua divisi diisi Company Supervisor lewat menu Data Sertifikat. Bagian yang belum diisi kosong di sertifikat.</p>
+                <p class="card-sub">Diisi Company Supervisor lewat Data Sertifikat</p>
             </div>
             @if ($divisions->isNotEmpty())
                 <span @class(['cpl-count', 'is-ok' => $complete === $divisions->count()])>{{ $complete }}/{{ $divisions->count() }} lengkap</span>
@@ -83,7 +83,7 @@
         </div>
 
         @if ($divisions->isEmpty())
-            <div class="empty"><strong>Belum ada divisi</strong> Daftar muncul setelah ada mahasiswa yang magang di sebuah divisi.</div>
+            <div class="empty"><strong>Belum ada divisi</strong> Muncul setelah ada mahasiswa di sebuah divisi.</div>
         @else
             <ul class="cpl-list">
                 @foreach ($divisions as $row)

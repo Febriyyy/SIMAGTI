@@ -80,12 +80,12 @@
                         <button type="button" class="btn btn-primary btn-block" data-open="dlg-accept"><x-ikon name="check" :size="16" /> Terima tawaran</button>
                         <button type="button" class="btn btn-block" data-open="dlg-decline">Tolak tawaran</button>
                     @elseif ($o->status === 'diterima')
-                        <p><strong>Selamat!</strong> Perusahaan sudah menerima jawaban Anda. Langkah selanjutnya akan disampaikan oleh kontak HR di bawah.</p>
+                        <p><strong>Selamat!</strong> Jawaban terkirim. Tunggu kabar dari HR.</p>
                     @elseif ($o->status === 'ditolak')
                         <p>Anda menolak tawaran ini: <strong>{{ mb_strtolower((string) $o->declineReasonLabel()) }}</strong>.</p>
                         @if ($o->decline_note)<p class="muted">“{{ $o->decline_note }}”</p>@endif
                     @else
-                        <p>Batas waktu menjawab sudah lewat. Hubungi kontak HR bila Anda masih berminat; perusahaan bisa memperpanjang batasnya.</p>
+                        <p>Batas waktu lewat. Hubungi HR bila masih berminat.</p>
                     @endif
                 </div>
                 <div class="card-foot job-contact">

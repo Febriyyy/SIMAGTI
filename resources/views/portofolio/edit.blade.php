@@ -15,7 +15,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Portofolio</h1>
-            <p class="page-sub">Tunjukkan proyek, sertifikat, dan skill kamu kepada perusahaan, bahkan sebelum mendapat tempat magang.</p>
+            <p class="page-sub">Proyek, sertifikat, dan skill kamu.</p>
         </div>
         <a href="{{ route('portofolio.lihat', $user) }}" class="btn" target="_blank" rel="noopener"><x-ikon name="arrow-up-right" :size="18" /> Lihat tampilan</a>
     </div>
@@ -59,7 +59,7 @@
                             <input type="hidden" name="show_gpa" value="0">
                             <input type="checkbox" name="show_gpa" value="1" @checked(old('show_gpa', $portfolio->show_gpa))>
                             <span class="pf-switch-ui" aria-hidden="true"></span>
-                            <span><b>Tampilkan IPK</b><small>Bila mati, IPK hanya tersimpan untuk kamu.</small></span>
+                            <span><b>Tampilkan IPK</b></span>
                         </label>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                     <div class="pf-other">
                         <label class="label" for="pf-interest-other">Minat lainnya</label>
                         <input id="pf-interest-other" name="interest_other" class="input" maxlength="160" value="{{ $otherInterests }}" placeholder="Game Development, Robotika" data-pf-interest-other>
-                        <p class="hint">Tulis sendiri bila tidak ada di pilihan. Pisahkan dengan koma.</p>
+                        <p class="hint">Pisahkan dengan koma.</p>
                     </div>
                     @error('interests')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
@@ -106,7 +106,7 @@
                             </li>
                         @endforeach
                     </ul>
-                    <p class="pf-empty-line" data-pf-skill-empty @if (count($skillRows)) hidden @endif>Belum ada skill. Tambahkan bahasa pemrograman, tools, atau keahlian lain yang kamu kuasai.</p>
+                    <p class="pf-empty-line" data-pf-skill-empty @if (count($skillRows)) hidden @endif>Belum ada skill.</p>
                     @error('skill_name')<p class="field-error">{{ $message }}</p>@enderror
                     <template data-pf-skill-template>
                         <li class="pf-skill">
@@ -129,7 +129,7 @@
                         <input type="hidden" name="is_public" value="0">
                         <input type="checkbox" name="is_public" value="1" @checked(old('is_public', $portfolio->is_public))>
                         <span class="pf-switch-ui" aria-hidden="true"></span>
-                        <span><b>Tautan publik</b><small>Siapa pun dengan tautan bisa melihat. Bisa dimatikan kapan saja.</small></span>
+                        <span><b>Tautan publik</b><small>Bisa dilihat siapa pun yang punya tautan.</small></span>
                     </label>
 
                     @if ($portfolio->is_public)
@@ -146,9 +146,8 @@
                             </div>
                         </div>
                     @else
-                        <p class="pf-off">Nyalakan lalu simpan untuk mendapatkan tautan dan kode QR.</p>
+                        <p class="pf-off">Nyalakan lalu simpan untuk dapat tautan.</p>
                     @endif
-                    <p class="pf-note">Kampus, dosen pembimbing, dan Company Supervisor perusahaan yang kamu tuju tetap bisa melihat portofolio ini dari SIMAGTI.</p>
 
                     <button type="submit" class="btn btn-primary pf-save">Simpan portofolio</button>
                 </div>
@@ -193,7 +192,7 @@
             @endif
         </div>
         @if ($portfolio->projects->isEmpty())
-            <div class="empty"><strong>Belum ada proyek</strong> Tugas kuliah, proyek pribadi, lomba, atau pekerjaan lepas yang pernah kamu buat.</div>
+            <div class="empty"><strong>Belum ada proyek</strong></div>
         @else
             <ul class="pf-projects">
                 @foreach ($portfolio->projects as $project)
@@ -237,7 +236,7 @@
             @endif
         </div>
         @if ($portfolio->certificates->isEmpty())
-            <div class="empty"><strong>Belum ada sertifikat</strong> Unggah sertifikat bootcamp, kursus, atau pelatihan yang pernah kamu ikuti.</div>
+            <div class="empty"><strong>Belum ada sertifikat</strong></div>
         @else
             <ul class="pf-certs">
                 @foreach ($portfolio->certificates as $cert)

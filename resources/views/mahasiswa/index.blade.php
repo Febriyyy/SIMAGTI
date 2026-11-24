@@ -19,7 +19,7 @@
         @if ($students->isEmpty())
             <div class="empty">
                 <strong>Mahasiswa tidak ditemukan</strong>
-                Coba kata kunci lain atau tambahkan mahasiswa lewat formulir di bawah.
+                Coba kata kunci lain.
             </div>
         @else
             <div class="table-wrap">
@@ -95,7 +95,7 @@
                 <div class="span-all">
                     <label for="password" class="label">Kata sandi awal</label>
                     <input id="password" name="password" type="text" class="input" minlength="8" required autocomplete="off">
-                    <p class="hint">Minimal 8 karakter. Sampaikan ke mahasiswa agar diganti setelah masuk.</p>
+                    <p class="hint">Minimal 8 karakter.</p>
                 </div>
                 <div class="span-all">
                     <button type="submit" class="btn btn-primary"><x-ikon name="plus" :size="16" /> Tambah mahasiswa</button>

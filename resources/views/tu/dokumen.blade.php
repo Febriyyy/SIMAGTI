@@ -51,7 +51,7 @@
         <div class="card-head">
             <div>
                 <h2 class="card-title">Belum lengkap</h2>
-                <p class="card-sub">KP berjalan yang dokumennya belum diunggah atau perlu diunggah ulang</p>
+                <p class="card-sub">Belum atau perlu diunggah ulang</p>
             </div>
         </div>
         @if ($missing->isEmpty())

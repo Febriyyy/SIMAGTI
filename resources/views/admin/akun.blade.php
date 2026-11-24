@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Akun</h1>
-            <p class="page-sub">Ubah peran, aktifkan atau nonaktifkan akun, dan atur ulang kata sandi.</p>
+            <p class="page-sub">Peran, status, dan kata sandi akun.</p>
         </div>
     </div>
 
@@ -19,7 +19,7 @@
                     <input id="temp-password" type="text" class="input temp-password" readonly value="{{ $temp['password'] }}" onclick="this.select()">
                     <button type="button" class="btn" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('temp-password').value); this.textContent='Tersalin'"><x-ikon name="copy" :size="18" /> Salin</button>
                 </div>
-                <p class="hint">Hanya tampil sekali. Berikan kepada pemilik akun ({{ $temp['email'] }}); kata sandi ini wajib diganti saat masuk.</p>
+                <p class="hint">Untuk {{ $temp['email'] }}. Hanya tampil sekali.</p>
             </div>
         </section>
     @endif

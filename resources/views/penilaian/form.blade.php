@@ -79,7 +79,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <p class="hint">Draft bisa diubah kapan saja. Setelah dikirim, penilaian menunggu validasi dosen pembimbing dan tidak bisa diubah.</p>
+                            <p class="hint">Setelah dikirim, tidak bisa diubah.</p>
                             <div class="row-actions">
                                 <button type="submit" name="aksi" value="simpan" class="btn">Simpan draft</button>
                                 <button type="submit" name="aksi" value="kirim" class="btn btn-primary">Kirim</button>

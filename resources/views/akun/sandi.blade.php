@@ -12,7 +12,7 @@
 
     @if ($forced)
         <div class="alert alert-warning" role="status">
-            Anda masuk dengan kata sandi sementara dari admin. Ganti dulu kata sandi Anda untuk melanjutkan.
+            Ganti kata sandi sementara untuk melanjutkan.
         </div>
     @endif
 
@@ -27,14 +27,14 @@
             <div class="field">
                 <label class="label" for="password">Kata sandi baru</label>
                 <input id="password" name="password" type="password" class="input" required minlength="8" autocomplete="new-password" aria-describedby="password-hint">
-                <p class="hint" id="password-hint">Harus berbeda dari kata sandi saat ini.</p>
+                <p class="hint" id="password-hint">Berbeda dari kata sandi saat ini.</p>
             </div>
             <div class="field">
                 <label class="label" for="password_confirmation">Ulangi kata sandi baru</label>
                 <input id="password_confirmation" name="password_confirmation" type="password" class="input" required autocomplete="new-password">
             </div>
             <div class="form-actions">
-                <p class="hint">Setelah diganti, sesi di perangkat lain dan token API akan diakhiri.</p>
+                <p class="hint">Perangkat lain otomatis keluar.</p>
                 <div class="row-actions"><button type="submit" class="btn btn-primary">Simpan kata sandi</button></div>
             </div>
         </form>

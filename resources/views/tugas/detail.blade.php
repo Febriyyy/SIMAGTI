@@ -90,7 +90,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Bukti pengerjaan</h2>
-                        <p class="card-sub">Link GitHub/Drive, atau unggah foto, PDF, ZIP, dan berkas lain.</p>
+                        <p class="card-sub">Tautan atau berkas (foto, PDF, ZIP).</p>
                     </div>
                 </div>
                 <div class="card-body">

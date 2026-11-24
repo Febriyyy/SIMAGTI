@@ -8,7 +8,7 @@
     <div class="card-head">
         <div>
             <h2 class="card-title">{{ $review ? 'Ulasanmu tentang '.$internship->company?->name : 'Bagaimana pengalaman magangmu?' }}</h2>
-            <p class="card-sub">{{ $review ? 'Terima kasih. Kamu masih bisa memperbaruinya.' : 'Ulasanmu tampil tanpa nama di halaman Lowongan dan membantu adik tingkat memilih tempat magang.' }}</p>
+            <p class="card-sub">{{ $review ? 'Masih bisa kamu perbarui.' : 'Tampil tanpa nama di halaman Lowongan.' }}</p>
         </div>
     </div>
     <form method="POST" action="{{ route('ulasan.simpan') }}" class="card-body rv-form">

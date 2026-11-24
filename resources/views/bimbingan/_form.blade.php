@@ -26,7 +26,7 @@
         <textarea id="{{ $prefix }}-notes" name="notes" class="textarea" rows="3" maxlength="2000">{{ old('notes') }}</textarea>
     </div>
     <div class="form-actions">
-        <p class="hint">Dosen pembimbing akan mengonfirmasi sesi ini.</p>
+        <p class="hint">Dikonfirmasi dosen pembimbing.</p>
         <div class="row-actions"><button type="submit" class="btn btn-primary"><x-ikon name="plus" :size="18" /> Simpan</button></div>
     </div>
 </form>

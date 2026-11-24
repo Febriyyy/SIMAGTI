@@ -76,7 +76,6 @@
                 <label class="label" for="gdone-note-{{ $s->id }}">Catatan hasil <span class="label-opt">(opsional)</span></label>
                 <textarea id="gdone-note-{{ $s->id }}" name="catatan" class="textarea" rows="3" maxlength="500" placeholder="Contoh: Bab 3 sudah sesuai, lanjut ke bab 4."></textarea>
             </div>
-            <p class="hint">Sesi yang selesai terhitung untuk syarat minimal bimbingan mahasiswa.</p>
             <div class="dialog-foot row-actions">
                 <button type="button" class="btn" data-close>Batal</button>
                 <button type="submit" name="keputusan" value="konfirmasi" class="btn btn-primary"><x-ikon name="check" :size="16" /> Tandai selesai</button>

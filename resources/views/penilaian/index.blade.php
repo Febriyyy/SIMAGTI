@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Penilaian akhir</h1>
-            <p class="page-sub">Diisi di akhir periode KP, lalu dikirim ke dosen pembimbing.</p>
+            <p class="page-sub">Diisi di akhir KP, lalu dikirim ke dosen.</p>
         </div>
     </div>
 

@@ -90,7 +90,7 @@
                             <div class="field">
                                 <label class="label" for="result_note">Catatan (wajib jika tidak diterima)</label>
                                 <textarea id="result_note" name="result_note" class="textarea" rows="3" maxlength="1000">{{ old('result_note') }}</textarea>
-                                <p class="hint">Setelah disimpan, KP ditutup dan data tidak bisa diubah lagi.</p>
+                                <p class="hint">KP ditutup dan tidak bisa diubah lagi.</p>
                             </div>
                             <div class="row-actions"><button type="submit" class="btn btn-primary" onclick="return confirm('Simpan hasil dan tutup KP ini?')"><x-ikon name="check" :size="18" /> Simpan hasil</button></div>
                         </form>

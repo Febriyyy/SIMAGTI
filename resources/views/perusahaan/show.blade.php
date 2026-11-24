@@ -109,7 +109,7 @@
                                 </li>
                             @endforeach
                         </ul>
-                        <p class="hint" style="margin-top: var(--space-3)">Satu mahasiswa bisa punya beberapa skill, jadi totalnya bisa lebih dari 100%.</p>
+                        <p class="hint" style="margin-top: var(--space-3)">Total bisa lebih dari 100%.</p>
                     @endif
                 </div>
             </section>
@@ -120,7 +120,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title">Performa per kategori</h2>
-                        <p class="card-sub">Rata-rata hard skill, soft skill, dan attitude dari penilaian yang sudah divalidasi</p>
+                        <p class="card-sub">Dari penilaian yang sudah divalidasi</p>
                     </div>
                 </div>
                 <div class="card-body">
@@ -163,7 +163,7 @@
             @endif
         </div>
         @if ($reviews->isEmpty())
-            <div class="empty"><strong>Belum ada ulasan</strong> Mahasiswa bisa mengulas tempat magang dari halaman Status KP setelah magang berakhir.</div>
+            <div class="empty"><strong>Belum ada ulasan</strong></div>
         @else
             <div class="card-body rv-company">
                 <dl class="rv-bars">

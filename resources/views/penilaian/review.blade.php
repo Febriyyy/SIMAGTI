@@ -7,7 +7,7 @@
         <div>
             <a href="{{ route('validasi.index') }}" class="back"><x-ikon name="back" :size="16" /> Kembali ke validasi penilaian</a>
             <h1 class="page-title">Penilaian {{ $internship->student->name }}</h1>
-            <p class="page-sub">Dua penilaian terpisah: dosen pembimbing (A) dan Company Supervisor (B), masing-masing 50% nilai sidang.</p>
+            <p class="page-sub">Dosen pembimbing dan Company Supervisor, masing-masing 50%.</p>
         </div>
     </div>
 
@@ -61,7 +61,7 @@
                     <div class="card-head">
                         <div>
                             <h2 class="card-title">Keputusan</h2>
-                            <p class="card-sub">Validasi mengunci nilai akhir dan huruf mutu secara permanen.</p>
+                            <p class="card-sub">Nilai terkunci permanen setelah validasi.</p>
                         </div>
                     </div>
                     <div class="card-body">

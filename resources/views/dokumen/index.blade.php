@@ -29,7 +29,7 @@
             </div>
             <div class="card-body stack">
                 @if (! $letter)
-                    <p>Minta surat pengantar bila perusahaan memerlukannya. TU Fakultas menerbitkannya dengan nomor surat otomatis, lalu Anda bisa mencetaknya dari sini.</p>
+                    <p>Minta bila perusahaan memerlukannya.</p>
                     @if ($canEdit)
                         <form method="POST" action="{{ route('dokumen.minta') }}" class="row-actions">
                             @csrf
@@ -70,7 +70,7 @@
                             <input type="file" name="berkas" accept=".pdf,.jpg,.jpeg,.png" required class="input" aria-label="Berkas {{ $doc->label() }}">
                             <button type="submit" class="btn btn-primary"><x-ikon name="upload" :size="18" /> {{ $doc->file ? 'Ganti berkas' : 'Unggah' }}</button>
                         </form>
-                        <p class="hint">PDF, JPG, atau PNG, maksimal 5 MB. Diperiksa TU Fakultas.</p>
+                        <p class="hint">PDF, JPG, atau PNG, maks. 5 MB.</p>
                     @endif
                 </div>
             </section>

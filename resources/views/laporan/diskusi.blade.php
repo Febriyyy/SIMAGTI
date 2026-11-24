@@ -134,7 +134,7 @@
                                 <p class="rd-empty">Bab ini belum diunggah.</p>
                             @endif
                         @else
-                            <p class="rd-empty">Bab ini menunggu persetujuan Company Supervisor sebelum bisa dibuka dosen.</p>
+                            <p class="rd-empty">Menunggu persetujuan Company Supervisor.</p>
                         @endif
 
                         @include('laporan._thread', ['thread' => $thread])
@@ -222,7 +222,7 @@
                         @if ($final?->file)
                             <button type="submit" class="btn btn-primary">{{ $score ? 'Perbarui nilai' : 'Simpan nilai' }}</button>
                         @else
-                            <p class="hint">Nilai bisa diisi setelah mahasiswa mengunggah laporan akhir.</p>
+                            <p class="hint">Bisa diisi setelah laporan akhir diunggah.</p>
                         @endif
                     </form>
                 @elseif ($score)

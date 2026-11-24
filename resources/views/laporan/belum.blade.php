@@ -14,7 +14,7 @@
     <section class="card">
         <div class="empty">
             <strong>Laporan dibuka setelah KP berjalan</strong>
-            Begitu magangmu dimulai, empat bab laporan disiapkan di sini lengkap dengan draf otomatis dari data KP-mu.
+            Empat bab disiapkan saat magangmu dimulai.
             <a href="{{ route('kp.status') }}" class="btn btn-sm" style="margin-top: 14px">Lihat Status KP</a>
         </div>
     </section>

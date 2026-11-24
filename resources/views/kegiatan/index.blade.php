@@ -13,7 +13,7 @@
         <div class="card">
             <div class="empty">
                 <strong>Belum bisa dipakai</strong>
-                Board kegiatan aktif setelah pengajuan KP Anda disetujui. <a href="{{ route('kp.status') }}">Lihat status KP</a>.
+                Aktif setelah pengajuan KP disetujui. <a href="{{ route('kp.status') }}">Lihat status KP</a>.
             </div>
         </div>
     @else
@@ -112,7 +112,7 @@
                         <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                     </div>
                     @if ($projects->isEmpty())
-                        <p class="muted">Belum ada proyek. Proyek mengelompokkan task dan memberi kode seperti PMS-12.</p>
+                        <p class="muted">Belum ada proyek.</p>
                     @else
                         <ul class="item-list bordered">
                             @foreach ($projects as $project)
@@ -154,7 +154,7 @@
                         <h2 class="card-title">Atur kolom board</h2>
                         <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                     </div>
-                    <p class="hint">Nama kolom bebas. "Arti" dipakai sistem untuk menghitung progres: task di kolom berarti <em>Selesai</em> dihitung selesai.</p>
+                    <p class="hint">Task di kolom berarti <em>Selesai</em> dihitung progres.</p>
                     <ul class="item-list bordered">
                         @foreach ($columns as $i => $column)
                             <li class="item-row">
@@ -205,7 +205,7 @@
                         </select>
                         <button type="submit" class="btn btn-sm">Simpan</button>
                     </form>
-                    <p class="hint">Menentukan arti "periode ini" di filter dan timesheet, sesuai kesepakatan dengan perusahaan.</p>
+                    <p class="hint">Dipakai di filter dan timesheet.</p>
                 </div>
             </dialog>
         @endif

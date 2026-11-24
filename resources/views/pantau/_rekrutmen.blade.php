@@ -93,7 +93,7 @@
                 <div class="dialog-head">
                     <div>
                         <h2 class="card-title">Kirim tawaran kerja</h2>
-                        <p class="card-sub">Untuk {{ $internship->student->name }} · dibaca mahasiswa sebelum memutuskan</p>
+                        <p class="card-sub">Untuk {{ $internship->student->name }}</p>
                     </div>
                     <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                 </div>

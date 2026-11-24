@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Laporan KP</h1>
-            <p class="page-sub">{{ $isSupervisor ? 'Hanya bab yang memuat informasi perusahaan.' : 'Bab berisi data perusahaan sampai di sini setelah disetujui Company Supervisor.' }}</p>
+            <p class="page-sub">{{ $isSupervisor ? 'Bab yang memuat informasi perusahaan.' : 'Bab yang sudah disetujui Company Supervisor.' }}</p>
         </div>
         @if ($queue->isNotEmpty())<x-chip tone="amber">{{ $queue->count() }} perlu ditinjau</x-chip>@endif
     </div>

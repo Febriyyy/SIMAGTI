@@ -41,7 +41,7 @@
         <div class="card">
             <div class="empty">
                 <strong>Belum bisa dipakai</strong>
-                Timesheet aktif setelah pengajuan KP Anda disetujui. <a href="{{ route('kp.status') }}">Lihat status KP</a>.
+                Aktif setelah pengajuan KP disetujui. <a href="{{ route('kp.status') }}">Lihat status KP</a>.
             </div>
         </div>
     @else
@@ -63,7 +63,7 @@
             @if ($plans->isEmpty())
                 <div class="empty">
                     <strong>Belum ada rencana</strong>
-                    Susun kegiatan yang akan dikerjakan per minggu atau per bulan. Task baru bisa dibuat setelah ada rencana.
+                    Task dibuat setelah ada rencana.
                     @if ($canEdit)
                         <div class="row-actions" style="justify-content: center; margin-top: var(--space-3)">
                             <button type="button" class="btn btn-primary" data-open="dlg-plan-new"><x-ikon name="plus" :size="18" /> Rencana baru</button>

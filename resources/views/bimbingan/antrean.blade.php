@@ -23,7 +23,7 @@
                     <div class="card-head">
                         <div>
                             <h2 class="card-title">Jadwal bimbingan</h2>
-                            <p class="card-sub">Tandai selesai setelah berlangsung agar terhitung</p>
+                            <p class="card-sub">Tandai selesai agar terhitung</p>
                         </div>
                     </div>
                     @include('bimbingan._scheduled', ['sessions' => $scheduled])
@@ -75,7 +75,7 @@
                 <div class="dialog-head">
                     <div>
                         <h2 class="card-title">Jadwalkan bimbingan</h2>
-                        <p class="card-sub">Mahasiswa mendapat notifikasi dan tombol Gabung</p>
+                        <p class="card-sub">Mahasiswa langsung diberi tahu</p>
                     </div>
                     <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
                 </div>

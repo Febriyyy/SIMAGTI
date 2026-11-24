@@ -73,7 +73,7 @@
                             <input type="number" name="scale[{{ $i }}][value]" class="input input-sm" min="0" max="100" step="0.5" value="{{ isset($row['value']) ? 0 + $row['value'] : '' }}" placeholder="Nilai" aria-label="Nilai pilihan {{ $i + 1 }}">
                         </div>
                     @endfor
-                    <p class="hint">2–7 pilihan. Isi baris kosong untuk menambah, kosongkan baris untuk menghapus. Nilai lama yang sudah tersimpan tidak berubah.</p>
+                    <p class="hint">2–7 pilihan. Kosongkan baris untuk menghapus.</p>
                     <div class="row-actions"><button type="submit" class="btn btn-primary btn-sm">Simpan</button></div>
                 </form>
             </section>
@@ -111,7 +111,7 @@
                     </div>
                     @error('grades')<p class="field-error">{{ $message }}</p>@enderror
                     @foreach ($errors->get('grades.*') as $messages)<p class="field-error">{{ $messages[0] }}</p>@break @endforeach
-                    <p class="hint">Isi baris kosong untuk menambah, kosongkan baris untuk menghapus. Nilai di bawah batas terendah mendapat huruf E. Nilai yang sudah divalidasi tetap memakai skala lamanya.</p>
+                    <p class="hint">Di bawah batas terendah mendapat huruf E.</p>
                     <div class="row-actions"><button type="submit" class="btn btn-primary btn-sm">Simpan</button></div>
                 </form>
             </section>

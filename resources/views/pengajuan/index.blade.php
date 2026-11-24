@@ -180,12 +180,12 @@
                             <div>
                                 <label for="website" class="label">Website <span class="label-opt">(opsional)</span></label>
                                 <input id="website" name="website" type="text" inputmode="url" class="input" value="{{ old('website', $prefill['website'] ?? '') }}" maxlength="200" placeholder="perusahaan.co.id">
-                                <p class="hint">Kosongkan bila perusahaan tidak punya website.</p>
+                                <p class="hint">Kosongkan bila tidak ada.</p>
                             </div>
                         </div>
 
                         <h3 class="form-section-title">Company Supervisor</h3>
-                        <p class="hint" style="margin-top: calc(var(--space-2) * -1)">Pembimbing Anda di perusahaan. Setelah pengajuan disetujui, TU Fakultas mengaktifkan akunnya.</p>
+                        <p class="hint" style="margin-top: calc(var(--space-2) * -1)">Akunnya diaktifkan TU setelah disetujui.</p>
                         <div class="form-grid">
                             <div>
                                 <label for="supervisor_name" class="label">Nama</label>

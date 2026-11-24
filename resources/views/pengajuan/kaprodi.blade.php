@@ -14,7 +14,7 @@
         <div class="card">
             <div class="empty">
                 <strong>Tidak ada pengajuan yang menunggu</strong>
-                Pengajuan muncul di sini setelah perusahaannya diverifikasi TU Fakultas.
+                Muncul setelah diverifikasi TU Fakultas.
             </div>
         </div>
     @else

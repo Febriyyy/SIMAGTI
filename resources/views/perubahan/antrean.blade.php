@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">{{ $step === 'tu' ? 'Ganti Company Supervisor' : 'Pengajuan Perubahan' }}</h1>
-            <p class="page-sub">{{ ['supervisor' => 'Cukup setuju atau tidak, kaprodi yang memutuskan.', 'tu' => 'Setelah disetujui, aktifkan supervisor baru.'][$step] ?? 'Perpanjangan, pindah, dan pengunduran diri.' }}</p>
+            <p class="page-sub">{{ ['supervisor' => 'Keputusan akhir di kaprodi.', 'tu' => 'Setelah disetujui, aktifkan supervisor baru.'][$step] ?? 'Perpanjangan, pindah, dan pengunduran diri.' }}</p>
         </div>
         <x-chip :tone="$pending->isEmpty() ? 'green' : 'amber'">{{ $pending->count() }} menunggu</x-chip>
     </div>

@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Lowongan Magang</h1>
-            <p class="page-sub">Lowongan yang dibuka terlihat oleh mahasiswa yang belum punya tempat KP.</p>
+            <p class="page-sub">Terlihat mahasiswa yang belum punya tempat KP.</p>
         </div>
         @if ($companies->isNotEmpty())
             <button type="button" class="btn btn-primary" data-open="job-new"><x-ikon name="plus" :size="18" /> Lowongan baru</button>
@@ -18,7 +18,7 @@
             <div class="card-head">
                 <div>
                     <h2 class="card-title">Pengajuan masuk <span class="dash-count">{{ $applicants->count() }}</span></h2>
-                    <p class="card-sub">Mahasiswa yang mengajukan KP ke perusahaan Anda. Lihat portofolionya sebelum memutuskan.</p>
+                    <p class="card-sub">Lihat portofolionya sebelum memutuskan</p>
                 </div>
             </div>
             <ul class="item-list">

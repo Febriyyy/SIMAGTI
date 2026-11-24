@@ -129,7 +129,7 @@
                 <span class="wrapped-cta-badge" aria-hidden="true">{{ $internship->end_date->format('Y') }}</span>
                 <span class="min0">
                     <strong>KP Wrapped kamu sudah siap</strong>
-                    <span>Lihat rangkuman perjalanan KP: hari tercatat, task, minggu terbaik, sampai nilai akhir.</span>
+                    <span>Rangkuman perjalanan KP-mu.</span>
                 </span>
                 <span class="wrapped-cta-go">Putar <x-ikon name="arrow" :size="16" /></span>
             </a>
@@ -237,7 +237,7 @@
                 <div class="card-head">
                     <div>
                         <h2 class="card-title" id="todo-title">Perlu dikerjakan</h2>
-                        <p class="card-sub">Belum selesai, tenggat sampai akhir {{ mb_strtolower($period->short) }}</p>
+                        <p class="card-sub">Tenggat akhir {{ mb_strtolower($period->short) }}</p>
                     </div>
                     <a href="{{ route('kegiatan.index') }}" class="dash-more">Board <x-ikon name="arrow-up-right" :size="16" /></a>
                 </div>
