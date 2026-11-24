@@ -425,19 +425,18 @@ class DemoSeeder extends Seeder
         $this->seedAssessment($internship, $supervisor, [95, 85, 95, 85, 95], submit: true, validator: $lecturer,
             note: 'Kinerja konsisten selama magang.', comment: 'Teliti dan bertanggung jawab atas akurasi data.');
 
-        DefenseScore::create([
+        $defenseScore = DefenseScore::create([
             'internship_id' => $internship->id,
             'score' => 86,
             'defended_at' => Carbon::today()->subWeeks(2),
             'entered_by' => $kaprodi->id,
         ]);
 
-        // Hasil KP sudah diputuskan dosen pembimbing: diterima, nilai dari penilaian yang divalidasi.
-        $assessment = $internship->assessment()->first();
+        // Hasil KP sudah diputuskan dosen pembimbing setelah sidang: diterima, nilai akhir = nilai sidang.
         $internship->forceFill([
             'result' => 'diterima',
-            'final_score' => $assessment?->final_score,
-            'final_grade' => $assessment?->letter_grade,
+            'final_score' => $defenseScore->score,
+            'final_grade' => $defenseScore->letter_grade,
             'result_by' => $lecturer->id,
             'result_at' => now()->subDays(1),
         ])->saveQuietly();

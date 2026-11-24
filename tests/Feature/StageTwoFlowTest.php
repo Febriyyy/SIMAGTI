@@ -17,11 +17,13 @@ use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\FinishesKpStages;
 use Tests\TestCase;
 
 /** Alur KP: konfirmasi supervisor, bimbingan, dokumen, hasil, perubahan, notifikasi. */
 class StageTwoFlowTest extends TestCase
 {
+    use FinishesKpStages;
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -110,7 +112,16 @@ class StageTwoFlowTest extends TestCase
         $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'diterima'])->assertSessionHasErrors('result');
 
         $this->actingAs($dospem)->patch("/validasi/{$fajar->id}", ['keputusan' => 'validasi', 'catatan' => 'Sesuai.']);
-        $this->assertSame([], FinalizeResult::blockers($fajar->fresh()));
+
+        // Penilaian tervalidasi saja belum cukup: masa magang, laporan akhir, dan sidang KP harus selesai dulu
+        $blockers = implode(' ', FinalizeResult::blockers($fajar->fresh()));
+        $this->assertStringContainsString('Laporan akhir KP belum diunggah', $blockers);
+        $this->assertStringContainsString('belum sidang KP', $blockers);
+        $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'diterima', 'result_note' => 'Baik.'])->assertSessionHasErrors('result');
+        $this->assertNull($fajar->fresh()->final_grade, 'Nilai belum muncul sebelum sidang');
+
+        $fajar = $this->finishReportAndDefense($fajar);
+        $this->assertSame([], FinalizeResult::blockers($fajar));
 
         $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'tidak'])->assertSessionHasErrors('result_note');
         $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'diterima', 'result_note' => 'Baik.'])->assertRedirect('/hasil');
@@ -118,7 +129,8 @@ class StageTwoFlowTest extends TestCase
         $fajar->refresh();
         $this->assertSame('selesai', $fajar->status);
         $this->assertSame('Diterima', $fajar->resultLabel());
-        $this->assertSame('A', $fajar->final_grade, 'Nilai diambil dari penilaian akhir yang divalidasi');
+        $this->assertSame($fajar->defenseScore->letter_grade, $fajar->final_grade, 'Nilai akhir = nilai sidang yang disahkan kaprodi');
+        $this->assertEquals((float) $fajar->defenseScore->score, (float) $fajar->final_score);
         $this->assertNotNull($fajar->locked_at);
         $this->assertSame('done', collect(KpProgress::steps($fajar))->firstWhere('key', 'result')['state']);
     }

@@ -12,11 +12,13 @@ use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\FinishesKpStages;
 use Tests\TestCase;
 
 /** Sertifikat KP: halaman cetak dengan QR dan halaman verifikasi publik. */
 class CertificateTest extends TestCase
 {
+    use FinishesKpStages;
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -76,6 +78,12 @@ class CertificateTest extends TestCase
         $dospem = $this->user('dospem@kp.test');
 
         $this->actingAs($dospem)->patch("/validasi/{$fajar->id}", ['keputusan' => 'validasi', 'catatan' => 'Sesuai.']);
+
+        // Sertifikat belum terbit sebelum laporan akhir dan sidang KP selesai
+        $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'diterima', 'result_note' => 'Baik.'])->assertSessionHasErrors('result');
+        $this->assertNull($fajar->fresh()->certificate);
+
+        $fajar = $this->finishReportAndDefense($fajar);
         $this->actingAs($dospem)->patch("/hasil/{$fajar->id}", ['result' => 'diterima', 'result_note' => 'Baik.'])->assertRedirect('/hasil');
 
         $certificate = $fajar->fresh()->certificate;

@@ -267,13 +267,16 @@ class AssessmentFlowTest extends TestCase
         $this->assertEquals(95, (float) $fajar->fresh()->assessment->final_score);
     }
 
-    public function test_mahasiswa_melihat_nilai_akhir_hanya_setelah_divalidasi(): void
+    public function test_mahasiswa_melihat_nilai_akhir_hanya_setelah_sidang_dan_hasil_kp(): void
     {
-        $this->actingAs($this->user('salsa@kp.test'))->get('/dashboard')->assertOk()->assertSee('Sudah divalidasi');
+        // Salsa: KP selesai, sudah sidang, hasil diputuskan; nilai akhir = nilai sidang
+        $salsa = Internship::where('student_id', $this->user('salsa@kp.test')->id)->latest('id')->firstOrFail();
+        $this->actingAs($this->user('salsa@kp.test'))->get('/dashboard')->assertOk()
+            ->assertSee('Nilai sidang KP')->assertSee($salsa->final_grade);
 
-        // Fajar: masih menunggu validasi, nilainya belum dibuka
+        // Fajar: belum sidang, nilainya belum dibuka
         $this->actingAs($this->user('fajar@kp.test'))->get('/dashboard')->assertOk()
-            ->assertDontSee('Sudah divalidasi')
+            ->assertDontSee('Nilai sidang KP')
             ->assertDontSee('Nilai akhir');
     }
 

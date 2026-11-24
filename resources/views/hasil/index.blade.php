@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Hasil KP</h1>
-            <p class="page-sub">Setelah penilaian divalidasi dan bimbingan cukup.</p>
+            <p class="page-sub">Setelah laporan KP dan sidang KP selesai.</p>
         </div>
     </div>
 

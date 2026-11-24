@@ -487,19 +487,18 @@ class DataSeeder extends Seeder
     {
         $this->seedAssessment($internship, $supervisor, $scores, submit: true, validator: $lecturer, note: $note);
 
-        DefenseScore::create([
+        $defenseScore = DefenseScore::create([
             'internship_id' => $internship->id,
             'score' => $defense,
             'defended_at' => $internship->end_date->copy()->addDays(10),
             'entered_by' => $kaprodi->id,
         ]);
 
-        // Hasil KP sudah diputuskan dosen pembimbing: diterima, nilai dari penilaian yang divalidasi.
-        $assessment = $internship->assessment()->first();
+        // Hasil KP sudah diputuskan dosen pembimbing setelah sidang: diterima, nilai akhir = nilai sidang.
         $internship->forceFill([
             'result' => 'diterima',
-            'final_score' => $assessment?->final_score,
-            'final_grade' => $assessment?->letter_grade,
+            'final_score' => $defenseScore->score,
+            'final_grade' => $defenseScore->letter_grade,
             'result_by' => $lecturer->id,
             'result_at' => $internship->end_date->copy()->addDays(12),
         ])->saveQuietly();

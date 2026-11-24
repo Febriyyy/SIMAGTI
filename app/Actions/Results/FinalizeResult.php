@@ -12,9 +12,11 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Dosen pembimbing memutuskan hasil akhir KP (Diterima / Tidak diterima), lalu KP ditutup dan dikunci.
- * Nilai angka dan huruf mutu diambil dari penilaian akhir Company Supervisor yang sudah divalidasi.
+ * Nilai angka dan huruf mutu = nilai sidang KP yang disahkan kaprodi (dosen pembimbing 50% + industri 50%).
  * KP yang diterima langsung mendapat sertifikat ber-QR.
- * Syarat: penilaian akhir sudah divalidasi dan bimbingan terkonfirmasi sudah memenuhi minimal.
+ * Syarat (nilai dan sertifikat tidak muncul sebelum semuanya terpenuhi): masa magang sudah berakhir,
+ * laporan akhir KP sudah diunggah, penilaian akhir sudah divalidasi, bimbingan memenuhi minimal,
+ * dan nilai sidang KP sudah disahkan kaprodi.
  */
 class FinalizeResult
 {
@@ -22,6 +24,12 @@ class FinalizeResult
     public static function blockers(Internship $internship): array
     {
         $blockers = [];
+        if ($internship->end_date && $internship->end_date->isAfter(today())) {
+            $blockers[] = 'Masa magang belum berakhir (sampai '.$internship->end_date->locale('id')->translatedFormat('j F Y').').';
+        }
+        if (! $internship->finalReport?->submitted_at) {
+            $blockers[] = 'Laporan akhir KP belum diunggah mahasiswa.';
+        }
         if (! $internship->assessment?->isValidated()) {
             $blockers[] = 'Penilaian akhir dari Company Supervisor belum divalidasi.';
         }
@@ -29,6 +37,9 @@ class FinalizeResult
         $count = $internship->confirmedGuidanceCount();
         if ($count < $min) {
             $blockers[] = "Bimbingan terkonfirmasi baru {$count} dari minimal {$min}.";
+        }
+        if (! $internship->defenseScore) {
+            $blockers[] = 'Mahasiswa belum sidang KP (nilai sidang belum disahkan kaprodi).';
         }
 
         return $blockers;
@@ -51,8 +62,8 @@ class FinalizeResult
             }
             $fields += [
                 'result' => $data['result'],
-                'final_score' => $internship->assessment->final_score,
-                'final_grade' => $internship->assessment->letter_grade,
+                'final_score' => $internship->defenseScore->score,
+                'final_grade' => $internship->defenseScore->letter_grade,
             ];
 
             $internship->update($fields + ['status' => 'selesai']);
