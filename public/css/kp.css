@@ -6927,3 +6927,12 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
     font-size: 13px; font-weight: 600;
 }
 .gcard-tag { color: var(--amber); }
+
+/* Baris antrean (aktivasi supervisor, pengajuan perubahan): semua isi sejajar tengah,
+   ikon sebesar avatar, kolom tombol selebar sama sehingga Detail dan status segaris antar-kartu */
+.item-row.change { align-items: center; }
+.activation-head { align-items: center; }
+.activation { column-gap: 12px; }
+.activation-icon { width: 40px; height: 40px; border-radius: 50%; }
+:is(.item-row.change, .activation) > .row-actions { min-width: 180px; justify-content: flex-end; }
+@media (max-width: 640px) { :is(.item-row.change, .activation) > .row-actions { min-width: 0; } }
