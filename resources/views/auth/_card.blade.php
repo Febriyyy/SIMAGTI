@@ -14,6 +14,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     @include('partials.pwa')
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/design-rules.css') }}?v={{ filemtime(public_path('css/design-rules.css')) }}">
 </head>
 <body class="av-body">
 <div class="gl-aura" aria-hidden="true"><i></i><i></i><i></i></div>

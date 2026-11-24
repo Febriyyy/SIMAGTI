@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
     {{-- Percobaan gaya landing (hapus baris ini untuk kembali ke UI sebelumnya) --}}
     <link rel="stylesheet" href="{{ asset('css/theme-landing.css') }}?v={{ filemtime(public_path('css/theme-landing.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/design-rules.css') }}?v={{ filemtime(public_path('css/design-rules.css')) }}">
 </head>
 <body>
 @php($user = auth()->user())

@@ -45,8 +45,9 @@
 .lg-glow i:nth-child(2) { width: 52%; aspect-ratio: 1; right: -16%; top: 30%; background: rgba(52, 211, 153, .28); }
 .lg-glow i:nth-child(3) { width: 70%; aspect-ratio: 1; left: 10%; bottom: -40%; background: rgba(2, 44, 37, .45); }
 
-.lg-brand { align-self: flex-start; display: inline-flex; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, .95); }
-.lg-brand img { display: block; height: 28px; width: auto; }
+/* Logo tanpa latar: dibuat putih polos supaya terbaca di atas panel hijau */
+.lg-brand { align-self: flex-start; display: inline-flex; border-radius: 8px; }
+.lg-brand img { display: block; height: 32px; width: auto; filter: brightness(0) invert(1); }
 
 .lg-panel-body { display: grid; gap: 16px; }
 .lg-chip { justify-self: start; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); font-size: 13px; font-weight: 500; letter-spacing: .02em; }
@@ -62,7 +63,7 @@
     background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .86);
     transition: background-color .2s ease, color .2s ease, border-color .2s ease;
 }
-.lg-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid currentColor; font-size: 13px; font-weight: 600; line-height: 1; }
+.lg-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid currentColor; font-size: 13px; font-weight: 600; line-height: 1; transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
 .lg-step-label { margin-top: auto; font-size: 13px; font-weight: 500; line-height: 1.4; }
 .lg-step-bar { position: absolute; left: 12px; right: 12px; bottom: 8px; height: 2px; border-radius: 2px; background: rgba(3, 122, 104, .14); opacity: 0; }
 .lg-step-bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary); transform: scaleX(0); transform-origin: left; }

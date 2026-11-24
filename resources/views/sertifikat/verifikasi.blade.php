@@ -20,6 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/design-rules.css') }}?v={{ filemtime(public_path('css/design-rules.css')) }}">
 </head>
 <body class="vx-body">
 <main class="vx">
