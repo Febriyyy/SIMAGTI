@@ -30,7 +30,7 @@
                 @if ($canEdit)
                     @php($scores = $assessment ? $assessment->scores->keyBy('rubric_aspect_id') : collect())
                     @php($scale = \App\Support\AssessmentStandard::scale())
-                    @php($weights = \App\Support\AssessmentStandard::weights())
+                    @php($weights = \App\Support\AssessmentStandard::weights($internship->programId()))
                     <form method="POST" action="{{ route('penilaian.update', $internship) }}" data-rating-form>
                         @csrf
                         @method('PUT')

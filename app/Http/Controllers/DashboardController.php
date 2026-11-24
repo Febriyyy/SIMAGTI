@@ -10,6 +10,7 @@ use App\Models\InternshipApproval;
 use App\Models\InternshipDocument;
 use App\Models\InternshipStaff;
 use App\Models\Invitation;
+use App\Models\StudyProgram;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Models\WeeklyMeeting;
@@ -207,7 +208,9 @@ class DashboardController extends Controller
     {
         $subtitle = [
             'dospem' => 'Mahasiswa bimbingan Anda.',
-            'kaprodi' => 'Seluruh mahasiswa kerja praktik.',
+            'kaprodi' => ($program = $user->programId() ? StudyProgram::find($user->programId()) : null)
+                ? 'Mahasiswa kerja praktik Program Studi '.$program->name.'.'
+                : 'Seluruh mahasiswa kerja praktik.',
         ][$user->role] ?? '';
 
         return view('dashboard.pantau', ['user' => $user, 'subtitle' => $subtitle] + app(BuildMonitoringDashboard::class)->handle($user));

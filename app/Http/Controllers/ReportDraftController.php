@@ -55,7 +55,7 @@ class ReportDraftController extends Controller
             'campus' => [
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),
-                'program' => (string) Campus::get('campus.program'),
+                'program' => Campus::program($internship->programId()),
                 'city' => Campus::city(),
             ],
         ]);

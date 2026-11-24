@@ -106,7 +106,7 @@ class ReportDiscussionController extends Controller
     public function finalFile(Request $request, Internship $internship): StreamedResponse
     {
         $user = $request->user();
-        abort_unless(DiscussReport::canDiscuss($user, $internship) || $user->role === 'kaprodi', 403);
+        abort_unless(DiscussReport::canDiscuss($user, $internship) || $user->managesProgram($internship->programId()), 403);
 
         return $this->stream($internship->finalReport?->file);
     }

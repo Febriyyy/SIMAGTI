@@ -130,9 +130,9 @@ class DemoSeeder extends Seeder
         $entryYear = (int) now()->subYears(3)->year; // semester 6 atau 7: memenuhi syarat minimal semester V
 
         // Profil kampus
-        foreach ([[$kaprodi, '0412058001'], [$dospem, '0415067502']] as [$lecturer, $nidn]) {
-            LecturerProfile::create(['user_id' => $lecturer->id, 'study_program_id' => $tif->id, 'nidn' => $nidn]);
-        }
+        // Kaprodi tes tidak terikat prodi (koordinator KP lintas prodi): melihat mahasiswa TIF dan SI
+        LecturerProfile::create(['user_id' => $kaprodi->id, 'study_program_id' => null, 'nidn' => '0412058001']);
+        LecturerProfile::create(['user_id' => $dospem->id, 'study_program_id' => $tif->id, 'nidn' => '0415067502']);
         foreach ([[$rina, $tif, 3.62], [$dimas, $si, 3.41], [$fajar, $tif, 3.20], [$salsa, $si, 3.75], [$nadia, $tif, 3.55],
             [$tari, $si, 3.48], [$gilang, $tif, 3.30], [$citra, $tif, 3.66]] as [$student, $program, $gpa]) {
             StudentProfile::create(['user_id' => $student->id, 'study_program_id' => $program->id, 'entry_year' => $entryYear, 'gpa' => $gpa]);

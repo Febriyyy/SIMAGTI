@@ -18,6 +18,7 @@ class DefenseController extends Controller
     public function index(Request $request): View
     {
         $internships = Internship::with(['student', 'lecturer', 'company', 'assessment', 'reportScore', 'finalReport', 'defenseScore', 'defenseSchedule.examiner'])
+            ->visibleTo($request->user())
             ->where(fn ($q) => $q->where('status', 'selesai')
                 ->orWhere(fn ($q) => $q->where('status', 'berjalan')->whereDate('end_date', '<=', today()->addDays(30))))
             ->orderBy('end_date')
@@ -38,6 +39,7 @@ class DefenseController extends Controller
     /** Kaprodi mengesahkan nilai sidang: dihitung dari nilai dosen pembimbing dan nilai industri. */
     public function update(Request $request, Internship $internship, RecordDefense $record): RedirectResponse
     {
+        abort_unless($request->user()->managesProgram($internship->programId()), 403, 'KP ini milik program studi lain.');
         $data = $request->validate([
             'defended_at' => ['required', 'date', 'before_or_equal:today'],
             'note' => ['nullable', 'string', 'max:500'],

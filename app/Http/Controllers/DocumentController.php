@@ -96,7 +96,7 @@ class DocumentController extends Controller
                 'faculty' => Campus::faculty(),
                 'city' => Campus::city(),
                 'address' => Campus::get('campus.address'),
-                'program' => Campus::get('campus.program'),
+                'program' => Campus::program($internship->programId()),
             ],
         ])->header('Cache-Control', 'private, no-store');
     }

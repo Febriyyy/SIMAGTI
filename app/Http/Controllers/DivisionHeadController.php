@@ -9,6 +9,7 @@ use App\Models\CompanyDivision;
 use App\Models\CompanyStaffProfile;
 use App\Models\Internship;
 use App\Models\User;
+use App\Support\Campus;
 use App\Support\Logos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,7 +50,11 @@ class DivisionHeadController extends Controller
 
         // Status penanda tangan kampus (kaprodi), hanya dibaca: nama dan sudah/belum ada tanda tangan.
         // Gambar tanda tangan kaprodi sengaja tidak dikirim ke halaman ini.
-        $campus = CertificateTemplate::where('scope', 'kampus')->first();
+        // Bila semua mahasiswanya dari satu prodi, tampilkan kaprodi prodi itu; jika campuran, template umum.
+        $programIds = Internship::supervisedBy($request->user())->with('student.studentProfile')->get()
+            ->map(fn (Internship $i) => $i->programId())->filter()->unique()->values();
+        $programId = $programIds->count() === 1 ? $programIds->first() : null;
+        $campus = CertificateTemplate::forProgram($programId);
 
         return view('divisi.ketua', [
             'companies' => $companies,
@@ -59,6 +64,7 @@ class DivisionHeadController extends Controller
                 'title' => $campus?->signer_title ?: 'Ketua Program Studi',
                 'name' => $campus?->signer_name,
                 'signed' => (bool) $campus?->signature_file_id,
+                'program' => Campus::program($programId),
             ],
         ]);
     }

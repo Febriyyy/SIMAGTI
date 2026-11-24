@@ -20,8 +20,10 @@ class StudentController extends Controller
 
         $search = trim((string) $request->query('q'));
 
+        $programId = $request->user()->programId();
         $students = User::where('role', 'mahasiswa')
             ->with(['studentProfile.studyProgram', 'internships' => fn ($q) => $q->latest('id')->with('company')])
+            ->when($programId, fn ($q) => $q->whereHas('studentProfile', fn ($p) => $p->where('study_program_id', $programId)))
             ->when($search !== '', fn ($q) => $q->where(fn ($w) => $w
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('nim', 'like', "%{$search}%")))
@@ -29,7 +31,7 @@ class StudentController extends Controller
             ->limit(200)
             ->get();
 
-        $programs = StudyProgram::orderBy('name')->get();
+        $programs = StudyProgram::when($programId, fn ($q) => $q->whereKey($programId))->orderBy('name')->get();
 
         return view('mahasiswa.index', compact('students', 'programs', 'search'));
     }

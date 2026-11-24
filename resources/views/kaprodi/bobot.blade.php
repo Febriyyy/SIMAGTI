@@ -6,7 +6,7 @@
     <div class="page-head">
         <div>
             <h1 class="page-title">Bobot Penilaian</h1>
-            <p class="page-sub">Bobot tiap kategori dalam persen, total 100%.</p>
+            <p class="page-sub">Bobot tiap kategori dalam persen, total 100%. Berlaku untuk {{ $program }}.</p>
         </div>
     </div>
 

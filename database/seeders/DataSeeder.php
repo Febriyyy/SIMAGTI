@@ -159,6 +159,9 @@ class DataSeeder extends Seeder
         foreach ([[$kaprodi, '0415078201'], [$dewi, '0422118702'], [$bambang, '0003066804'], [$rizky, '0419099003']] as [$lecturer, $nidn]) {
             LecturerProfile::create(['user_id' => $lecturer->id, 'study_program_id' => $tif->id, 'nidn' => $nidn]);
         }
+        // Kaprodi Sistem Informasi: hanya melihat mahasiswa SI (Arief hanya Teknik Informatika)
+        $kaprodiSi = $this->person('Dr. Nurul Hidayah, S.Kom., M.Kom.', 'nurul.hidayah@'.self::CAMPUS, 'kaprodi', phone: '081255903317');
+        LecturerProfile::create(['user_id' => $kaprodiSi->id, 'study_program_id' => $si->id, 'nidn' => '0411048502']);
 
         // ---------- Perusahaan dan Company Supervisor ----------
         $cakrawala = $this->company('PT Cakrawala Solusi Digital', 'Teknologi dan IT', 'Jl. Asia Afrika No. 112', 'Bandung', 'cakrawaladigital.co.id', '0224231178', $tu);

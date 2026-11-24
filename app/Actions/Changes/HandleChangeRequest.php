@@ -140,7 +140,7 @@ class HandleChangeRequest
         $internship = $change->internship;
         $to = match ($change->step) {
             'supervisor' => $internship->supervisor,
-            'kaprodi' => Notify::role('kaprodi'),
+            'kaprodi' => User::kaprodiFor($internship->programId()),
             'tu' => Notify::role('tu'),
             default => null,
         };

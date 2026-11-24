@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\CertificateTemplate;
 use App\Models\CompanyDivision;
+use App\Support\Campus;
 use App\Support\Logos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,14 +20,16 @@ class KaprodiSignatureController extends Controller
 {
     public function edit(Request $request): View
     {
-        $template = CertificateTemplate::campus($request->user());
+        // Kaprodi berprodi mengisi template prodinya sendiri; tanpa prodi mengisi template umum
+        $template = CertificateTemplate::forKaprodi($request->user());
         $signature = Logos::dataUri($template->signature);
 
         return view('kaprodi.tanda-tangan', [
             'template' => $template,
             'signature' => $signature,
             'logos' => collect(Logos::INSTITUTIONS)->mapWithKeys(fn ($v, $kind) => [$kind => Logos::institution($kind)]),
-            'divisions' => self::companyCompleteness(),
+            'divisions' => self::companyCompleteness($request->user()->programId()),
+            'program' => Campus::program($request->user()->programId()),
         ]);
     }
 
@@ -63,11 +66,14 @@ class KaprodiSignatureController extends Controller
      * (berjalan atau selesai): logo perusahaan, nama ketua divisi, tanda tangan ketua divisi.
      * Hanya status, tanpa gambar tanda tangannya. Yang belum lengkap di atas.
      */
-    public static function companyCompleteness(): Collection
+    public static function companyCompleteness(?int $programId = null): Collection
     {
+        // Hanya divisi tempat mahasiswa prodi ini magang (semua prodi bila tanpa prodi)
+        $active = fn ($q) => $q->whereIn('status', ['berjalan', 'selesai'])->inProgram($programId);
+
         return CompanyDivision::query()
-            ->whereHas('internships', fn ($q) => $q->whereIn('status', ['berjalan', 'selesai']))
-            ->withCount(['internships as students_count' => fn ($q) => $q->whereIn('status', ['berjalan', 'selesai'])])
+            ->whereHas('internships', $active)
+            ->withCount(['internships as students_count' => $active])
             ->with('company:id,name,logo_file_id')
             ->get()
             ->map(function (CompanyDivision $division) {
@@ -97,7 +103,7 @@ class KaprodiSignatureController extends Controller
             'signature.max' => 'Ukuran tanda tangan maksimal 1 MB.',
         ]);
 
-        $template = CertificateTemplate::campus($request->user());
+        $template = CertificateTemplate::forKaprodi($request->user());
         $fields = ['signer_name' => trim($data['signer_name']), 'signer_title' => trim($data['signer_title'])];
         $old = $template->signature;
         $replace = $request->hasFile('signature') || ! empty($data['remove_signature']);

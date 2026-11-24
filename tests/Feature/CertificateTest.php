@@ -129,7 +129,8 @@ class CertificateTest extends TestCase
         $admin = $this->user('admin@kp.test');
         $kaprodiLogo = $this->user('kaprodi@kp.test');
         $this->actingAs($admin)->get('/dashboard')->assertOk()->assertDontSee('Identitas Kampus');
-        $this->actingAs($admin)->get('/admin/kampus')->assertNotFound();
+        // Halaman admin Kampus & Prodi hanya identitas teks dan prodi; logo tetap diunggah kaprodi
+        $this->actingAs($admin)->get('/admin/kampus')->assertOk()->assertSee('Identitas kampus')->assertDontSee('Logo kampus');
         $this->actingAs($admin)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => $png('x.png')])->assertForbidden();
         $this->actingAs($kaprodiLogo)->get('/kaprodi/tanda-tangan')->assertOk()->assertSee('Logo kampus')->assertSee('Logo fakultas');
         $this->actingAs($kaprodiLogo)->put('/kaprodi/tanda-tangan/logo/kampus', ['logo' => UploadedFile::fake()->create('logo.svg', 5, 'image/svg+xml')])->assertSessionHasErrorsIn('logo_kampus', 'logo');

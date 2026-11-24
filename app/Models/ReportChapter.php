@@ -91,7 +91,7 @@ class ReportChapter extends Model
             'mahasiswa' => (int) $internship->student_id === (int) $user->id,
             'supervisor' => $this->needs_supervisor && $internship->isSupervisedBy($user),
             'dospem' => (int) $internship->lecturer_id === (int) $user->id && $this->campusMayRead(),
-            'kaprodi' => $this->campusMayRead(),
+            'kaprodi' => $user->managesProgram($internship->programId()) && $this->campusMayRead(),
             default => false,
         };
     }

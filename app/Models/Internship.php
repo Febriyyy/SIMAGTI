@@ -380,9 +380,27 @@ class Internship extends Model
             'mahasiswa' => $query->where('student_id', $user->id),
             'supervisor' => $query->supervisedBy($user),
             'dospem' => $query->where('lecturer_id', $user->id),
-            'kaprodi', 'tu' => $query, // kaprodi dan TU fakultas melihat semuanya
+            // Kaprodi hanya melihat mahasiswa prodinya; kaprodi tanpa prodi (mis. ketua jurusan) dan TU fakultas melihat semuanya
+            'kaprodi' => $query->inProgram($user->programId()),
+            'tu' => $query,
             default => $query->whereRaw('1 = 0'),
         };
+    }
+
+    /** Hanya KP mahasiswa dari program studi tertentu; null = semua prodi. */
+    public function scopeInProgram(Builder $query, ?int $programId): Builder
+    {
+        return $programId === null
+            ? $query
+            : $query->whereHas('student.studentProfile', fn ($q) => $q->where('study_program_id', $programId));
+    }
+
+    /** Program studi mahasiswa KP ini (lewat profil mahasiswa). */
+    public function programId(): ?int
+    {
+        $id = $this->student?->studentProfile?->study_program_id;
+
+        return $id === null ? null : (int) $id;
     }
 
     /** KP mandiri yang sudah diverifikasi TU Fakultas dan menunggu persetujuan akhir kaprodi. */

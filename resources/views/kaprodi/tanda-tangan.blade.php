@@ -38,7 +38,7 @@
                 'role' => $template->signer_title ?: 'Ketua Program Studi',
                 'name' => $template->signer_name,
                 'sign' => $signature,
-                'sub' => \App\Support\Campus::get('campus.program'),
+                'sub' => $program,
                 'form' => 'f-ttd',
                 'nameField' => 'signer_name',
                 'titleField' => 'signer_title',

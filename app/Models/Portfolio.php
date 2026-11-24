@@ -102,8 +102,11 @@ class Portfolio extends Model
         if (! $viewer) {
             return false;
         }
-        if ((int) $viewer->id === (int) $this->user_id || in_array($viewer->role, ['kaprodi', 'tu', 'admin'], true)) {
+        if ((int) $viewer->id === (int) $this->user_id || in_array($viewer->role, ['tu', 'admin'], true)) {
             return true;
+        }
+        if ($viewer->role === 'kaprodi') {
+            return $viewer->managesProgram(User::with('studentProfile')->find($this->user_id)?->programId());
         }
         $internships = Internship::where('student_id', $this->user_id);
 

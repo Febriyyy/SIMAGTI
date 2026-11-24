@@ -26,7 +26,7 @@ class ActionItems
             'mahasiswa' => self::student($user),
             'supervisor' => self::supervisor($user),
             'dospem' => self::lecturer($user),
-            'kaprodi' => self::kaprodi(),
+            'kaprodi' => self::kaprodi($user),
             'tu' => self::tu(),
             default => [],
         };
@@ -154,14 +154,15 @@ class ActionItems
 
     // ---------------------------------------------------------------- Kampus
 
-    private static function kaprodi(): array
+    private static function kaprodi(User $user): array
     {
         $items = [];
-        $waiting = Internship::awaitingKaprodi()->count();
+        $waiting = Internship::visibleTo($user)->awaitingKaprodi()->count();
         if ($waiting > 0) {
             $items[] = self::item("{$waiting} pengajuan KP menunggu persetujuan", route('kaprodi.persetujuan'), null, 'approval');
         }
-        $changes = ChangeRequest::where('status', 'pending')->where('step', 'kaprodi')->count();
+        $changes = ChangeRequest::where('status', 'pending')->where('step', 'kaprodi')
+            ->whereHas('internship', fn ($q) => $q->visibleTo($user))->count();
         if ($changes > 0) {
             $items[] = self::item("{$changes} pengajuan perubahan menunggu", route('perubahan.antrean'), null, 'history');
         }

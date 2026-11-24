@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ActivityMonitorController;
 use App\Http\Controllers\ActivityPlanController;
+use App\Http\Controllers\AdminCampusController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentReviewController;
@@ -377,6 +378,12 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::post('/akun/{account}/sandi', [AdminUserController::class, 'resetPassword'])
             ->whereNumber('account')->middleware('throttle:20,1')->name('admin.akun.sandi');
         Route::get('/log-aktivitas', [ActivityLogController::class, 'index'])->name('log.index');
+
+        // Identitas kampus dan daftar program studi (beserta kaprodinya)
+        Route::get('/kampus', [AdminCampusController::class, 'edit'])->name('admin.kampus');
+        Route::put('/kampus', [AdminCampusController::class, 'update'])->name('admin.kampus.update');
+        Route::post('/kampus/prodi', [AdminCampusController::class, 'storeProgram'])->name('admin.prodi.store');
+        Route::put('/kampus/prodi/{program}', [AdminCampusController::class, 'updateProgram'])->whereNumber('program')->name('admin.prodi.update');
 
         // Standar penilaian kampus: pertanyaan per kategori, skala nilai, dan huruf mutu
         // Identitas kampus: logo kampus untuk sertifikat

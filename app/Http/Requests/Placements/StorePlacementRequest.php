@@ -4,6 +4,7 @@ namespace App\Http\Requests\Placements;
 
 use App\Models\CompanyStaffProfile;
 use App\Models\Internship;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -31,6 +32,13 @@ class StorePlacementRequest extends FormRequest
 
                     if ($hasActive) {
                         $fail('Mahasiswa ini masih memiliki penempatan atau pengajuan KP yang aktif.');
+                    }
+                },
+                // Kaprodi hanya menempatkan mahasiswa prodinya sendiri
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $student = User::with('studentProfile')->find($value);
+                    if ($student && ! $this->user()->managesProgram($student->programId())) {
+                        $fail('Mahasiswa ini dari program studi lain.');
                     }
                 },
             ],

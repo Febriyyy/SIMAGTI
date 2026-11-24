@@ -18,10 +18,16 @@ class DataSeederTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        $this->assertSame(29, User::count());
+        $this->assertSame(30, User::count());
         $this->assertSame(0, User::where('email', 'like', '%@kp.test')->count()); // tidak ada akun contoh
         $this->assertSame(0, User::whereIn('role', ['mentor', 'ketua_divisi'])->count());
         $this->assertSame(1, Internship::awaitingKaprodi()->count());      // Ilham
+        // Dua kaprodi, masing-masing satu prodi: pengajuan Ilham hanya tampil di antrean kaprodi prodinya
+        $arief = User::where('email', 'arief.hakim@kampus.ac.id')->firstOrFail();
+        $nurul = User::where('email', 'nurul.hidayah@kampus.ac.id')->firstOrFail();
+        $this->assertNotNull($arief->programId());
+        $this->assertNotSame($arief->programId(), $nurul->programId());
+        $this->assertSame(1, Internship::visibleTo($arief)->awaitingKaprodi()->count() + Internship::visibleTo($nurul)->awaitingKaprodi()->count());
         $this->assertSame(2, Internship::awaitingSupervisor()->count());   // Farhan dan Tiara, satu supervisor
         $this->assertSame(1, User::where('role', 'admin')->count());       // Wulan (dulu Biro Kerjasama)
         $this->assertSame(0, User::where('role', 'biro')->count());
@@ -40,8 +46,9 @@ class DataSeederTest extends TestCase
             'nabila.azzahra@mhs.kampus.ac.id' => ['/status-kp', '/kegiatan', '/kegiatan?tampilan=list', '/timesheet', '/dokumen'],
             'andika.saputra@cakrawaladigital.co.id' => ['/pantau', '/penilaian', '/aktivitas'],
             'retno.kusumaningrum@kampus.ac.id' => ['/tu/aktivasi', '/tu/verifikasi', '/tu/dokumen', '/penempatan', '/perusahaan'],
-            'arief.hakim@kampus.ac.id' => ['/pantau', '/kaprodi/persetujuan', '/penempatan', '/kaprodi/bobot', '/aktivitas'],
-            'wulan.anggraini@kampus.ac.id' => ['/admin/akun', '/admin/penilaian', '/admin/log-aktivitas'],
+            'arief.hakim@kampus.ac.id' => ['/pantau', '/kaprodi/persetujuan', '/penempatan', '/kaprodi/bobot', '/aktivitas', '/rekap', '/kaprodi/tanda-tangan'],
+            'nurul.hidayah@kampus.ac.id' => ['/pantau', '/kaprodi/persetujuan', '/penempatan', '/kaprodi/sidang', '/rekap', '/mahasiswa'],
+            'wulan.anggraini@kampus.ac.id' => ['/admin/akun', '/admin/penilaian', '/admin/log-aktivitas', '/admin/kampus'],
             'bambang.sutrisno@kampus.ac.id' => ['/validasi', '/hasil', '/aktivitas', '/antrean-bimbingan'],
         ];
         foreach ($pages as $email => $urls) {

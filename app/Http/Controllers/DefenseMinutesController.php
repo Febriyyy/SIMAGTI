@@ -19,7 +19,7 @@ class DefenseMinutesController extends Controller
         abort_unless(
             (int) $internship->student_id === (int) $user->id
             || ($user->role === 'dospem' && (int) $internship->lecturer_id === (int) $user->id)
-            || $user->role === 'kaprodi',
+            || $user->managesProgram($internship->programId()),
             403,
         );
 
@@ -35,7 +35,7 @@ class DefenseMinutesController extends Controller
             'campus' => [
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),
-                'program' => (string) Campus::get('campus.program'),
+                'program' => Campus::program($internship->programId()),
                 'city' => Campus::city(),
             ],
         ]);

@@ -28,7 +28,7 @@
             'role' => $campusSigner['title'],
             'name' => $campusSigner['name'],
             'owner' => 'Diisi kaprodi',
-            'sub' => \App\Support\Campus::get('campus.program'),
+            'sub' => $campusSigner['program'],
             'status' => [$campusSigner['signed'], $campusSigner['signed'] ? 'Sudah ditandatangani kaprodi' : 'Belum ditandatangani kaprodi'],
         ];
     ?>

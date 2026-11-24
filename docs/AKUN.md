@@ -17,7 +17,8 @@ Hanya ada satu jenis KP (tidak ada lagi MBKM dan Seminar); silabus, evaluasi bul
 
 | Peran | Nama | Email |
 |---|---|---|
-| Kaprodi (sekaligus Koordinator KP) | Dr. Arief Rahman Hakim, S.Kom., M.T. | arief.hakim@kampus.ac.id |
+| Kaprodi Teknik Informatika (sekaligus Koordinator KP) | Dr. Arief Rahman Hakim, S.Kom., M.T. | arief.hakim@kampus.ac.id |
+| Kaprodi Sistem Informasi | Dr. Nurul Hidayah, S.Kom., M.Kom. | nurul.hidayah@kampus.ac.id |
 | Dosen Pembimbing | Dewi Lestari Wulandari, S.Kom., M.Kom. | dewi.lestari@kampus.ac.id |
 | Dosen Pembimbing | Ir. Bambang Sutrisno, M.T. | bambang.sutrisno@kampus.ac.id |
 | Dosen Pembimbing | Rizky Aditya Pratama, S.T., M.Cs. | rizky.pratama@kampus.ac.id |

@@ -60,10 +60,14 @@ class AssessmentStandard
         return self::CATEGORIES[$category][0] ?? ucfirst($category);
     }
 
-    /** Bobot kategori (persen) yang berlaku. @return array<string, float> */
-    public static function weights(): array
+    /**
+     * Bobot kategori (persen) yang berlaku. Prodi bisa punya bobot sendiri (diisi kaprodinya);
+     * jika belum, memakai bobot umum. @return array<string, float>
+     */
+    public static function weights(?int $programId = null): array
     {
-        $saved = (array) Campus::get('assessment.weights');
+        $own = $programId ? Setting::get(self::WEIGHTS_KEY.'.'.$programId) : null;
+        $saved = (array) ($own ?: Campus::get('assessment.weights'));
         $weights = [];
         foreach (array_keys(self::CATEGORIES) as $key) {
             $weights[$key] = (float) ($saved[$key] ?? 0);
@@ -73,9 +77,10 @@ class AssessmentStandard
     }
 
     /** @param  array<string, float|int>  $weights */
-    public static function saveWeights(array $weights, ?int $userId = null): void
+    public static function saveWeights(array $weights, ?int $userId = null, ?int $programId = null): void
     {
-        Setting::put(self::WEIGHTS_KEY, array_map('floatval', array_intersect_key($weights, self::CATEGORIES)), 'Bobot kategori penilaian akhir (kaprodi)', $userId);
+        $key = $programId ? self::WEIGHTS_KEY.'.'.$programId : self::WEIGHTS_KEY;
+        Setting::put($key, array_map('floatval', array_intersect_key($weights, self::CATEGORIES)), 'Bobot kategori penilaian akhir (kaprodi'.($programId ? ', prodi '.$programId : '').')', $userId);
         Campus::flush();
     }
 
@@ -180,6 +185,6 @@ class AssessmentStandard
     /** Bobot yang dipakai satu penilaian: tersimpan di penilaian (setelah dikirim) atau yang berlaku sekarang. */
     public static function weightsFor(?Assessment $assessment): array
     {
-        return $assessment?->category_weights ?: self::weights();
+        return $assessment?->category_weights ?: self::weights($assessment?->internship?->programId());
     }
 }

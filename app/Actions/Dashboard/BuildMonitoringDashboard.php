@@ -71,7 +71,7 @@ class BuildMonitoringDashboard
         }
 
         if ($user->hasRole('kaprodi')) {
-            $data['waitingApproval'] = Internship::awaitingKaprodi()->count();
+            $data['waitingApproval'] = Internship::visibleTo($user)->awaitingKaprodi()->count();
             $data['companies'] = $this->companySummary($internships);
         }
 

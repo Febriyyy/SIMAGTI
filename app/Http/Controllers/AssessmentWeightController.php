@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Support\AssessmentStandard;
+use App\Support\Campus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -11,10 +12,12 @@ use Illuminate\View\View;
 /** Kaprodi mengatur bobot kategori penilaian akhir dalam persen. Pertanyaan dan skala nilai diatur admin. */
 class AssessmentWeightController extends Controller
 {
-    public function edit(): View
+    public function edit(Request $request): View
     {
+        // Kaprodi berprodi mengatur bobot prodinya; tanpa prodi mengatur bobot umum
         return view('kaprodi.bobot', [
-            'weights' => AssessmentStandard::weights(),
+            'weights' => AssessmentStandard::weights($request->user()->programId()),
+            'program' => Campus::program($request->user()->programId()),
             'rubric' => AssessmentStandard::rubric(),
             'scale' => AssessmentStandard::scale(),
         ]);
@@ -36,7 +39,7 @@ class AssessmentWeightController extends Controller
             return back()->withInput()->withErrors(['weights' => 'Total bobot harus 100%. Sekarang '.rtrim(rtrim(number_format(array_sum($weights), 2, ',', ''), '0'), ',').'%.']);
         }
 
-        AssessmentStandard::saveWeights($weights, $request->user()->id);
+        AssessmentStandard::saveWeights($weights, $request->user()->id, $request->user()->programId());
 
         $text = collect($weights)->map(fn ($w, $k) => AssessmentStandard::categoryLabel($k).' '.rtrim(rtrim(number_format($w, 2, ',', ''), '0'), ',').'%')->join(', ');
         ActivityLog::record('penilaian.bobot', 'Mengubah bobot penilaian: '.$text);

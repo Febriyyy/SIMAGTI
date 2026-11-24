@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\ConversionCandidate;
 use App\Models\Internship;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 /**
@@ -21,11 +22,13 @@ class ProdiRecap
     ];
 
     /** @return Collection<int, Internship> */
-    public static function internships(string $filter = 'aktif', ?string $search = null): Collection
+    public static function internships(string $filter = 'aktif', ?string $search = null, ?User $viewer = null, ?int $programId = null): Collection
     {
         $statuses = self::FILTERS[$filter][1] ?? self::FILTERS['aktif'][1];
 
-        return Internship::with(['student', 'company', 'lecturer', 'assessment', 'defenseScore', 'conversion', 'reportChapters'])
+        return Internship::with(['student.studentProfile.studyProgram', 'company', 'lecturer', 'assessment', 'defenseScore', 'conversion', 'reportChapters'])
+            ->when($viewer, fn ($q) => $q->visibleTo($viewer))
+            ->inProgram($programId)
             ->whereIn('status', $statuses)
             ->when(filled($search), fn ($q) => $q->whereHas('student', fn ($s) => $s->where('name', 'like', '%'.$search.'%')->orWhere('nim', 'like', '%'.$search.'%')))
             ->orderByRaw("CASE status WHEN 'berjalan' THEN 0 WHEN 'selesai' THEN 1 ELSE 2 END")
@@ -79,7 +82,7 @@ class ProdiRecap
     /** Berkas Excel rekap. */
     public static function xlsx(Collection $internships, string $filterLabel): string
     {
-        $rows = [['No', 'NIM', 'Nama', 'Perusahaan', 'Posisi', 'Dosen pembimbing', 'Periode', 'Status KP', 'Hasil KP',
+        $rows = [['No', 'NIM', 'Nama', 'Program studi', 'Perusahaan', 'Posisi', 'Dosen pembimbing', 'Periode', 'Status KP', 'Hasil KP',
             'Nilai akhir', 'Huruf', 'Nilai sidang', 'Huruf sidang', 'Tanggal sidang', 'Laporan disetujui', 'Rekrutmen']];
 
         foreach ($internships->values() as $n => $i) {
@@ -87,6 +90,7 @@ class ProdiRecap
                 $n + 1,
                 $i->student->nim,
                 $i->student->name,
+                $i->student->studentProfile?->studyProgram?->name,
                 $i->placeName(),
                 $i->position,
                 $i->lecturer?->name,

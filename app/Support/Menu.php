@@ -79,6 +79,7 @@ class Menu
             'admin' => [
                 $dashboard,
                 ['label' => 'Akun', 'route' => 'admin.akun', 'icon' => 'users', 'active' => 'admin.akun*'],
+                ['label' => 'Kampus dan Prodi', 'route' => 'admin.kampus', 'icon' => 'school', 'active' => 'admin.kampus*'],
                 ['label' => 'Standar Penilaian', 'route' => 'admin.penilaian', 'icon' => 'award', 'active' => 'admin.penilaian*'],
                 ['label' => 'Log Aktivitas', 'route' => 'log.index', 'icon' => 'history', 'active' => 'log.*'],
             ],

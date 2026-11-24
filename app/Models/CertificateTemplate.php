@@ -14,6 +14,7 @@ class CertificateTemplate extends Model
     protected $fillable = [
         'scope',
         'company_id',
+        'study_program_id',
         'name',
         'logo_file_id',
         'signature_file_id',
@@ -31,15 +32,44 @@ class CertificateTemplate extends Model
         ];
     }
 
-    /** Template sertifikat kampus (penanda tangan kaprodi); dibuat sekali bila belum ada. */
+    /** Template sertifikat kampus umum (tanpa prodi); dibuat sekali bila belum ada. */
     public static function campus(?User $kaprodi = null): self
     {
         $kaprodi ??= User::where('role', 'kaprodi')->where('is_active', true)->orderBy('id')->first();
 
         return self::firstOrCreate(
-            ['scope' => 'kampus', 'name' => 'Sertifikat KP kampus'],
+            ['scope' => 'kampus', 'name' => 'Sertifikat KP kampus', 'study_program_id' => null],
             ['signer_name' => $kaprodi?->name, 'signer_title' => 'Ketua Program Studi', 'created_by' => $kaprodi?->id]
         );
+    }
+
+    /**
+     * Template yang dipakai sertifikat mahasiswa prodi tertentu: milik prodi itu bila sudah ada,
+     * jika belum template umum. Dipakai saat sertifikat ditampilkan, jadi perubahan kaprodi langsung berlaku.
+     */
+    public static function forProgram(?int $programId): self
+    {
+        return ($programId ? self::where('scope', 'kampus')->where('study_program_id', $programId)->first() : null)
+            ?? self::campus();
+    }
+
+    /** Template yang diisi seorang kaprodi: milik prodinya (dibuat bila belum ada), atau template umum bila tanpa prodi. */
+    public static function forKaprodi(User $kaprodi): self
+    {
+        $programId = $kaprodi->programId();
+        if ($programId === null) {
+            return self::campus($kaprodi);
+        }
+
+        return self::firstOrCreate(
+            ['scope' => 'kampus', 'study_program_id' => $programId],
+            ['name' => 'Sertifikat KP '.(StudyProgram::find($programId)?->name ?? 'prodi'), 'signer_name' => $kaprodi->name, 'signer_title' => 'Ketua Program Studi', 'created_by' => $kaprodi->id]
+        );
+    }
+
+    public function studyProgram(): BelongsTo
+    {
+        return $this->belongsTo(StudyProgram::class);
     }
 
     public function company(): BelongsTo

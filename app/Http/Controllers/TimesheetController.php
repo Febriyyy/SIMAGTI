@@ -93,7 +93,7 @@ class TimesheetController extends Controller
             'mahasiswa' => (int) $internship->student_id === (int) $user->id,
             'supervisor' => $internship->isSupervisedBy($user),
             'dospem' => (int) $internship->lecturer_id === (int) $user->id,
-            'kaprodi' => true,
+            'kaprodi' => $user->managesProgram($internship->programId()),
             default => false,
         };
         abort_unless($allowed, 403);

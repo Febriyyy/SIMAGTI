@@ -8,7 +8,7 @@
             <h1 class="page-title">Rekap KP</h1>
             <p class="page-sub">Status, nilai, laporan, dan rekrutmen seluruh mahasiswa KP.</p>
         </div>
-        <a href="{{ route('rekap.unduh', array_filter(['status' => $filter, 'q' => $search])) }}" class="btn btn-primary"><x-ikon name="download" :size="18" /> Unduh Excel</a>
+        <a href="{{ route('rekap.unduh', array_filter(['status' => $filter, 'q' => $search, 'prodi' => $program])) }}" class="btn btn-primary"><x-ikon name="download" :size="18" /> Unduh Excel</a>
     </div>
 
     <div class="stat-grid">
@@ -28,6 +28,14 @@
             @endforeach
         </div>
         <div class="recap-search">
+            @if ($programs->count() > 1)
+                <select name="prodi" class="select" aria-label="Program studi" onchange="this.form.submit()">
+                    <option value="">Semua prodi</option>
+                    @foreach ($programs as $p)
+                        <option value="{{ $p->id }}" @selected($program === $p->id)>{{ $p->name }}</option>
+                    @endforeach
+                </select>
+            @endif
             <input type="search" name="q" class="input" value="{{ $search }}" placeholder="Cari nama atau NIM" aria-label="Cari nama atau NIM">
             <button type="submit" class="btn">Cari</button>
         </div>

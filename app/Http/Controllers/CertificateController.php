@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Results\IssueCertificate;
 use App\Models\Certificate;
+use App\Models\CertificateTemplate;
 use App\Models\Internship;
 use App\Support\AssessmentStandard;
 use App\Support\Campus;
@@ -28,19 +29,23 @@ class CertificateController extends Controller
 
         $verifyUrl = route('sertifikat.verifikasi', $certificate->verification_token);
 
+        // Template kaprodi mengikuti prodi mahasiswa (milik prodi itu, atau template umum)
+        $template = CertificateTemplate::forProgram($internship->programId());
+        $certificate->setRelation('template', $template);
+
         return view('sertifikat.cetak', [
-            'certificate' => $certificate->load('template'),
+            'certificate' => $certificate,
             'internship' => $internship,
             'verifyUrl' => $verifyUrl,
             'qr' => Qr::svg($verifyUrl),
             'campusLogo' => Logos::campus(),
             'facultyLogo' => Logos::faculty(),
-            'kaprodiSignature' => Logos::dataUri($certificate->template?->signature),
+            'kaprodiSignature' => Logos::dataUri($template->signature),
             'divisionSignature' => Logos::dataUri($internship->division?->headSignature),
             'campus' => [
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),
-                'program' => (string) Campus::get('campus.program'),
+                'program' => Campus::program($internship->programId()),
                 'city' => Campus::city(),
             ],
         ]);
@@ -78,7 +83,7 @@ class CertificateController extends Controller
                 'grade' => $grade,
                 'university' => Campus::university(),
                 'faculty' => Campus::faculty(),
-                'program' => (string) Campus::get('campus.program'),
+                'program' => Campus::program($certificate?->internship?->programId()),
                 'city' => Campus::city(),
             ], $certificate ? 200 : 404)
             ->header('X-Robots-Tag', 'noindex');

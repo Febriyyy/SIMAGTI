@@ -20,7 +20,9 @@ class StoreStudentRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')],
             'nim' => ['required', 'string', 'max:20', Rule::unique('users', 'nim')],
-            'study_program_id' => ['required', Rule::exists('study_programs', 'id')->whereNull('deleted_at')],
+            'study_program_id' => ['required', Rule::exists('study_programs', 'id')->whereNull('deleted_at'),
+                // Kaprodi berprodi hanya menambah mahasiswa ke prodinya sendiri
+                fn (string $attribute, mixed $value, \Closure $fail) => $this->user()->managesProgram((int) $value) ? null : $fail('Pilih program studi Anda sendiri.')],
             'entry_year' => ['nullable', 'integer', 'min:2000', 'max:'.((int) date('Y') + 1)],
             'gpa' => ['nullable', 'numeric', 'between:0,4'],
             'password' => ['required', 'string', 'min:8'],

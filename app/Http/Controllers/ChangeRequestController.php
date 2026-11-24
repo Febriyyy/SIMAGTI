@@ -57,10 +57,13 @@ class ChangeRequestController extends Controller
         $query = ChangeRequest::with(['internship.student', 'internship.company', 'requester'])->where('status', 'pending')->where('step', $step);
         if ($step === 'supervisor') {
             $query->whereHas('internship', fn ($q) => $q->supervisedBy($user));
+        } elseif ($step === 'kaprodi') {
+            $query->whereHas('internship', fn ($q) => $q->visibleTo($user));
         }
 
         $recent = ChangeRequest::with(['internship.student', 'decider'])->where('status', '!=', 'pending')
             ->when($step === 'supervisor', fn ($q) => $q->whereHas('internship', fn ($i) => $i->supervisedBy($user)))
+            ->when($step === 'kaprodi', fn ($q) => $q->whereHas('internship', fn ($i) => $i->visibleTo($user)))
             ->when($step === 'tu', fn ($q) => $q->where('type', 'replace_supervisor'))
             ->latest('decided_at')->limit(10)->get();
 
@@ -72,7 +75,7 @@ class ChangeRequestController extends Controller
         $user = $request->user();
         $allowed = match ($change->step) {
             'supervisor' => $change->internship->isSupervisedBy($user),
-            'kaprodi' => $user->role === 'kaprodi',
+            'kaprodi' => $user->managesProgram($change->internship->programId()),
             'tu' => $user->role === 'tu',
             default => false,
         };

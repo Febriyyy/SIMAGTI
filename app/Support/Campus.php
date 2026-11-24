@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Setting;
+use App\Models\StudyProgram;
 
 /**
  * Identitas kampus dan aturan KP. Diambil dari tabel settings bila ada, jika tidak dari config/simagti.php.
@@ -41,6 +42,14 @@ class Campus
     public static function city(): string
     {
         return (string) self::get('campus.city');
+    }
+
+    /** "Program Studi <nama>" untuk prodi tertentu; tanpa prodi memakai nama prodi bawaan (pengaturan/config). */
+    public static function program(?int $programId = null): string
+    {
+        $name = $programId ? StudyProgram::find($programId)?->name : null;
+
+        return $name ? 'Program Studi '.$name : (string) self::get('campus.program');
     }
 
     public static function rule(string $name): mixed

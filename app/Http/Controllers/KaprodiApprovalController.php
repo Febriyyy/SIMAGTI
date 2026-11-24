@@ -7,14 +7,16 @@ use App\Http\Requests\Applications\ReviewKaprodiRequest;
 use App\Models\Internship;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /** Kaprodi memberi persetujuan akhir KP mandiri dan menunjuk dosen pembimbing. */
 class KaprodiApprovalController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $waiting = Internship::with(['student.studentProfile.studyProgram', 'company', 'division', 'approvals.reviewer'])
+            ->visibleTo($request->user())
             ->awaitingKaprodi()
             ->oldest()
             ->get();

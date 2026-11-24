@@ -67,7 +67,7 @@ class SaveAssessmentRequest extends FormRequest
                     if ($missing > 0) {
                         $validator->errors()->add('scores', "Masih ada {$missing} pertanyaan yang belum dinilai.");
                     }
-                    if (abs(AssessmentStandard::totalWeight() - 100) > 0.001) {
+                    if (abs(AssessmentStandard::totalWeight(AssessmentStandard::weights($this->internship()->programId())) - 100) > 0.001) {
                         $validator->errors()->add('scores', 'Bobot penilaian belum 100%. Hubungi kaprodi.');
                     }
                 }

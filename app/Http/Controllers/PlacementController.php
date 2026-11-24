@@ -23,6 +23,7 @@ class PlacementController extends Controller
         $status = $request->query('status');
 
         $internships = Internship::with(['student', 'company', 'division', 'supervisor', 'lecturer'])
+            ->visibleTo($request->user())
             ->withProgress()
             ->when(array_key_exists((string) $status, Internship::STATUSES), fn ($q) => $q->where('status', $status))
             ->latest('id')
@@ -40,8 +41,11 @@ class PlacementController extends Controller
 
         $activeStudentIds = Internship::whereIn('status', Internship::ACTIVE_STATUSES)->pluck('student_id');
 
+        // Kaprodi berprodi hanya melihat mahasiswa prodinya
+        $programId = request()->user()->programId();
         $students = User::where('role', 'mahasiswa')->where('is_active', true)
             ->whereNotIn('id', $activeStudentIds)
+            ->when($programId, fn ($q) => $q->whereHas('studentProfile', fn ($p) => $p->where('study_program_id', $programId)))
             ->orderBy('name')->get();
 
         $companies = Company::with('divisions')

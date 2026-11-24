@@ -160,9 +160,13 @@ class InternshipPolicy
     /** Hanya kaprodi yang memberi persetujuan akhir KP mandiri. */
     public function reviewAsKaprodi(User $user, Internship $internship): Response
     {
-        return $user->role === 'kaprodi'
+        if ($user->role !== 'kaprodi') {
+            return Response::deny('Hanya Kaprodi yang dapat memberi persetujuan akhir.');
+        }
+
+        return $user->managesProgram($internship->programId())
             ? Response::allow()
-            : Response::deny('Hanya Kaprodi yang dapat memberi persetujuan akhir.');
+            : Response::deny('Pengajuan ini milik program studi lain.');
     }
 
     /** Daftar seluruh penempatan boleh dilihat kaprodi dan TU. */

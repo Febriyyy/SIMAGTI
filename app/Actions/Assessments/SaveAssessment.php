@@ -39,7 +39,7 @@ class SaveAssessment
             $assessment->fill([
                 'assessor_id' => $actor->id,
                 'comment' => $comment,
-                'category_weights' => $submit ? AssessmentStandard::weights() : null,
+                'category_weights' => $submit ? AssessmentStandard::weights($internship->programId()) : null,
             ]);
             $assessment->final_score = $assessment->computeFinalScore();
 

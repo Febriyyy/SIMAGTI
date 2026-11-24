@@ -26,7 +26,7 @@ class IssueCertificate
         }
 
         return DB::transaction(function () use ($internship, $issuer) {
-            $template = CertificateTemplate::campus();
+            $template = CertificateTemplate::forProgram($internship->programId());
 
             $certificate = Certificate::create([
                 'internship_id' => $internship->id,

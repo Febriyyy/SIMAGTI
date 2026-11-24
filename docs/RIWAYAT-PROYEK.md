@@ -169,3 +169,11 @@ Urutan yang dikorbankan jika waktu mepet: lowongan, template laporan dan surat, 
 ## 8. Akun demo
 
 Lihat `docs/AKUN.md`. Kata sandi semua akun: `Simagti2026`. (Akun `*@kp.test` hanya ada di database tes otomatis.)
+
+## Banyak program studi dan identitas kampus (24 November 2026)
+
+- **Kaprodi per prodi**: kaprodi diikat ke satu prodi lewat profil dosennya (`lecturer_profiles.study_program_id`, diatur admin di menu *Kampus dan Prodi*). Kaprodi hanya melihat dan mengurus KP mahasiswa prodinya: persetujuan, penempatan, data mahasiswa, pemantauan, rekap, pengesahan nilai, berita acara, portofolio, dan antrean perubahan. Satu titik aturan: `Internship::visibleTo()` dan `User::managesProgram()`.
+- **Kaprodi tanpa prodi** (mis. ketua jurusan atau koordinator KP) tetap melihat semua prodi. **TU Fakultas dan admin** melihat semua prodi; rekap punya pilihan prodi.
+- **Pengaturan per prodi**: nama, jabatan, dan tanda tangan kaprodi di sertifikat (`certificate_templates.study_program_id`; prodi tanpa template memakai template umum) dan bobot penilaian (`settings` kunci `simagti.assessment.weights.{prodi}`; jika kosong memakai bobot umum). Nama prodi di sertifikat, surat pengantar, berita acara, dan draf laporan mengikuti prodi mahasiswa (`Campus::program()`).
+- **Identitas kampus diatur admin** (universitas, singkatan, fakultas, kota, alamat, kode surat) di menu *Kampus dan Prodi*, disimpan di `settings`; `.env` hanya nilai awal. Admin juga menambah prodi dan menunjuk kaprodinya.
+- Data demo: Arief kaprodi Teknik Informatika, Nurul Hidayah kaprodi Sistem Informasi.

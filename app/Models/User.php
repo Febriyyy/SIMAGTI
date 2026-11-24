@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -150,6 +151,36 @@ class User extends Authenticatable
     public function lecturerProfile(): HasOne
     {
         return $this->hasOne(LecturerProfile::class);
+    }
+
+    /**
+     * Program studi pengguna: mahasiswa dari profil mahasiswa, dosen dan kaprodi dari profil dosen.
+     * null = tidak terikat prodi (kaprodi tanpa prodi melihat semua prodi).
+     */
+    public function programId(): ?int
+    {
+        $id = match ($this->role) {
+            'mahasiswa' => $this->studentProfile?->study_program_id,
+            'dospem', 'kaprodi' => $this->lecturerProfile?->study_program_id,
+            default => null,
+        };
+
+        return $id === null ? null : (int) $id;
+    }
+
+    /** Kaprodi yang boleh mengurus KP mahasiswa prodi tertentu (prodinya sendiri, atau kaprodi tanpa prodi). */
+    public function managesProgram(?int $programId): bool
+    {
+        return $this->role === 'kaprodi' && ($this->programId() === null || $programId === null || $this->programId() === $programId);
+    }
+
+    /** Kaprodi yang bertanggung jawab atas satu prodi: kaprodi prodi itu, atau kaprodi tanpa prodi bila tidak ada. */
+    public static function kaprodiFor(?int $programId): Collection
+    {
+        $all = self::where('role', 'kaprodi')->where('is_active', true)->with('lecturerProfile')->get();
+        $own = $programId === null ? collect() : $all->filter(fn (User $u) => $u->programId() === $programId);
+
+        return $own->isNotEmpty() ? $own->values() : $all->filter(fn (User $u) => $u->programId() === null)->values()->whenEmpty(fn () => $all);
     }
 
     public function staffProfile(): HasOne
