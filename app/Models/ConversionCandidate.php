@@ -106,6 +106,18 @@ class ConversionCandidate extends Model
             ->map(fn ($l) => trim(ltrim(trim($l), "-•* \t")))->filter()->values()->all();
     }
 
+    /** Nomor surat penawaran, mis. "003/TK-AD/XI/2026" (urut id, inisial perusahaan, bulan Romawi, tahun tawaran). */
+    public function letterNumber(): string
+    {
+        $date = $this->offered_at ?? $this->created_at ?? now();
+        $name = preg_replace('/^(PT|CV|UD|Yayasan)\.?\s+/i', '', (string) $this->internship?->company?->name);
+        $initials = collect(preg_split('/\s+/', trim($name)))->filter()->take(2)
+            ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('') ?: 'X';
+        $roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][$date->month - 1];
+
+        return sprintf('%03d/TK-%s/%s/%d', $this->id, $initials, $roman, $date->year);
+    }
+
     /** Sisa hari sampai batas jawaban (0 = hari ini terakhir; negatif = lewat). */
     public function daysLeft(): ?int
     {

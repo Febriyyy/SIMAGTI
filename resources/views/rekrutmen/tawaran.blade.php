@@ -64,13 +64,23 @@
                 </div>
             </section>
 
-            @if ($o->offerLetter)
+            @if ($o->offered_position)
                 <section class="card">
                     <div class="card-head">
-                        <h2 class="card-title">Surat resmi perusahaan</h2>
-                        <a href="{{ route('rekrutmen.surat', $o) }}" target="_blank" rel="noopener" class="btn btn-sm btn-ghost"><x-ikon name="download" :size="16" /> Buka</a>
+                        <div>
+                            <h2 class="card-title">Surat penawaran kerja</h2>
+                            <p class="card-sub">No. {{ $o->letterNumber() }}</p>
+                        </div>
+                        <a href="{{ route('rekrutmen.surat.penawaran', $o) }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="download" :size="16" /> Buka dan cetak</a>
                     </div>
-                    <iframe class="job-letter" src="{{ route('rekrutmen.surat', $o) }}#view=FitH" title="Surat penawaran kerja dari {{ $internship->placeName() }}"></iframe>
+                    <iframe class="job-letter" src="{{ route('rekrutmen.surat.penawaran', $o) }}" title="Surat penawaran kerja dari {{ $internship->placeName() }}"></iframe>
+                    @if ($o->offerLetter)
+                        <div class="card-foot job-attach">
+                            <x-ikon name="file" :size="16" />
+                            <span>Lampiran dari perusahaan</span>
+                            <a href="{{ route('rekrutmen.surat', $o) }}" target="_blank" rel="noopener">{{ $o->offerLetter->original_name ?? 'Surat (PDF)' }}</a>
+                        </div>
+                    @endif
                 </section>
             @endif
         </div>

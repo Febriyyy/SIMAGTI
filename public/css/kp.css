@@ -6981,3 +6981,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
     .offer-card .offer-actions { width: 100%; }
     .offer-card .offer-actions .btn { width: 100%; justify-content: center; }
 }
+/* Surat penawaran kerja di halaman tawaran: pratinjau setinggi satu halaman, lampiran PDF di kaki kartu */
+.job-letter { display: block; width: 100%; height: 780px; border: 0; border-top: 1px solid var(--line); background: #e9eeeb; }
+.job-attach { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.job-attach a { margin-left: auto; font-weight: 600; }

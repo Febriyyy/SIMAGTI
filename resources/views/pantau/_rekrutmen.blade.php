@@ -75,8 +75,11 @@
                         </form>
                         <button type="button" class="btn btn-primary" data-open="dlg-offer"><x-ikon name="send" :size="16" /> Kirim tawaran kerja</button>
                     @else
+                        @if ($c->offered_position)
+                            <a href="{{ route('rekrutmen.surat.penawaran', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="file" :size="16" /> Surat penawaran</a>
+                        @endif
                         @if ($c->offerLetter)
-                            <a href="{{ route('rekrutmen.surat', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="file" :size="16" /> Lihat surat</a>
+                            <a href="{{ route('rekrutmen.surat', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="download" :size="16" /> Lampiran PDF</a>
                         @endif
                         <button type="button" class="btn" data-open="dlg-extend"><x-ikon name="calendar" :size="16" /> Perpanjang batas</button>
                     @endif

@@ -123,11 +123,7 @@ class ConversionController extends Controller
     /** Surat resmi: hanya mahasiswa penerima tawaran dan Company Supervisor penempatan itu. */
     public function letter(Request $request, ConversionCandidate $candidate): StreamedResponse
     {
-        $user = $request->user();
-        $internship = $candidate->internship;
-        $allowed = ($user->role === 'mahasiswa' && (int) $internship->student_id === (int) $user->id && $candidate->status !== 'direkomendasikan')
-            || ($user->role === 'supervisor' && $internship->isSupervisedBy($user));
-        abort_unless($allowed, 403);
+        $this->authorizeLetter($request, $candidate);
 
         $file = $candidate->offerLetter;
         abort_unless($file && Storage::disk($file->disk)->exists($file->path), 404);
@@ -138,6 +134,27 @@ class ConversionController extends Controller
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store',
         ]);
+    }
+
+    /** Surat penawaran kerja yang disusun dari data tawaran (selalu ada, siap cetak atau simpan PDF). */
+    public function offerLetter(Request $request, ConversionCandidate $candidate): View
+    {
+        $this->authorizeLetter($request, $candidate);
+        abort_if($candidate->status === 'direkomendasikan' || ! $candidate->offered_position, 404);
+
+        $candidate->load(['internship.student.studentProfile.studyProgram', 'internship.company', 'internship.division', 'internship.supervisor']);
+
+        return view('rekrutmen.surat-penawaran', ['offer' => $candidate, 'internship' => $candidate->internship]);
+    }
+
+    /** Mahasiswa penerima tawaran (setelah ditawarkan) atau Company Supervisor penempatannya. */
+    private function authorizeLetter(Request $request, ConversionCandidate $candidate): void
+    {
+        $user = $request->user();
+        $internship = $candidate->internship;
+        $allowed = ($user->role === 'mahasiswa' && (int) $internship->student_id === (int) $user->id && $candidate->status !== 'direkomendasikan')
+            || ($user->role === 'supervisor' && $internship->isSupervisedBy($user));
+        abort_unless($allowed, 403);
     }
 
     /** KP mahasiswa yang punya tawaran kerja (yang sudah ditawarkan; rekomendasi belum terlihat mahasiswa). */

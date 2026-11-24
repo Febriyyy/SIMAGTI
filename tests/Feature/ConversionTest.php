@@ -143,6 +143,30 @@ class ConversionTest extends TestCase
         $this->assertSame('diterima', $c->fresh()->status);
     }
 
+    public function test_surat_penawaran_kerja_disusun_dari_data_tawaran(): void
+    {
+        $fajar = $this->recommended();
+        $c = $fajar->conversion;
+
+        // Masih rekomendasi: belum ada surat
+        $this->actingAs($fajar->supervisor)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertNotFound();
+
+        $this->actingAs($fajar->supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer())->assertSessionHasNoErrors();
+        $c->refresh();
+
+        $this->actingAs($this->user('fajar@kp.test'))->get("/rekrutmen/{$c->id}/surat-penawaran")->assertOk()
+            ->assertSee('Surat Penawaran Kerja')->assertSee($c->letterNumber())
+            ->assertSee('Junior Backend Developer')->assertSee('Tim Platform')->assertSee('Bandung')->assertSee('Hybrid')
+            ->assertSee('Mengembangkan API layanan pemesanan')->assertSee('Rani HR')->assertSee('Ditandatangani secara elektronik');
+        $this->actingAs($fajar->supervisor)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertOk();
+        $this->actingAs($fajar->lecturer)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertForbidden();
+
+        // Halaman tawaran memuat surat penawaran dan lampiran PDF dari perusahaan
+        $this->actingAs($this->user('fajar@kp.test'))->get('/tawaran-kerja')
+            ->assertSee(route('rekrutmen.surat.penawaran', $c), false)->assertSee('Lampiran dari perusahaan');
+        $this->assertMatchesRegularExpression('#^\d{3}/TK-[A-Z]{1,2}/[IVX]+/\d{4}$#', $c->letterNumber());
+    }
+
     public function test_hanya_supervisor_penempatan_itu_yang_bisa_mengelola(): void
     {
         $fajar = $this->internshipOf('fajar@kp.test');

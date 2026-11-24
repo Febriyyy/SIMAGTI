@@ -137,6 +137,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
     // Surat resmi tawaran kerja (hanya mahasiswa penerima dan Company Supervisor penempatannya)
     Route::get('/rekrutmen/{candidate}/surat', [ConversionController::class, 'letter'])->whereNumber('candidate')->name('rekrutmen.surat');
+    Route::get('/rekrutmen/{candidate}/surat-penawaran', [ConversionController::class, 'offerLetter'])->whereNumber('candidate')->name('rekrutmen.surat.penawaran');
 
     // Berkas laporan per bab (dicek ReportChapter::canBeReadBy)
     Route::get('/laporan-bab/{chapter}/berkas', [ReportChapterController::class, 'file'])->whereNumber('chapter')->name('laporan.berkas');
