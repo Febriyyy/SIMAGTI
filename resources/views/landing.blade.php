@@ -44,8 +44,13 @@
     {{-- Hero: judul besar di panel terang, tiga kartu angka menumpang di tepi bawahnya --}}
     <section class="ld-hero" aria-labelledby="ld-hero-title">
         <div class="ld-hero-panel">
+            <svg class="ld-hero-spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2c1.2 10.6 5.4 15.8 18 18-12.6 2.2-16.8 7.4-18 18-1.2-10.6-5.4-15.8-18-18 12.6-2.2 16.8-7.4 18-18Z"/></svg>
+            <svg class="ld-hero-star" viewBox="0 0 40 40" aria-hidden="true"><g stroke="currentColor" stroke-width="5" stroke-linecap="round"><path d="M20 4v32M4 20h32M8.7 8.7l22.6 22.6M31.3 8.7 8.7 31.3"/></g></svg>
+
             <h1 id="ld-hero-title" class="ld-hero-title">
-                Magang terpantau dari pengajuan sampai sertifikat.
+                Magang terpantau
+                <span class="ld-pill-arrow" aria-hidden="true"><svg viewBox="0 0 64 16"><path d="M2 8h56M50 2l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                dari pengajuan sampai sertifikat.
             </h1>
             <p class="ld-hero-sub">Mahasiswa, perusahaan, dosen, dan kampus bekerja di satu tempat. Setiap task, bimbingan, dan nilai tercatat rapi.</p>
             <div class="ld-hero-cta">
@@ -174,6 +179,7 @@
             </div>
             <div class="ld-jobs">
                 <article class="ld-jobs-lead" data-reveal>
+                    <svg class="ld-jobs-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
                     <p class="ld-jobs-count"><span data-count="{{ $openCount }}">{{ $openCount }}</span></p>
                     <p class="ld-jobs-label">lowongan magang sedang dibuka</p>
                     <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk untuk mengajukan</a>
@@ -216,6 +222,7 @@
 
     {{-- Penutup --}}
     <section class="ld-close" aria-labelledby="ld-close-title" data-reveal>
+        <svg class="ld-close-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
         <h2 id="ld-close-title" class="ld-close-title">Kelola magang dengan lebih tenang, mulai hari ini.</h2>
         <p class="ld-close-sub">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
         <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk ke SIMAGTI</a>
@@ -223,6 +230,12 @@
 </main>
 
 <footer class="ld-footer" aria-labelledby="ld-footer-title">
+    <svg class="ld-footer-rings" viewBox="0 0 600 600" aria-hidden="true">
+        @foreach ([300, 250, 200, 150, 100] as $r)
+            <circle cx="500" cy="100" r="{{ $r }}" />
+        @endforeach
+    </svg>
+
     <div class="ld-footer-top">
         <div class="ld-footer-brand">
             <h2 id="ld-footer-title" class="ld-visually-hidden">Tentang SIMAGTI</h2>
@@ -239,8 +252,10 @@
 
         <div class="ld-footer-cta">
             <h3>Sudah punya akun?</h3>
-            <p>Masuk untuk melanjutkan KP Anda.</p>
-            <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
+            <div class="ld-footer-pill">
+                <span>Lanjutkan KP Anda</span>
+                <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
+            </div>
         </div>
     </div>
 
