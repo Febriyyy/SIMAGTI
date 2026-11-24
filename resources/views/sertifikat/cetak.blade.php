@@ -24,7 +24,7 @@
          * Bingkai garis hijau tipis dengan aksen sudut. Warna mengikuti token merek di public/css/kp.css.
          */
         :root {
-            --ink: #03423e; --primary: #037a68; --lime: #c9f065;
+            --ink: #0e3b33; --primary: #2e7d16; --lime: #c5f04a;
             --text: #1b2f2c; --muted: #667a76; --line: #cfdcd8; --page: #e6eeec; --paper: #ffffff;
             --serif: "Fraunces", Georgia, serif; --sans: "Geist", system-ui, sans-serif;
         }
@@ -40,10 +40,10 @@
         .toolbar a:focus-visible, .toolbar button:focus-visible { outline: 3px solid var(--lime); outline-offset: 2px; }
 
         .sheet-wrap { overflow-x: auto; padding: 0 16px 32px; }
-        .sheet { position: relative; width: 297mm; height: 210mm; margin: 0 auto; overflow: hidden; background: var(--paper); box-shadow: 0 12px 40px rgba(3, 66, 62, .16); }
+        .sheet { position: relative; width: 297mm; height: 210mm; margin: 0 auto; overflow: hidden; background: var(--paper); box-shadow: 0 12px 40px rgba(14, 59, 51, .16); }
         /* Cahaya hijau sangat tipis di dua sudut */
         .sheet::before { content: ""; position: absolute; inset: 0; pointer-events: none;
-            background: radial-gradient(circle at 0% 0%, rgba(3, 122, 104, .07), transparent 38%), radial-gradient(circle at 100% 100%, rgba(201, 240, 101, .16), transparent 34%); }
+            background: radial-gradient(circle at 0% 0%, rgba(46, 125, 22, .07), transparent 38%), radial-gradient(circle at 100% 100%, rgba(197, 240, 74, .16), transparent 34%); }
 
         /* Bingkai: garis tipis hijau dengan aksen sudut */
         .frame { position: absolute; inset: 9mm; border: .3mm solid var(--primary); pointer-events: none; }
@@ -85,7 +85,7 @@
         .grade-pill > span + span { border-left: .3mm solid var(--line); }
         .gp-label { font-size: 3mm; color: var(--muted); }
         .gp-letter { font-family: var(--serif); font-size: 8mm; font-weight: 600; line-height: 1; color: var(--ink); padding-top: 1.8mm !important; padding-bottom: 1.8mm !important;
-            background: linear-gradient(180deg, rgba(201, 240, 101, .35), rgba(201, 240, 101, .12)); }
+            background: linear-gradient(180deg, rgba(197, 240, 74, .35), rgba(197, 240, 74, .12)); }
         .gp-score { gap: 1.2mm; font-size: 4.2mm; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
         .gp-score small { font-size: 2.9mm; font-weight: 400; color: var(--muted); }
 

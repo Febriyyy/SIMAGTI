@@ -5,14 +5,14 @@
    ===================================================================== */
 .lg-body {
     --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --bg: #f8fafc;
+    --bg: #eef0ea;
     --surface: #ffffff;
-    --border: #e5e7eb;
-    --text: #1f2937;
-    --text-muted: #6b7280;
-    --primary: #037a68;
-    --primary-hover: #02695a;
-    --primary-ring: rgba(3, 122, 104, .15);
+    --border: #e2e6dd;
+    --text: #111a15;
+    --text-muted: #5e6862;
+    --primary: #2e7d16;
+    --primary-hover: #1f6612;
+    --primary-ring: rgba(46, 125, 22, .15);
     --danger: #dc2626;
     --ease-out: cubic-bezier(.16, 1, .3, 1);
 
@@ -37,13 +37,13 @@
     position: relative; isolation: isolate; overflow: hidden;
     display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
     padding: 32px; border-radius: 12px; color: #fff;
-    background: linear-gradient(160deg, #04806d 0%, #036a5a 55%, #02574a 100%);
+    background: linear-gradient(160deg, #2e7d16 0%, #1f6612 55%, #0e3b33 100%);
 }
 .lg-glow { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .lg-glow i { position: absolute; border-radius: 50%; filter: blur(60px); }
-.lg-glow i:nth-child(1) { width: 60%; aspect-ratio: 1; left: -12%; top: -14%; background: rgba(167, 243, 208, .32); }
-.lg-glow i:nth-child(2) { width: 52%; aspect-ratio: 1; right: -16%; top: 30%; background: rgba(52, 211, 153, .28); }
-.lg-glow i:nth-child(3) { width: 70%; aspect-ratio: 1; left: 10%; bottom: -40%; background: rgba(2, 44, 37, .45); }
+.lg-glow i:nth-child(1) { width: 60%; aspect-ratio: 1; left: -12%; top: -14%; background: rgba(212, 245, 154, .32); }
+.lg-glow i:nth-child(2) { width: 52%; aspect-ratio: 1; right: -16%; top: 30%; background: rgba(140, 214, 70, .28); }
+.lg-glow i:nth-child(3) { width: 70%; aspect-ratio: 1; left: 10%; bottom: -40%; background: rgba(8, 40, 32, .45); }
 
 /* Logo putih tanpa latar (logo-simagti-putih.svg, lubang huruf benar-benar tembus) di atas panel hijau */
 .lg-brand { align-self: flex-start; display: inline-flex; border-radius: 8px; }
@@ -65,7 +65,7 @@
 }
 .lg-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid currentColor; font-size: 13px; font-weight: 600; line-height: 1; transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
 .lg-step-label { margin-top: auto; font-size: 13px; font-weight: 500; line-height: 1.4; }
-.lg-step-bar { position: absolute; left: 12px; right: 12px; bottom: 8px; height: 2px; border-radius: 2px; background: rgba(3, 122, 104, .14); opacity: 0; }
+.lg-step-bar { position: absolute; left: 12px; right: 12px; bottom: 8px; height: 2px; border-radius: 2px; background: rgba(46, 125, 22, .14); opacity: 0; }
 .lg-step-bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary); transform: scaleX(0); transform-origin: left; }
 .lg-step.is-on { background: #fff; border-color: #fff; color: var(--text); }
 .lg-step.is-on .lg-step-n { border-color: var(--primary); background: var(--primary); color: #fff; }

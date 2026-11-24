@@ -12,17 +12,17 @@
     --radius-lg: 28px;
     --radius-md: 20px;
     --radius-sm: 14px;
-    --shadow: 0 1px 2px rgba(15, 31, 27, .04);
-    --shadow-hover: 0 14px 34px rgba(15, 31, 27, .08);
+    --shadow: 0 1px 2px rgba(15, 26, 20, .04);
+    --shadow-hover: 0 14px 34px rgba(15, 26, 20, .08);
     --ease-ld: cubic-bezier(.2, .8, .2, 1);
 }
 
 /* ---------- Kerangka ---------- */
 .sidebar { border-right: 0; }
 .nav-item { min-height: 42px; border-radius: 999px; padding: 8px 16px; font-weight: 550; }
-.nav-item.is-active { box-shadow: 0 10px 22px rgba(3, 122, 104, .22); }
+.nav-item.is-active { box-shadow: 0 10px 22px rgba(46, 125, 22, .22); }
 .nav-label { padding-left: 16px; letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 600; color: var(--muted); }
-.topbar { background: rgba(243, 245, 240, .78); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--line); }
+.topbar { background: rgba(238, 240, 234, .78); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--line); }
 .container { gap: 24px; }
 
 /* ---------- Tipografi ---------- */
@@ -38,12 +38,12 @@
 .btn-sm { min-height: 34px; padding-left: 14px; padding-right: 14px; }
 .btn-icon { padding: 0; width: 38px; min-width: 38px; }
 .btn-sm.btn-icon { width: 32px; min-width: 32px; }
-.btn-primary:hover { box-shadow: 0 10px 22px rgba(3, 122, 104, .28); }
+.btn-primary:hover { box-shadow: 0 10px 22px rgba(46, 125, 22, .28); }
 .btn-ghost:hover { transform: none; }
 
 /* ---------- Isian ---------- */
 .input, .select, .textarea { border-radius: 14px; }
-.input:focus, .select:focus, .textarea:focus { box-shadow: 0 0 0 4px rgba(3, 122, 104, .12); }
+.input:focus, .select:focus, .textarea:focus { box-shadow: 0 0 0 4px rgba(46, 125, 22, .12); }
 
 /* ---------- Kartu ---------- */
 .card { border-radius: 24px; border-color: var(--line); box-shadow: var(--shadow); }
@@ -53,7 +53,7 @@
 
 /* ---------- Banner judul halaman: panel lega bersudut besar ---------- */
 .page-head { border-radius: 28px; padding: 28px 32px; min-height: 108px; }
-.page-icon { width: 56px; height: 56px; border-radius: 18px; background: var(--primary); color: #fff; box-shadow: 0 10px 22px rgba(3, 122, 104, .22); }
+.page-icon { width: 56px; height: 56px; border-radius: 18px; background: var(--primary); color: #fff; box-shadow: 0 10px 22px rgba(46, 125, 22, .22); }
 .page-icon .ikon { color: #fff; }
 
 /* ---------- Banner sapaan dasbor: besar, dengan gelombang lime ---------- */
@@ -72,7 +72,7 @@
 .stat-go { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); color: var(--text); display: grid; place-items: center; transition: background-color 200ms, color 200ms, transform 200ms var(--ease-ld); }
 .stat-link:hover .stat-go { background: var(--lime); color: var(--ink); transform: rotate(45deg); }
 
-.stat-grid > .stat:first-child:not(.stat-amber) { background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); border-color: transparent; color: #fff; }
+.stat-grid > .stat:first-child:not(.stat-amber) { background: linear-gradient(150deg, #3e9a1c 0%, var(--primary) 55%, var(--primary-dark) 100%); border-color: transparent; color: #fff; }
 .stat-grid > .stat:first-child:not(.stat-amber) .stat-label,
 .stat-grid > .stat:first-child:not(.stat-amber) .stat-hint,
 .stat-grid > .stat:first-child:not(.stat-amber) .stat-value small { color: rgba(255, 255, 255, .8); }
@@ -136,7 +136,7 @@
 .stat-grid.stat-grid > .stat:first-child:not(.stat-amber):not(:hover) .stat-bar > span { background: var(--primary); }
 
 /* Kartu yang diarahkan menjadi hijau penuh */
-.stat-grid.stat-grid > .stat:hover { background: linear-gradient(150deg, #0b9a7f 0%, var(--primary) 55%, var(--primary-dark) 100%); border-color: transparent; color: #fff; box-shadow: 0 16px 34px rgba(3, 122, 104, .22); }
+.stat-grid.stat-grid > .stat:hover { background: linear-gradient(150deg, #3e9a1c 0%, var(--primary) 55%, var(--primary-dark) 100%); border-color: transparent; color: #fff; box-shadow: 0 16px 34px rgba(46, 125, 22, .22); }
 .stat-grid.stat-grid > .stat:hover .stat-label,
 .stat-grid.stat-grid > .stat:hover .stat-hint,
 .stat-grid.stat-grid > .stat:hover .stat-value small,

@@ -18,7 +18,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     <style>
         /* Halaman cetak berdiri sendiri (A4 tegak). Warna mengikuti token merek di public/css/kp.css. */
-        :root { --ink: #03423e; --primary: #037a68; --tint: #eef7f4; --text: #142b29; --muted: #5d706d; --line: #d4dfdc; --page: #e6eeec; --lime: #c9f065; }
+        :root { --ink: #0e3b33; --primary: #2e7d16; --tint: #eef7f4; --text: #142b29; --muted: #5d706d; --line: #d4dfdc; --page: #e6eeec; --lime: #c5f04a; }
         @page { size: A4 portrait; margin: 0; }
         * { box-sizing: border-box; }
         html, body { margin: 0; }
@@ -30,7 +30,7 @@
         .toolbar button { border-color: var(--primary); background: var(--primary); color: #fff; }
 
         .sheet-wrap { overflow-x: auto; padding: 0 16px 32px; }
-        .sheet { position: relative; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 16mm 18mm 14mm; background: #fff; box-shadow: 0 12px 40px rgba(3, 66, 62, .16); }
+        .sheet { position: relative; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 16mm 18mm 14mm; background: #fff; box-shadow: 0 12px 40px rgba(14, 59, 51, .16); }
         .sheet::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3mm; background: linear-gradient(90deg, var(--ink), var(--primary) 60%, var(--lime)); }
 
         .head { display: flex; align-items: center; justify-content: space-between; gap: 8mm; padding-bottom: 5mm; border-bottom: .4mm solid var(--ink); }
