@@ -4,105 +4,103 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Masuk · {{ config('app.name') }}</title>
+    <meta name="theme-color" content="#f8fafc">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     @include('partials.pwa')
     <link rel="stylesheet" href="{{ asset('css/kp.css') }}?v={{ filemtime(public_path('css/kp.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}?v={{ filemtime(public_path('css/login.css')) }}">
 </head>
-<body class="gl-body">
-{{-- Latar: cahaya lembut hijau-biru di atas putih, wadah kaca jernih di tengah --}}
-<div class="gl-aura" aria-hidden="true"><i></i><i></i><i></i></div>
+{{--
+    Halaman masuk: kartu dua sisi.
+    Kiri panel hijau dengan cahaya lembut yang bergeser pelan, judul, dan empat tahap KP yang bergantian aktif.
+    Kanan formulir. Satu animasi masuk saat dibuka; semua gerak mati bila pengguna memilih kurangi gerak.
+--}}
+<body class="lg-body">
+<main class="lg-card">
+    {{-- Kiri: panel hijau --}}
+    <section class="lg-panel" aria-label="Tentang SIMAGTI">
+        <div class="lg-glow" aria-hidden="true"><i></i><i></i><i></i></div>
 
-<main class="gl">
-    {{-- Kiri: formulir masuk --}}
-    <section class="gl-form-side">
-        <a href="{{ route('home') }}" class="gl-logo-link" aria-label="SIMAGTI, kembali ke beranda"><img src="{{ asset('images/logo-simagti.svg') }}" alt="" class="gl-logo" width="132" height="40"></a>
+        <a href="{{ route('home') }}" class="lg-brand" aria-label="SIMAGTI, kembali ke beranda">
+            <img src="{{ asset('images/logo-simagti.svg') }}" alt="" width="132" height="40">
+        </a>
 
-        <div class="gl-form-box">
-            <h1 class="gl-title">Masuk ke akun Anda</h1>
-            <p class="gl-sub">Sistem Monitoring Magang Terintegrasi</p>
+        <div class="lg-panel-body">
+            <span class="lg-chip">Sistem Monitoring Magang Terintegrasi</span>
+            <h2 class="lg-panel-title">
+                <span class="lg-line"><span>Magang tercatat rapi,</span></span>
+                <span class="lg-line"><span>dari awal sampai akhir.</span></span>
+            </h2>
+            <p class="lg-panel-sub">Semua tahap KP ada di satu tempat.</p>
 
-            <form method="POST" action="{{ route('login') }}" class="gl-form" novalidate>
+            <ol class="lg-steps" data-steps>
+                @foreach (['Pengajuan KP', 'Task dan catatan harian', 'Bimbingan dan nilai', 'Sertifikat terbit'] as $step)
+                    <li @class(['lg-step', 'is-on' => $loop->first])>
+                        <span class="lg-step-n">{{ $loop->iteration }}</span>
+                        <span class="lg-step-label">{{ $step }}</span>
+                        <span class="lg-step-bar" aria-hidden="true"><i></i></span>
+                    </li>
+                @endforeach
+            </ol>
+        </div>
+    </section>
+
+    {{-- Kanan: formulir --}}
+    <section class="lg-form-side">
+        <a href="{{ route('home') }}" class="lg-home">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+            Beranda
+        </a>
+
+        <div class="lg-form-box">
+            <h1 class="lg-title lg-rise">Masuk ke akun Anda</h1>
+            <p class="lg-sub lg-rise">Selamat datang kembali di SIMAGTI.</p>
+
+            <form method="POST" action="{{ route('login') }}" class="lg-form" novalidate>
                 @csrf
 
                 @if (session('status'))
-                    <div class="alert alert-success" role="status">{{ session('status') }}</div>
+                    <div class="alert alert-success lg-rise" role="status">{{ session('status') }}</div>
                 @endif
                 @if ($errors->any())
-                    <div class="alert alert-error" role="alert">{{ $errors->first() }}</div>
+                    <div class="alert alert-error lg-rise" role="alert">{{ $errors->first() }}</div>
                 @endif
 
-                <div class="gl-field">
+                <div class="lg-field lg-rise">
                     <label for="email">Email</label>
                     <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="nama@kampus.ac.id" required autofocus autocomplete="username">
                 </div>
 
-                <div class="gl-field">
+                <div class="lg-field lg-rise">
                     <label for="password">Kata sandi</label>
-                    <div class="gl-pass">
-                        <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password">
-                        <button type="button" class="gl-eye" data-toggle-password aria-label="Tampilkan kata sandi" aria-pressed="false">
-                            <svg class="eye-open" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-closed" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.1 3.9M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                    <div class="lg-pass">
+                        <input id="password" name="password" type="password" placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                        <button type="button" class="lg-eye" data-toggle-password aria-label="Tampilkan kata sandi" aria-pressed="false">
+                            <svg class="eye-open" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-closed" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.1 3.9M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
                         </button>
                     </div>
                 </div>
 
-                <div class="gl-row">
-                    <label class="gl-check"><input type="checkbox" name="remember" value="1" @checked(old('remember'))> Ingat saya</label>
-                    <a href="{{ route('password.request') }}" class="gl-link">Lupa kata sandi?</a>
+                <div class="lg-row lg-rise">
+                    <label class="lg-check"><input type="checkbox" name="remember" value="1" @checked(old('remember'))><span>Ingat saya</span></label>
+                    <a href="{{ route('password.request') }}" class="lg-link">Lupa kata sandi?</a>
                 </div>
 
-                <button type="submit" class="gl-submit"><span class="gl-submit-label">Masuk</span><span class="gl-spin" aria-hidden="true"></span></button>
+                <button type="submit" class="lg-submit lg-rise"><span class="lg-submit-label">Masuk</span><span class="lg-spin" aria-hidden="true"></span></button>
             </form>
         </div>
 
-        <p class="gl-foot">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
-    </section>
-
-    {{-- Kanan: panel hijau berlatar cairan seperti kain, alur magang, dan kartu kaca --}}
-    <section class="gl-panel" aria-label="Tentang SIMAGTI">
-        <svg class="gl-silk" viewBox="0 0 600 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <defs>
-                <linearGradient id="gl-s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset="1" stop-color="#0b7a63"/></linearGradient>
-                <linearGradient id="gl-s2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d1fae5"/><stop offset="1" stop-color="#14b88a"/></linearGradient>
-                <filter id="gl-sb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="16"/></filter>
-            </defs>
-            <g filter="url(#gl-sb)" fill="none">
-                <path d="M640 40 C 460 120, 520 320, 360 380 S 120 520, 220 760" stroke="url(#gl-s1)" stroke-width="150" opacity=".55"/>
-                <path d="M620 -40 C 560 160, 700 300, 540 470 S 420 700, 640 760" stroke="url(#gl-s2)" stroke-width="110" opacity=".45"/>
-            </g>
-            <g fill="none" stroke="#ecfdf5" stroke-linecap="round">
-                @for ($n = 0; $n < 8; $n++)
-                    <path d="M{{ 640 - $n * 6 }} {{ 30 + $n * 4 }} C {{ 470 - $n * 5 }} 120, {{ 520 - $n * 7 }} 320, {{ 362 - $n * 6 }} 382 S {{ 130 - $n * 4 }} 520, {{ 225 - $n * 5 }} 760" stroke-width="{{ $n % 3 === 0 ? 1.2 : 0.6 }}" opacity="{{ 0.16 + ($n % 3) * 0.06 }}"/>
-                @endfor
-            </g>
-        </svg>
-
-        <h2 class="gl-panel-title">Magang tercatat rapi<br>dari awal sampai akhir.</h2>
-
-        <ol class="gl-flow" data-flow>
-            <span class="gl-flow-fill" aria-hidden="true"></span>
-            <li class="is-on"><span class="gl-flow-dot"></span><b>Pengajuan KP</b><small>Pilih lowongan, ajukan, tunggu persetujuan</small></li>
-            <li><span class="gl-flow-dot"></span><b>Task dan catatan harian</b><small>Dikerjakan dan dipantau setiap hari</small></li>
-            <li><span class="gl-flow-dot"></span><b>Bimbingan dan penilaian</b><small>Dosen dan supervisor memberi nilai</small></li>
-            <li><span class="gl-flow-dot"></span><b>Sertifikat</b><small>Terbit otomatis setelah KP selesai</small></li>
-        </ol>
-
-        <div class="gl-card">
-            <span class="gl-spark" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 1.5c.6 5.4 3.1 7.9 8.5 8.5-5.4.6-7.9 3.1-8.5 8.5-.6-5.4-3.1-7.9-8.5-8.5 5.4-.6 7.9-3.1 8.5-8.5Z"/></svg></span>
-            <strong>Satu akun untuk setiap peran</strong>
-            <p>Mahasiswa, supervisor, dosen, dan kampus bekerja di satu tempat.</p>
-            <div class="gl-avatars" aria-hidden="true"><i>M</i><i>S</i><i>D</i><i>K</i></div>
-        </div>
+        <p class="lg-foot">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
     </section>
 </main>
 
 <script>
-    // Tampilkan / sembunyikan kata sandi, dan bantuan "lupa kata sandi" (tanpa pustaka luar).
     (function () {
+        // Tampilkan / sembunyikan kata sandi
         var eye = document.querySelector('[data-toggle-password]');
         var input = document.getElementById('password');
         if (eye && input) {
@@ -116,17 +114,9 @@
                 input.focus();
             });
         }
-        var help = document.querySelector('[data-toggle-help]');
-        var note = document.getElementById('signin-help');
-        if (help && note) {
-            help.addEventListener('click', function () {
-                note.hidden = !note.hidden;
-                help.setAttribute('aria-expanded', note.hidden ? 'false' : 'true');
-            });
-        }
 
-        // Kirim formulir: tombol menunjukkan proses agar tidak diklik dua kali.
-        var form = document.querySelector('.gl-form'), submit = document.querySelector('.gl-submit');
+        // Kirim formulir: tombol menunjukkan proses agar tidak diklik dua kali
+        var form = document.querySelector('.lg-form'), submit = document.querySelector('.lg-submit');
         if (form && submit) {
             form.addEventListener('submit', function () {
                 submit.classList.add('is-loading');
@@ -135,18 +125,18 @@
             });
         }
 
-        // Alur magang: tahap aktif bergeser pelan, garis terisi mengikuti tahap.
-        var flow = document.querySelector('[data-flow]');
+        // Tahap KP bergantian aktif; garis di kartu aktif terisi selama tahap itu tampil
+        var list = document.querySelector('[data-steps]');
         var still = false;
         try { still = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-        if (flow && !still) {
-            var steps = [].slice.call(flow.querySelectorAll('li')), at = 0;
-            var paint = function () {
-                steps.forEach(function (li, n) { li.classList.toggle('is-on', n === at); li.classList.toggle('is-past', n < at); });
-                flow.style.setProperty('--fill', steps.length > 1 ? at / (steps.length - 1) : 1);
-            };
-            paint();
-            setInterval(function () { if (!document.hidden) { at = (at + 1) % steps.length; paint(); } }, 2800);
+        if (list && !still) {
+            var steps = [].slice.call(list.children), at = 0;
+            list.classList.add('is-playing');
+            setInterval(function () {
+                if (document.hidden) return;
+                at = (at + 1) % steps.length;
+                steps.forEach(function (li, n) { li.classList.toggle('is-on', n === at); });
+            }, 3600);
         }
     })();
 </script>

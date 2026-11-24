@@ -1,0 +1,173 @@
+/* =====================================================================
+   Halaman masuk SIMAGTI (24 Nov 2026), mengikuti design-rules.md:
+   satu font (Geist), satu aksen (hijau SIMAGTI), jarak kelipatan 4px,
+   input dan tombol 40px radius 8, kartu radius 12, wadah radius 16, transisi 150-200ms.
+   ===================================================================== */
+.lg-body {
+    --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --primary: #037a68;
+    --primary-hover: #02695a;
+    --primary-ring: rgba(3, 122, 104, .15);
+    --danger: #dc2626;
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+
+    margin: 0; min-height: 100vh; min-height: 100dvh; box-sizing: border-box;
+    display: grid; place-items: center; padding: 24px;
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-sans); font-size: 15px; line-height: 1.6; letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+}
+.lg-body *, .lg-body *::before, .lg-body *::after { box-sizing: border-box; }
+
+/* Wadah dua sisi */
+.lg-card {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    width: 100%; max-width: 1080px; min-height: 640px; padding: 8px; gap: 8px;
+    border-radius: 16px; background: var(--surface);
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 24px 48px -32px rgba(15, 23, 42, .18);
+}
+
+/* ---------- Panel kiri ---------- */
+.lg-panel {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
+    padding: 32px; border-radius: 12px; color: #fff;
+    background: linear-gradient(160deg, #04806d 0%, #036a5a 55%, #02574a 100%);
+}
+.lg-glow { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.lg-glow i { position: absolute; border-radius: 50%; filter: blur(60px); }
+.lg-glow i:nth-child(1) { width: 60%; aspect-ratio: 1; left: -12%; top: -14%; background: rgba(167, 243, 208, .32); }
+.lg-glow i:nth-child(2) { width: 52%; aspect-ratio: 1; right: -16%; top: 30%; background: rgba(52, 211, 153, .28); }
+.lg-glow i:nth-child(3) { width: 70%; aspect-ratio: 1; left: 10%; bottom: -40%; background: rgba(2, 44, 37, .45); }
+
+.lg-brand { align-self: flex-start; display: inline-flex; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, .95); }
+.lg-brand img { display: block; height: 28px; width: auto; }
+
+.lg-panel-body { display: grid; gap: 16px; }
+.lg-chip { justify-self: start; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); font-size: 13px; font-weight: 500; letter-spacing: .02em; }
+.lg-panel-title { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.25; }
+.lg-line { display: block; overflow: hidden; }
+.lg-line > span { display: block; }
+.lg-panel-sub { margin: 0; font-size: 15px; color: rgba(255, 255, 255, .82); }
+
+.lg-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.lg-step {
+    position: relative; display: flex; flex-direction: column; gap: 24px; min-height: 120px; padding: 12px 12px 20px;
+    border-radius: 12px; overflow: hidden;
+    background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .18); color: rgba(255, 255, 255, .86);
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+.lg-step-n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid currentColor; font-size: 13px; font-weight: 600; line-height: 1; }
+.lg-step-label { margin-top: auto; font-size: 13px; font-weight: 500; line-height: 1.4; }
+.lg-step-bar { position: absolute; left: 12px; right: 12px; bottom: 8px; height: 2px; border-radius: 2px; background: rgba(3, 122, 104, .14); opacity: 0; }
+.lg-step-bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary); transform: scaleX(0); transform-origin: left; }
+.lg-step.is-on { background: #fff; border-color: #fff; color: var(--text); }
+.lg-step.is-on .lg-step-n { border-color: var(--primary); background: var(--primary); color: #fff; }
+.lg-steps.is-playing .lg-step.is-on .lg-step-bar { opacity: 1; }
+.lg-steps.is-playing .lg-step.is-on .lg-step-bar i { animation: lg-fill 3.6s linear both; }
+
+/* ---------- Formulir kanan ---------- */
+.lg-form-side { display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 24px 48px 32px; }
+.lg-home { align-self: flex-end; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 500; text-decoration: none; transition: background-color .15s ease, color .15s ease; }
+.lg-home:hover { background: var(--bg); color: var(--text); }
+.lg-form-box { width: 100%; max-width: 380px; margin: 0 auto; }
+.lg-title { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.25; color: var(--text); }
+.lg-sub { margin: 8px 0 32px; font-size: 15px; color: var(--text-muted); }
+.lg-form { display: grid; gap: 16px; }
+.lg-form .alert { margin: 0; }
+
+.lg-field { display: grid; gap: 6px; }
+.lg-field label { font-size: 14px; font-weight: 500; line-height: 1.4; color: var(--text); }
+.lg-field input {
+    width: 100%; height: 40px; padding: 0 12px; margin: 0;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+    font: inherit; font-size: 15px; color: var(--text); box-shadow: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.lg-field input::placeholder { color: #9ca3af; }
+.lg-field input:hover { border-color: #d1d5db; }
+.lg-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
+.lg-pass { position: relative; }
+.lg-pass input { padding-right: 44px; }
+.lg-eye { position: absolute; right: 4px; top: 4px; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: background-color .15s ease, color .15s ease; }
+.lg-eye:hover { background: var(--bg); color: var(--text); }
+.lg-eye:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--primary-ring); }
+.lg-eye .eye-closed { display: none; }
+.lg-eye.is-open .eye-open { display: none; }
+.lg-eye.is-open .eye-closed { display: block; }
+
+.lg-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.lg-check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text); cursor: pointer; }
+.lg-check input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
+.lg-link { font-size: 14px; font-weight: 500; color: var(--primary); text-decoration: none; border-radius: 4px; }
+.lg-link:hover { color: var(--primary-hover); text-decoration: underline; text-underline-offset: 3px; }
+.lg-link:focus-visible, .lg-home:focus-visible, .lg-brand:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--primary-ring); }
+
+.lg-submit {
+    position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; height: 40px; margin-top: 8px; padding: 0 20px; border: 0; border-radius: 8px;
+    background: var(--primary); color: #fff; font: inherit; font-size: 14px; font-weight: 500; line-height: 1; cursor: pointer;
+    transition: background-color .15s ease;
+}
+/* Kilau tipis menyapu tombol saat disorot */
+.lg-submit::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .22) 50%, transparent 70%); transform: translateX(-100%); pointer-events: none; }
+.lg-submit:hover { background: var(--primary-hover); }
+.lg-submit:hover::after { transition: transform .7s var(--ease-out); transform: translateX(100%); }
+.lg-submit:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--primary-ring); }
+.lg-spin { display: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff; animation: lg-spin .7s linear infinite; }
+.lg-submit.is-loading { cursor: progress; }
+.lg-submit.is-loading .lg-spin { display: inline-block; }
+
+.lg-foot { margin: 0; text-align: center; font-size: 13px; color: var(--text-muted); }
+
+/* ---------- Satu momen masuk ---------- */
+@media (prefers-reduced-motion: no-preference) {
+    .lg-card { animation: lg-in .5s var(--ease-out) both; }
+    .lg-line > span { animation: lg-reveal .7s var(--ease-out) both; }
+    .lg-line:nth-child(1) > span { animation-delay: .2s; }
+    .lg-line:nth-child(2) > span { animation-delay: .3s; }
+    .lg-glow i { animation: lg-drift 24s ease-in-out infinite alternate; }
+    .lg-glow i:nth-child(2) { animation-duration: 30s; animation-delay: -8s; }
+    .lg-glow i:nth-child(3) { animation-duration: 36s; animation-delay: -16s; }
+    .lg-rise { animation: lg-rise .45s var(--ease-out) both; }
+    .lg-form-box .lg-rise:nth-child(1) { animation-delay: .15s; }
+    .lg-form-box .lg-rise:nth-child(2) { animation-delay: .2s; }
+    .lg-form > .lg-rise:nth-of-type(1) { animation-delay: .25s; }
+    .lg-form > .lg-rise:nth-of-type(2) { animation-delay: .3s; }
+    .lg-form > .lg-rise:nth-of-type(3) { animation-delay: .35s; }
+    .lg-form > .lg-submit { animation-delay: .4s; }
+}
+@keyframes lg-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes lg-reveal { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes lg-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes lg-drift { from { transform: translate(0, 0); } to { transform: translate(8%, 6%); } }
+@keyframes lg-fill { to { transform: scaleX(1); } }
+@keyframes lg-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Tablet dan HP ---------- */
+@media (max-width: 960px) {
+    .lg-form-side { padding: 24px 32px 32px; }
+    .lg-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .lg-step { min-height: 96px; }
+}
+@media (max-width: 767px) {
+    .lg-body { padding: 16px; place-items: start center; }
+    .lg-card { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .lg-panel { gap: 24px; padding: 24px; }
+    .lg-panel-title { font-size: 22px; line-height: 1.3; }
+    .lg-steps, .lg-panel-sub { display: none; }
+    .lg-form-side { gap: 24px; padding: 8px 16px 24px; }
+    .lg-home { display: none; }
+    .lg-sub { margin-bottom: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lg-step, .lg-field input, .lg-submit, .lg-home, .lg-eye { transition: none; }
+    .lg-submit:hover::after { transition: none; transform: translateX(-100%); }
+    .lg-spin { animation-duration: 1.6s; }
+}
