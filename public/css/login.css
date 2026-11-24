@@ -45,9 +45,9 @@
 .lg-glow i:nth-child(2) { width: 52%; aspect-ratio: 1; right: -16%; top: 30%; background: rgba(52, 211, 153, .28); }
 .lg-glow i:nth-child(3) { width: 70%; aspect-ratio: 1; left: 10%; bottom: -40%; background: rgba(2, 44, 37, .45); }
 
-/* Logo tanpa latar: dibuat putih polos supaya terbaca di atas panel hijau */
+/* Logo putih tanpa latar (logo-simagti-putih.svg, lubang huruf benar-benar tembus) di atas panel hijau */
 .lg-brand { align-self: flex-start; display: inline-flex; border-radius: 8px; }
-.lg-brand img { display: block; height: 32px; width: auto; filter: brightness(0) invert(1); }
+.lg-brand img { display: block; height: 32px; width: auto; }
 
 .lg-panel-body { display: grid; gap: 16px; }
 .lg-chip { justify-self: start; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); font-size: 13px; font-weight: 500; letter-spacing: .02em; }

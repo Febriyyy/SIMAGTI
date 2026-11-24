@@ -25,7 +25,7 @@
         <div class="lg-glow" aria-hidden="true"><i></i><i></i><i></i></div>
 
         <a href="{{ route('home') }}" class="lg-brand" aria-label="SIMAGTI, kembali ke beranda">
-            <img src="{{ asset('images/logo-simagti.svg') }}" alt="" width="132" height="40">
+            <img src="{{ asset('images/logo-simagti-putih.svg') }}" alt="" width="132" height="40">
         </a>
 
         <div class="lg-panel-body">
