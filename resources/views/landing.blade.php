@@ -3,188 +3,211 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#25b47e">
     <title>SIMAGTI · Sistem Monitoring Magang Terintegrasi</title>
     <meta name="description" content="SIMAGTI memantau magang mahasiswa dari pengajuan, task harian, bimbingan, penilaian, sampai sertifikat dalam satu tempat.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-simagti-mark.svg') }}">
     @include('partials.pwa')
     <link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ filemtime(public_path('css/landing.css')) }}">
-    <script>
-        // Animasi pembuka hanya bila halaman terlihat saat dimuat dan pengguna tidak meminta gerak dikurangi.
-        (function () {
-            var still = false;
-            try { still = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-            if (!still && document.visibilityState === 'visible') document.documentElement.classList.add('motion');
-        })();
-    </script>
 </head>
-<body class="ld">
+{{--
+    Halaman depan SIMAGTI. Blok warna penuh per bagian, huruf display besar (Bricolage Grotesque):
+    hero hijau daun, pita berjalan, "peran" hutan gelap dengan pemilih peran, "alur" mint, angka dan lowongan, penutup lime.
+    Variabel: stats (interns, companies, tasks), postings, openCount
+--}}
+<body class="lp">
 <?php
-    $icon = fn (string $d) => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$d.'</svg>';
     $num = fn (int $n) => number_format($n, 0, ',', '.');
+    $roles = [
+        'mahasiswa' => ['Mahasiswa', 'Ajukan KP, kerjakan task', [
+            ['Rencana & task', 'Task harian dari supervisor, dikerjakan di papan kegiatan.', '24/31', 'task selesai'],
+            ['Catatan harian', 'Timesheet tercatat per hari, tanpa formulir kertas.', '68', 'hari tercatat'],
+            ['Laporan per bab', 'Unggah bab, revisi dari dosen langsung terlihat.', '3/4', 'bab disetujui'],
+        ]],
+        'supervisor' => ['Company Supervisor', 'Pantau dan nilai', [
+            ['Pantau progres', 'Melihat task, catatan, dan aktivitas mahasiswa magang.', '86%', 'progres rata-rata'],
+            ['Penilaian akhir', 'Satu klik per pertanyaan, skala standar kampus.', '15', 'aspek dinilai'],
+            ['Data sertifikat', 'Logo perusahaan dan tanda tangan ketua divisi sekali isi.', '1×', 'untuk semua sertifikat'],
+        ]],
+        'dosen' => ['Dosen pembimbing', 'Bimbing dan validasi', [
+            ['Bimbingan', 'Jadwal, tautan rapat, dan catatan setiap sesi.', '6', 'sesi terkonfirmasi'],
+            ['Laporan KP', 'Diskusi per bab dan nilai laporan akhir.', '4', 'aspek nilai laporan'],
+            ['Jadwal sidang', 'Atur waktu dan penguji, mahasiswa langsung diberi tahu.', 'H-1', 'pengingat otomatis'],
+        ]],
+        'kampus' => ['Kaprodi & TU', 'Setujui dan sahkan', [
+            ['Persetujuan KP', 'Verifikasi perusahaan dan tunjuk dosen pembimbing.', '1', 'antrean hari ini'],
+            ['Pengesahan nilai', 'Dosen 50% dan industri 50%, berita acara siap cetak.', '50/50', 'bobot nilai sidang'],
+            ['Rekap per prodi', 'Status, nilai, dan rekrutmen, unduh ke Excel.', '.xlsx', 'sekali klik'],
+        ]],
+    ];
+    $arrow = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 ?>
 
-<a href="#isi" class="ld-skip">Lewati ke isi</a>
+<a href="#isi" class="lp-skip">Lewati ke isi</a>
 
-<header class="ld-nav">
-    <a href="{{ route('home') }}" class="ld-brand" aria-label="SIMAGTI, beranda">
-        <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="124" height="38">
-    </a>
-    <nav class="ld-links" aria-label="Bagian halaman">
-        <a href="#peran">Peran</a>
-        <a href="#alur">Alur KP</a>
-        @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan</a>@endif
-    </nav>
-    <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
+<header class="lp-nav">
+    <a href="{{ route('home') }}" class="lp-brand" aria-label="SIMAGTI, beranda">
+            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="118" height="36">
+        </a>
+        <nav class="lp-links" aria-label="Bagian halaman">
+            <a href="#peran">Peran</a>
+            <a href="#alur">Alur KP</a>
+            <a href="#angka">Angka</a>
+            @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan</a>@endif
+        </nav>
+        <a href="{{ route('login') }}" class="lp-btn lp-btn-dark lp-nav-cta">Masuk</a>
 </header>
 
 <main id="isi">
-    {{-- Hero: judul besar di panel terang, tiga kartu angka menumpang di tepi bawahnya --}}
-    <section class="ld-hero" aria-labelledby="ld-hero-title">
-        <div class="ld-hero-panel">
-            <svg class="ld-hero-spark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2c1.2 10.6 5.4 15.8 18 18-12.6 2.2-16.8 7.4-18 18-1.2-10.6-5.4-15.8-18-18 12.6-2.2 16.8-7.4 18-18Z"/></svg>
-            <svg class="ld-hero-star" viewBox="0 0 40 40" aria-hidden="true"><g stroke="currentColor" stroke-width="5" stroke-linecap="round"><path d="M20 4v32M4 20h32M8.7 8.7l22.6 22.6M31.3 8.7 8.7 31.3"/></g></svg>
-
-            <h1 id="ld-hero-title" class="ld-hero-title">
-                Magang terpantau
-                <span class="ld-pill-arrow" aria-hidden="true"><svg viewBox="0 0 64 16"><path d="M2 8h56M50 2l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                dari pengajuan sampai sertifikat.
+    {{-- ============ Hero hijau daun ============ --}}
+    <section class="lp-hero" aria-labelledby="lp-hero-title">
+        <div class="lp-hero-copy">
+            <p class="lp-kicker">Sistem Monitoring Magang Terintegrasi</p>
+            <h1 id="lp-hero-title" class="lp-display lp-hero-title">
+                <span>Magang</span>
+                <span>terpantau,</span>
+                <span class="is-light">tanpa ribet.</span>
             </h1>
-            <p class="ld-hero-sub">Mahasiswa, perusahaan, dosen, dan kampus bekerja di satu tempat. Setiap task, bimbingan, dan nilai tercatat rapi.</p>
-            <div class="ld-hero-cta">
-                <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk ke SIMAGTI</a>
-                <a href="#alur" class="ld-btn ld-btn-ghost">Lihat alur KP</a>
+            <p class="lp-hero-sub"><b>SIMAGTI</b> menyatukan mahasiswa, perusahaan, dosen, dan kampus. Pengajuan, task harian, bimbingan, nilai, sampai sertifikat tercatat di satu tempat.</p>
+            <div class="lp-hero-cta">
+                <a href="{{ route('login') }}" class="lp-btn lp-btn-dark">Masuk ke SIMAGTI {!! $arrow !!}</a>
+                <a href="#alur" class="lp-btn lp-btn-line">Lihat alur KP</a>
             </div>
         </div>
 
-        <div class="ld-stats">
-            <article class="ld-stat ld-stat-c1">
-                <div class="ld-stat-faces" aria-hidden="true"><i>NA</i><i>RP</i><i>DS</i><i>+</i></div>
-                <p class="ld-stat-num" data-count="{{ $stats['interns'] }}">{{ $num($stats['interns']) }}</p>
-                <p class="ld-stat-label">Mahasiswa magang tercatat</p>
-            </article>
-            <article class="ld-stat ld-stat-c2">
-                <svg class="ld-stat-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
-                <p class="ld-stat-num" data-count="{{ $stats['companies'] }}">{{ $num($stats['companies']) }}</p>
-                <p class="ld-stat-label">Perusahaan mitra kampus</p>
-            </article>
-            <article class="ld-stat ld-stat-c3">
-                <svg class="ld-stat-bars" viewBox="0 0 120 60" aria-hidden="true">
-                    @foreach ([22, 34, 28, 44, 38, 52] as $n => $h)
-                        <rect x="{{ $n * 20 }}" y="{{ 60 - $h }}" width="12" height="{{ $h }}" rx="6"/>
-                    @endforeach
-                </svg>
-                <p class="ld-stat-num" data-count="{{ $stats['tasks'] }}">{{ $num($stats['tasks']) }}</p>
-                <p class="ld-stat-label">Task dikerjakan dan dipantau</p>
-                @if ($postings->isNotEmpty())
-                    <a href="#lowongan" class="ld-stat-notch">Lihat lowongan</a>
-                @endif
-            </article>
-        </div>
-    </section>
-
-    {{-- Peran: kartu per peran, masing-masing dengan cuplikan layar yang ia pakai --}}
-    <section id="peran" class="ld-section" aria-labelledby="ld-roles-title">
-        <div class="ld-roles">
-            <div class="ld-head" data-reveal>
-                <h2 id="ld-roles-title" class="ld-h2">Satu sistem untuk setiap peran.</h2>
-                <p class="ld-head-note">Setiap orang hanya melihat yang perlu ia kerjakan, tanpa berpindah aplikasi.</p>
+        {{-- Ilustrasi: lengkung hijau tua berisi tiga kartu layar SIMAGTI --}}
+        <div class="lp-hero-art" aria-hidden="true">
+            <div class="lp-arch"></div>
+            <div class="lp-badge">
+                <svg viewBox="0 0 120 120"><defs><path id="lp-circ" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs>
+                    <text><textPath href="#lp-circ" textLength="286" lengthAdjust="spacing">EMPAT PERAN · SATU SISTEM ·</textPath></text></svg>
+                <b>4</b>
             </div>
 
-            <div class="ld-role-grid">
-                <article class="ld-role" data-reveal style="--i: 0">
-                    <header class="ld-role-head"><span class="ld-role-icon">{!! $icon('<path d="M3 9.5 12 5l9 4.5-9 4.5-9-4.5Z"/><path d="M7 11.5V16c0 1.2 2.2 2.5 5 2.5s5-1.3 5-2.5v-4.5"/>') !!}</span><h3>Mahasiswa</h3></header>
-                    <p>Rencana, task harian, dan laporan per bab.</p>
-                    <div class="ld-mock ld-mock-tasks" aria-hidden="true">
-                        <span class="is-done"><i></i>Rancang alur pendaftaran</span>
-                        <span class="is-done"><i></i>Catatan harian minggu 3</span>
-                        <span><i></i>Bab 2 laporan akhir</span>
-                    </div>
-                </article>
-
-                <article class="ld-role" data-reveal style="--i: 1">
-                    <header class="ld-role-head"><span class="ld-role-icon">{!! $icon('<rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/>') !!}</span><h3>Company Supervisor</h3></header>
-                    <p>Memantau progres dan menilai di akhir magang.</p>
-                    <div class="ld-mock ld-mock-rate" aria-hidden="true">
-                        <b>Komunikasi tim</b>
-                        <div class="ld-rate"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i></div>
-                        <small>Sangat baik</small>
-                    </div>
-                </article>
-
-                <article class="ld-role" data-reveal style="--i: 2">
-                    <header class="ld-role-head"><span class="ld-role-icon">{!! $icon('<path d="M5 5.5h9a3 3 0 0 1 3 3V19a2.5 2.5 0 0 0-2.5-2.5H5Z"/><path d="M19 5.5v13.5M8.5 9.5h5M8.5 12.5h3"/>') !!}</span><h3>Dosen pembimbing</h3></header>
-                    <p>Bimbingan, validasi nilai, dan catatan sidang.</p>
-                    <div class="ld-mock ld-mock-note" aria-hidden="true">
-                        <span class="ld-note-in">Bab 2 sudah saya unggah, Pak.</span>
-                        <span class="ld-note-out">Bagus, perjelas metode di 2.3.</span>
-                    </div>
-                </article>
-
-                <article class="ld-role" data-reveal style="--i: 3">
-                    <header class="ld-role-head"><span class="ld-role-icon">{!! $icon('<path d="M4.5 19.5h15M7 16V11M12 16V7M17 16v-3"/>') !!}</span><h3>Kaprodi dan TU</h3></header>
-                    <p>Persetujuan, jadwal sidang, dan rekap prodi.</p>
-                    <div class="ld-mock ld-mock-chart" aria-hidden="true">
-                        @foreach ([['Berjalan', 72], ['Selesai', 48], ['Diajukan', 26]] as [$label, $w])
-                            <span><small>{{ $label }}</small><i style="--w: {{ $w }}%"></i></span>
-                        @endforeach
-                    </div>
-                </article>
+            <div class="lp-card lp-card-progress">
+                <small>Kemajuan KP</small>
+                <p><b>82</b>%</p>
+                <span class="lp-bar"><i style="width: 82%"></i></span>
+                <em>Minggu 10 dari 12. Laporan menunggu bab 4.</em>
             </div>
+
+            <div class="lp-card lp-card-tasks">
+                <span class="lp-card-head"><i>NA</i><span><b>Nabila A.</b><small>PT Arunika Data</small></span></span>
+                <ul>
+                    <li class="is-done">Rancang alur pendaftaran</li>
+                    <li class="is-done">Catatan harian minggu 9</li>
+                    <li>Bab 4 laporan akhir</li>
+                </ul>
+            </div>
+
+            <div class="lp-card lp-card-grade">
+                <small>Nilai akhir</small>
+                <p><b>A</b><span>91 / 100</span></p>
+            </div>
+            <div class="lp-shelf"></div>
         </div>
     </section>
 
-    {{-- Alur KP: pita lime, kartu progres gelap di kiri, empat tahap di kanan --}}
-    <section id="alur" class="ld-flow" aria-labelledby="ld-flow-title">
-        <div class="ld-flow-inner">
-            <div class="ld-progress" aria-hidden="true" data-reveal>
-                <div class="ld-progress-top">
-                    <span class="ld-progress-who"><i>NA</i><span><b>Nabila Azzahra</b><small>PT Arunika Data</small></span></span>
-                    <span class="ld-progress-week">Minggu 7 dari 12</span>
-                </div>
-                <div class="ld-progress-main">
-                    <svg class="ld-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50"/><circle class="ld-ring-val" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="68 100"/></svg>
-                    <div>
-                        <p class="ld-progress-num"><span data-count="68">68</span>%</p>
-                        <p class="ld-progress-label">Progres KP</p>
-                    </div>
-                </div>
-                <div class="ld-progress-rows">
-                    <span><small>Task selesai</small><b>24 dari 31</b></span>
-                    <span><small>Bimbingan</small><b>6 sesi</b></span>
-                    <span><small>Laporan</small><b>3 dari 5 bab</b></span>
-                </div>
+{{-- ============ Pita berjalan ============ --}}
+<div class="lp-marquee" aria-hidden="true">
+    <div class="lp-marquee-track">
+        @for ($n = 0; $n < 2; $n++)
+            <span>Pengajuan KP</span><i></i><span>Task harian</span><i></i><span class="is-lime">Bimbingan</span><i></i>
+            <span>Penilaian</span><i></i><span>Sidang KP</span><i></i><span class="is-lime">Sertifikat</span><i></i>
+        @endfor
+    </div>
+</div>
+
+{{-- ============ Peran: hutan gelap, pemilih peran ============ --}}
+<section id="peran" class="lp-roles" aria-labelledby="lp-roles-title">
+    <div class="lp-wrap">
+        <div class="lp-head">
+            <h2 id="lp-roles-title" class="lp-display lp-h2">Satu sistem.<br><span class="is-mint">Empat peran.</span></h2>
+            <p class="lp-head-note">Setiap orang hanya melihat yang perlu ia kerjakan. Pilih peran Anda untuk melihat isinya.</p>
+        </div>
+
+        <div class="lp-roles-grid">
+            <div class="lp-role-pick" role="tablist" aria-label="Peran pengguna">
+                @foreach ($roles as $key => [$label, $hint])
+                    <button type="button" role="tab" id="tab-{{ $key }}" aria-controls="panel-{{ $key }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" tabindex="{{ $loop->first ? '0' : '-1' }}" @class(['lp-role-opt', 'is-on' => $loop->first]) data-role="{{ $key }}">
+                        <span class="lp-role-n">0{{ $loop->iteration }}</span>
+                        <b>{{ $label }}</b>
+                        <small>{{ $hint }}</small>
+                    </button>
+                @endforeach
             </div>
 
-            <div class="ld-steps-wrap">
-                <h2 id="ld-flow-title" class="ld-h2" data-reveal>Empat tahap, semuanya tercatat.</h2>
-                <ol class="ld-steps">
-                    <li data-reveal style="--i: 1"><span class="ld-step-n">1</span><div><b>Pengajuan KP</b><p>Pilih lowongan mitra atau ajukan tempat sendiri, lalu tunggu persetujuan kaprodi.</p></div></li>
-                    <li data-reveal style="--i: 2"><span class="ld-step-n">2</span><div><b>Task dan catatan harian</b><p>Kerjakan task dari supervisor dan catat kegiatan setiap hari.</p></div></li>
-                    <li data-reveal style="--i: 3"><span class="ld-step-n">3</span><div><b>Bimbingan dan penilaian</b><p>Dosen membimbing dan menjadwalkan sidang, supervisor menilai, kaprodi mengesahkan nilai.</p></div></li>
-                    <li data-reveal style="--i: 4"><span class="ld-step-n">4</span><div><b>Sertifikat</b><p>Terbit otomatis setelah hasil KP diputuskan.</p></div></li>
-                </ol>
+            <div class="lp-role-panels">
+                @foreach ($roles as $key => [$label, $hint, $features])
+                    <div role="tabpanel" id="panel-{{ $key }}" aria-labelledby="tab-{{ $key }}" class="lp-role-panel" @unless ($loop->first) hidden @endunless>
+                        <div class="lp-role-panel-head">
+                            <h3>Untuk {{ $label }}</h3>
+                            <span><i></i>Fitur utama</span>
+                        </div>
+                        <div class="lp-feats">
+                            @foreach ($features as [$title, $desc, $big, $unit])
+                                <article class="lp-feat">
+                                    <span class="lp-feat-n">0{{ $loop->iteration }}</span>
+                                    <p class="lp-feat-big">{{ $big }}<small>{{ $unit }}</small></p>
+                                    <h4>{{ $title }}</h4>
+                                    <p>{{ $desc }}</p>
+                                </article>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    @if ($postings->isNotEmpty())
-        {{-- Lowongan terbaru: kartu gelap berisi jumlah lowongan, diikuti kartu lowongan yang bisa diklik --}}
-        <section id="lowongan" class="ld-section" aria-labelledby="ld-jobs-title">
-            <div class="ld-head" data-reveal>
-                <h2 id="ld-jobs-title" class="ld-h2">Lowongan dari perusahaan mitra.</h2>
-                <p class="ld-head-note">Data perusahaan langsung terisi saat mahasiswa mengajukan KP dari lowongan.</p>
+{{-- ============ Alur KP: mint, empat kartu tahap ============ --}}
+<section id="alur" class="lp-flow" aria-labelledby="lp-flow-title">
+    <div class="lp-wrap">
+        <div class="lp-head">
+            <h2 id="lp-flow-title" class="lp-display lp-h2 is-dark">Empat tahap.<br><span class="is-green">Semua tercatat.</span></h2>
+            <p class="lp-head-note is-dark">Dari pengajuan sampai sertifikat, setiap langkah punya pemilik dan jejak yang jelas.</p>
+        </div>
+        <ol class="lp-steps">
+            @foreach ([
+                ['Pengajuan KP', 'Pilih lowongan mitra atau ajukan tempat sendiri, lalu disetujui kaprodi.', 'Mahasiswa → Kaprodi'],
+                ['Task & catatan', 'Kerjakan task dari supervisor dan catat kegiatan setiap hari.', 'Mahasiswa → Supervisor'],
+                ['Bimbingan & nilai', 'Dosen membimbing dan menjadwalkan sidang, supervisor menilai, kaprodi mengesahkan.', 'Dosen → Kaprodi'],
+                ['Sertifikat', 'Terbit otomatis setelah hasil KP diputuskan, lengkap dengan QR verifikasi.', 'Otomatis'],
+            ] as $n => [$title, $desc, $who])
+                <li class="lp-step lp-step-{{ $n }}">
+                    <span class="lp-step-n">{{ $n + 1 }}</span>
+                    <h3>{{ $title }}</h3>
+                    <p>{{ $desc }}</p>
+                    <span class="lp-step-who">{{ $who }}</span>
+                </li>
+            @endforeach
+        </ol>
+    </div>
+</section>
+
+{{-- ============ Angka dan lowongan ============ --}}
+<section id="angka" class="lp-numbers" aria-labelledby="lp-numbers-title">
+    <div class="lp-wrap">
+        <div class="lp-head">
+            <h2 id="lp-numbers-title" class="lp-display lp-h2 is-dark">Sudah berjalan.</h2>
+            <p class="lp-head-note is-dark">Angka langsung dari data SIMAGTI hari ini.</p>
+        </div>
+        <div class="lp-stats">
+            <article class="lp-stat is-lime"><p class="lp-stat-num">{{ $num($stats['interns']) }}</p><p>Mahasiswa magang tercatat</p></article>
+            <article class="lp-stat is-paper"><p class="lp-stat-num">{{ $num($stats['companies']) }}</p><p>Perusahaan mitra kampus</p></article>
+            <article class="lp-stat is-forest"><p class="lp-stat-num">{{ $num($stats['tasks']) }}</p><p>Task dikerjakan dan dipantau</p></article>
+        </div>
+
+        @if ($postings->isNotEmpty())
+            <div id="lowongan" class="lp-jobs-head">
+                <h3 class="lp-display lp-h3">Lowongan dari perusahaan mitra.</h3>
+                <span class="lp-jobs-count">{{ $openCount }} lowongan dibuka</span>
             </div>
-            <div class="ld-jobs">
-                <article class="ld-jobs-lead" data-reveal>
-                    <svg class="ld-jobs-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
-                    <p class="ld-jobs-count"><span data-count="{{ $openCount }}">{{ $openCount }}</span></p>
-                    <p class="ld-jobs-label">lowongan magang sedang dibuka</p>
-                    <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk untuk mengajukan</a>
-                </article>
-
+            <div class="lp-jobs">
                 @foreach ($postings as $p)
                     <?php
                         $co = $p->company->name;
@@ -192,131 +215,83 @@
                         $initials = mb_strtoupper($words->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('')) ?: '?';
                         $left = $p->deadline ? (int) today()->diffInDays($p->deadline, false) : null;
                     ?>
-                    <a href="{{ route('login') }}" class="ld-job ld-job-{{ $loop->index % 3 }}" data-reveal style="--i: {{ $loop->index + 1 }}" aria-label="{{ $p->title }} di {{ $co }}. Masuk untuk mengajukan.">
-                        <div class="ld-job-top">
-                            <span class="ld-job-mark" aria-hidden="true">{{ $initials }}</span>
+                    <a href="{{ route('login') }}" class="lp-job" aria-label="{{ $p->title }} di {{ $co }}. Masuk untuk mengajukan.">
+                        <span class="lp-job-top">
+                            <span class="lp-job-mark" aria-hidden="true">{{ $initials }}</span>
                             @if ($left !== null)
-                                <span @class(['ld-job-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? $left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
+                                <span @class(['lp-job-due', 'is-soon' => $left <= 7])>{{ $left === 0 ? 'Tutup hari ini' : ($left <= 7 ? $left.' hari lagi' : 'Tutup '.$p->deadline->locale('id')->translatedFormat('j M')) }}</span>
                             @endif
-                        </div>
-                        <p class="ld-job-co">{{ $co }}</p>
-                        <h3 class="ld-job-title">{{ $p->title }}</h3>
-                        @if ($p->description)<p class="ld-job-desc">{{ \Illuminate\Support\Str::limit($p->description, 110) }}</p>@endif
+                        </span>
+                        <span class="lp-job-co">{{ $co }}</span>
+                        <span class="lp-job-title">{{ $p->title }}</span>
                         @if ($p->skills->isNotEmpty())
-                            <ul class="ld-job-skills" aria-label="Keahlian">
-                                @foreach ($p->skills->take(3) as $skill)<li>{{ $skill->name }}</li>@endforeach
-                            </ul>
+                            <span class="lp-job-skills">@foreach ($p->skills->take(3) as $skill)<i>{{ $skill->name }}</i>@endforeach</span>
                         @endif
-                        <div class="ld-job-foot">
-                            <span class="ld-job-meta">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-                                {{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}@if ($p->quota), {{ $p->quota }} orang @endif
-                            </span>
-                            <span class="ld-job-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-                        </div>
+                        <span class="lp-job-foot">
+                            <span>{{ $p->location ?: ($p->company->city ?: 'Lokasi menyusul') }}@if ($p->quota) · {{ $p->quota }} orang @endif</span>
+                            <span class="lp-job-go" aria-hidden="true">{!! $arrow !!}</span>
+                        </span>
                     </a>
                 @endforeach
             </div>
-        </section>
-    @endif
+        @endif
+    </div>
+</section>
 
-    {{-- Penutup --}}
-    <section class="ld-close" aria-labelledby="ld-close-title" data-reveal>
-        <svg class="ld-close-wave" viewBox="0 0 220 90" aria-hidden="true"><path pathLength="1" d="M6 70 C 30 70, 34 18, 62 18 S 92 72, 118 72 S 150 18, 176 18 S 206 52, 214 52" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"/></svg>
-        <h2 id="ld-close-title" class="ld-close-title">Kelola magang dengan lebih tenang, mulai hari ini.</h2>
-        <p class="ld-close-sub">Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
-        <a href="{{ route('login') }}" class="ld-btn ld-btn-lime">Masuk ke SIMAGTI</a>
-    </section>
+{{-- ============ Penutup ============ --}}
+<section class="lp-close" aria-labelledby="lp-close-title">
+    <div class="lp-close-card">
+        <h2 id="lp-close-title" class="lp-display lp-close-title">Siap mulai?<br>Masuk sekarang.</h2>
+        <p>Akun dibuat oleh admin kampus atau lewat undangan perusahaan.</p>
+        <a href="{{ route('login') }}" class="lp-btn lp-btn-dark">Masuk ke SIMAGTI {!! $arrow !!}</a>
+    </div>
+</section>
 </main>
 
-<footer class="ld-footer" aria-labelledby="ld-footer-title">
-    <svg class="ld-footer-rings" viewBox="0 0 600 600" aria-hidden="true">
-        @foreach ([300, 250, 200, 150, 100] as $r)
-            <circle cx="500" cy="100" r="{{ $r }}" />
-        @endforeach
-    </svg>
-
-    <div class="ld-footer-top">
-        <div class="ld-footer-brand">
-            <h2 id="ld-footer-title" class="ld-visually-hidden">Tentang SIMAGTI</h2>
-            <img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="124" height="38">
+<footer class="lp-footer">
+    <div class="lp-wrap lp-footer-inner">
+        <div class="lp-footer-brand">
+            <span class="lp-brand"><img src="{{ asset('images/logo-simagti.svg') }}" alt="SIMAGTI" width="118" height="36"></span>
             <p>Sistem Monitoring Magang Terintegrasi untuk mahasiswa, perusahaan, dosen, dan kampus.</p>
         </div>
-
-        <nav class="ld-footer-col" aria-label="Bagian halaman">
-            <h3>Jelajahi</h3>
-            <a href="#peran">Peran pengguna</a>
+        <nav class="lp-footer-links" aria-label="Bagian halaman">
+            <a href="#peran">Peran</a>
             <a href="#alur">Alur KP</a>
-            @if ($postings->isNotEmpty())<a href="#lowongan">Lowongan magang</a>@endif
+            <a href="#angka">Angka</a>
+            <a href="{{ route('login') }}">Masuk</a>
         </nav>
-
-        <div class="ld-footer-cta">
-            <h3>Sudah punya akun?</h3>
-            <div class="ld-footer-pill">
-                <span>Lanjutkan KP Anda</span>
-                <a href="{{ route('login') }}" class="ld-btn ld-btn-primary">Masuk</a>
-            </div>
-        </div>
     </div>
-
-    <div class="ld-footer-bottom">
-        <p>Dibuat untuk program kerja praktik kampus.</p>
-        <p>© {{ now()->year }} SIMAGTI. Hak cipta dilindungi.</p>
-        <a href="#isi" class="ld-footer-top-link">
-            Kembali ke atas
-            <span aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
-        </a>
-    </div>
+    <p class="lp-wrap lp-footer-copy">© {{ now()->year }} SIMAGTI</p>
 </footer>
+
 <script>
-    // Animasi halaman depan: muncul saat digulir, angka dihitung naik, navigasi kaca saat digulir.
+    // Pemilih peran (tab): klik atau panah kiri/kanan mengganti panel
     (function () {
-        var root = document.documentElement;
-        var nav = document.querySelector('.ld-nav');
+        var tabs = [].slice.call(document.querySelectorAll('.lp-role-opt'));
+        var show = function (tab, focus) {
+            tabs.forEach(function (t) {
+                var on = t === tab;
+                t.classList.toggle('is-on', on);
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+                t.tabIndex = on ? 0 : -1;
+                document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+            });
+            if (focus) tab.focus();
+        };
+        tabs.forEach(function (t, i) {
+            t.addEventListener('click', function () { show(t); });
+            t.addEventListener('keydown', function (e) {
+                var d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+                if (!d) return;
+                e.preventDefault();
+                show(tabs[(i + d + tabs.length) % tabs.length], true);
+            });
+        });
+        // Navigasi menempel dengan latar saat digulir
+        var nav = document.querySelector('.lp-nav');
         var onScroll = function () { nav.classList.toggle('is-stuck', window.scrollY > 12); };
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
-
-        if (!root.classList.contains('motion') || !('IntersectionObserver' in window)) return;
-        root.classList.add('ld-js');
-
-        var fmt = function (n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
-        var count = function (el) {
-            var to = parseInt(el.getAttribute('data-count'), 10) || 0, start = null, dur = 1200;
-            if (to === 0) return;
-            var done = false;
-            el.textContent = '0';
-            // Pengaman: bila frame animasi tertahan (tab latar), angka akhir tetap tampil.
-            setTimeout(function () { done = true; el.textContent = fmt(to); }, dur + 300);
-            var step = function (t) {
-                if (done) return;
-                if (start === null) start = t;
-                var p = Math.min((t - start) / dur, 1), e = 1 - Math.pow(1 - p, 3);
-                el.textContent = fmt(Math.round(to * e));
-                if (p < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-        };
-
-        var reveal = function (el) {
-            if (el.classList.contains('is-in')) return;
-            el.classList.add('is-in');
-            setTimeout(function () { el.classList.add('is-settled'); }, 1600);
-            [].forEach.call(el.querySelectorAll('[data-count]'), count);
-            seen.unobserve(el);
-        };
-        var seen = new IntersectionObserver(function (entries) {
-            entries.forEach(function (en) { if (en.isIntersecting) reveal(en.target); });
-        }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
-        var items = [].slice.call(document.querySelectorAll('[data-reveal]'));
-        items.forEach(function (el) { seen.observe(el); });
-        // Cadangan: periksa posisi saat digulir, untuk peramban yang menunda pengamat.
-        window.addEventListener('scroll', function () {
-            items.forEach(function (el) { if (el.getBoundingClientRect().top < window.innerHeight * 0.92) reveal(el); });
-        }, { passive: true });
-
-        // Kartu angka di hero: hitung naik bersamaan dengan urutan pembuka.
-        setTimeout(function () { [].forEach.call(document.querySelectorAll('.ld-stat [data-count]'), count); }, 380);
     })();
 </script>
 </body>

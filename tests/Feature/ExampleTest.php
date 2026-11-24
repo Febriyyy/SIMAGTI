@@ -22,9 +22,9 @@ class ExampleTest extends TestCase
     public function test_tamu_melihat_landing_page(): void
     {
         $this->get('/')->assertOk()
-            ->assertSee('Magang terpantau')
-            ->assertSee('Satu sistem untuk setiap peran.')
-            ->assertSee('Empat tahap, semuanya tercatat.')
+            ->assertSee('Magang')->assertSee('terpantau,')
+            ->assertSee('Empat peran.')
+            ->assertSee('Semua tercatat.')
             ->assertSee(route('login'));
     }
 
