@@ -131,8 +131,17 @@ class MultiProdiTest extends TestCase
         $this->assertSame('Universitas Nusantara Raya', Campus::university());
         $this->assertSame('Surabaya', Campus::city());
 
-        $this->actingAs($admin)->post('/admin/kampus/prodi', ['code' => 'ti', 'name' => 'Teknologi Informasi'])->assertSessionHasNoErrors();
+        // Fakultas wajib diisi per prodi
+        $this->actingAs($admin)->post('/admin/kampus/prodi', ['code' => 'ti', 'name' => 'Teknologi Informasi'])->assertSessionHasErrorsIn('prodi', ['faculty']);
+        $this->actingAs($admin)->post('/admin/kampus/prodi', ['code' => 'ti', 'name' => 'Teknologi Informasi', 'faculty' => 'Fakultas Ilmu Komputer'])->assertSessionHasNoErrors();
         $prodi = StudyProgram::where('code', 'TI')->firstOrFail();
+        $this->assertSame('Fakultas Ilmu Komputer', $prodi->faculty);
+
+        // Prodi S1 dari data induk: 14 prodi dari 6 fakultas, tampil per fakultas
+        $this->assertSame(14, StudyProgram::where('code', '!=', 'TI')->count());
+        $this->assertSame(6, StudyProgram::where('code', '!=', 'TI')->distinct()->count('faculty'));
+        $this->actingAs($admin)->get('/admin/kampus')->assertOk()
+            ->assertSeeInOrder(['Fakultas Desain dan Seni Kreatif', 'Desain Interior', 'Fakultas Ekonomi dan Bisnis', 'Akuntansi', 'Fakultas Ilmu Komputer', 'Sistem Informasi']);
         $this->actingAs($admin)->put("/admin/kampus/prodi/{$prodi->id}", ['name' => 'Teknologi Informasi', 'kaprodi_id' => $this->kaprodiSi->id])->assertSessionHasNoErrors();
         $this->assertSame($prodi->id, $this->kaprodiSi->fresh()->programId());
 

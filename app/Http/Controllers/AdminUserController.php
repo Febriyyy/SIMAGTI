@@ -39,7 +39,7 @@ class AdminUserController extends Controller
 
         $counts = User::selectRaw('role, COUNT(*) as total')->groupBy('role')->pluck('total', 'role');
 
-        $programs = StudyProgram::orderBy('name')->get(['id', 'code', 'name']);
+        $programs = StudyProgram::orderBy('faculty')->orderBy('name')->get(['id', 'code', 'name', 'faculty']);
 
         return view('admin.akun', compact('users', 'counts', 'role', 'status', 'term', 'sort', 'programs'));
     }

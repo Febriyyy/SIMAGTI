@@ -31,12 +31,13 @@ class AdminCampusController extends Controller
 
     public function edit(): View
     {
-        $programs = StudyProgram::withCount('students')->orderBy('name')->get();
+        $programs = StudyProgram::withCount('students')->orderBy('faculty')->orderBy('name')->get();
         $kaprodis = User::where('role', 'kaprodi')->with('lecturerProfile')->orderBy('name')->get();
 
         return view('admin.kampus', [
             'campus' => collect(self::FIELDS)->mapWithKeys(fn ($v, $key) => [$key => (string) Campus::get('campus.'.$key)]),
             'programs' => $programs,
+            'faculties' => $programs->pluck('faculty')->filter()->unique()->values(),
             'kaprodis' => $kaprodis,
         ]);
     }
@@ -60,8 +61,10 @@ class AdminCampusController extends Controller
         $data = $request->validateWithBag('prodi', [
             'code' => ['required', 'string', 'max:10', Rule::unique('study_programs', 'code')->whereNull('deleted_at')],
             'name' => ['required', 'string', 'max:100'],
+            'faculty' => ['required', 'string', 'max:120'],
         ], [
             'code.required' => 'Isi kode prodi.',
+            'faculty.required' => 'Isi fakultas.',
             'code.unique' => 'Kode prodi sudah dipakai.',
             'name.required' => 'Isi nama prodi.',
         ]);
@@ -69,7 +72,7 @@ class AdminCampusController extends Controller
         $program = StudyProgram::create([
             'code' => mb_strtoupper(trim($data['code'])),
             'name' => trim($data['name']),
-            'faculty' => Campus::faculty(),
+            'faculty' => trim($data['faculty']),
         ]);
         ActivityLog::record('prodi.tambah', 'Menambah program studi '.$program->name, $program);
 

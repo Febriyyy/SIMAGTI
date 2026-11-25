@@ -166,8 +166,12 @@
                     <label class="label" for="acc-prodi">Program studi</label>
                     <select id="acc-prodi" name="study_program_id" class="select">
                         <option value="">Semua prodi</option>
-                        @foreach ($programs as $p)
-                            <option value="{{ $p->id }}" @selected((string) old('study_program_id') === (string) $p->id)>{{ $p->name }}</option>
+                        @foreach ($programs->groupBy(fn ($p) => $p->faculty ?: 'Lainnya') as $faculty => $group)
+                            <optgroup label="{{ $faculty }}">
+                                @foreach ($group as $p)
+                                    <option value="{{ $p->id }}" @selected((string) old('study_program_id') === (string) $p->id)>{{ $p->name }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                     @if ($ab->has('study_program_id'))<p class="field-error">{{ $ab->first('study_program_id') }}</p>@endif

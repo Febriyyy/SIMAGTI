@@ -31,7 +31,7 @@ class StudentController extends Controller
             ->limit(200)
             ->get();
 
-        $programs = StudyProgram::when($programId, fn ($q) => $q->whereKey($programId))->orderBy('name')->get();
+        $programs = StudyProgram::when($programId, fn ($q) => $q->whereKey($programId))->orderBy('faculty')->orderBy('name')->get();
 
         return view('mahasiswa.index', compact('students', 'programs', 'search'));
     }

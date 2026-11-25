@@ -32,6 +32,9 @@
                             $bag = $errors->getBag('prodi'.$program->id);
                             $current = $kaprodis->first(fn ($k) => (int) $k->lecturerProfile?->study_program_id === (int) $program->id);
                         ?>
+                        @if ($loop->first || $programs[$loop->index - 1]->faculty !== $program->faculty)
+                            <li class="prd-faculty">{{ $program->faculty ?: 'Fakultas belum diisi' }}</li>
+                        @endif
                         <li class="prd-row">
                             <form method="POST" action="{{ route('admin.prodi.update', $program) }}" class="prd-form">
                                 @csrf
@@ -94,7 +97,6 @@
             <div class="dialog-head">
                 <div>
                     <h2 class="card-title">Tambah program studi</h2>
-                    <p class="card-sub">{{ \App\Support\Campus::faculty() }}</p>
                 </div>
                 <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
             </div>
@@ -109,6 +111,13 @@
                     <input id="new-name" name="name" class="input" maxlength="100" required placeholder="Sistem Informasi" value="{{ old('name') }}">
                     @if ($pb->has('name'))<p class="field-error">{{ $pb->first('name') }}</p>@endif
                 </div>
+            </div>
+            <div class="field">
+                <label class="label" for="new-faculty">Fakultas</label>
+                <input id="new-faculty" name="faculty" class="input" maxlength="120" required list="faculty-options"
+                       value="{{ old('faculty', $faculties->first() ?? \App\Support\Campus::faculty()) }}" placeholder="Fakultas Ilmu Komputer">
+                <datalist id="faculty-options">@foreach ($faculties as $f)<option value="{{ $f }}">@endforeach</datalist>
+                @if ($pb->has('faculty'))<p class="field-error">{{ $pb->first('faculty') }}</p>@endif
             </div>
             <div class="dialog-foot row-actions">
                 <button type="button" class="btn" data-close>Batal</button>

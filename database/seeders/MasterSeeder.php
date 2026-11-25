@@ -18,10 +18,24 @@ use Illuminate\Database\Seeder;
  */
 class MasterSeeder extends Seeder
 {
+    /** Program studi S1 per fakultas: kode => nama */
+    public const PROGRAMS = [
+        'Fakultas Ekonomi dan Bisnis' => ['MNJ' => 'Manajemen', 'AKT' => 'Akuntansi'],
+        'Fakultas Teknik' => ['TS' => 'Teknik Sipil', 'TM' => 'Teknik Mesin', 'TE' => 'Teknik Elektro', 'TIN' => 'Teknik Industri', 'ARS' => 'Arsitektur'],
+        'Fakultas Ilmu Komputer' => ['TIF' => 'Teknik Informatika', 'SI' => 'Sistem Informasi'],
+        'Fakultas Ilmu Komunikasi' => ['IKOM' => 'Ilmu Komunikasi'],
+        'Fakultas Desain dan Seni Kreatif' => ['DP' => 'Desain Produk', 'DI' => 'Desain Interior', 'DKV' => 'Desain Komunikasi Visual'],
+        'Fakultas Psikologi' => ['PSI' => 'Psikologi'],
+    ];
+
     public function run(): void
     {
-        StudyProgram::firstOrCreate(['code' => 'TIF'], ['name' => 'Teknik Informatika', 'faculty' => 'Fakultas Ilmu Komputer']);
-        StudyProgram::firstOrCreate(['code' => 'SI'], ['name' => 'Sistem Informasi', 'faculty' => 'Fakultas Ilmu Komputer']);
+        // Program studi S1 (KP hanya untuk jenjang S1), dikelompokkan per fakultas
+        foreach (self::PROGRAMS as $faculty => $programs) {
+            foreach ($programs as $code => $name) {
+                StudyProgram::firstOrCreate(['code' => $code], ['name' => $name, 'faculty' => $faculty]);
+            }
+        }
 
         AcademicPeriod::firstOrCreate(
             ['name' => 'Ganjil 2026/2027'],

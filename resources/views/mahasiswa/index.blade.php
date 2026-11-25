@@ -79,8 +79,12 @@
                     <label for="study_program_id" class="label">Program studi</label>
                     <select id="study_program_id" name="study_program_id" class="select" required>
                         <option value="">Pilih program studi</option>
-                        @foreach ($programs as $program)
-                            <option value="{{ $program->id }}" @selected((string) old('study_program_id') === (string) $program->id)>{{ $program->name }}</option>
+                        @foreach ($programs->groupBy(fn ($p) => $p->faculty ?: 'Lainnya') as $faculty => $group)
+                            <optgroup label="{{ $faculty }}">
+                                @foreach ($group as $program)
+                                    <option value="{{ $program->id }}" @selected((string) old('study_program_id') === (string) $program->id)>{{ $program->name }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                 </div>
