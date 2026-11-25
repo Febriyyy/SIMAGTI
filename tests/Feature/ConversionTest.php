@@ -102,6 +102,10 @@ class ConversionTest extends TestCase
         $this->assertSame('diterima', $c->status);
         $this->assertNotNull($c->responded_at);
         $this->assertSame(['direkomendasikan', 'ditawari', 'diterima'], $c->histories()->orderBy('id')->pluck('to_status')->all());
+
+        // Setelah dijawab, kartu tawaran tetap ada di dashboard agar tawaran dan suratnya bisa dibuka lagi
+        $this->actingAs($student)->get('/dashboard')->assertSee('Anda menerima tawaran kerja')->assertSee('Lihat tawaran');
+        $this->actingAs($student)->get('/tawaran-kerja')->assertOk()->assertSee('Anda menerima');
     }
 
     public function test_menolak_wajib_dengan_alasan(): void

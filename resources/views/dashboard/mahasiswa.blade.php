@@ -50,17 +50,24 @@
             </x-slot:meta>
         </x-hero>
 
-        {{-- Tawaran kerja dari tempat magang: tampil hanya saat menunggu jawaban mahasiswa --}}
-        @php($offer = $internship->conversion()->where('status', 'ditawari')->first())
+        {{-- Tawaran kerja dari tempat magang: tetap tampil setelah dijawab agar tawaran dan suratnya bisa dibuka lagi
+             (rekomendasi yang belum ditawarkan tidak terlihat mahasiswa) --}}
+        @php($offer = $internship->conversion()->whereIn('status', ['ditawari', 'diterima', 'ditolak', 'kedaluwarsa'])->first())
         @if ($offer)
+            @php($waiting = $offer->status === 'ditawari')
             <section class="offer-card" aria-labelledby="offer-title">
                 <span class="offer-icon" aria-hidden="true"><x-ikon name="star" :size="22" fill /></span>
                 <div class="min0 grow">
-                    <h2 id="offer-title" class="offer-title">Tawaran kerja dari {{ $internship->placeName() }}</h2>
-                    <p class="offer-sub">{{ $offer->offered_position }}@if ($offer->respond_by) · jawab sebelum {{ $offer->respond_by->locale('id')->translatedFormat('j F') }}@endif</p>
+                    <h2 id="offer-title" class="offer-title">{{ $offer->status === 'diterima' ? 'Anda menerima tawaran kerja dari' : 'Tawaran kerja dari' }} {{ $internship->placeName() }}</h2>
+                    <p class="offer-sub">
+                        {{ $offer->offered_position }}@if ($waiting && $offer->respond_by) · jawab sebelum {{ $offer->respond_by->locale('id')->translatedFormat('j F') }}@endif
+                    </p>
                 </div>
+                @unless ($waiting)
+                    <x-chip :tone="$offer->statusTone()">{{ $offer->status === 'ditolak' ? 'Anda menolak' : $offer->statusLabel() }}</x-chip>
+                @endunless
                 <div class="offer-actions">
-                    <a href="{{ route('rekrutmen.tawaran') }}" class="btn btn-primary">Lihat tawaran <x-ikon name="arrow" :size="16" /></a>
+                    <a href="{{ route('rekrutmen.tawaran') }}" @class(['btn', 'btn-primary' => $waiting])>Lihat tawaran <x-ikon name="arrow" :size="16" /></a>
                 </div>
             </section>
         @endif
