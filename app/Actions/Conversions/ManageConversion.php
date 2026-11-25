@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 /**
  * Rekomendasi jadi karyawan dan tawaran kerja resmi.
  *
- * Alur: Company Supervisor merekomendasikan, lalu mengirim tawaran kerja lengkap (detail pekerjaan + surat resmi PDF
+ * Alur: Company Supervisor merekomendasikan, lalu mengirim tawaran kerja lengkap (detail pekerjaan + surat PDF dengan template perusahaan, opsional
  * + batas waktu jawaban). Mahasiswa baru diberi tahu saat ditawari, membaca detail dan suratnya, lalu menerima
  * atau menolak dengan alasan. Lewat batas waktu tanpa jawaban: kedaluwarsa (bukan dianggap menolak);
  * supervisor bisa memperpanjang batas waktu.
@@ -58,15 +58,16 @@ class ManageConversion
      * @param  array{posisi: string, unit?: ?string, lokasi: string, mode: string, jenis: string, durasi?: ?int,
      *               mulai?: ?string, deskripsi: string, kompensasi?: ?string, hr_nama: string, hr_email: string, batas: string}  $data
      */
-    public function offer(User $supervisor, Internship $internship, array $data, UploadedFile $letter): ConversionCandidate
+    public function offer(User $supervisor, Internship $internship, array $data, ?UploadedFile $letter = null): ConversionCandidate
     {
         $this->guardSupervisor($supervisor, $internship);
         $candidate = $this->candidateIn($internship, ['direkomendasikan']);
 
-        $path = $letter->storeAs("rekrutmen/{$internship->id}", Str::uuid().'.pdf', self::DISK);
+        // Surat dengan template perusahaan sendiri (opsional); tanpa unggahan dipakai surat resmi SIMAGTI.
+        $path = $letter?->storeAs("rekrutmen/{$internship->id}", Str::uuid().'.pdf', self::DISK);
 
         return DB::transaction(function () use ($supervisor, $internship, $data, $letter, $path, $candidate) {
-            $stored = StoredFile::create([
+            $stored = $letter ? StoredFile::create([
                 'disk' => self::DISK,
                 'path' => $path,
                 'original_name' => mb_substr($letter->getClientOriginalName(), 0, 200),
@@ -74,7 +75,7 @@ class ManageConversion
                 'size' => $letter->getSize(),
                 'checksum' => hash_file('sha256', $letter->getRealPath()),
                 'uploaded_by' => $supervisor->id,
-            ]);
+            ]) : null;
 
             $candidate->update([
                 'offered_position' => $data['posisi'],
@@ -88,7 +89,7 @@ class ManageConversion
                 'compensation' => $data['kompensasi'] ?? null,
                 'hr_contact_name' => $data['hr_nama'],
                 'hr_contact_email' => $data['hr_email'],
-                'offer_letter_id' => $stored->id,
+                'offer_letter_id' => $stored?->id,
                 'offered_at' => now(),
                 'respond_by' => $data['batas'],
             ]);

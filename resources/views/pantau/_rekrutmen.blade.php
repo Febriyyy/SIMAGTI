@@ -75,11 +75,10 @@
                         </form>
                         <button type="button" class="btn btn-primary" data-open="dlg-offer"><x-ikon name="send" :size="16" /> Kirim tawaran kerja</button>
                     @else
-                        @if ($c->offered_position)
-                            <a href="{{ route('rekrutmen.surat.penawaran', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="file" :size="16" /> Surat penawaran</a>
-                        @endif
                         @if ($c->offerLetter)
-                            <a href="{{ route('rekrutmen.surat', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="download" :size="16" /> Lampiran PDF</a>
+                            <a href="{{ route('rekrutmen.surat', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="file" :size="16" /> Surat penawaran</a>
+                        @elseif ($c->offered_position)
+                            <a href="{{ route('rekrutmen.surat.penawaran', $c) }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-ikon name="file" :size="16" /> Surat penawaran</a>
                         @endif
                         <button type="button" class="btn" data-open="dlg-extend"><x-ikon name="calendar" :size="16" /> Perpanjang batas</button>
                     @endif
@@ -177,8 +176,9 @@
                                 @if ($e->has('hr_email'))<p class="field-error">{{ $e->first('hr_email') }}</p>@endif
                             </div>
                             <div>
-                                <label class="label" for="of-letter">Surat penawaran kerja (PDF, maks. 5 MB)</label>
-                                <input id="of-letter" type="file" name="surat" class="input" accept=".pdf,application/pdf" required>
+                                <label class="label" for="of-letter">Surat penawaran perusahaan <span class="label-opt">(opsional)</span></label>
+                                <input id="of-letter" type="file" name="surat" class="input" accept=".pdf,application/pdf">
+                                <p class="hint">PDF dengan template perusahaan, maks. 5 MB. Kosongkan untuk memakai surat SIMAGTI.</p>
                                 @if ($e->has('surat'))<p class="field-error">{{ $e->first('surat') }}</p>@endif
                             </div>
                             <div>

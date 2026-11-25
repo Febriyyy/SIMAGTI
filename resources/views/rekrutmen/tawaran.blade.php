@@ -65,22 +65,17 @@
             </section>
 
             @if ($o->offered_position)
+                {{-- Surat dengan template perusahaan bila diunggah supervisor; bila tidak, surat resmi SIMAGTI --}}
+                @php($letterUrl = $o->offerLetter ? route('rekrutmen.surat', $o) : route('rekrutmen.surat.penawaran', $o))
                 <section class="card">
                     <div class="card-head">
                         <div>
                             <h2 class="card-title">Surat penawaran kerja</h2>
-                            <p class="card-sub">No. {{ $o->letterNumber() }}</p>
+                            <p class="card-sub">{{ $o->offerLetter ? 'Dari '.$internship->placeName() : 'No. '.$o->letterNumber() }}</p>
                         </div>
-                        <a href="{{ route('rekrutmen.surat.penawaran', $o) }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="download" :size="16" /> Buka dan cetak</a>
+                        <a href="{{ $letterUrl }}" target="_blank" rel="noopener" class="btn btn-sm"><x-ikon name="download" :size="16" /> {{ $o->offerLetter ? 'Buka PDF' : 'Buka dan cetak' }}</a>
                     </div>
-                    <iframe class="job-letter" src="{{ route('rekrutmen.surat.penawaran', $o) }}" title="Surat penawaran kerja dari {{ $internship->placeName() }}"></iframe>
-                    @if ($o->offerLetter)
-                        <div class="card-foot job-attach">
-                            <x-ikon name="file" :size="16" />
-                            <span>Lampiran dari perusahaan</span>
-                            <a href="{{ route('rekrutmen.surat', $o) }}" target="_blank" rel="noopener">{{ $o->offerLetter->original_name ?? 'Surat (PDF)' }}</a>
-                        </div>
-                    @endif
+                    <iframe class="job-letter" src="{{ $letterUrl }}{{ $o->offerLetter ? '#view=FitH' : '' }}" title="Surat penawaran kerja dari {{ $internship->placeName() }}"></iframe>
                 </section>
             @endif
         </div>

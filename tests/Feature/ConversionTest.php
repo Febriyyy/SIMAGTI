@@ -74,8 +74,10 @@ class ConversionTest extends TestCase
         $this->actingAs($student)->get('/tawaran-kerja')->assertNotFound();
 
         // Surat dan detail wajib
-        $this->actingAs($supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer(['surat' => null, 'deskripsi' => '']))
-            ->assertSessionHasErrorsIn('offer', ['surat', 'deskripsi']);
+        // Detail wajib; surat perusahaan opsional tapi harus PDF
+        $this->actingAs($supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer([
+            'surat' => UploadedFile::fake()->create('surat.docx', 20, 'application/msword'), 'deskripsi' => '',
+        ]))->assertSessionHasErrorsIn('offer', ['surat', 'deskripsi']);
         $this->actingAs($supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer())->assertSessionHasNoErrors();
 
         $c = $fajar->fresh()->conversion;
@@ -151,8 +153,10 @@ class ConversionTest extends TestCase
         // Masih rekomendasi: belum ada surat
         $this->actingAs($fajar->supervisor)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertNotFound();
 
-        $this->actingAs($fajar->supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer())->assertSessionHasNoErrors();
+        // Tanpa unggahan surat perusahaan: dipakai surat resmi SIMAGTI
+        $this->actingAs($fajar->supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer(['surat' => null]))->assertSessionHasNoErrors();
         $c->refresh();
+        $this->assertNull($c->offer_letter_id);
 
         $this->actingAs($this->user('fajar@kp.test'))->get("/rekrutmen/{$c->id}/surat-penawaran")->assertOk()
             ->assertSee('Surat Penawaran Kerja')->assertSee($c->letterNumber())
@@ -161,10 +165,24 @@ class ConversionTest extends TestCase
         $this->actingAs($fajar->supervisor)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertOk();
         $this->actingAs($fajar->lecturer)->get("/rekrutmen/{$c->id}/surat-penawaran")->assertForbidden();
 
-        // Halaman tawaran memuat surat penawaran dan lampiran PDF dari perusahaan
+        // Halaman tawaran menampilkan surat resmi SIMAGTI
         $this->actingAs($this->user('fajar@kp.test'))->get('/tawaran-kerja')
-            ->assertSee(route('rekrutmen.surat.penawaran', $c), false)->assertSee('Lampiran dari perusahaan');
+            ->assertSee(route('rekrutmen.surat.penawaran', $c), false)->assertDontSee('href="'.route('rekrutmen.surat', $c).'"', false);
         $this->assertMatchesRegularExpression('#^\d{3}/TK-[A-Z]{1,2}/[IVX]+/\d{4}$#', $c->letterNumber());
+    }
+
+    public function test_surat_dengan_template_perusahaan_menjadi_surat_utama(): void
+    {
+        $fajar = $this->recommended();
+        $this->actingAs($fajar->supervisor)->post("/pantau/{$fajar->id}/rekrutmen/tawaran", $this->offer())->assertSessionHasNoErrors();
+        $c = $fajar->fresh()->conversion;
+        $this->assertNotNull($c->offer_letter_id);
+
+        // Mahasiswa melihat surat unggahan perusahaan, bukan surat SIMAGTI
+        $this->actingAs($this->user('fajar@kp.test'))->get('/tawaran-kerja')
+            ->assertSee(route('rekrutmen.surat', $c), false)->assertSee('Buka PDF')
+            ->assertDontSee(route('rekrutmen.surat.penawaran', $c), false);
+        $this->actingAs($fajar->supervisor)->get("/pantau/{$fajar->id}")->assertSee(route('rekrutmen.surat', $c), false);
     }
 
     public function test_hanya_supervisor_penempatan_itu_yang_bisa_mengelola(): void

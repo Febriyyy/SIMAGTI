@@ -54,7 +54,7 @@ class ConversionController extends Controller
             'hr_nama' => ['required', 'string', 'max:100'],
             'hr_email' => ['required', 'email', 'max:150'],
             'batas' => ['required', 'date', 'after:today', 'before_or_equal:'.now()->addDays(60)->toDateString()],
-            'surat' => ['required', 'file', 'max:'.ManageConversion::LETTER_MAX_KB, 'extensions:pdf', 'mimetypes:application/pdf'],
+            'surat' => ['nullable', 'file', 'max:'.ManageConversion::LETTER_MAX_KB, 'extensions:pdf', 'mimetypes:application/pdf'],
         ], [
             'posisi.required' => 'Isi posisi yang ditawarkan.',
             'lokasi.required' => 'Isi lokasi penempatan.',
@@ -64,7 +64,6 @@ class ConversionController extends Controller
             'hr_email.required' => 'Isi email kontak HR.',
             'batas.after' => 'Batas jawaban paling cepat besok.',
             'batas.before_or_equal' => 'Batas jawaban paling lama 60 hari dari sekarang.',
-            'surat.required' => 'Unggah surat resmi penawaran kerja (PDF).',
             'surat.max' => 'Ukuran surat maksimal 5 MB.',
             'surat.extensions' => 'Surat harus berupa PDF.',
             'surat.mimetypes' => 'Surat harus berupa PDF.',
