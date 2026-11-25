@@ -13,9 +13,9 @@ class CreateStudent
     /**
      * @param  array<string, mixed>  $data  sudah divalidasi oleh StoreStudentRequest
      */
-    public function handle(User $actor, array $data): User
+    public function handle(User $actor, array $data, bool $log = true): User
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $log) {
             $student = User::create([
                 'name' => $data['name'],
                 'email' => mb_strtolower($data['email']),
@@ -23,6 +23,7 @@ class CreateStudent
                 'role' => 'mahasiswa',
                 'nim' => $data['nim'],
                 'is_active' => true,
+                'must_change_password' => (bool) ($data['must_change_password'] ?? false),
             ]);
 
             StudentProfile::create([
@@ -32,7 +33,9 @@ class CreateStudent
                 'gpa' => $data['gpa'] ?? null,
             ]);
 
-            ActivityLog::record('mahasiswa.tambah', "Menambah mahasiswa {$student->name} ({$student->nim})", $student);
+            if ($log) {
+                ActivityLog::record('mahasiswa.tambah', "Menambah mahasiswa {$student->name} ({$student->nim})", $student);
+            }
 
             return $student;
         });

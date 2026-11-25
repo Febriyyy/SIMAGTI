@@ -49,6 +49,7 @@ use App\Http\Controllers\ReportDiscussionController;
 use App\Http\Controllers\ReportDraftController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentImportController;
 use App\Http\Controllers\StudentTaskController;
 use App\Http\Controllers\SupervisorActivationController;
 use App\Http\Controllers\SupervisorConfirmationController;
@@ -374,6 +375,12 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
 
         Route::get('/mahasiswa', [StudentController::class, 'index'])->name('mahasiswa.index');
         Route::post('/mahasiswa', [StudentController::class, 'store'])->name('mahasiswa.store');
+        Route::get('/mahasiswa/impor', [StudentImportController::class, 'form'])->name('mahasiswa.impor');
+        Route::get('/mahasiswa/impor/template', [StudentImportController::class, 'template'])->name('mahasiswa.impor.template');
+        Route::post('/mahasiswa/impor', [StudentImportController::class, 'check'])->middleware('throttle:20,1')->name('mahasiswa.impor.periksa');
+        Route::post('/mahasiswa/impor/simpan', [StudentImportController::class, 'store'])->middleware('throttle:10,1')->name('mahasiswa.impor.simpan');
+        Route::get('/mahasiswa/impor/akun', [StudentImportController::class, 'credentials'])->name('mahasiswa.impor.akun');
+        Route::delete('/mahasiswa/impor', [StudentImportController::class, 'cancel'])->name('mahasiswa.impor.batal');
 
         Route::get('/penempatan/tambah', [PlacementController::class, 'create'])->name('penempatan.create');
         Route::post('/penempatan', [PlacementController::class, 'store'])->name('penempatan.store');

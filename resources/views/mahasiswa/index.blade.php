@@ -8,6 +8,7 @@
             <h1 class="page-title">Mahasiswa</h1>
             <p class="page-sub">Akun mahasiswa dan status KP masing-masing.</p>
         </div>
+        <a href="{{ route('mahasiswa.impor') }}" class="btn btn-primary"><x-ikon name="upload" :size="16" /> Impor dari Excel</a>
     </div>
 
     <form method="GET" action="{{ route('mahasiswa.index') }}" class="inline-form">

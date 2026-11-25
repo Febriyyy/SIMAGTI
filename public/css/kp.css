@@ -6988,3 +6988,7 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
 /* Kampus dan Prodi: judul fakultas di antara kelompok prodi */
 .prd-faculty { padding: 16px var(--card-x) 6px; font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line); }
 .prd-list > .prd-faculty:first-child { border-top: 0; }
+/* Pratinjau impor: baris bermasalah bertanda merah lembut, pesan sejajar dengan kolom data */
+.imp-table tr.is-invalid td { background: color-mix(in srgb, var(--red) 5%, transparent); }
+.imp-table .imp-error { color: var(--red); font-weight: 500; }
+.imp-table .imp-error .ikon { margin-right: 4px; vertical-align: -3px; }
