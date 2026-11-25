@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ActivityLog;
+use App\Models\StudyProgram;
 use App\Models\User;
 use Database\Seeders\TestingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -113,5 +114,79 @@ class AdminTest extends TestCase
         $this->actingAs($second)->patch("/admin/akun/{$admin->id}", ['is_active' => 0])->assertSessionHasNoErrors();
         $this->actingAs($admin->fresh())->get('/dashboard')->assertRedirect('/login');
         $this->assertSame(1, User::where('role', 'admin')->where('is_active', true)->count());
+    }
+
+    // ---------- Tambah akun staf kampus ----------
+
+    public function test_admin_membuat_akun_dosen_dengan_prodi_dan_kata_sandi_sementara(): void
+    {
+        $si = StudyProgram::where('code', 'SI')->firstOrFail();
+
+        $response = $this->actingAs($this->user('admin@kp.test'))->post('/admin/akun', [
+            'name' => 'Dosen Baru, M.Kom.', 'email' => 'Dosen.Baru@KP.test', 'role' => 'dospem',
+            'study_program_id' => $si->id, 'nidn' => '0011223344',
+        ]);
+        $response->assertRedirect(route('admin.akun', ['urut' => 'terbaru']))->assertSessionHas('temporary_password');
+
+        $dosen = User::where('email', 'dosen.baru@kp.test')->firstOrFail();
+        $this->assertSame('dospem', $dosen->role);
+        $this->assertTrue($dosen->is_active);
+        $this->assertTrue((bool) $dosen->must_change_password);
+        $this->assertSame($si->id, $dosen->programId());
+        $this->assertSame('0011223344', $dosen->lecturerProfile->nidn);
+        $this->assertTrue(ActivityLog::where('action', 'akun.tambah')->exists());
+
+        // Kata sandi sementara bisa dipakai masuk, lalu wajib diganti
+        $temporary = session('temporary_password')['password'];
+        auth()->logout();
+        $this->post('/login', ['email' => 'dosen.baru@kp.test', 'password' => $temporary])->assertRedirect();
+        $this->get('/dashboard')->assertRedirect(route('akun.sandi'));
+    }
+
+    public function test_akun_tu_dan_admin_tanpa_profil_dosen(): void
+    {
+        $admin = $this->user('admin@kp.test');
+        $this->actingAs($admin)->post('/admin/akun', ['name' => 'Staf TU', 'email' => 'staf.tu@kp.test', 'role' => 'tu', 'study_program_id' => StudyProgram::first()->id])
+            ->assertSessionHasNoErrors();
+        $tu = User::where('email', 'staf.tu@kp.test')->firstOrFail();
+        $this->assertSame('tu', $tu->role);
+        $this->assertNull($tu->lecturerProfile);
+    }
+
+    public function test_tambah_akun_menolak_peran_mahasiswa_supervisor_dan_email_ganda(): void
+    {
+        $admin = $this->user('admin@kp.test');
+        foreach (['mahasiswa', 'supervisor'] as $role) {
+            $this->actingAs($admin)->post('/admin/akun', ['name' => 'X', 'email' => "x.{$role}@kp.test", 'role' => $role])
+                ->assertSessionHasErrorsIn('account', ['role']);
+        }
+        $this->actingAs($admin)->post('/admin/akun', ['name' => 'X', 'email' => 'dospem@kp.test', 'role' => 'dospem'])
+            ->assertSessionHasErrorsIn('account', ['email']);
+        $this->assertSame(0, User::where('email', 'like', 'x.%')->count());
+    }
+
+    public function test_satu_prodi_satu_kaprodi(): void
+    {
+        $admin = $this->user('admin@kp.test');
+        $tif = StudyProgram::where('code', 'TIF')->firstOrFail();
+
+        $this->actingAs($admin)->post('/admin/akun', ['name' => 'Kaprodi TIF', 'email' => 'kaprodi.tif@kp.test', 'role' => 'kaprodi', 'study_program_id' => $tif->id])
+            ->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post('/admin/akun', ['name' => 'Kaprodi Kedua', 'email' => 'kaprodi.dua@kp.test', 'role' => 'kaprodi', 'study_program_id' => $tif->id])
+            ->assertSessionHasErrorsIn('account', ['study_program_id']);
+
+        // Kaprodi tanpa prodi (melihat semua prodi) tetap boleh
+        $this->actingAs($admin)->post('/admin/akun', ['name' => 'Kaprodi Umum', 'email' => 'kaprodi.umum@kp.test', 'role' => 'kaprodi'])
+            ->assertSessionHasNoErrors();
+        $this->assertNull(User::where('email', 'kaprodi.umum@kp.test')->firstOrFail()->programId());
+    }
+
+    public function test_hanya_admin_yang_bisa_menambah_akun(): void
+    {
+        foreach (['kaprodi@kp.test', 'tu@kp.test', 'dospem@kp.test'] as $email) {
+            $this->actingAs($this->user($email))->post('/admin/akun', ['name' => 'X', 'email' => 'x.baru@kp.test', 'role' => 'dospem'])
+                ->assertForbidden();
+        }
+        $this->assertNull(User::where('email', 'x.baru@kp.test')->first());
     }
 }

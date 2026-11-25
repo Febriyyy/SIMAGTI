@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Accounts\CreateAccount;
 use App\Actions\Auth\ResetPassword;
 use App\Models\ActivityLog;
 use App\Models\Internship;
 use App\Models\InternshipStaff;
+use App\Models\StudyProgram;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +15,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-/** Admin: daftar akun, ubah peran, aktifkan / nonaktifkan akun, atur ulang kata sandi. */
+/** Admin: daftar akun, tambah akun staf kampus, ubah peran, aktifkan / nonaktifkan akun, atur ulang kata sandi. */
 class AdminUserController extends Controller
 {
     public function index(Request $request): View
@@ -37,7 +39,9 @@ class AdminUserController extends Controller
 
         $counts = User::selectRaw('role, COUNT(*) as total')->groupBy('role')->pluck('total', 'role');
 
-        return view('admin.akun', compact('users', 'counts', 'role', 'status', 'term', 'sort'));
+        $programs = StudyProgram::orderBy('name')->get(['id', 'code', 'name']);
+
+        return view('admin.akun', compact('users', 'counts', 'role', 'status', 'term', 'sort', 'programs'));
     }
 
     public function update(Request $request, User $account): RedirectResponse
@@ -80,6 +84,45 @@ class AdminUserController extends Controller
     }
 
     /** Kata sandi sementara tampil sekali di kartu halaman Akun (lewat flash session), tidak disimpan dalam bentuk asli. */
+    /** Admin membuat akun staf kampus; kata sandi sementara tampil sekali di halaman Akun. */
+    public function store(Request $request, CreateAccount $action): RedirectResponse
+    {
+        $data = $request->validateWithBag('account', [
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')],
+            'role' => ['required', Rule::in(CreateAccount::ROLES)],
+            'study_program_id' => ['nullable', 'integer', Rule::exists('study_programs', 'id')],
+            'nidn' => ['nullable', 'string', 'max:20'],
+        ], [
+            'name.required' => 'Isi nama lengkap.',
+            'email.required' => 'Isi email.',
+            'email.email' => 'Format email belum benar.',
+            'email.unique' => 'Email ini sudah dipakai akun lain.',
+            'role.required' => 'Pilih peran.',
+            'role.in' => 'Peran ini tidak dibuat dari sini. Mahasiswa ditambah kaprodi, Company Supervisor lewat undangan TU.',
+        ]);
+
+        // Satu prodi satu kaprodi: penggantian kaprodi dilakukan di Kampus dan Prodi
+        if ($data['role'] === 'kaprodi' && ! empty($data['study_program_id'])) {
+            $existing = User::where('role', 'kaprodi')
+                ->whereHas('lecturerProfile', fn ($q) => $q->where('study_program_id', $data['study_program_id']))->first();
+            if ($existing) {
+                throw ValidationException::withMessages(['study_program_id' => "Prodi ini sudah punya kaprodi ({$existing->name}). Ganti lewat Kampus dan Prodi."])
+                    ->errorBag('account');
+            }
+        }
+        if (! in_array($data['role'], ['dospem', 'kaprodi'], true)) {
+            $data['study_program_id'] = null;
+            $data['nidn'] = null;
+        }
+
+        [$account, $temporary] = $action->handle($request->user(), $data);
+
+        return redirect()->route('admin.akun', ['urut' => 'terbaru'])
+            ->with('status', "Akun {$account->roleLabel()} {$account->listName()} dibuat.")
+            ->with('temporary_password', ['name' => $account->listName(), 'email' => $account->email, 'password' => $temporary]);
+    }
+
     public function resetPassword(Request $request, User $account, ResetPassword $action): RedirectResponse
     {
         $temporary = $action->handle($request->user(), $account);

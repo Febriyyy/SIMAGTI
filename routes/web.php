@@ -382,6 +382,7 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
     // ---------------------------------------------------------------- Admin
     Route::middleware(EnsureRole::class.':admin')->prefix('admin')->group(function () {
         Route::get('/akun', [AdminUserController::class, 'index'])->name('admin.akun');
+        Route::post('/akun', [AdminUserController::class, 'store'])->middleware('throttle:30,1')->name('admin.akun.store');
         Route::patch('/akun/{account}', [AdminUserController::class, 'update'])->whereNumber('account')->name('admin.akun.update');
         Route::post('/akun/{account}/sandi', [AdminUserController::class, 'resetPassword'])
             ->whereNumber('account')->middleware('throttle:20,1')->name('admin.akun.sandi');

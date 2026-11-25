@@ -8,6 +8,7 @@
             <h1 class="page-title">Akun</h1>
             <p class="page-sub">Peran, status, dan kata sandi akun.</p>
         </div>
+        <button type="button" class="btn btn-primary" data-open="dlg-account"><x-ikon name="plus" :size="16" /> Tambah akun</button>
     </div>
 
     @if (session('temporary_password'))
@@ -126,4 +127,73 @@
             @endif
         @endif
     </section>
+
+    {{-- Dialog tambah akun staf kampus (mahasiswa ditambah kaprodi, Company Supervisor lewat undangan TU) --}}
+    <?php $ab = $errors->getBag('account'); ?>
+    <dialog id="dlg-account" class="dialog" @if ($ab->any()) data-autoopen @endif>
+        <form method="POST" action="{{ route('admin.akun.store') }}" class="dialog-body" data-account-form>
+            @csrf
+            <div class="dialog-head">
+                <div>
+                    <h2 class="card-title">Tambah akun</h2>
+                    <p class="card-sub">Kata sandi sementara dibuat otomatis</p>
+                </div>
+                <button type="button" class="btn btn-sm btn-icon btn-ghost" data-close aria-label="Tutup">×</button>
+            </div>
+            <div class="field">
+                <label class="label" for="acc-name">Nama lengkap</label>
+                <input id="acc-name" name="name" class="input" maxlength="120" required autofocus value="{{ old('name') }}" placeholder="Dr. Nama Lengkap, S.Kom., M.Kom.">
+                @if ($ab->has('name'))<p class="field-error">{{ $ab->first('name') }}</p>@endif
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label class="label" for="acc-email">Email</label>
+                    <input id="acc-email" name="email" type="email" class="input" maxlength="150" required value="{{ old('email') }}" placeholder="nama@kampus.ac.id" autocomplete="off">
+                    @if ($ab->has('email'))<p class="field-error">{{ $ab->first('email') }}</p>@endif
+                </div>
+                <div class="field">
+                    <label class="label" for="acc-role">Peran</label>
+                    <select id="acc-role" name="role" class="select" required data-account-role>
+                        @foreach (\App\Actions\Accounts\CreateAccount::ROLES as $r)
+                            <option value="{{ $r }}" @selected(old('role', 'dospem') === $r)>{{ \App\Models\User::ROLE_LABELS[$r] }}</option>
+                        @endforeach
+                    </select>
+                    @if ($ab->has('role'))<p class="field-error">{{ $ab->first('role') }}</p>@endif
+                </div>
+            </div>
+            <div class="form-grid" data-account-lecturer>
+                <div class="field">
+                    <label class="label" for="acc-prodi">Program studi</label>
+                    <select id="acc-prodi" name="study_program_id" class="select">
+                        <option value="">Semua prodi</option>
+                        @foreach ($programs as $p)
+                            <option value="{{ $p->id }}" @selected((string) old('study_program_id') === (string) $p->id)>{{ $p->name }}</option>
+                        @endforeach
+                    </select>
+                    @if ($ab->has('study_program_id'))<p class="field-error">{{ $ab->first('study_program_id') }}</p>@endif
+                </div>
+                <div class="field">
+                    <label class="label" for="acc-nidn">NIDN <span class="label-opt">(opsional)</span></label>
+                    <input id="acc-nidn" name="nidn" class="input" maxlength="20" inputmode="numeric" value="{{ old('nidn') }}">
+                    @if ($ab->has('nidn'))<p class="field-error">{{ $ab->first('nidn') }}</p>@endif
+                </div>
+            </div>
+            <div class="dialog-foot row-actions">
+                <button type="button" class="btn" data-close>Batal</button>
+                <button type="submit" class="btn btn-primary">Buat akun</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        // Prodi dan NIDN hanya untuk dosen pembimbing dan kaprodi
+        (function () {
+            var role = document.querySelector('[data-account-role]');
+            var box = document.querySelector('[data-account-lecturer]');
+            if (!role || !box) return;
+            var sync = function () { box.hidden = ['dospem', 'kaprodi'].indexOf(role.value) < 0; };
+            role.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
 @endsection
