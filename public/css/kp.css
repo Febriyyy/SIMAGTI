@@ -7032,3 +7032,51 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
 /* Tempat magang: divisi dan posisi = ikon + teks */
 .place-tags { gap: 6px 16px; }
 .place-tag { padding: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; font-size: 13px; font-weight: 600; color: var(--text); }
+
+/* =====================================================================
+   Konsistensi komponen, tahap 2: semua halaman (26 Nov 2026).
+   Radius dua tingkat (wadah 24, kartu di dalam wadah dan menu melayang 16), label kecil tanpa pil berlatar,
+   angka penghitung jadi angka tebal biasa, tanpa rona dekoratif saat diam.
+   ===================================================================== */
+
+/* Radius: wadah 24 */
+.page-head, .icard, .gtrack, .cst-studio, .jb-list { border-radius: 24px !important; }
+/* Radius: kartu di dalam wadah, kotak isian besar, menu melayang 16 */
+.gcard, .kcard, .icard-well, .card .item-list, ul.item-list, dl.kv, .next-step, .pf-identity, .pf-link, .dropzone,
+.gtk, .pf-project, .howto, .menu-panel { border-radius: 16px !important; }
+
+/* Label kecil: titik atau ikon + teks, tanpa latar pil */
+.attn-chip, .attn .attn-chip, .cohort-badge, .gtk-rel, .gtk-mode, .cst-sign-status, .cpl-check, .cpl-check.is-ok,
+.pf-identity-tags > span, .pf-exp-period, .pf-exp .pf-exp-period, .rd-attach em, .icard-progress-top em, .icard.is-idle .icard-progress-top em {
+    height: auto !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important;
+    background: none !important; box-shadow: none !important;
+}
+.attn .attn-chip { font-size: 13px; font-weight: 600; }
+.attn .attn-chip.is-idle { color: var(--red); }
+.attn .attn-chip.is-low { color: var(--amber); }
+.attn .attn-chip.is-end { color: #6d4bd0; }
+.cohort-badge { color: var(--muted); font-size: 13px; font-weight: 600; }
+.gtk-rel.is-now { color: var(--primary); font-weight: 700; }
+.cpl-checks { gap: 6px 16px; }
+.cpl-check { color: var(--amber); font-weight: 600; }
+.cpl-check.is-ok { color: var(--text); font-weight: 500; }
+.rd-attach em { color: var(--lime-ink); font-size: 13px; }
+.icard-progress-top em { color: var(--primary); font-weight: 700; }
+.icard.is-idle .icard-progress-top em { color: var(--amber); }
+.pf-identity-tags { gap: 6px 16px; }
+
+/* Angka penghitung di samping judul atau di baris daftar: angka tebal biasa */
+.attn .attn-count, .kcol-count, .kcol-count-wide, .recap-count, .recap-count.is-done, .cpl-count, .cpl-count.is-ok,
+.card .item-list .num, :is(.layout, .split) > .col:last-child .card > .item-list .num, .dash-count {
+    min-width: 0 !important; height: auto !important; padding: 0 !important; border-radius: 0 !important;
+    background: none !important; box-shadow: none !important; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.recap-count.is-done, .cpl-count.is-ok { color: var(--primary); }
+.cpl-count { color: var(--amber); }
+
+/* Jam bimbingan: teks tebal, bukan pil hijau */
+.gtk-clock, .gtk.is-due .gtk-clock { padding: 0; border-radius: 0; background: none; color: var(--primary); font-size: 13px; }
+
+/* Tanpa rona dekoratif saat diam */
+.jquick { background: var(--surface) !important; }
+.prof-stats > div { border-radius: 16px !important; }
