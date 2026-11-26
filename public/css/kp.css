@@ -6995,3 +6995,40 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
 /* Lowongan: catatan penolakan dari TU di bawah judul */
 .job-review-note { margin-top: 4px; font-size: 13px; color: var(--red); }
 .job-review-note b { font-weight: 600; }
+
+/* =====================================================================
+   Konsistensi komponen, tahap 1: dasbor (26 Nov 2026).
+   Kartu luar radius 24, kartu di dalam kartu radius 16; tanpa rona warna saat diam;
+   label status/keterangan kecil = titik atau ikon + teks, tanpa pil berlatar.
+   ===================================================================== */
+.kpp { border-radius: 24px; }
+.plan-cards .plan-card[data-state], .place-people { border-radius: 16px !important; }
+
+/* Kartu rencana: polos saat diam, sorotan hijau hanya saat diarahkan */
+.plan-cards .plan-card[data-state]::after { opacity: 0 !important; transition: opacity 220ms; }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within)::after { opacity: 1 !important; }
+
+/* Status rencana: titik + teks */
+.plan-cards .plan-card[data-state] .plan-card-state {
+    display: inline-flex; align-items: center; gap: 7px; padding: 0; border-radius: 0;
+    background: none !important; box-shadow: none !important; font-size: 13px; font-weight: 600; color: var(--gray);
+}
+.plan-cards .plan-card[data-state] .plan-card-state::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 16%, transparent);
+}
+.plan-cards .plan-card[data-state="active"] .plan-card-state { color: var(--primary); }
+.plan-cards .plan-card[data-state="upcoming"] .plan-card-state { color: var(--lime-ink); }
+.plan-cards .plan-card[data-state="late"] .plan-card-state { color: var(--red); }
+.plan-cards .plan-card[data-state="done"] .plan-card-state { color: var(--primary-dark); }
+.plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-state { color: var(--lime); }
+
+/* Lama hari dan "Belum ada task": teks biasa */
+.plan-cards .plan-card-days, .plan-cards .plan-card[data-state]:has(.plan-card-open):is(:hover, :focus-within) .plan-card-days {
+    padding: 0; border-radius: 0; background: none; font-size: 13px; font-weight: 600;
+}
+.plan-cards .plan-card[data-state] .plan-card-empty { padding: 0; border: 0; border-radius: 0; font-size: 13px; }
+
+/* Tempat magang: divisi dan posisi = ikon + teks */
+.place-tags { gap: 6px 16px; }
+.place-tag { padding: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; font-size: 13px; font-weight: 600; color: var(--text); }
