@@ -315,6 +315,11 @@ Route::middleware(['auth', EnsureActiveAccount::class, EnsurePasswordChanged::cl
         Route::delete('/lowongan/{posting}', [JobPostingController::class, 'destroy'])->whereNumber('posting')->name('lowongan.destroy');
     });
 
+    // TU Fakultas menyetujui atau menolak lowongan ajuan Company Supervisor
+    Route::middleware(EnsureRole::class.':tu')->group(function () {
+        Route::patch('/lowongan/{posting}/tinjau', [JobPostingController::class, 'review'])->whereNumber('posting')->name('lowongan.tinjau');
+    });
+
     // Antrean pengajuan perubahan: Company Supervisor (perpanjangan), kaprodi, TU Fakultas (ganti supervisor)
     Route::middleware(EnsureRole::class.':supervisor,kaprodi,tu')->group(function () {
         Route::get('/antrean-perubahan', [ChangeRequestController::class, 'queue'])->name('perubahan.antrean');

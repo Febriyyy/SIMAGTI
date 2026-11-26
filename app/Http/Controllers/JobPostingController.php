@@ -18,7 +18,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Lowongan magang. TU Fakultas (semua perusahaan) dan Company Supervisor (perusahaannya sendiri) memasang lowongan;
+ * Lowongan magang. TU Fakultas (semua perusahaan) membuka lowongan langsung; Company Supervisor (perusahaannya sendiri)
+ * mengajukan lowongan yang lalu disetujui atau ditolak TU Fakultas;
  * mahasiswa melihat lowongan yang dibuka dan bisa langsung mengajukan KP dengan data perusahaan terisi.
  */
 class JobPostingController extends Controller
@@ -31,7 +32,9 @@ class JobPostingController extends Controller
         $companies = $this->companiesFor($user);
 
         return view('lowongan.kelola', [
-            'postings' => $this->scope($user)->with(['company', 'skills'])->latest('id')->get(),
+            // Ajuan yang menunggu persetujuan TU tampil paling atas
+            'postings' => $this->scope($user)->with(['company', 'skills', 'poster'])
+                ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'rejected' THEN 1 ELSE 2 END")->latest('id')->get(),
             'companies' => $companies,
             // Mahasiswa yang sedang mengajukan KP ke perusahaan ini; portofolionya bisa dibuka sebelum diterima.
             'applicants' => Internship::with(['student.studentProfile.studyProgram', 'company'])
@@ -42,41 +45,94 @@ class JobPostingController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $user = $request->user();
         $data = $this->validated($request, 'posting');
-        $posting = JobPosting::create($this->attributes($data) + ['posted_by' => $request->user()->id, 'status' => 'draft']);
+        $posting = JobPosting::create($this->attributes($data) + ['posted_by' => $user->id, 'status' => 'draft']);
         $this->syncSkills($posting, $data['keahlian'] ?? null);
-        if ($request->boolean('buka')) {
-            $this->open($posting);
-        }
         ActivityLog::record('lowongan.buat', 'Membuat lowongan '.$posting->title.' di '.$posting->company->name, $posting);
 
-        return redirect()->route('lowongan.kelola')->with('status', $posting->status === 'published' ? 'Lowongan dibuka dan terlihat mahasiswa.' : 'Lowongan tersimpan sebagai draf.');
+        if (! $request->boolean('buka')) {
+            return redirect()->route('lowongan.kelola')->with('status', 'Lowongan tersimpan sebagai draf.');
+        }
+
+        return redirect()->route('lowongan.kelola')->with('status', $this->publishOrSubmit($user, $posting));
     }
 
     public function update(Request $request, JobPosting $posting): RedirectResponse
     {
-        $this->authorizeManage($request->user(), $posting);
+        $user = $request->user();
+        $this->authorizeManage($user, $posting);
         $data = $this->validated($request, 'posting'.$posting->id);
         $posting->update($this->attributes($data));
         $this->syncSkills($posting, $data['keahlian'] ?? null);
 
+        // Lowongan supervisor yang sudah dibuka lalu diubah ditinjau ulang TU, agar isinya tidak berganti diam-diam
+        if ($user->role !== 'tu' && $posting->status === 'published') {
+            return redirect()->route('lowongan.kelola')->with('status', 'Lowongan diperbarui. '.$this->publishOrSubmit($user, $posting));
+        }
+
         return redirect()->route('lowongan.kelola')->with('status', 'Lowongan diperbarui.');
     }
 
-    /** Buka (terbitkan) atau tutup lowongan. */
+    /** Buka (TU langsung; supervisor mengajukan ke TU) atau tutup lowongan. */
     public function status(Request $request, JobPosting $posting): RedirectResponse
     {
-        $this->authorizeManage($request->user(), $posting);
+        $user = $request->user();
+        $this->authorizeManage($user, $posting);
         $to = $request->validate(['status' => ['required', Rule::in(['published', 'closed'])]])['status'];
 
         if ($to === 'published') {
-            $this->open($posting);
-        } else {
-            $posting->update(['status' => 'closed']);
+            return back()->with('status', $this->publishOrSubmit($user, $posting));
         }
-        ActivityLog::record('lowongan.status', ($to === 'published' ? 'Membuka' : 'Menutup').' lowongan '.$posting->title, $posting);
 
-        return back()->with('status', $to === 'published' ? 'Lowongan dibuka.' : 'Lowongan ditutup.');
+        $posting->update(['status' => 'closed']);
+        ActivityLog::record('lowongan.status', 'Menutup lowongan '.$posting->title, $posting);
+
+        return back()->with('status', 'Lowongan ditutup.');
+    }
+
+    /** TU Fakultas menyetujui (lowongan dibuka) atau menolak dengan alasan lowongan ajuan supervisor. */
+    public function review(Request $request, JobPosting $posting): RedirectResponse
+    {
+        abort_unless($posting->status === 'pending', 404);
+        $data = $request->validateWithBag('review'.$posting->id, [
+            'keputusan' => ['required', Rule::in(['setujui', 'tolak'])],
+            'catatan' => ['nullable', 'string', 'max:500', Rule::requiredIf($request->input('keputusan') === 'tolak')],
+        ], ['catatan.required' => 'Tulis alasan agar supervisor bisa memperbaikinya.']);
+
+        $approve = $data['keputusan'] === 'setujui';
+        $posting->update([
+            'review_note' => filled($data['catatan'] ?? null) ? trim($data['catatan']) : null,
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+        ] + ($approve ? [] : ['status' => 'rejected']));
+        if ($approve) {
+            $this->open($posting);
+        }
+
+        ActivityLog::record('lowongan.tinjau', ($approve ? 'Menyetujui' : 'Menolak').' lowongan '.$posting->title, $posting);
+        Notify::send($posting->poster, $approve ? 'Lowongan disetujui: '.$posting->title : 'Lowongan perlu perbaikan: '.$posting->title,
+            $approve ? 'Lowongan sudah dibuka untuk mahasiswa.' : $posting->review_note, route('lowongan.kelola'), 'placement', $approve ? 'green' : 'red');
+
+        return back()->with('status', $approve ? 'Lowongan disetujui dan dibuka.' : 'Lowongan dikembalikan ke supervisor.');
+    }
+
+    /** TU membuka langsung; Company Supervisor mengajukan ke TU Fakultas. @return string pesan untuk pengguna */
+    private function publishOrSubmit(User $user, JobPosting $posting): string
+    {
+        if ($user->role === 'tu') {
+            $this->open($posting);
+            ActivityLog::record('lowongan.status', 'Membuka lowongan '.$posting->title, $posting);
+
+            return 'Lowongan dibuka dan terlihat mahasiswa.';
+        }
+
+        $posting->update(['status' => 'pending', 'submitted_at' => now(), 'review_note' => null, 'reviewed_by' => null, 'reviewed_at' => null]);
+        ActivityLog::record('lowongan.ajukan', 'Mengajukan lowongan '.$posting->title.' ke TU Fakultas', $posting);
+        Notify::send(User::where('role', 'tu')->where('is_active', true)->get(), 'Lowongan menunggu persetujuan: '.$posting->title,
+            $posting->company->name, route('lowongan.kelola'), 'placement', 'amber');
+
+        return 'Lowongan diajukan ke TU Fakultas dan dibuka setelah disetujui.';
     }
 
     public function destroy(Request $request, JobPosting $posting): RedirectResponse

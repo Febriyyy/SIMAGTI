@@ -51,7 +51,7 @@ class JobPostingTest extends TestCase
 
         // Ditutup: tidak lagi tampil
         $this->actingAs($this->user('tu@kp.test'))->patch("/lowongan/{$posting->id}/status", ['status' => 'closed'])->assertRedirect();
-        $this->actingAs($citra)->get('/lowongan-magang')->assertDontSee('<h2 class="job-card-title">Magang QA Engineer</h2>', false);
+        $this->actingAs($citra)->get('/lowongan-magang')->assertDontSee('data-open="job-'.$posting->id.'"', false);
     }
 
     public function test_mahasiswa_dengan_kp_aktif_hanya_melihat_dan_supervisor_hanya_untuk_perusahaannya(): void
@@ -71,5 +71,58 @@ class JobPostingTest extends TestCase
 
         $this->actingAs($this->user('dospem@kp.test'))->get('/lowongan')->assertForbidden();
         $this->actingAs($this->user('kaprodi@kp.test'))->get('/lowongan-magang')->assertForbidden();
+    }
+
+    public function test_lowongan_supervisor_diajukan_lalu_disetujui_atau_ditolak_tu(): void
+    {
+        $fajar = Internship::where('student_id', $this->user('fajar@kp.test')->id)->latest('id')->firstOrFail();
+        $supervisor = $fajar->supervisor;
+        $tu = $this->user('tu@kp.test');
+        $citra = $this->user('citra@kp.test');
+
+        // "Ajukan ke TU": belum terlihat mahasiswa, TU diberi tahu
+        $this->actingAs($supervisor)->post('/lowongan', [
+            'perusahaan' => $fajar->company_id, 'judul' => 'Magang DevOps', 'deskripsi' => 'Mengelola server.', 'buka' => 1,
+        ])->assertSessionHasNoErrors();
+        $posting = JobPosting::where('title', 'Magang DevOps')->firstOrFail();
+        $this->assertSame('pending', $posting->status);
+        $this->assertNotNull($posting->submitted_at);
+        $this->assertSame(1, $tu->notifications()->where('data', 'like', '%Magang DevOps%')->count());
+        $this->actingAs($citra)->get('/lowongan-magang')->assertDontSee('Magang DevOps');
+
+        // Supervisor tidak bisa membuka sendiri atau meninjau
+        $this->actingAs($supervisor)->patch("/lowongan/{$posting->id}/status", ['status' => 'published']);
+        $this->assertSame('pending', $posting->fresh()->status);
+        $this->actingAs($supervisor)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'setujui'])->assertForbidden();
+
+        // TU menolak: alasan wajib, supervisor diberi tahu dan melihat catatannya
+        $this->actingAs($tu)->get('/lowongan')->assertSee('Magang DevOps')->assertSee('Setujui');
+        $this->actingAs($tu)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'tolak'])->assertSessionHasErrorsIn('review'.$posting->id, ['catatan']);
+        $this->actingAs($tu)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'tolak', 'catatan' => 'Lengkapi kualifikasi.'])->assertSessionHasNoErrors();
+        $posting->refresh();
+        $this->assertSame('rejected', $posting->status);
+        $this->assertSame($tu->id, $posting->reviewed_by);
+        $this->assertSame(1, $supervisor->notifications()->where('data', 'like', '%perlu perbaikan%')->count());
+        $this->actingAs($supervisor)->get('/lowongan')->assertSee('Lengkapi kualifikasi.')->assertSee('Ajukan lagi');
+
+        // Ajukan lagi lalu disetujui: dibuka dan mahasiswa tanpa KP diberi tahu
+        $this->actingAs($supervisor)->patch("/lowongan/{$posting->id}/status", ['status' => 'published']);
+        $this->assertSame('pending', $posting->fresh()->status);
+        $this->assertNull($posting->fresh()->review_note);
+        $this->actingAs($tu)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'setujui'])->assertSessionHasNoErrors();
+        $this->assertSame('published', $posting->fresh()->status);
+        $this->actingAs($citra)->get('/lowongan-magang')->assertSee('data-open="job-'.$posting->id.'"', false);
+        $this->assertSame(1, $citra->notifications()->where('data', 'like', '%Magang DevOps%')->count());
+
+        // Supervisor mengubah lowongan yang sudah dibuka: ditinjau ulang TU
+        $this->actingAs($supervisor)->put("/lowongan/{$posting->id}", [
+            'perusahaan' => $fajar->company_id, 'judul' => 'Magang DevOps', 'deskripsi' => 'Mengelola server dan CI/CD.',
+        ])->assertSessionHasNoErrors();
+        $this->assertSame('pending', $posting->fresh()->status);
+        $this->actingAs($citra)->get('/lowongan-magang')->assertDontSee('data-open="job-'.$posting->id.'"', false);
+
+        // Lowongan yang tidak menunggu persetujuan tidak bisa ditinjau
+        $this->actingAs($tu)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'setujui']);
+        $this->actingAs($tu)->patch("/lowongan/{$posting->id}/tinjau", ['keputusan' => 'setujui'])->assertNotFound();
     }
 }

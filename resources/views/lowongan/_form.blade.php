@@ -61,7 +61,7 @@
                 <button type="submit" class="btn btn-primary">Simpan</button>
             @else
                 <button type="submit" class="btn">Simpan draf</button>
-                <button type="submit" name="buka" value="1" class="btn btn-primary">Simpan dan buka</button>
+                <button type="submit" name="buka" value="1" class="btn btn-primary">{{ auth()->user()->role === 'tu' ? 'Simpan dan buka' : 'Ajukan ke TU' }}</button>
             @endif
         </div>
     </form>

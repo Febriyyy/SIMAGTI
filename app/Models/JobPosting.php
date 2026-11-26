@@ -14,8 +14,10 @@ class JobPosting extends Model
     /** status => [label, warna chip] */
     public const STATUSES = [
         'draft' => ['Draft', 'gray'],
+        'pending' => ['Menunggu persetujuan TU', 'amber'],
+        'rejected' => ['Perlu perbaikan', 'red'],
         'published' => ['Dibuka', 'green'],
-        'closed' => ['Ditutup', 'red'],
+        'closed' => ['Ditutup', 'gray'],
     ];
 
     protected $fillable = [
@@ -29,6 +31,10 @@ class JobPosting extends Model
         'deadline',
         'status',
         'published_at',
+        'review_note',
+        'reviewed_by',
+        'reviewed_at',
+        'submitted_at',
     ];
 
     protected function casts(): array
@@ -36,6 +42,8 @@ class JobPosting extends Model
         return [
             'deadline' => 'date',
             'published_at' => 'datetime',
+            'reviewed_at' => 'datetime',
+            'submitted_at' => 'datetime',
         ];
     }
 
@@ -47,6 +55,21 @@ class JobPosting extends Model
     public function poster(): BelongsTo
     {
         return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function statusLabel(): string
+    {
+        return self::STATUSES[$this->status][0] ?? $this->status;
+    }
+
+    public function statusTone(): string
+    {
+        return self::STATUSES[$this->status][1] ?? 'gray';
     }
 
     public function skills(): BelongsToMany
